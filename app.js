@@ -1,11 +1,39 @@
 // ── State ─────────────────────────────────────────────────
+let DB = null;
 let curStore = 'all', curType = 'all', curView = 'table', curPage = 1;
 const PAGE_SZ = 50;
 
+// ── DB init ───────────────────────────────────────────────
+async function initDB() {
+  const SQL = await initSqlJs({
+    locateFile: f => `https://cdn.jsdelivr.net/npm/sql.js@1.12.0/dist/${f}`
+  });
+  const res = await fetch('database.sql');
+  const sql = await res.text();
+  DB = new SQL.Database();
+  DB.run(sql);
+  init();
+}
+
+function queryAll() {
+  const result = DB.exec('SELECT id,store,name,price,origin,region,process,notes,url,isNew,isDecaf,isSpecial FROM products');
+  if (!result.length) return [];
+  const { columns, values } = result[0];
+  return values.map(row => {
+    const p = {};
+    columns.forEach((c, i) => p[c] = row[i]);
+    p.isNew     = p.isNew     === 1;
+    p.isDecaf   = p.isDecaf   === 1;
+    p.isSpecial = p.isSpecial === 1;
+    return p;
+  });
+}
+
 // ── Init ──────────────────────────────────────────────────
 function init() {
-  // Populate origin dropdown
-  const origins = [...new Set(PRODUCTS.map(p => p.origin))].sort((a,b) => a.localeCompare(b,'ko'));
+  const products = queryAll();
+
+  const origins = [...new Set(products.map(p => p.origin))].sort((a,b) => a.localeCompare(b,'ko'));
   const sel = document.getElementById('originSelect');
   origins.forEach(o => {
     const opt = document.createElement('option');
@@ -14,18 +42,17 @@ function init() {
     sel.appendChild(opt);
   });
 
-  document.getElementById('totalCount').textContent = PRODUCTS.length;
+  document.getElementById('totalCount').textContent = products.length;
   document.getElementById('originCount').textContent = origins.length;
 
-  buildStatBars();
+  buildStatBars(products);
   applyFilters();
 }
 
 // ── Statistics sidebar ────────────────────────────────────
-function buildStatBars() {
-  // Origin
+function buildStatBars(products) {
   const oc = {};
-  PRODUCTS.forEach(p => { oc[p.origin] = (oc[p.origin]||0)+1; });
+  products.forEach(p => { oc[p.origin] = (oc[p.origin]||0)+1; });
   const topO = Object.entries(oc).sort((a,b)=>b[1]-a[1]).slice(0,8);
   const maxO = topO[0]?.[1]||1;
   document.getElementById('originStats').innerHTML = topO.map(([o,c])=>`
@@ -34,9 +61,8 @@ function buildStatBars() {
       <div class="stat-bar-track"><div class="stat-bar-fill" style="width:${c/maxO*100}%"></div></div>
     </div>`).join('');
 
-  // Process
   const pc = {};
-  PRODUCTS.forEach(p => { pc[p.process] = (pc[p.process]||0)+1; });
+  products.forEach(p => { pc[p.process] = (pc[p.process]||0)+1; });
   const topP = Object.entries(pc).sort((a,b)=>b[1]-a[1]);
   const maxP = topP[0]?.[1]||1;
   document.getElementById('processStats').innerHTML = topP.map(([proc,c])=>`
@@ -80,6 +106,7 @@ function resetFilters() {
 
 // ── Core filter & render ──────────────────────────────────
 function applyFilters() {
+  if (!DB) return;
   const search  = document.getElementById('searchInput').value.toLowerCase().trim();
   const origin  = document.getElementById('originSelect').value;
   const process = document.getElementById('processSelect').value;
@@ -87,7 +114,7 @@ function applyFilters() {
   const pMax    = parseFloat(document.getElementById('priceMax').value)||Infinity;
   const sortVal = document.getElementById('sortSelect').value;
 
-  let filtered = PRODUCTS.filter(p => {
+  let filtered = queryAll().filter(p => {
     if (origin  && p.origin  !== origin)  return false;
     if (process && p.process !== process) return false;
     if (curStore !== 'all' && p.store !== curStore) return false;
@@ -223,7 +250,6 @@ function colSort(col) {
   const sel = document.getElementById('sortSelect');
   const cur = sel.value;
   if (cur === m[col]) {
-    // toggle to desc if applicable
     if (col==='price') sel.value = 'price_desc';
   } else {
     sel.value = m[col]||'price_asc';
@@ -232,4 +258,4 @@ function colSort(col) {
   applyFilters();
 }
 
-init();
+initDB();

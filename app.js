@@ -1,6 +1,6 @@
 // ── State ─────────────────────────────────────────────────
 let DB = null;
-let curStore = 'all', curOrigin = 'all', curView = 'table', curPage = 1;
+let curStore = 'all', curOrigin = 'all', curRegion = 'all', curView = 'table', curPage = 1;
 const PAGE_SZ = 50;
 
 // ── DB init ───────────────────────────────────────────────
@@ -81,6 +81,14 @@ function setStore(el, val) {
   el.classList.add('active');
   curPage = 1; applyFilters();
 }
+function setRegion(el, val) {
+  curRegion = val;
+  curOrigin = 'all';
+  document.querySelectorAll('.region-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('#originFilter .tag-btn').forEach(b=>b.classList.toggle('active',b.dataset.origin==='all'));
+  curPage = 1; applyFilters();
+}
 function setOrigin(el, val) {
   curOrigin = val;
   document.querySelectorAll('#originFilter .tag-btn').forEach(b=>b.classList.remove('active'));
@@ -99,9 +107,10 @@ function resetFilters() {
   document.getElementById('priceMin').value = '';
   document.getElementById('priceMax').value = '';
   document.getElementById('sortSelect').value = 'price_asc';
-  curStore = 'all'; curOrigin = 'all'; curPage = 1;
+  curStore = 'all'; curOrigin = 'all'; curRegion = 'all'; curPage = 1;
   document.querySelectorAll('#storeFilter .tag-btn').forEach(b=>b.classList.toggle('active',b.dataset.store==='all'));
   document.querySelectorAll('#originFilter .tag-btn').forEach(b=>b.classList.toggle('active',b.dataset.origin==='all'));
+  document.querySelectorAll('.region-btn').forEach(b=>b.classList.toggle('active',b.dataset.region==='all'));
   applyFilters();
 }
 
@@ -115,6 +124,10 @@ function applyFilters() {
   const sortVal = document.getElementById('sortSelect').value;
 
   let filtered = queryAll().filter(p => {
+    if (curRegion !== 'all') {
+      const inRegion = curRegion === '아시아' ? p.region.startsWith('아시아') : p.region === curRegion;
+      if (!inRegion) return false;
+    }
     if (curOrigin !== 'all' && p.origin !== curOrigin) return false;
     if (process && p.process !== process) return false;
     if (curStore !== 'all' && p.store !== curStore) return false;

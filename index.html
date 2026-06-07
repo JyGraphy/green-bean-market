@@ -13,6 +13,12 @@
     <h1>☕ 생두 가격 비교</h1>
     <p>한국 주요 생두 쇼핑몰 · 가격·원산지·가공방식 통합 비교</p>
   </div>
+  <nav class="region-nav">
+    <button class="region-btn active" data-region="all" onclick="setRegion(this,'all')">🌐 전체</button>
+    <button class="region-btn" data-region="아프리카" onclick="setRegion(this,'아프리카')">🌍 아프리카</button>
+    <button class="region-btn" data-region="중남미" onclick="setRegion(this,'중남미')">🌎 중남미</button>
+    <button class="region-btn" data-region="아시아" onclick="setRegion(this,'아시아')">🌏 아시아</button>
+  </nav>
   <div class="header-stats">
     <div class="hstat"><div class="hstat-num" id="totalCount">0</div><div class="hstat-label">총 상품</div></div>
     <div class="hstat"><div class="hstat-num">12</div><div class="hstat-label">쇼핑몰</div></div>

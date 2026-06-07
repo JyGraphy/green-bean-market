@@ -55,6 +55,21 @@
   .hstat { text-align: center; }
   .hstat-num { font-size: 1.35rem; font-weight: 800; color: #f5c887; line-height: 1; }
   .hstat-label { font-size: 0.66rem; opacity: 0.6; margin-top: 3px; }
+  .region-nav { display: flex; gap: 6px; flex-shrink: 0; }
+  .region-btn {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.75);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s;
+    white-space: nowrap;
+  }
+  .region-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+  .region-btn.active { background: #f5c887; color: #1c0f07; border-color: #f5c887; }
 
   /* LAYOUT */
   .layout { display: flex; max-width: 1600px; margin: 0 auto; min-height: calc(100vh - 64px); }
@@ -349,7 +364,9 @@
     .content { padding: 14px; }
   }
   @media (max-width: 600px) {
-    header { padding: 12px 14px; }
+    header { padding: 12px 14px; flex-wrap: wrap; }
+    .region-nav { order: 3; width: 100%; gap: 4px; }
+    .region-btn { padding: 5px 10px; font-size: 0.75rem; }
     .header-stats { display: none; }
     .coffee-table td, .coffee-table th { padding: 7px 9px; }
     .name-wrap { min-width: 140px; }

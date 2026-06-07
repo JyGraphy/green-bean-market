@@ -86,8 +86,28 @@ function setRegion(el, val) {
   curOrigin = 'all';
   document.querySelectorAll('.region-btn').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
-  document.querySelectorAll('#originFilter .tag-btn').forEach(b=>b.classList.toggle('active',b.dataset.origin==='all'));
+  rebuildOriginButtons(val);
   curPage = 1; applyFilters();
+}
+
+function rebuildOriginButtons(region) {
+  const all = queryAll();
+  const origins = [...new Set(
+    all
+      .filter(p => region === 'all' || (region === '아시아' ? p.region.startsWith('아시아') : p.region === region))
+      .map(p => p.origin)
+  )].sort((a, b) => a.localeCompare(b, 'ko'));
+
+  const grp = document.getElementById('originFilter');
+  grp.innerHTML = `<button class="tag-btn active" data-origin="all" onclick="setOrigin(this,'all')">전체</button>`;
+  origins.forEach(o => {
+    const btn = document.createElement('button');
+    btn.className = 'tag-btn';
+    btn.dataset.origin = o;
+    btn.textContent = `${FLAG[o]||'🌍'} ${o}`;
+    btn.onclick = () => setOrigin(btn, o);
+    grp.appendChild(btn);
+  });
 }
 function setOrigin(el, val) {
   curOrigin = val;
@@ -109,8 +129,8 @@ function resetFilters() {
   document.getElementById('sortSelect').value = 'price_asc';
   curStore = 'all'; curOrigin = 'all'; curRegion = 'all'; curPage = 1;
   document.querySelectorAll('#storeFilter .tag-btn').forEach(b=>b.classList.toggle('active',b.dataset.store==='all'));
-  document.querySelectorAll('#originFilter .tag-btn').forEach(b=>b.classList.toggle('active',b.dataset.origin==='all'));
   document.querySelectorAll('.region-btn').forEach(b=>b.classList.toggle('active',b.dataset.region==='all'));
+  rebuildOriginButtons('all');
   applyFilters();
 }
 

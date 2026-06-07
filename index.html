@@ -29,13 +29,6 @@
     </div>
 
     <div class="fsec">
-      <div class="fsec-title">원산지</div>
-      <select class="f-select" id="originSelect" onchange="applyFilters()">
-        <option value="">전체 원산지</option>
-      </select>
-    </div>
-
-    <div class="fsec">
       <div class="fsec-title">가공방식</div>
       <select class="f-select" id="processSelect" onchange="applyFilters()">
         <option value="">전체 가공방식</option>
@@ -79,12 +72,9 @@
     </div>
 
     <div class="fsec">
-      <div class="fsec-title">분류</div>
-      <div class="tag-grp" id="typeFilter">
-        <button class="tag-btn active" data-type="all" onclick="setType(this,'all')">전체</button>
-        <button class="tag-btn" data-type="디카페인" onclick="setType(this,'디카페인')">디카페인</button>
-        <button class="tag-btn" data-type="스페셜티" onclick="setType(this,'스페셜티')">스페셜티</button>
-        <button class="tag-btn" data-type="일반" onclick="setType(this,'일반')">일반</button>
+      <div class="fsec-title">산지</div>
+      <div class="tag-grp" id="originFilter">
+        <button class="tag-btn active" data-origin="all" onclick="setOrigin(this,'all')">전체</button>
       </div>
     </div>
 

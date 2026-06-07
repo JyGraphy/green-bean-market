@@ -1,6 +1,6 @@
 // ── State ─────────────────────────────────────────────────
 let DB = null;
-let curStore = 'all', curType = 'all', curView = 'table', curPage = 1;
+let curStore = 'all', curOrigin = 'all', curView = 'table', curPage = 1;
 const PAGE_SZ = 50;
 
 // ── DB init ───────────────────────────────────────────────
@@ -34,12 +34,14 @@ function init() {
   const products = queryAll();
 
   const origins = [...new Set(products.map(p => p.origin))].sort((a,b) => a.localeCompare(b,'ko'));
-  const sel = document.getElementById('originSelect');
+  const grp = document.getElementById('originFilter');
   origins.forEach(o => {
-    const opt = document.createElement('option');
-    opt.value = o;
-    opt.textContent = `${FLAG[o]||'🌍'} ${o}`;
-    sel.appendChild(opt);
+    const btn = document.createElement('button');
+    btn.className = 'tag-btn';
+    btn.dataset.origin = o;
+    btn.textContent = `${FLAG[o]||'🌍'} ${o}`;
+    btn.onclick = () => setOrigin(btn, o);
+    grp.appendChild(btn);
   });
 
   document.getElementById('totalCount').textContent = products.length;
@@ -79,9 +81,9 @@ function setStore(el, val) {
   el.classList.add('active');
   curPage = 1; applyFilters();
 }
-function setType(el, val) {
-  curType = val;
-  document.querySelectorAll('#typeFilter .tag-btn').forEach(b=>b.classList.remove('active'));
+function setOrigin(el, val) {
+  curOrigin = val;
+  document.querySelectorAll('#originFilter .tag-btn').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
   curPage = 1; applyFilters();
 }
@@ -93,14 +95,13 @@ function setView(v) {
 }
 function resetFilters() {
   document.getElementById('searchInput').value = '';
-  document.getElementById('originSelect').value = '';
   document.getElementById('processSelect').value = '';
   document.getElementById('priceMin').value = '';
   document.getElementById('priceMax').value = '';
   document.getElementById('sortSelect').value = 'price_asc';
-  curStore = 'all'; curType = 'all'; curPage = 1;
+  curStore = 'all'; curOrigin = 'all'; curPage = 1;
   document.querySelectorAll('#storeFilter .tag-btn').forEach(b=>b.classList.toggle('active',b.dataset.store==='all'));
-  document.querySelectorAll('#typeFilter .tag-btn').forEach(b=>b.classList.toggle('active',b.dataset.type==='all'));
+  document.querySelectorAll('#originFilter .tag-btn').forEach(b=>b.classList.toggle('active',b.dataset.origin==='all'));
   applyFilters();
 }
 
@@ -108,19 +109,15 @@ function resetFilters() {
 function applyFilters() {
   if (!DB) return;
   const search  = document.getElementById('searchInput').value.toLowerCase().trim();
-  const origin  = document.getElementById('originSelect').value;
   const process = document.getElementById('processSelect').value;
   const pMin    = parseFloat(document.getElementById('priceMin').value)||0;
   const pMax    = parseFloat(document.getElementById('priceMax').value)||Infinity;
   const sortVal = document.getElementById('sortSelect').value;
 
   let filtered = queryAll().filter(p => {
-    if (origin  && p.origin  !== origin)  return false;
+    if (curOrigin !== 'all' && p.origin !== curOrigin) return false;
     if (process && p.process !== process) return false;
     if (curStore !== 'all' && p.store !== curStore) return false;
-    if (curType === '디카페인' && !p.isDecaf)  return false;
-    if (curType === '스페셜티' && !p.isSpecial) return false;
-    if (curType === '일반' && (p.isDecaf||p.isSpecial)) return false;
     if (p.price < pMin || p.price > pMax) return false;
     if (search) {
       const hay = (p.name+p.origin+p.notes+p.store+p.process).toLowerCase();

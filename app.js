@@ -37,7 +37,7 @@ function init() {
   const grp = document.getElementById('originFilter');
   origins.forEach(o => {
     const btn = document.createElement('button');
-    btn.className = 'tag-btn';
+    btn.className = 'origin-chip';
     btn.dataset.origin = o;
     btn.textContent = `${FLAG[o]||'🌍'} ${o}`;
     btn.onclick = () => setOrigin(btn, o);
@@ -99,10 +99,10 @@ function rebuildOriginButtons(region) {
   )].sort((a, b) => a.localeCompare(b, 'ko'));
 
   const grp = document.getElementById('originFilter');
-  grp.innerHTML = `<button class="tag-btn active" data-origin="all" onclick="setOrigin(this,'all')">전체</button>`;
+  grp.innerHTML = `<button class="origin-chip active" data-origin="all" onclick="setOrigin(this,'all')">전체</button>`;
   origins.forEach(o => {
     const btn = document.createElement('button');
-    btn.className = 'tag-btn';
+    btn.className = 'origin-chip';
     btn.dataset.origin = o;
     btn.textContent = `${FLAG[o]||'🌍'} ${o}`;
     btn.onclick = () => setOrigin(btn, o);
@@ -111,7 +111,7 @@ function rebuildOriginButtons(region) {
 }
 function setOrigin(el, val) {
   curOrigin = val;
-  document.querySelectorAll('#originFilter .tag-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#originFilter .origin-chip').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
   curPage = 1; applyFilters();
 }

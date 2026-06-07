@@ -189,13 +189,34 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 14px;
+    gap: 10px;
+    margin-bottom: 10px;
     flex-wrap: wrap;
   }
-  .result-info { font-size: 0.85rem; color: var(--text-muted); }
+  .result-info { font-size: 0.85rem; color: var(--text-muted); white-space: nowrap; }
   .result-info strong { color: var(--accent); font-weight: 700; }
-  .ctrl-row { display: flex; align-items: center; gap: 8px; }
+  .origin-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    flex: 1;
+    min-width: 0;
+  }
+  .origin-chip {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    color: var(--text-muted);
+    border-radius: 14px;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .origin-chip:hover { border-color: var(--accent); color: var(--accent); }
+  .origin-chip.active { background: var(--accent); border-color: var(--accent); color: white; }
+  .ctrl-row { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
   .sort-sel {
     padding: 6px 24px 6px 10px;
     border: 1.5px solid var(--border);

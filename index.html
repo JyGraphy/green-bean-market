@@ -77,13 +77,6 @@
       </div>
     </div>
 
-    <div class="fsec">
-      <div class="fsec-title">산지</div>
-      <div class="tag-grp" id="originFilter">
-        <button class="tag-btn active" data-origin="all" onclick="setOrigin(this,'all')">전체</button>
-      </div>
-    </div>
-
     <button class="reset-btn" onclick="resetFilters()">↺ 필터 초기화</button>
 
     <div class="fsec" style="margin-top:22px">
@@ -117,6 +110,9 @@
   <main class="content">
     <div class="content-hdr">
       <div class="result-info">총 <strong id="showingCount">0</strong>개 상품</div>
+      <div class="origin-filter-bar" id="originFilter">
+        <button class="origin-chip active" data-origin="all" onclick="setOrigin(this,'all')">전체</button>
+      </div>
       <div class="ctrl-row">
         <select class="sort-sel" id="sortSelect" onchange="applyFilters()">
           <option value="price_asc">가격 낮은순</option>

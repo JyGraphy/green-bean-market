@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>생두 가격 비교 - 한국 생두 쇼핑몰 통합 비교</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+  <div class="header-brand">
+    <h1>☕ 생두 가격 비교</h1>
+    <p>한국 주요 생두 쇼핑몰 · 가격·원산지·가공방식 통합 비교</p>
+  </div>
+  <div class="header-stats">
+    <div class="hstat"><div class="hstat-num" id="totalCount">0</div><div class="hstat-label">총 상품</div></div>
+    <div class="hstat"><div class="hstat-num">12</div><div class="hstat-label">쇼핑몰</div></div>
+    <div class="hstat"><div class="hstat-num" id="originCount">0</div><div class="hstat-label">산지</div></div>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+
+    <div class="fsec">
+      <div class="fsec-title">키워드 검색</div>
+      <input class="f-input" id="searchInput" type="text" placeholder="품종, 농장, 가공방식..." oninput="applyFilters()">
+    </div>
+
+    <div class="fsec">
+      <div class="fsec-title">원산지</div>
+      <select class="f-select" id="originSelect" onchange="applyFilters()">
+        <option value="">전체 원산지</option>
+      </select>
+    </div>
+
+    <div class="fsec">
+      <div class="fsec-title">가공방식</div>
+      <select class="f-select" id="processSelect" onchange="applyFilters()">
+        <option value="">전체 가공방식</option>
+        <option value="워시드">워시드</option>
+        <option value="내추럴">내추럴</option>
+        <option value="허니">허니</option>
+        <option value="무산소발효">무산소발효</option>
+        <option value="펄프드내추럴">펄프드내추럴</option>
+        <option value="웻훌드">웻훌드</option>
+        <option value="알수없음">알수없음</option>
+      </select>
+    </div>
+
+    <div class="fsec">
+      <div class="fsec-title">가격 범위 (1kg)</div>
+      <div class="price-row">
+        <input class="price-inp" id="priceMin" type="number" placeholder="최소" min="0" step="1000" oninput="applyFilters()">
+        <span class="price-sep">~</span>
+        <input class="price-inp" id="priceMax" type="number" placeholder="최대" min="0" step="1000" oninput="applyFilters()">
+      </div>
+      <div class="price-hint">단위: 원 (예: 15000 ~ 50000)</div>
+    </div>
+
+    <div class="fsec">
+      <div class="fsec-title">공급사</div>
+      <div class="tag-grp" id="storeFilter">
+        <button class="tag-btn active" data-store="all" onclick="setStore(this,'all')">전체</button>
+        <button class="tag-btn" data-store="커피플랜트" onclick="setStore(this,'커피플랜트')">커피플랜트</button>
+        <button class="tag-btn" data-store="커피창고" onclick="setStore(this,'커피창고')">커피창고</button>
+        <button class="tag-btn" data-store="엠아이커피" onclick="setStore(this,'엠아이커피')">엠아이커피</button>
+        <button class="tag-btn" data-store="모모스커피" onclick="setStore(this,'모모스커피')">모모스커피</button>
+        <button class="tag-btn" data-store="코빈즈커피" onclick="setStore(this,'코빈즈커피')">코빈즈커피</button>
+        <button class="tag-btn" data-store="아얀투" onclick="setStore(this,'아얀투')">아얀투</button>
+        <button class="tag-btn" data-store="오로미아코리아" onclick="setStore(this,'오로미아코리아')">오로미아코리아</button>
+        <button class="tag-btn" data-store="지에스씨(GSC)" onclick="setStore(this,'지에스씨(GSC)')">지에스씨(GSC)</button>
+        <button class="tag-btn" data-store="오월의숲" onclick="setStore(this,'오월의숲')">오월의숲</button>
+        <button class="tag-btn" data-store="커피리브레" onclick="setStore(this,'커피리브레')">커피리브레</button>
+        <button class="tag-btn" data-store="블레스빈" onclick="setStore(this,'블레스빈')">블레스빈</button>
+        <button class="tag-btn" data-store="콤파스커피" onclick="setStore(this,'콤파스커피')">콤파스커피</button>
+      </div>
+    </div>
+
+    <div class="fsec">
+      <div class="fsec-title">분류</div>
+      <div class="tag-grp" id="typeFilter">
+        <button class="tag-btn active" data-type="all" onclick="setType(this,'all')">전체</button>
+        <button class="tag-btn" data-type="디카페인" onclick="setType(this,'디카페인')">디카페인</button>
+        <button class="tag-btn" data-type="스페셜티" onclick="setType(this,'스페셜티')">스페셜티</button>
+        <button class="tag-btn" data-type="일반" onclick="setType(this,'일반')">일반</button>
+      </div>
+    </div>
+
+    <button class="reset-btn" onclick="resetFilters()">↺ 필터 초기화</button>
+
+    <div class="fsec" style="margin-top:22px">
+      <div class="fsec-title">원산지 분포</div>
+      <div id="originStats"></div>
+    </div>
+
+    <div class="fsec">
+      <div class="fsec-title">가공방식 분포</div>
+      <div id="processStats"></div>
+    </div>
+
+    <div style="margin-top:16px; padding-top:12px; border-top:1px solid var(--border-light); font-size:0.68rem; color:var(--text-light); line-height:1.6;">
+      ※ 가격은 1kg 기준<br>
+      최종 가격은 각 쇼핑몰 확인<br>
+      <span style="color:#dc2626">●</span> 커피플랜트 &nbsp;
+      <span style="color:#16a34a">●</span> 커피창고<br>
+      <span style="color:#1d4ed8">●</span> 엠아이커피 &nbsp;
+      <span style="color:#c2410c">●</span> 모모스커피<br>
+      <span style="color:#0284c7">●</span> 코빈즈커피<br>
+      <span style="color:#7c3aed">●</span> 아얀투 &nbsp;
+      <span style="color:#b45309">●</span> 오로미아코리아<br>
+      <span style="color:#0d9488">●</span> 지에스씨(GSC) &nbsp;
+      <span style="color:#15803d">●</span> 오월의숲<br>
+      <span style="color:#d97706">●</span> 커피리브레 &nbsp;
+      <span style="color:#0e7490">●</span> 블레스빈<br>
+      <span style="color:#be185d">●</span> 콤파스커피
+    </div>
+  </aside>
+
+  <main class="content">
+    <div class="content-hdr">
+      <div class="result-info">총 <strong id="showingCount">0</strong>개 상품</div>
+      <div class="ctrl-row">
+        <select class="sort-sel" id="sortSelect" onchange="applyFilters()">
+          <option value="price_asc">가격 낮은순</option>
+          <option value="price_desc">가격 높은순</option>
+          <option value="name_asc">이름순</option>
+          <option value="origin_asc">원산지순</option>
+          <option value="process_asc">가공방식순</option>
+        </select>
+        <div class="view-toggle">
+          <button class="vbtn active" id="btnTable" onclick="setView('table')" title="테이블">☰</button>
+          <button class="vbtn" id="btnCard" onclick="setView('card')" title="카드">⊞</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="productContainer"></div>
+    <div class="pagination" id="pagination"></div>
+  </main>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

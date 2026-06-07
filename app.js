@@ -34,15 +34,7 @@ function init() {
   const products = queryAll();
 
   const origins = [...new Set(products.map(p => p.origin))].sort((a,b) => a.localeCompare(b,'ko'));
-  const grp = document.getElementById('originFilter');
-  origins.forEach(o => {
-    const btn = document.createElement('button');
-    btn.className = 'origin-chip';
-    btn.dataset.origin = o;
-    btn.textContent = `${FLAG[o]||'🌍'} ${o}`;
-    btn.onclick = () => setOrigin(btn, o);
-    grp.appendChild(btn);
-  });
+  document.getElementById('originFilter').innerHTML = '';
 
   document.getElementById('totalCount').textContent = products.length;
   document.getElementById('originCount').textContent = origins.length;
@@ -91,14 +83,17 @@ function setRegion(el, val) {
 }
 
 function rebuildOriginButtons(region) {
-  const all = queryAll();
+  const grp = document.getElementById('originFilter');
+  if (region === 'all') {
+    grp.innerHTML = '';
+    return;
+  }
   const origins = [...new Set(
-    all
-      .filter(p => region === 'all' || (region === '아시아' ? p.region.startsWith('아시아') : p.region === region))
+    queryAll()
+      .filter(p => region === '아시아' ? p.region.startsWith('아시아') : p.region === region)
       .map(p => p.origin)
   )].sort((a, b) => a.localeCompare(b, 'ko'));
 
-  const grp = document.getElementById('originFilter');
   grp.innerHTML = `<button class="origin-chip active" data-origin="all" onclick="setOrigin(this,'all')">전체</button>`;
   origins.forEach(o => {
     const btn = document.createElement('button');

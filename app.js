@@ -1,18 +1,36 @@
 // ── State ─────────────────────────────────────────────────
 let DB = null;
+let dbReady = false;
 let curStore = 'all', curOrigin = 'all', curRegion = 'all', curView = 'table', curPage = 1;
 const PAGE_SZ = 50;
 
 // ── DB init ───────────────────────────────────────────────
 async function initDB() {
-  const SQL = await initSqlJs({
-    locateFile: f => `https://cdn.jsdelivr.net/npm/sql.js@1.12.0/dist/${f}`
-  });
-  const res = await fetch('database.sql');
-  const sql = await res.text();
-  DB = new SQL.Database();
-  DB.run(sql);
+  showLoading(true);
+  try {
+    const SQL = await initSqlJs({
+      locateFile: f => `https://cdn.jsdelivr.net/npm/sql.js@1.12.0/dist/${f}`
+    });
+    const res = await fetch('database.sql');
+    const buf = await res.arrayBuffer();
+    DB = new SQL.Database(new Uint8Array(buf));
+  } catch(e) {
+    // fallback: text mode
+    const SQL = await initSqlJs({
+      locateFile: f => `https://cdn.jsdelivr.net/npm/sql.js@1.12.0/dist/${f}`
+    });
+    const res = await fetch('database.sql');
+    const sql = await res.text();
+    DB = new SQL.Database();
+    DB.run(sql);
+  }
+  dbReady = true;
+  showLoading(false);
   init();
+}
+
+function showLoading(on) {
+  document.getElementById('loadingOverlay').style.display = on ? 'flex' : 'none';
 }
 
 function queryAll() {
@@ -32,9 +50,7 @@ function queryAll() {
 // ── Init ──────────────────────────────────────────────────
 function init() {
   const products = queryAll();
-
   const origins = [...new Set(products.map(p => p.origin))].sort((a,b) => a.localeCompare(b,'ko'));
-  document.getElementById('originFilter').innerHTML = '';
 
   document.getElementById('totalCount').textContent = products.length;
   document.getElementById('originCount').textContent = origins.length;
@@ -131,7 +147,7 @@ function resetFilters() {
 
 // ── Core filter & render ──────────────────────────────────
 function applyFilters() {
-  if (!DB) return;
+  if (!dbReady) return;
   const search  = document.getElementById('searchInput').value.toLowerCase().trim();
   const process = document.getElementById('processSelect').value;
   const pMin    = parseFloat(document.getElementById('priceMin').value)||0;

@@ -25,6 +25,8 @@
     --store-cl: #d97706;
     --store-bb: #0e7490;
     --store-compass: #be185d;
+    --store-wbean: #7c2d12;
+    --store-comansa: #166534;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -345,6 +347,8 @@
   .sp-bb       { background: #ecfeff; color: var(--store-bb); }
   .sp-compass  { background: #fdf2f8; color: var(--store-compass); }
   .sp-falcon   { background: #fff7ed; color: #ea580c; }
+  .sp-wbean    { background: #fff7ed; color: var(--store-wbean); }
+  .sp-comansa  { background: #f0fdf4; color: var(--store-comansa); }
 
   .bsm { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 0.66rem; font-weight: 700; }
   .bsm-new     { background: #fff7ed; color: #c2410c; }

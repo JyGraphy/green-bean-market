@@ -1,9 +1,7 @@
 name: Deploy to GitHub Pages
 
 on:
-  push:
-    branches: [main]
-  workflow_dispatch:
+  workflow_dispatch:  # 수동 실행만 허용 (Vercel로 전환)
 
 permissions:
   contents: read

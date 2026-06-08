@@ -22,7 +22,7 @@ async function initDB() {
     const res = await fetch('database.sql');
     const sql = await res.text();
     DB = new SQL.Database();
-    DB.run(sql);
+    DB.exec(sql);
   }
   dbReady = true;
   showLoading(false);

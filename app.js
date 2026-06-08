@@ -7,23 +7,13 @@ const PAGE_SZ = 50;
 // ── DB init ───────────────────────────────────────────────
 async function initDB() {
   showLoading(true);
-  try {
-    const SQL = await initSqlJs({
-      locateFile: f => `https://cdn.jsdelivr.net/npm/sql.js@1.12.0/dist/${f}`
-    });
-    const res = await fetch('database.sql');
-    const buf = await res.arrayBuffer();
-    DB = new SQL.Database(new Uint8Array(buf));
-  } catch(e) {
-    // fallback: text mode
-    const SQL = await initSqlJs({
-      locateFile: f => `https://cdn.jsdelivr.net/npm/sql.js@1.12.0/dist/${f}`
-    });
-    const res = await fetch('database.sql');
-    const sql = await res.text();
-    DB = new SQL.Database();
-    DB.exec(sql);
-  }
+  const SQL = await initSqlJs({
+    locateFile: f => `https://cdn.jsdelivr.net/npm/sql.js@1.12.0/dist/${f}`
+  });
+  const res = await fetch('database.sql');
+  const sql = await res.text();
+  DB = new SQL.Database();
+  DB.exec(sql);
   dbReady = true;
   showLoading(false);
   init();

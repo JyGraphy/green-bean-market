@@ -75,8 +75,7 @@ function buildStatBars(products) {
 // ── Filter controls ───────────────────────────────────────
 function setStore(el, val) {
   curStore = val;
-  document.querySelectorAll('#storeFilter .tag-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
+  document.querySelectorAll('#storeFilter .tag-btn, #storeFilterMob .tag-btn').forEach(b=>b.classList.toggle('active', b.dataset.store===val));
   curPage = 1; applyFilters();
 }
 function setRegion(el, val) {
@@ -123,13 +122,13 @@ function setView(v) {
   applyFilters();
 }
 function resetFilters() {
-  document.getElementById('searchInput').value = '';
-  document.getElementById('processSelect').value = '';
-  document.getElementById('priceMin').value = '';
-  document.getElementById('priceMax').value = '';
+  ['searchInput','searchInputMob'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['processSelect','processSelectMob'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['priceMin','priceMinMob'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['priceMax','priceMaxMob'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('sortSelect').value = 'price_asc';
   curStore = 'all'; curOrigin = 'all'; curRegion = 'all'; curPage = 1;
-  document.querySelectorAll('#storeFilter .tag-btn').forEach(b=>b.classList.toggle('active',b.dataset.store==='all'));
+  document.querySelectorAll('#storeFilter .tag-btn, #storeFilterMob .tag-btn').forEach(b=>b.classList.toggle('active',b.dataset.store==='all'));
   document.querySelectorAll('.region-btn').forEach(b=>b.classList.toggle('active',b.dataset.region==='all'));
   rebuildOriginButtons('all');
   applyFilters();
@@ -169,6 +168,9 @@ function applyFilters() {
   }[sortVal]||(() => filtered.sort((a,b)=>a.price-b.price)))();
 
   document.getElementById('showingCount').textContent = filtered.length;
+  const mobCount = document.getElementById('showingCountMob');
+  if (mobCount) mobCount.textContent = filtered.length;
+  updateFilterBadge();
   renderPage(filtered);
 }
 
@@ -184,8 +186,17 @@ function renderPage(filtered) {
     return;
   }
 
-  if (curView === 'table') renderTable(slice, ctr);
-  else renderCards(slice, ctr);
+  const isMobile = window.innerWidth <= 600;
+  if (curView === 'table') {
+    if (isMobile) {
+      ctr.innerHTML = '';
+      renderTableMobile(slice, ctr);
+    } else {
+      renderTable(slice, ctr);
+    }
+  } else {
+    renderCards(slice, ctr);
+  }
   renderPagination(totalPages);
 }
 
@@ -287,6 +298,101 @@ function colSort(col) {
   }
   curPage = 1;
   applyFilters();
+}
+
+// ── Mobile drawer ─────────────────────────────────────────
+function openDrawer() {
+  document.getElementById('filterDrawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeDrawer() {
+  document.getElementById('filterDrawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Sync drawer inputs → sidebar inputs → applyFilters
+function syncSearch(el) {
+  const other = el.id === 'searchInputMob' ? 'searchInput' : 'searchInputMob';
+  document.getElementById(other).value = el.value;
+  applyFilters();
+}
+function syncProcess(el) {
+  const other = el.id === 'processSelectMob' ? 'processSelect' : 'processSelectMob';
+  document.getElementById(other).value = el.value;
+  applyFilters();
+}
+function syncPriceMin(el) {
+  const other = el.id === 'priceMinMob' ? 'priceMin' : 'priceMinMob';
+  document.getElementById(other).value = el.value;
+  applyFilters();
+}
+function syncPriceMax(el) {
+  const other = el.id === 'priceMaxMob' ? 'priceMax' : 'priceMaxMob';
+  document.getElementById(other).value = el.value;
+  applyFilters();
+}
+function setStoreMob(el, val) {
+  curStore = val;
+  // sync both filter panels
+  document.querySelectorAll('#storeFilter .tag-btn, #storeFilterMob .tag-btn').forEach(b => b.classList.toggle('active', b.dataset.store === val));
+  curPage = 1; applyFilters();
+}
+function resetFiltersMob() {
+  document.getElementById('searchInputMob').value = '';
+  document.getElementById('processSelectMob').value = '';
+  document.getElementById('priceMinMob').value = '';
+  document.getElementById('priceMaxMob').value = '';
+  resetFilters();
+}
+
+// Update filter badge count
+function updateFilterBadge() {
+  const active = [
+    document.getElementById('searchInput').value.trim() !== '',
+    document.getElementById('processSelect').value !== '',
+    document.getElementById('priceMin').value !== '',
+    document.getElementById('priceMax').value !== '',
+    curStore !== 'all',
+    curOrigin !== 'all',
+    curRegion !== 'all',
+  ].filter(Boolean).length;
+  const badge = document.getElementById('filterCount');
+  if (badge) {
+    badge.style.display = active > 0 ? 'inline-block' : 'none';
+    badge.textContent = active;
+  }
+}
+
+// ── Mobile table cards render ─────────────────────────────
+function renderTableMobile(items, ctr) {
+  ctr.innerHTML = items.map(p => {
+    const flag = FLAG[p.origin]||'🌍';
+    const sc   = STORE_CLS[p.store]||'sp-cp';
+    const pc   = PROC_CLS[p.process]||'proc-unknown';
+    const bdgs = [
+      p.isNew     ? `<span class="bsm bsm-new">NEW</span>`     : '',
+      p.isDecaf   ? `<span class="bsm bsm-decaf">디카페인</span>` : '',
+      p.isSpecial ? `<span class="bsm bsm-special">스페셜티</span>` : '',
+    ].filter(Boolean).join(' ');
+    const notes = p.notes ? `<div class="mob-row-notes">☕ ${p.notes}</div>` : '';
+    return `<div class="mob-row-card">
+      <div class="mob-row-top">
+        <div class="mob-row-name">${p.name}${bdgs ? ` <span style="display:inline-flex;gap:3px;vertical-align:middle">${bdgs}</span>` : ''}</div>
+        <div class="mob-row-price">₩${p.price.toLocaleString()}<span style="font-size:0.62rem;font-weight:500;color:var(--text-muted);display:block;text-align:right">/kg</span></div>
+      </div>
+      <div class="mob-row-meta">
+        <span class="mob-row-origin">${flag} ${p.origin}</span>
+        <span class="proc-badge ${pc}">${p.process}</span>
+      </div>
+      ${notes}
+      <div class="mob-row-bot">
+        <span class="sp ${sc}">${p.store}</span>
+        <a href="${p.url}" target="_blank" rel="noopener" class="buy-lnk">구매 →</a>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 initDB();

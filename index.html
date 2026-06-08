@@ -32,6 +32,72 @@
   </div>
 </header>
 
+<!-- Mobile filter drawer overlay -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+<!-- Mobile filter drawer -->
+<div class="filter-drawer" id="filterDrawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-header">
+    <span class="drawer-title">필터</span>
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  </div>
+
+  <div class="fsec">
+    <div class="fsec-title">키워드 검색</div>
+    <input class="f-input" id="searchInputMob" type="text" placeholder="품종, 농장, 가공방식..." oninput="syncSearch(this)">
+  </div>
+
+  <div class="fsec">
+    <div class="fsec-title">가공방식</div>
+    <select class="f-select" id="processSelectMob" onchange="syncProcess(this)">
+      <option value="">전체 가공방식</option>
+      <option value="워시드">워시드</option>
+      <option value="내추럴">내추럴</option>
+      <option value="허니">허니</option>
+      <option value="무산소발효">무산소발효</option>
+      <option value="펄프드내추럴">펄프드내추럴</option>
+      <option value="웻훌드">웻훌드</option>
+      <option value="알수없음">알수없음</option>
+    </select>
+  </div>
+
+  <div class="fsec">
+    <div class="fsec-title">가격 범위 (1kg)</div>
+    <div class="price-row">
+      <input class="price-inp" id="priceMinMob" type="number" placeholder="최소" min="0" step="1000" oninput="syncPriceMin(this)">
+      <span class="price-sep">~</span>
+      <input class="price-inp" id="priceMaxMob" type="number" placeholder="최대" min="0" step="1000" oninput="syncPriceMax(this)">
+    </div>
+    <div class="price-hint">단위: 원 (예: 15000 ~ 50000)</div>
+  </div>
+
+  <div class="fsec">
+    <div class="fsec-title">공급사</div>
+    <div class="tag-grp" id="storeFilterMob">
+      <button class="tag-btn active" data-store="all" onclick="setStoreMob(this,'all')">전체</button>
+      <button class="tag-btn" data-store="커피플랜트" onclick="setStoreMob(this,'커피플랜트')">커피플랜트</button>
+      <button class="tag-btn" data-store="커피창고" onclick="setStoreMob(this,'커피창고')">커피창고</button>
+      <button class="tag-btn" data-store="엠아이커피" onclick="setStoreMob(this,'엠아이커피')">엠아이커피</button>
+      <button class="tag-btn" data-store="모모스커피" onclick="setStoreMob(this,'모모스커피')">모모스커피</button>
+      <button class="tag-btn" data-store="코빈즈커피" onclick="setStoreMob(this,'코빈즈커피')">코빈즈커피</button>
+      <button class="tag-btn" data-store="아얀투" onclick="setStoreMob(this,'아얀투')">아얀투</button>
+      <button class="tag-btn" data-store="오로미아코리아" onclick="setStoreMob(this,'오로미아코리아')">오로미아코리아</button>
+      <button class="tag-btn" data-store="지에스씨(GSC)" onclick="setStoreMob(this,'지에스씨(GSC)')">지에스씨(GSC)</button>
+      <button class="tag-btn" data-store="오월의숲" onclick="setStoreMob(this,'오월의숲')">오월의숲</button>
+      <button class="tag-btn" data-store="커피리브레" onclick="setStoreMob(this,'커피리브레')">커피리브레</button>
+      <button class="tag-btn" data-store="블레스빈" onclick="setStoreMob(this,'블레스빈')">블레스빈</button>
+      <button class="tag-btn" data-store="콤파스커피" onclick="setStoreMob(this,'콤파스커피')">콤파스커피</button>
+      <button class="tag-btn" data-store="팔콘커피" onclick="setStoreMob(this,'팔콘커피')">팔콘커피</button>
+      <button class="tag-btn" data-store="더블유빈" onclick="setStoreMob(this,'더블유빈')">더블유빈</button>
+      <button class="tag-btn" data-store="커만사" onclick="setStoreMob(this,'커만사')">커만사</button>
+    </div>
+  </div>
+
+  <button class="reset-btn" onclick="resetFiltersMob()">↺ 필터 초기화</button>
+  <button class="drawer-apply" onclick="closeDrawer()">결과 보기</button>
+</div>
+
 <div class="layout">
   <aside class="sidebar">
 
@@ -120,6 +186,16 @@
   </aside>
 
   <main class="content">
+    <!-- Mobile filter bar (tablet/mobile only) -->
+    <div class="mob-filter-bar">
+      <button class="mob-filter-btn" onclick="openDrawer()">
+        <span class="filter-icon">☰</span>
+        필터
+        <span class="mob-filter-badge" id="filterCount" style="display:none">0</span>
+      </button>
+      <div class="result-info" style="margin-left:auto">총 <strong id="showingCountMob">0</strong>개</div>
+    </div>
+
     <div class="content-hdr">
       <div class="result-info">총 <strong id="showingCount">0</strong>개 상품</div>
       <div class="origin-filter-bar" id="originFilter">

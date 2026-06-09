@@ -8,17 +8,17 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #111111;
+  background: #111;
   color: #f0f0f0;
   font-size: 15px;
   line-height: 1.6;
   min-height: 100vh;
 }
 
-/* ── HEADER ── */
+/* HEADER */
 header {
-  background: #111111;
-  border-bottom: 1px solid #2a2a2a;
+  background: #111;
+  border-bottom: 1px solid #222;
   padding: 14px 20px;
   display: flex;
   align-items: center;
@@ -27,726 +27,654 @@ header {
   top: 0;
   z-index: 100;
 }
-.header-back { font-size: 1.2rem; cursor: pointer; color: #f0f0f0; text-decoration: none; padding: 4px 8px; }
+.header-back { font-size: 1.1rem; color: #ccc; text-decoration: none; padding: 4px 8px; }
 .header-center {
   font-size: 1rem;
   font-weight: 700;
   display: flex;
   align-items: center;
-  gap: 6px;
-  cursor: pointer;
+  gap: 5px;
 }
-.header-center .arrow { font-size: 0.75rem; color: #888; }
+.header-center .arr { font-size: 0.7rem; color: #666; }
 .header-right { width: 40px; }
 
-/* ── PAGE ── */
+/* PAGE */
 .page { max-width: 480px; margin: 0 auto; padding: 28px 20px 80px; }
 
-h1.page-title {
-  font-size: 1.8rem;
-  font-weight: 900;
-  letter-spacing: -0.4px;
-  margin-bottom: 10px;
-}
-.page-subtitle {
-  font-size: 0.88rem;
-  color: #888;
-  line-height: 1.6;
-  margin-bottom: 20px;
-}
+h1.page-title { font-size: 1.8rem; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 10px; }
+.page-sub { font-size: 0.88rem; color: #777; margin-bottom: 20px; line-height: 1.6; }
 
-/* ── GRINDER SELECT ── */
-.grinder-select-wrap {
-  margin-bottom: 28px;
-}
-.grinder-select {
+/* GRINDER */
+.grinder-wrap { margin-bottom: 28px; }
+.grinder-sel {
   width: 100%;
-  background: #1e1e1e;
-  border: 1px solid #333;
+  background: #1c1c1c;
+  border: 1px solid #2e2e2e;
   color: #f0f0f0;
-  padding: 12px 16px;
+  padding: 13px 40px 13px 16px;
   border-radius: 10px;
   font-size: 0.9rem;
+  font-family: inherit;
   appearance: none;
   cursor: pointer;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 14px center;
 }
-.grinder-select:focus { outline: none; border-color: #4ade80; }
+.grinder-sel:focus { outline: none; border-color: #4ade80; }
 
-/* ── ROAST TABS ── */
-.roast-tabs {
-  display: flex;
-  border-bottom: 1px solid #2a2a2a;
-  margin-bottom: 28px;
-}
+/* TABS */
+.roast-tabs { display: flex; border-bottom: 1px solid #222; margin-bottom: 32px; }
 .roast-tab {
-  flex: 1;
-  padding: 12px;
-  text-align: center;
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: #555;
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: all 0.2s;
+  flex: 1; padding: 13px; text-align: center;
+  font-size: 0.9rem; font-weight: 600; color: #444;
+  cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s;
 }
 .roast-tab.active { color: #f0f0f0; border-bottom-color: #f0f0f0; }
 
-/* ── FLAVOR WHEEL ── */
-.wheel-section { margin-bottom: 32px; }
-.wheel-wrap { position: relative; width: 100%; max-width: 360px; margin: 0 auto; }
-#flavorCanvas { width: 100%; height: auto; display: block; cursor: crosshair; touch-action: none; }
-
-/* ── RECOMMENDATION ── */
-.recommend-section { margin-bottom: 32px; }
-.recommend-title {
-  font-size: 1.4rem;
-  font-weight: 900;
-  line-height: 1.4;
-  margin-bottom: 18px;
-  letter-spacing: -0.3px;
+/* COMPASS */
+.compass-section { margin-bottom: 0; }
+.compass-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+  user-select: none;
 }
-.recommend-title span { color: #4ade80; }
+#compassCanvas { width: 100%; height: auto; display: block; cursor: crosshair; touch-action: none; }
 
-.adjust-card {
+/* DIVIDER */
+.divider { height: 1px; background: #222; margin: 32px 0; }
+
+/* RECOMMENDATION */
+.rec-section { margin-bottom: 32px; }
+.rec-title {
+  font-size: 1.35rem; font-weight: 900; line-height: 1.45;
+  margin-bottom: 20px; letter-spacing: -0.3px;
+}
+.rec-title .highlight { color: #4ade80; }
+
+.advice-card {
   background: #1a1a1a;
   border-radius: 12px;
-  padding: 18px;
-  margin-bottom: 12px;
+  padding: 18px 18px 16px;
+  margin-bottom: 10px;
 }
-.adjust-card-title {
-  font-size: 0.82rem;
-  color: #888;
-  margin-bottom: 6px;
-}
-.adjust-card-body {
-  font-size: 0.92rem;
-  color: #f0f0f0;
-  line-height: 1.6;
-}
-.adjust-card-note {
-  font-size: 0.78rem;
-  color: #666;
-  margin-top: 8px;
-  line-height: 1.6;
-}
-.adjust-card-note::before { content: '* '; }
+.advice-card-head { font-size: 0.82rem; color: #555; margin-bottom: 6px; }
+.advice-card-body { font-size: 0.92rem; color: #f0f0f0; line-height: 1.6; }
+.advice-card-note { font-size: 0.77rem; color: #555; margin-top: 10px; line-height: 1.65; }
 
-/* ── DIVIDER ── */
-.divider { height: 1px; background: #2a2a2a; margin: 32px 0; }
-
-/* ── CALCULATOR ── */
+/* CALC */
 .calc-section { margin-bottom: 32px; }
-.section-title {
-  font-size: 1.15rem;
-  font-weight: 800;
-  margin-bottom: 18px;
-  letter-spacing: -0.2px;
-}
-
-.calc-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 20px;
-}
+.sec-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 16px; letter-spacing: -0.2px; }
+.calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .calc-field { background: #1a1a1a; border-radius: 10px; padding: 14px 16px; }
-.calc-label { font-size: 0.72rem; color: #555; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.calc-input {
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid #333;
-  color: #f0f0f0;
-  font-size: 1.35rem;
-  font-weight: 700;
-  width: 100%;
-  padding: 4px 0;
-  outline: none;
-  font-family: inherit;
+.calc-lbl { font-size: 0.72rem; color: #555; margin-bottom: 8px; }
+.calc-inp {
+  background: transparent; border: none;
+  border-bottom: 1px solid #2e2e2e;
+  color: #f0f0f0; font-size: 1.3rem; font-weight: 700;
+  width: 100%; padding: 3px 0; outline: none; font-family: inherit;
 }
-.calc-input:focus { border-bottom-color: #4ade80; }
-.calc-input[readonly] { color: #4ade80; cursor: default; }
-.calc-unit { font-size: 0.72rem; color: #555; margin-top: 4px; }
+.calc-inp:focus { border-bottom-color: #4ade80; }
+.calc-inp.result { color: #4ade80; cursor: default; }
+.calc-unit { font-size: 0.7rem; color: #444; margin-top: 4px; }
 
-/* ── EXTRACTION CHART ── */
-.chart-section { margin-bottom: 32px; }
-.ecc-wrap { position: relative; width: 100%; max-width: 360px; margin: 0 auto; }
+/* ECC */
+.ecc-section { margin-bottom: 32px; }
+.ecc-wrap { max-width: 360px; margin: 0 auto; }
 #eccCanvas { width: 100%; height: auto; display: block; }
 
-/* ── LEGEND ── */
-.legend { display: flex; gap: 16px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
-.legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: #888; }
-.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-
-/* ── MOBILE ── */
-@media (max-width: 480px) {
-  h1.page-title { font-size: 1.5rem; }
-  .recommend-title { font-size: 1.2rem; }
-}
+/* LEGEND */
+.legend { display: flex; gap: 18px; justify-content: center; margin-top: 12px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: #777; }
+.ldot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 </style>
 </head>
 <body>
 
 <header>
   <a href="index.html" class="header-back">⌂</a>
-  <div class="header-center">가이드 <span class="arrow">∨</span></div>
+  <div class="header-center">가이드 <span class="arr">∨</span></div>
   <div class="header-right"></div>
 </header>
 
 <div class="page">
 
   <h1 class="page-title">브루잉 가이드</h1>
-  <p class="page-subtitle">사용하는 그라인더가 있다면 설정해보세요.<br>선택한 그라인더 맞춤 추천이 제공됩니다.</p>
+  <p class="page-sub">사용하는 그라인더가 있다면 설정해보세요.<br>선택한 그라인더 맞춤 추천이 제공됩니다.</p>
 
-  <div class="grinder-select-wrap">
-    <select class="grinder-select" id="grinderSelect" onchange="onGrinderChange()">
-      <option value="">내가 사용하는 그라인더 ▼</option>
+  <div class="grinder-wrap">
+    <select class="grinder-sel" id="grinderSel" onchange="onGrinder()">
+      <option value="">내가 사용하는 그라인더 ▾</option>
       <optgroup label="핸드밀">
-        <option value="timemore_c2">Timemore C2 / C3</option>
-        <option value="1zpresso_jx">1Zpresso JX / JX-Pro</option>
+        <option value="timemore">Timemore C2 / C3</option>
+        <option value="1zpresso">1Zpresso JX / JX-Pro</option>
         <option value="comandante">Comandante C40</option>
-        <option value="kinu_m47">Kinu M47</option>
-        <option value="hario_slim">Hario Slim Plus</option>
+        <option value="kinu">Kinu M47</option>
+        <option value="hario">Hario Slim Plus</option>
       </optgroup>
-      <optgroup label="전동 그라인더">
-        <option value="baratza_encore">Baratza Encore</option>
-        <option value="eureka_mignon">Eureka Mignon</option>
-        <option value="fellow_ode">Fellow Ode</option>
-        <option value="mahlkonig_x54">Mahlkönig X54</option>
-        <option value="niche_zero">Niche Zero</option>
+      <optgroup label="전동">
+        <option value="encore">Baratza Encore</option>
+        <option value="eureka">Eureka Mignon</option>
+        <option value="ode">Fellow Ode</option>
+        <option value="mahlkonig">Mahlkönig X54</option>
+        <option value="niche">Niche Zero</option>
       </optgroup>
     </select>
   </div>
 
-  <!-- ROAST TABS -->
   <div class="roast-tabs">
     <div class="roast-tab active" id="tab-light" onclick="setRoast('light')">약·중배전</div>
     <div class="roast-tab" id="tab-dark" onclick="setRoast('dark')">강배전</div>
   </div>
 
-  <!-- FLAVOR WHEEL -->
-  <div class="wheel-section">
-    <div class="wheel-wrap">
-      <canvas id="flavorCanvas" width="360" height="360"></canvas>
+  <!-- COMPASS -->
+  <div class="compass-section">
+    <div class="compass-wrap">
+      <canvas id="compassCanvas" width="360" height="360"></canvas>
     </div>
-    <div class="legend" style="margin-top:14px">
-      <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div>현재</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#4ade80"></div>목표</div>
+    <div class="legend" style="margin-top:10px">
+      <div class="legend-item"><div class="ldot" style="background:#ef4444"></div>현재</div>
+      <div class="legend-item"><div class="ldot" style="background:#4ade80"></div>목표</div>
     </div>
-    <p style="font-size:0.75rem;color:#555;text-align:center;margin-top:8px">원을 눌러 현재 위치를 설정하세요</p>
+    <p style="font-size:0.73rem;color:#444;text-align:center;margin-top:6px">화면을 눌러 현재 위치를 설정하세요</p>
   </div>
 
   <div class="divider"></div>
 
   <!-- RECOMMENDATION -->
-  <div class="recommend-section">
-    <div class="recommend-title" id="recommendTitle">
-      목표한 맛을 위해서는: <span id="recommendAction">균형 잡혀 있습니다.</span>
+  <div class="rec-section">
+    <div class="rec-title" id="recTitle">
+      목표한 맛을 위해서는: <span class="highlight" id="recAction">균형 잡혀 있습니다.</span>
     </div>
 
-    <div class="adjust-card" id="yieldCard">
-      <div class="adjust-card-title">수율을 높히기 위해서는</div>
-      <div class="adjust-card-body" id="yieldAdvice">분쇄도를 약 30미크로 만큼 가늘게 가져가주세요.</div>
-      <div class="adjust-card-note" id="yieldNote">수율이란 일정량의 커피에서 얼마만큼의 커피 성분을 추출했는지를 나타냅니다. (예시 1g의 커피에서 0.5g의 커피 성분을 추출했다면 50%의 수율을 가지게 되는 것 입니다.)</div>
+    <div class="advice-card" id="yieldCard" style="display:none">
+      <div class="advice-card-head" id="yieldHead">수율을 높히기 위해서는</div>
+      <div class="advice-card-body" id="yieldBody">분쇄도를 약 30미크로 만큼 가늘게 가져가주세요.</div>
+      <div class="advice-card-note">수율이란 일정량의 커피에서 얼마만큼의 커피 성분을 추출했는지를 나타냅니다. (예시 1g의 커피에서 0.5g의 커피 성분을 추출했다면 50%의 수율을 가지게 되는 것 입니다.)</div>
     </div>
 
-    <div class="adjust-card" id="doseCard">
-      <div class="adjust-card-title" id="doseTitleText">추출농도가 낮을때는</div>
-      <div class="adjust-card-body" id="doseAdvice">원두를 1.0g 더 넣어주세요.</div>
-      <div class="adjust-card-note" id="doseNote">추출 농도란 추출된 커피 안에 얼마만큼의 커피 성분이 들어갔는가를 나타냅니다. 맛의 진함과 연함이 이곳에서 결정됩니다. 추출 농도는 TDS 측정기로 측정할 수 있습니다.</div>
+    <div class="advice-card" id="doseCard" style="display:none">
+      <div class="advice-card-head" id="doseHead">추출농도가 낮을때는</div>
+      <div class="advice-card-body" id="doseBody">원두를 1.0g 더 넣어주세요.</div>
+      <div class="advice-card-note">추출 농도란 추출된 커피 안에 얼마만큼의 커피 성분이 들어갔는가를 나타냅니다. 맛의 진함과 연함이 이곳에서 결정됩니다. 추출 농도는 TDS 측정기로 측정할 수 있습니다.</div>
     </div>
   </div>
 
   <div class="divider"></div>
 
-  <!-- TDS CALCULATOR -->
+  <!-- CALCULATOR -->
   <div class="calc-section">
-    <div class="section-title">수율 계산하기</div>
+    <div class="sec-title">수율 계산하기</div>
     <div class="calc-grid">
       <div class="calc-field">
-        <div class="calc-label">투입한 원두…</div>
-        <input class="calc-input" id="calcDose" type="number" value="20" min="1" step="0.1" oninput="calcYield()">
+        <div class="calc-lbl">투입한 원두…</div>
+        <input class="calc-inp" id="cDose" type="number" value="20" min="1" step="0.1" oninput="calcYield()">
         <div class="calc-unit">g</div>
       </div>
       <div class="calc-field">
-        <div class="calc-label">TDS(%) = …</div>
-        <input class="calc-input" id="calcTds" type="number" value="1.4" min="0.1" max="3" step="0.01" oninput="calcYield()">
+        <div class="calc-lbl">TDS(%) = …</div>
+        <input class="calc-inp" id="cTds" type="number" value="1.4" min="0.1" max="3" step="0.01" oninput="calcYield()">
         <div class="calc-unit">%</div>
       </div>
       <div class="calc-field">
-        <div class="calc-label">추출한 커피…</div>
-        <input class="calc-input" id="calcBrew" type="number" value="300" min="1" step="1" oninput="calcYield()">
+        <div class="calc-lbl">추출한 커피…</div>
+        <input class="calc-inp" id="cBrew" type="number" value="300" min="1" step="1" oninput="calcYield()">
         <div class="calc-unit">g (ml)</div>
       </div>
       <div class="calc-field">
-        <div class="calc-label">추출 수율(%)</div>
-        <input class="calc-input" id="calcResult" type="text" value="21.00" readonly>
+        <div class="calc-lbl">추출 수율(%)</div>
+        <input class="calc-inp result" id="cResult" type="text" readonly value="21.00">
         <div class="calc-unit">%</div>
       </div>
     </div>
   </div>
 
-  <!-- EXTRACTION CHART -->
-  <div class="chart-section">
+  <!-- ECC -->
+  <div class="ecc-section">
     <div class="ecc-wrap">
       <canvas id="eccCanvas" width="360" height="300"></canvas>
     </div>
   </div>
 
-</div><!-- /page -->
+</div>
 
 <script>
-// ── STATE ─────────────────────────────────────────────────
+// ─── STATE ───────────────────────────────────────────────
+// curPos: {nx, ny} in units of the compass grid
+// target is always (0, 0) = center = ideal
+// X axis: yield offset  (right = higher yield)
+// Y axis: strength offset (up = stronger)
+let curPos = { nx: -0.15, ny: -0.1 };
 let roast = 'light';
-let currentPos = { x: 0, y: 0 };   // -1..1 range (x=yield offset, y=strength offset)
-let targetPos  = { x: 0.15, y: 0.1 }; // slightly upper-right = target
 let isDragging = false;
 
-// ── FLAVOR LABELS ─────────────────────────────────────────
-// Each: { text, x, y } where x,y in -1..1 (x=yield, y=strength)
-const LIGHT_FLAVORS = [
-  // Strong zone (y > 0.5)
-  { text:'자극적인', x:-0.55, y:0.75 }, { text:'날카로운', x:-0.3, y:0.82 },
-  { text:'진한', x:0.05, y:0.78 }, { text:'현대감', x:0.38, y:0.72 },
-  { text:'탑탑한', x:0.62, y:0.65 },
-  // Over zone (x > 0.5)
-  { text:'드라이한', x:0.80, y:0.3 }, { text:'과다추출', x:0.90, y:0.0 },
-  { text:'우디한', x:0.80, y:-0.3 }, { text:'야린', x:0.65, y:-0.58 },
-  // Weak zone (y < -0.5)
-  { text:'맑은', x:0.38, y:-0.75 }, { text:'부드러운', x:0.05, y:-0.82 },
-  { text:'라일락이', x:-0.28, y:-0.75 }, { text:'면향', x:-0.58, y:-0.65 },
-  // Under zone (x < -0.5)
-  { text:'과소추출', x:-0.90, y:0.0 }, { text:'쓰고그린', x:-0.80, y:0.3 },
-  { text:'풀향', x:-0.80, y:-0.3 }, { text:'신맛', x:-0.65, y:-0.45 },
-  // Mid ring
-  { text:'복합향', x:0.2, y:0.45 }, { text:'화사한', x:0.42, y:0.28 },
-  { text:'겸마로운', x:-0.18, y:0.38 }, { text:'약특향', x:0.0, y:0.42 },
-  { text:'달달한', x:-0.42, y:-0.3 }, { text:'상쾌함', x:-0.55, y:0.15 },
-  { text:'맛있어', x:-0.05, y:-0.42 }, { text:'은연한', x:0.38, y:-0.42 },
-  { text:'목적', x:0.22, y:0.65 },
+// ─── COMPASS CANVAS ──────────────────────────────────────
+const CC = document.getElementById('compassCanvas');
+const cx = CC.getContext('2d');
+const W = 360, H = 360;
+const MX = W / 2, MY = H / 2;
+
+// X axis: -90um .. +90um  →  -1 .. 1 in canvas space
+// Y axis: -2.0g .. +2.0g  →  -1 .. 1 in canvas space
+const XSTEPS = [-90, -60, -30, 0, 30, 60, 90]; // um
+const YSTEPS = [-2.0, -1.5, -1.0, -0.5, 0, 0.5, 1.0, 1.5, 2.0]; // g
+const XRANGE = 90, YRANGE = 2.0;
+const PAD = 52; // pixels of padding for labels
+const GW = W - PAD * 2; // grid width in px
+const GH = H - PAD * 2;
+
+function nx2px(nx) { return MX + nx * (GW / 2); }
+function ny2py(ny) { return MY - ny * (GH / 2); }
+function px2nx(px) { return (px - MX) / (GW / 2); }
+function py2ny(py) { return -(py - MY) / (GH / 2); }
+
+// Flavor labels: {text, nx, ny}
+const LIGHT_LABELS = [
+  // Axis labels (edge)
+  { text:'강한',      nx: 0,    ny: 1.15, axis:true },
+  { text:'약한',      nx: 0,    ny:-1.15, axis:true },
+  { text:'수율\n낮추기', nx:-1.2,  ny: 0,   axis:true },
+  { text:'수율\n높이기', nx: 1.2,  ny: 0,   axis:true },
+  // Flavor terms
+  { text:'자극적인',   nx:-0.60, ny: 0.72 },
+  { text:'날카로운',   nx:-0.30, ny: 0.85 },
+  { text:'풀향',      nx:-0.72, ny: 0.42 },
+  { text:'쓰고그린',   nx:-0.80, ny: 0.20 },
+  { text:'진한',      nx: 0.05, ny: 0.75 },
+  { text:'복합향',    nx: 0.28, ny: 0.60 },
+  { text:'현대감',    nx: 0.50, ny: 0.70 },
+  { text:'탑탑한',    nx: 0.72, ny: 0.42 },
+  { text:'드라이한',   nx: 0.82, ny: 0.18 },
+  { text:'우디한',    nx: 0.80, ny:-0.25 },
+  { text:'야린',      nx: 0.65, ny:-0.55 },
+  { text:'맑은',      nx: 0.40, ny:-0.75 },
+  { text:'부드러운',   nx: 0.05, ny:-0.80 },
+  { text:'라일락이',   nx:-0.32, ny:-0.75 },
+  { text:'면향',      nx:-0.62, ny:-0.58 },
+  { text:'신맛',      nx:-0.72, ny:-0.30 },
+  { text:'달달한',    nx:-0.55, ny:-0.10 },
+  { text:'상쾌함',    nx:-0.50, ny: 0.15 },
+  { text:'겸마로운',   nx:-0.20, ny: 0.38 },
+  { text:'화사한',    nx: 0.18, ny: 0.38 },
+  { text:'맛있어',    nx: 0.35, ny:-0.15 },
+  { text:'은연한',    nx: 0.38, ny:-0.42 },
 ];
-const DARK_FLAVORS = [
-  { text:'쓴', x:-0.55, y:0.75 }, { text:'탄향', x:-0.3, y:0.82 },
-  { text:'진한', x:0.05, y:0.78 }, { text:'다크초콜릿', x:0.38, y:0.72 },
-  { text:'스모키', x:0.62, y:0.65 },
-  { text:'우디', x:0.80, y:0.3 }, { text:'과다추출', x:0.90, y:0.0 },
-  { text:'재떨이', x:0.80, y:-0.3 }, { text:'쓴여운', x:0.65, y:-0.58 },
-  { text:'카라멜', x:0.38, y:-0.75 }, { text:'부드러운', x:0.05, y:-0.82 },
-  { text:'고소한', x:-0.28, y:-0.75 }, { text:'은은한', x:-0.58, y:-0.65 },
-  { text:'과소추출', x:-0.90, y:0.0 }, { text:'풀향', x:-0.80, y:0.3 },
-  { text:'그린', x:-0.80, y:-0.3 }, { text:'신맛', x:-0.65, y:-0.45 },
-  { text:'초콜릿', x:0.2, y:0.45 }, { text:'견과류', x:0.42, y:0.28 },
-  { text:'복합향', x:-0.18, y:0.38 }, { text:'달콤한', x:0.0, y:0.42 },
-  { text:'시럽', x:-0.42, y:-0.3 }, { text:'묵직한', x:-0.55, y:0.15 },
-  { text:'맛있어', x:-0.05, y:-0.42 }, { text:'버터리', x:0.38, y:-0.42 },
+const DARK_LABELS = [
+  { text:'강한',      nx: 0,    ny: 1.15, axis:true },
+  { text:'약한',      nx: 0,    ny:-1.15, axis:true },
+  { text:'수율\n낮추기', nx:-1.2,  ny: 0,   axis:true },
+  { text:'수율\n높이기', nx: 1.2,  ny: 0,   axis:true },
+  { text:'쓴맛',      nx:-0.60, ny: 0.72 },
+  { text:'탄향',      nx:-0.30, ny: 0.85 },
+  { text:'그린',      nx:-0.72, ny: 0.42 },
+  { text:'풀향',      nx:-0.80, ny: 0.20 },
+  { text:'다크초콜릿', nx: 0.05, ny: 0.75 },
+  { text:'진한',      nx: 0.28, ny: 0.60 },
+  { text:'스모키',    nx: 0.50, ny: 0.70 },
+  { text:'재떨이',    nx: 0.72, ny: 0.42 },
+  { text:'우디',      nx: 0.82, ny: 0.18 },
+  { text:'쓴여운',    nx: 0.80, ny:-0.25 },
+  { text:'강한쓴맛',  nx: 0.65, ny:-0.55 },
+  { text:'카라멜',    nx: 0.40, ny:-0.75 },
+  { text:'부드러운',  nx: 0.05, ny:-0.80 },
+  { text:'고소한',    nx:-0.32, ny:-0.75 },
+  { text:'은은한',    nx:-0.62, ny:-0.58 },
+  { text:'신맛',      nx:-0.72, ny:-0.30 },
+  { text:'달콤한',    nx:-0.55, ny:-0.10 },
+  { text:'묵직한',    nx:-0.50, ny: 0.15 },
+  { text:'견과류',    nx:-0.20, ny: 0.38 },
+  { text:'초콜릿',    nx: 0.18, ny: 0.38 },
+  { text:'맛있어',    nx: 0.35, ny:-0.15 },
+  { text:'버터리',    nx: 0.38, ny:-0.42 },
 ];
 
-// ── CANVAS SETUP ──────────────────────────────────────────
-const canvas = document.getElementById('flavorCanvas');
-const ctx    = canvas.getContext('2d');
-const CX = 180, CY = 180, R = 160;
+function drawCompass() {
+  cx.clearRect(0, 0, W, H);
 
-function norm2px(nx, ny) {
-  return { px: CX + nx * R, py: CY - ny * R };
-}
-function px2norm(px, py) {
-  return { nx: (px - CX) / R, ny: -(py - CY) / R };
-}
+  const labels = roast === 'light' ? LIGHT_LABELS : DARK_LABELS;
 
-function drawWheel() {
-  const flavors = roast === 'light' ? LIGHT_FLAVORS : DARK_FLAVORS;
-  ctx.clearRect(0, 0, 360, 360);
+  // Background
+  cx.fillStyle = '#111';
+  cx.fillRect(0, 0, W, H);
 
-  // Background circle
-  ctx.beginPath();
-  ctx.arc(CX, CY, R, 0, Math.PI * 2);
-  ctx.fillStyle = '#1a1a1a';
-  ctx.fill();
-
-  // Zone colors (quadrants)
-  drawZone( 0.0,  0.0, R, '#1f2a1f', 0.5,   // upper right = over+strong (dark green)
-            '#2a1f1f', -0.5,                  // upper left  = under+strong
-            '#1f1f2a', -0.5, 0.5,             // lower right = over+weak
-            '#2a2a1f');                        // lower left  = under+weak
-
-  // Draw zone quadrant fills
-  const zones = [
-    { x1:-1, y1: 0, x2: 0, y2: 1, color:'rgba(120,60,30,0.18)' },   // under+strong
-    { x1: 0, y1: 0, x2: 1, y2: 1, color:'rgba(60,100,60,0.18)' },   // over+strong
-    { x1:-1, y1:-1, x2: 0, y2: 0, color:'rgba(60,60,100,0.18)' },   // under+weak
-    { x1: 0, y1:-1, x2: 1, y2: 0, color:'rgba(80,80,50,0.18)' },    // over+weak
+  // Quadrant backgrounds
+  const quads = [
+    { nx1:-1, ny1: 0, nx2: 0, ny2: 1, c:'rgba(140,80,40,0.18)' },  // under+strong
+    { nx1: 0, ny1: 0, nx2: 1, ny2: 1, c:'rgba(50,110,60,0.18)' },  // over+strong
+    { nx1:-1, ny1:-1, nx2: 0, ny2: 0, c:'rgba(60,60,140,0.18)' },  // under+weak
+    { nx1: 0, ny1:-1, nx2: 1, ny2: 0, c:'rgba(100,80,40,0.18)' },  // over+weak
   ];
-  zones.forEach(z => {
-    const p1 = norm2px(z.x1, z.y1);
-    const p2 = norm2px(z.x2, z.y2);
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(CX, CY, R, 0, Math.PI * 2);
-    ctx.clip();
-    ctx.fillStyle = z.color;
-    ctx.fillRect(Math.min(p1.px,p2.px), Math.min(p1.py,p2.py), Math.abs(p2.px-p1.px), Math.abs(p2.py-p1.py));
-    ctx.restore();
+  quads.forEach(q => {
+    cx.fillStyle = q.c;
+    cx.fillRect(
+      nx2px(q.nx1), ny2py(q.ny2),
+      nx2px(q.nx2) - nx2px(q.nx1),
+      ny2py(q.ny1) - ny2py(q.ny2)
+    );
   });
 
-  // 균형잡힌 center zone
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(CX, CY, R * 0.28, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(74,222,128,0.12)';
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(74,222,128,0.25)';
-  ctx.lineWidth = 1;
-  ctx.stroke();
-  ctx.restore();
+  // Grid lines
+  cx.strokeStyle = 'rgba(255,255,255,0.06)';
+  cx.lineWidth = 0.8;
+  // Vertical (yield)
+  [-1, -0.667, -0.333, 0, 0.333, 0.667, 1].forEach(nx => {
+    cx.beginPath(); cx.moveTo(nx2px(nx), ny2py(1)); cx.lineTo(nx2px(nx), ny2py(-1)); cx.stroke();
+  });
+  // Horizontal (strength)
+  [-1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1].forEach(ny => {
+    cx.beginPath(); cx.moveTo(nx2px(-1), ny2py(ny)); cx.lineTo(nx2px(1), ny2py(ny)); cx.stroke();
+  });
 
-  // Crosshair lines
-  ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-  ctx.lineWidth = 1;
-  ctx.setLineDash([4, 4]);
-  ctx.beginPath(); ctx.moveTo(CX - R, CY); ctx.lineTo(CX + R, CY); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(CX, CY - R); ctx.lineTo(CX, CY + R); ctx.stroke();
-  ctx.setLineDash([]);
+  // Main axes (brighter)
+  cx.strokeStyle = 'rgba(255,255,255,0.18)';
+  cx.lineWidth = 1;
+  cx.beginPath(); cx.moveTo(nx2px(-1), MY); cx.lineTo(nx2px(1), MY); cx.stroke();
+  cx.beginPath(); cx.moveTo(MX, ny2py(-1)); cx.lineTo(MX, ny2py(1)); cx.stroke();
 
-  // Outer circle border
-  ctx.beginPath();
-  ctx.arc(CX, CY, R, 0, Math.PI * 2);
-  ctx.strokeStyle = 'rgba(255,255,255,0.12)';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
+  // Axis tick labels (um / g)
+  cx.font = '10px Apple SD Gothic Neo, sans-serif';
+  cx.fillStyle = '#444';
+  cx.textBaseline = 'top';
+  cx.textAlign = 'center';
+  // X ticks
+  [[-1,'-90um'],[-0.667,'-60um'],[-0.333,'-30um'],[0.333,'+30um'],[0.667,'+60um'],[1,'+90um']].forEach(([n,t]) => {
+    cx.fillText(t, nx2px(n), ny2py(-1) + 5);
+  });
+  // Y ticks
+  cx.textAlign = 'right';
+  cx.textBaseline = 'middle';
+  [[-1,'-2.0g'],[-0.5,'-1.0g'],[0.5,'+1.0g'],[1,'+2.0g']].forEach(([n,t]) => {
+    cx.fillText(t, nx2px(-1) - 5, ny2py(n));
+  });
 
-  // Axis labels
-  ctx.font = 'bold 11px Apple SD Gothic Neo, sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,0.5)';
-  ctx.textAlign = 'center';
-  ctx.fillText('강한', CX, CY - R - 8);
-  ctx.fillText('약한', CX, CY + R + 16);
-  ctx.textAlign = 'right';
-  ctx.fillText('과소추출', CX - R - 4, CY + 4);
-  ctx.textAlign = 'left';
-  ctx.fillText('과다추출', CX + R + 4, CY + 4);
-
-  // Center label
-  ctx.font = 'bold 11px Apple SD Gothic Neo, sans-serif';
-  ctx.fillStyle = 'rgba(74,222,128,0.7)';
-  ctx.textAlign = 'center';
-  ctx.fillText('균형잡힌', CX, CY + 4);
+  // Axis direction labels
+  cx.font = 'bold 11px Apple SD Gothic Neo, sans-serif';
+  cx.fillStyle = 'rgba(255,255,255,0.45)';
+  cx.textAlign = 'center';
+  cx.textBaseline = 'bottom';
+  cx.fillText('농도 높이기', MX, ny2py(1) - 4);
+  cx.textBaseline = 'top';
+  cx.fillText('농도 낮추기', MX, ny2py(-1) + 4);
+  cx.textAlign = 'right';
+  cx.textBaseline = 'middle';
+  cx.fillText('수율 낮추기', nx2px(-1) - 3, MY);
+  cx.textAlign = 'left';
+  cx.fillText('수율 높이기', nx2px(1) + 3, MY);
 
   // Flavor labels
-  flavors.forEach(f => {
-    const { px, py } = norm2px(f.x, f.y);
-    // Skip center label area
-    const dist = Math.sqrt(f.x * f.x + f.y * f.y);
-    if (dist < 0.2) return;
-
-    ctx.font = '9.5px Apple SD Gothic Neo, sans-serif';
-    ctx.fillStyle = 'rgba(200,200,200,0.75)';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(f.text, px, py);
+  cx.font = '9.5px Apple SD Gothic Neo, sans-serif';
+  cx.textBaseline = 'middle';
+  labels.filter(l => !l.axis).forEach(l => {
+    if (Math.abs(l.nx) > 1 || Math.abs(l.ny) > 1) return;
+    cx.fillStyle = 'rgba(180,180,180,0.6)';
+    cx.textAlign = 'center';
+    cx.fillText(l.text, nx2px(l.nx), ny2py(l.ny));
   });
 
+  // 균형잡힌 at center
+  cx.font = 'bold 11px Apple SD Gothic Neo, sans-serif';
+  cx.fillStyle = 'rgba(74,222,128,0.5)';
+  cx.textAlign = 'center';
+  cx.textBaseline = 'middle';
+  cx.fillText('균형잡힌', MX, MY);
+
+  // Target dot (always center = ideal)
+  const TPX = MX, TPY = MY;
+  cx.beginPath();
+  cx.arc(TPX, TPY, 13, 0, Math.PI * 2);
+  cx.fillStyle = '#4ade80';
+  cx.fill();
+  cx.font = 'bold 9px Apple SD Gothic Neo, sans-serif';
+  cx.fillStyle = '#111';
+  cx.textAlign = 'center';
+  cx.textBaseline = 'middle';
+  cx.fillText('목표', TPX, TPY);
+
   // Current dot
-  const cp = norm2px(currentPos.x, currentPos.y);
-  ctx.beginPath();
-  ctx.arc(cp.px, cp.py, 11, 0, Math.PI * 2);
-  ctx.fillStyle = '#ef4444';
-  ctx.fill();
-  ctx.font = 'bold 9px Apple SD Gothic Neo, sans-serif';
-  ctx.fillStyle = 'white';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('현재', cp.px, cp.py);
+  const cpx = nx2px(curPos.nx);
+  const cpy = ny2py(curPos.ny);
+  cx.beginPath();
+  cx.arc(cpx, cpy, 13, 0, Math.PI * 2);
+  cx.fillStyle = '#ef4444';
+  cx.fill();
+  cx.font = 'bold 9px Apple SD Gothic Neo, sans-serif';
+  cx.fillStyle = 'white';
+  cx.textAlign = 'center';
+  cx.textBaseline = 'middle';
+  cx.fillText('현재', cpx, cpy);
 
-  // Target dot
-  const tp = norm2px(targetPos.x, targetPos.y);
-  ctx.beginPath();
-  ctx.arc(tp.px, tp.py, 11, 0, Math.PI * 2);
-  ctx.fillStyle = '#4ade80';
-  ctx.fill();
-  ctx.font = 'bold 9px Apple SD Gothic Neo, sans-serif';
-  ctx.fillStyle = '#111';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('목표', tp.px, tp.py);
+  // Arrow from current to target
+  drawArrow(cpx, cpy, TPX, TPY);
 }
 
-function drawZone() {} // noop helper above
+function drawArrow(x1, y1, x2, y2) {
+  const dx = x2 - x1, dy = y2 - y1;
+  const len = Math.sqrt(dx*dx + dy*dy);
+  if (len < 20) return;
+  const ux = dx/len, uy = dy/len;
+  const sx = x1 + ux * 16, sy = y1 + uy * 16;
+  const ex = x2 - ux * 16, ey = y2 - uy * 16;
+  cx.save();
+  cx.strokeStyle = 'rgba(255,255,255,0.35)';
+  cx.lineWidth = 1.5;
+  cx.setLineDash([4, 4]);
+  cx.beginPath(); cx.moveTo(sx, sy); cx.lineTo(ex, ey); cx.stroke();
+  cx.setLineDash([]);
+  // Arrowhead
+  const angle = Math.atan2(ey - sy, ex - sx);
+  cx.beginPath();
+  cx.moveTo(ex, ey);
+  cx.lineTo(ex - 8*Math.cos(angle-0.4), ey - 8*Math.sin(angle-0.4));
+  cx.lineTo(ex - 8*Math.cos(angle+0.4), ey - 8*Math.sin(angle+0.4));
+  cx.closePath();
+  cx.fillStyle = 'rgba(255,255,255,0.35)';
+  cx.fill();
+  cx.restore();
+}
 
-// ── RECOMMENDATION ────────────────────────────────────────
-function updateRecommendation() {
-  const dx = targetPos.x - currentPos.x; // positive = need more yield
-  const dy = targetPos.y - currentPos.y; // positive = need more strength
+// ─── INTERACTION ─────────────────────────────────────────
+function getPos(e) {
+  const rect = CC.getBoundingClientRect();
+  const scX = W / rect.width, scY = H / rect.height;
+  const cx_ = e.touches ? e.touches[0].clientX : e.clientX;
+  const cy_ = e.touches ? e.touches[0].clientY : e.clientY;
+  const px = (cx_ - rect.left) * scX;
+  const py = (cy_ - rect.top)  * scY;
+  return { px, py };
+}
 
-  const yieldDir  = dx > 0.05 ? '높히기' : dx < -0.05 ? '낮추기' : null;
-  const strengthDir = dy > 0.05 ? '높히기' : dy < -0.05 ? '낮추기' : null;
+function applyPos(px, py) {
+  let nx = px2nx(px), ny = py2ny(py);
+  nx = Math.max(-1, Math.min(1, nx));
+  ny = Math.max(-1, Math.min(1, ny));
+  curPos = { nx, ny };
+  drawCompass();
+  updateRec();
+  updateECC();
+}
 
-  let actionText = '';
-  if (!yieldDir && !strengthDir) {
-    actionText = '균형 잡혀 있습니다 👍';
-  } else {
-    const parts = [];
-    if (strengthDir) parts.push(`농도 ${strengthDir}`);
-    if (yieldDir)    parts.push(`수율 ${yieldDir}`);
-    actionText = parts.join(', ') + '가 권장됩니다.';
-  }
-  document.getElementById('recommendAction').textContent = actionText;
+CC.addEventListener('mousedown',  e => { e.preventDefault(); isDragging = true; applyPos(...Object.values(getPos(e))); });
+CC.addEventListener('mousemove',  e => { if (!isDragging) return; e.preventDefault(); applyPos(...Object.values(getPos(e))); });
+CC.addEventListener('mouseup',    () => { isDragging = false; });
+CC.addEventListener('mouseleave', () => { isDragging = false; });
+CC.addEventListener('touchstart', e => { e.preventDefault(); isDragging = true; applyPos(...Object.values(getPos(e))); }, { passive:false });
+CC.addEventListener('touchmove',  e => { e.preventDefault(); if (isDragging) applyPos(...Object.values(getPos(e))); }, { passive:false });
+CC.addEventListener('touchend',   () => { isDragging = false; });
 
-  // Yield advice
+// ─── RECOMMENDATION ──────────────────────────────────────
+// dx = 0 - curPos.nx → positive means need more yield
+// dy = 0 - curPos.ny → positive means need more strength
+function updateRec() {
+  const dx = -curPos.nx;
+  const dy = -curPos.ny;
+  const THRESH = 0.08;
+
+  const needMoreYield  = dx >  THRESH;
+  const needLessYield  = dx < -THRESH;
+  const needMoreStrength = dy >  THRESH;
+  const needLessStrength = dy < -THRESH;
+
+  // Action text
+  const parts = [];
+  if (needMoreStrength)  parts.push('농도 높히기');
+  else if (needLessStrength) parts.push('농도 낮추기');
+  if (needMoreYield)     parts.push('수율 높히기');
+  else if (needLessYield)    parts.push('수율 낮추기');
+
+  document.getElementById('recAction').textContent =
+    parts.length ? parts.join(', ') + '가 권장됩니다.' : '균형 잡혀 있습니다 👍';
+
+  // Yield card
   const ycard = document.getElementById('yieldCard');
-  const yadvice = document.getElementById('yieldAdvice');
-  const ytitle  = ycard.querySelector('.adjust-card-title');
-  if (yieldDir === '높히기') {
-    ytitle.textContent   = '수율을 높히기 위해서는';
-    yadvice.textContent  = '분쇄도를 약 30미크로 만큼 가늘게 가져가주세요.';
-    ycard.style.display  = '';
-  } else if (yieldDir === '낮추기') {
-    ytitle.textContent   = '수율을 낮추기 위해서는';
-    yadvice.textContent  = '분쇄도를 약 30미크로 만큼 굵게 가져가주세요.';
-    ycard.style.display  = '';
+  const yhead = document.getElementById('yieldHead');
+  const ybody = document.getElementById('yieldBody');
+  if (needMoreYield) {
+    yhead.textContent = '수율을 높히기 위해서는';
+    ybody.textContent = '분쇄도를 약 30미크로 만큼 가늘게 가져가주세요.';
+    ycard.style.display = '';
+  } else if (needLessYield) {
+    yhead.textContent = '수율을 낮추기 위해서는';
+    ybody.textContent = '분쇄도를 약 30미크로 만큼 굵게 가져가주세요.';
+    ycard.style.display = '';
   } else {
-    ycard.style.display  = 'none';
+    ycard.style.display = 'none';
   }
 
-  // Dose advice
-  const dcard   = document.getElementById('doseCard');
-  const dadvice = document.getElementById('doseAdvice');
-  const dtitle  = document.getElementById('doseTitleText');
-  if (strengthDir === '높히기') {
-    dtitle.textContent   = '추출농도가 낮을때는';
-    dadvice.textContent  = '원두를 1.0g 더 넣어주세요.';
-    dcard.style.display  = '';
-  } else if (strengthDir === '낮추기') {
-    dtitle.textContent   = '추출농도가 높을때는';
-    dadvice.textContent  = '물을 20ml 더 추가해주세요.';
-    dcard.style.display  = '';
+  // Dose card
+  const dcard = document.getElementById('doseCard');
+  const dhead = document.getElementById('doseHead');
+  const dbody = document.getElementById('doseBody');
+  if (needMoreStrength) {
+    dhead.textContent = '추출농도가 낮을때는';
+    dbody.textContent = '원두를 1.0g 더 넣어주세요.';
+    dcard.style.display = '';
+  } else if (needLessStrength) {
+    dhead.textContent = '추출농도가 높을때는';
+    dbody.textContent = '물을 20ml 더 추가해주세요.';
+    dcard.style.display = '';
   } else {
-    dcard.style.display  = 'none';
+    dcard.style.display = 'none';
   }
 }
 
-// ── CANVAS INTERACTION ────────────────────────────────────
-function getCanvasPos(e) {
-  const rect  = canvas.getBoundingClientRect();
-  const scaleX = 360 / rect.width;
-  const scaleY = 360 / rect.height;
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-  return {
-    px: (clientX - rect.left) * scaleX,
-    py: (clientY - rect.top)  * scaleY,
-  };
+// ─── ROAST / GRINDER ─────────────────────────────────────
+function setRoast(r) {
+  roast = r;
+  document.getElementById('tab-light').classList.toggle('active', r === 'light');
+  document.getElementById('tab-dark').classList.toggle('active',  r === 'dark');
+  drawCompass();
 }
 
-function handleCanvasDown(e) {
-  e.preventDefault();
-  const { px, py } = getCanvasPos(e);
-  const { nx, ny } = px2norm(px, py);
-  // Clamp to circle
-  const dist = Math.sqrt(nx*nx + ny*ny);
-  if (dist > 1) return;
-  currentPos = { x: Math.max(-1, Math.min(1, nx)), y: Math.max(-1, Math.min(1, ny)) };
-  isDragging = true;
-  drawWheel();
-  updateRecommendation();
-  updateECC();
+function onGrinder() {
+  // Grinder presets: suggest where target should be (curPos stays, target always 0,0)
+  // Just redraw - target is always ideal center
+  drawCompass();
 }
-function handleCanvasMove(e) {
-  if (!isDragging) return;
-  e.preventDefault();
-  const { px, py } = getCanvasPos(e);
-  const { nx, ny } = px2norm(px, py);
-  const dist = Math.sqrt(nx*nx + ny*ny);
-  if (dist > 1) {
-    const angle = Math.atan2(ny, nx);
-    currentPos = { x: Math.cos(angle), y: Math.sin(angle) };
-  } else {
-    currentPos = { x: nx, y: ny };
-  }
-  drawWheel();
-  updateRecommendation();
-  updateECC();
-}
-function handleCanvasUp() { isDragging = false; }
 
-canvas.addEventListener('mousedown',  handleCanvasDown);
-canvas.addEventListener('mousemove',  handleCanvasMove);
-canvas.addEventListener('mouseup',    handleCanvasUp);
-canvas.addEventListener('touchstart', handleCanvasDown, { passive: false });
-canvas.addEventListener('touchmove',  handleCanvasMove, { passive: false });
-canvas.addEventListener('touchend',   handleCanvasUp);
-
-// ── YIELD CALCULATOR ──────────────────────────────────────
+// ─── YIELD CALCULATOR ────────────────────────────────────
 function calcYield() {
-  const dose = parseFloat(document.getElementById('calcDose').value) || 0;
-  const tds  = parseFloat(document.getElementById('calcTds').value)  || 0;
-  const brew = parseFloat(document.getElementById('calcBrew').value) || 0;
-  if (dose > 0 && tds > 0 && brew > 0) {
-    const y = (tds / 100 * brew / dose * 100);
-    document.getElementById('calcResult').value = y.toFixed(2);
-    // Update ECC dot position
+  const dose = parseFloat(document.getElementById('cDose').value) || 0;
+  const tds  = parseFloat(document.getElementById('cTds').value)  || 0;
+  const brew = parseFloat(document.getElementById('cBrew').value) || 0;
+  if (dose > 0 && brew > 0) {
+    const y = tds / 100 * brew / dose * 100;
+    document.getElementById('cResult').value = y.toFixed(2);
     updateECC(tds, y);
   }
 }
 
-// ── EXTRACTION CONTROL CHART ──────────────────────────────
-const eccCanvas = document.getElementById('eccCanvas');
-const eccCtx    = eccCanvas.getContext('2d');
+// ─── EXTRACTION CONTROL CHART ────────────────────────────
+const EC = document.getElementById('eccCanvas');
+const ec = EC.getContext('2d');
+const EW = 360, EH = 300;
+const EP = { l:44, r:350, t:18, b:268 };
+EP.w = EP.r - EP.l; EP.h = EP.b - EP.t;
+const TDS_MIN=0.80, TDS_MAX=1.60, Y_MIN=14, Y_MAX=26;
 
-// Chart bounds: yield 14%–26%, TDS 0.80–1.60
-const ECC = {
-  left: 48, right: 350, top: 20, bottom: 270,
-  yieldMin: 14, yieldMax: 26,
-  tdsMin: 0.80, tdsMax: 1.60,
-};
-ECC.w = ECC.right - ECC.left;
-ECC.h = ECC.bottom - ECC.top;
+function t2py(t)  { return EP.b - (t - TDS_MIN)/(TDS_MAX - TDS_MIN) * EP.h; }
+function y2px(y)  { return EP.l + (y - Y_MIN)/(Y_MAX - Y_MIN) * EP.w; }
 
-// SCA-style ideal zone (TDS 1.15–1.45, yield 18–22)
-const IDEAL = { tdsLow:1.15, tdsHigh:1.45, yLow:18, yHigh:22 };
-
-function tds2py(tds) {
-  return ECC.bottom - (tds - ECC.tdsMin) / (ECC.tdsMax - ECC.tdsMin) * ECC.h;
-}
-function yield2px(y) {
-  return ECC.left + (y - ECC.yieldMin) / (ECC.yieldMax - ECC.yieldMin) * ECC.w;
-}
+const ECC_ZONES = [
+  { t1:1.45, t2:1.60, y1:14, y2:18, lbl:'진한\n과소', c:'rgba(160,80,40,0.4)' },
+  { t1:1.45, t2:1.60, y1:18, y2:22, lbl:'진한',     c:'rgba(160,120,40,0.4)' },
+  { t1:1.45, t2:1.60, y1:22, y2:26, lbl:'진한\n과다', c:'rgba(130,80,40,0.4)' },
+  { t1:1.15, t2:1.45, y1:14, y2:18, lbl:'과소',     c:'rgba(70,70,160,0.4)' },
+  { t1:1.15, t2:1.45, y1:18, y2:22, lbl:'적절',     c:'rgba(40,130,70,0.55)' },
+  { t1:1.15, t2:1.45, y1:22, y2:26, lbl:'과다',     c:'rgba(160,70,70,0.4)' },
+  { t1:0.80, t2:1.15, y1:14, y2:18, lbl:'묽은\n과소', c:'rgba(50,50,110,0.4)' },
+  { t1:0.80, t2:1.15, y1:18, y2:22, lbl:'묽은',     c:'rgba(50,70,90,0.4)' },
+  { t1:0.80, t2:1.15, y1:22, y2:26, lbl:'묽은\n과다', c:'rgba(90,50,50,0.4)' },
+];
 
 function drawECC(dotTds, dotYield) {
-  eccCtx.clearRect(0, 0, 360, 300);
-  eccCtx.fillStyle = '#111';
-  eccCtx.fillRect(0, 0, 360, 300);
+  ec.fillStyle = '#111';
+  ec.fillRect(0, 0, EW, EH);
 
-  const zones = [
-    // row: tds range, col: yield range, label, color
-    { t1:1.45, t2:1.60, y1:14, y2:18, label:'진한\n과소', color:'rgba(180,100,50,0.35)' },
-    { t1:1.45, t2:1.60, y1:18, y2:22, label:'진한',     color:'rgba(180,130,50,0.35)' },
-    { t1:1.45, t2:1.60, y1:22, y2:26, label:'진한\n과다', color:'rgba(150,100,50,0.35)' },
-    { t1:1.15, t2:1.45, y1:14, y2:18, label:'과소',     color:'rgba(80,80,160,0.3)' },
-    { t1:1.15, t2:1.45, y1:18, y2:22, label:'적절',     color:'rgba(40,140,80,0.45)' },
-    { t1:1.15, t2:1.45, y1:22, y2:26, label:'과다',     color:'rgba(160,80,80,0.3)' },
-    { t1:0.80, t2:1.15, y1:14, y2:18, label:'묽은\n과소', color:'rgba(60,60,120,0.3)' },
-    { t1:0.80, t2:1.15, y1:18, y2:22, label:'묽은',     color:'rgba(60,80,100,0.3)' },
-    { t1:0.80, t2:1.15, y1:22, y2:26, label:'묽은\n과다', color:'rgba(100,60,60,0.3)' },
-  ];
-
-  zones.forEach(z => {
-    const x1 = yield2px(z.y1), x2 = yield2px(z.y2);
-    const y1 = tds2py(z.t2),   y2 = tds2py(z.t1);
-    eccCtx.fillStyle = z.color;
-    eccCtx.fillRect(x1, y1, x2-x1, y2-y1);
-    eccCtx.strokeStyle = 'rgba(255,255,255,0.08)';
-    eccCtx.lineWidth = 0.5;
-    eccCtx.strokeRect(x1, y1, x2-x1, y2-y1);
-    // Label
-    const lines = z.label.split('\n');
-    eccCtx.fillStyle = 'rgba(255,255,255,0.65)';
-    eccCtx.font = '10px Apple SD Gothic Neo, sans-serif';
-    eccCtx.textAlign = 'center';
-    eccCtx.textBaseline = 'middle';
-    const mx = (x1+x2)/2, my = (y1+y2)/2;
-    if (lines.length === 2) {
-      eccCtx.fillText(lines[0], mx, my - 7);
-      eccCtx.fillText(lines[1], mx, my + 7);
-    } else {
-      eccCtx.fillText(lines[0], mx, my);
-    }
+  ECC_ZONES.forEach(z => {
+    const x1=y2px(z.y1), x2=y2px(z.y2), y1=t2py(z.t2), y2=t2py(z.t1);
+    ec.fillStyle = z.c;
+    ec.fillRect(x1, y1, x2-x1, y2-y1);
+    ec.strokeStyle = 'rgba(255,255,255,0.07)';
+    ec.lineWidth = 0.5;
+    ec.strokeRect(x1, y1, x2-x1, y2-y1);
+    const lines = z.lbl.split('\n');
+    ec.fillStyle = 'rgba(255,255,255,0.7)';
+    ec.font = '10px Apple SD Gothic Neo, sans-serif';
+    ec.textAlign = 'center'; ec.textBaseline = 'middle';
+    const mx=(x1+x2)/2, my=(y1+y2)/2;
+    lines.forEach((l,i) => ec.fillText(l, mx, my + (lines.length>1 ? (i-0.5)*12 : 0)));
   });
 
-  // Grid lines & Y axis labels (TDS)
-  [0.80, 0.90, 1.00, 1.10, 1.20, 1.30, 1.40, 1.50, 1.60].forEach(t => {
-    const py = tds2py(t);
-    eccCtx.strokeStyle = 'rgba(255,255,255,0.08)';
-    eccCtx.lineWidth = 0.5;
-    eccCtx.beginPath();
-    eccCtx.moveTo(ECC.left, py);
-    eccCtx.lineTo(ECC.right, py);
-    eccCtx.stroke();
-    eccCtx.fillStyle = '#666';
-    eccCtx.font = '9px Apple SD Gothic Neo, sans-serif';
-    eccCtx.textAlign = 'right';
-    eccCtx.textBaseline = 'middle';
-    eccCtx.fillText(t.toFixed(1), ECC.left - 4, py);
+  // Grid
+  [0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6].forEach(t => {
+    const py = t2py(t);
+    ec.strokeStyle = 'rgba(255,255,255,0.07)'; ec.lineWidth = 0.5;
+    ec.beginPath(); ec.moveTo(EP.l, py); ec.lineTo(EP.r, py); ec.stroke();
+    ec.fillStyle = '#555'; ec.font = '9px Apple SD Gothic Neo, sans-serif';
+    ec.textAlign = 'right'; ec.textBaseline = 'middle';
+    ec.fillText(t.toFixed(1), EP.l-4, py);
+  });
+  [14,16,18,20,22,24,26].forEach(y => {
+    const px = y2px(y);
+    ec.strokeStyle = 'rgba(255,255,255,0.07)'; ec.lineWidth = 0.5;
+    ec.beginPath(); ec.moveTo(px, EP.t); ec.lineTo(px, EP.b); ec.stroke();
+    ec.fillStyle = '#555'; ec.font = '9px Apple SD Gothic Neo, sans-serif';
+    ec.textAlign = 'center'; ec.textBaseline = 'top';
+    ec.fillText(y+'%', px, EP.b+4);
   });
 
-  // X axis labels (yield %)
-  [14, 16, 18, 20, 22, 24, 26].forEach(y => {
-    const px = yield2px(y);
-    eccCtx.strokeStyle = 'rgba(255,255,255,0.08)';
-    eccCtx.lineWidth = 0.5;
-    eccCtx.beginPath();
-    eccCtx.moveTo(px, ECC.top);
-    eccCtx.lineTo(px, ECC.bottom);
-    eccCtx.stroke();
-    eccCtx.fillStyle = '#666';
-    eccCtx.font = '9px Apple SD Gothic Neo, sans-serif';
-    eccCtx.textAlign = 'center';
-    eccCtx.textBaseline = 'top';
-    eccCtx.fillText(y + '%', px, ECC.bottom + 4);
-  });
+  // Axis labels
+  ec.save();
+  ec.translate(10, (EP.t+EP.b)/2);
+  ec.rotate(-Math.PI/2);
+  ec.fillStyle = '#555'; ec.font = '10px Apple SD Gothic Neo, sans-serif';
+  ec.textAlign = 'center'; ec.textBaseline = 'middle';
+  ec.fillText('TDS (농도)', 0, 0);
+  ec.restore();
 
-  // Axis titles
-  eccCtx.save();
-  eccCtx.translate(11, (ECC.top + ECC.bottom) / 2);
-  eccCtx.rotate(-Math.PI / 2);
-  eccCtx.fillStyle = '#666';
-  eccCtx.font = '10px Apple SD Gothic Neo, sans-serif';
-  eccCtx.textAlign = 'center';
-  eccCtx.fillText('TDS (농도)', 0, 0);
-  eccCtx.restore();
-
-  // Current dot on ECC
-  if (dotTds && dotYield) {
-    const cx = yield2px(dotYield);
-    const cy = tds2py(dotTds);
-    if (cx > ECC.left && cx < ECC.right && cy > ECC.top && cy < ECC.bottom) {
-      eccCtx.beginPath();
-      eccCtx.arc(cx, cy, 7, 0, Math.PI * 2);
-      eccCtx.fillStyle = '#ef4444';
-      eccCtx.fill();
-      eccCtx.strokeStyle = 'white';
-      eccCtx.lineWidth = 1.5;
-      eccCtx.stroke();
+  // Dot
+  if (dotTds != null && dotYield != null) {
+    const dpx = y2px(dotYield), dpy = t2py(dotTds);
+    if (dpx > EP.l && dpx < EP.r && dpy > EP.t && dpy < EP.b) {
+      ec.beginPath(); ec.arc(dpx, dpy, 7, 0, Math.PI*2);
+      ec.fillStyle = '#ef4444'; ec.fill();
+      ec.strokeStyle = '#fff'; ec.lineWidth = 1.5; ec.stroke();
     }
   }
 }
 
 function updateECC(tds, yld) {
-  const t = tds || parseFloat(document.getElementById('calcTds').value);
-  const y = yld || parseFloat(document.getElementById('calcResult').value);
+  const t = tds  ?? parseFloat(document.getElementById('cTds').value);
+  const y = yld  ?? parseFloat(document.getElementById('cResult').value);
   drawECC(t, y);
 }
 
-// ── ROAST / GRINDER ───────────────────────────────────────
-function setRoast(r) {
-  roast = r;
-  document.getElementById('tab-light').classList.toggle('active', r === 'light');
-  document.getElementById('tab-dark').classList.toggle('active',  r === 'dark');
-  drawWheel();
-}
-
-function onGrinderChange() {
-  const grinder = document.getElementById('grinderSelect').value;
-  if (!grinder) return;
-  // Move target slightly based on grinder type (simplified)
-  const offsets = {
-    timemore_c2:   { x: 0.1, y: 0.05 }, '1zpresso_jx': { x: 0.15, y: 0.1 },
-    comandante:    { x: 0.2, y: 0.15 }, kinu_m47:      { x: 0.2, y: 0.15 },
-    hario_slim:    { x: 0.05, y: 0.0 }, baratza_encore:{ x: 0.1, y: 0.1 },
-    eureka_mignon: { x: 0.15, y: 0.1 }, fellow_ode:    { x: 0.2, y: 0.15 },
-    mahlkonig_x54: { x: 0.2, y: 0.2 }, niche_zero:    { x: 0.2, y: 0.2 },
-  };
-  if (offsets[grinder]) targetPos = offsets[grinder];
-  drawWheel();
-  updateRecommendation();
-}
-
-// ── INIT ──────────────────────────────────────────────────
-drawWheel();
-updateRecommendation();
+// ─── INIT ────────────────────────────────────────────────
+drawCompass();
+updateRec();
 calcYield();
-drawECC(1.4, 21.0);
 </script>
 </body>
 </html>

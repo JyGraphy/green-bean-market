@@ -459,9 +459,10 @@ function drawGrid() {
   gc.textAlign = 'left';
   gc.fillText('수율 높이기', GX0+GW+2, GY0+GH/2);
 
-  // Arrow
-  const cp = gNorm2px(cur.nx, cur.ny);
-  const tp = gNorm2px(tgt.nx, tgt.ny);
+  // Grid uses delta: 현재 fixed at (0,0), 목표 at (tgt - cur)
+  const gdx = clamp(tgt.nx - cur.nx), gdy = clamp(tgt.ny - cur.ny);
+  const cp = gNorm2px(0, 0);
+  const tp = gNorm2px(gdx, gdy);
   drawArrowG(cp.px, cp.py, tp.px, tp.py);
 
   // Dots
@@ -519,8 +520,11 @@ function handleDown(canvas, e) {
     if (Math.sqrt(dnx*dnx+dny*dny) > 1.05) return;
     dragTarget = pickDot(cp.px,cp.py,tp.px,tp.py,px,py);
   } else {
-    const cp = gNorm2px(cur.nx,cur.ny), tp = gNorm2px(tgt.nx,tgt.ny);
-    dragTarget = pickDot(cp.px,cp.py,tp.px,tp.py,px,py);
+    // On grid, 현재 is always fixed — only 목표 is draggable
+    const gdx = clamp(tgt.nx - cur.nx), gdy = clamp(tgt.ny - cur.ny);
+    const tp = gNorm2px(gdx, gdy);
+    const dt = dist(px, py, tp.px, tp.py);
+    dragTarget = dt < 36 ? 'tgt' : 'tgt'; // always tgt on grid
   }
   dragCanvas = canvas;
   handleMove(canvas, e);
@@ -533,11 +537,14 @@ function handleMove(canvas, e) {
   let nx, ny;
   if (canvas === WC) {
     nx = clamp((px-WCX)/WR); ny = clamp(-(py-WCY)/WR);
+    if (dragTarget === 'cur') cur = {nx,ny};
+    else                       tgt = {nx,ny};
   } else {
-    nx = clamp(gPx2norm(px,py).nx); ny = clamp(gPx2norm(px,py).ny);
+    // Grid drag: delta from cur
+    const gnx = clamp(gPx2norm(px,py).nx);
+    const gny = clamp(gPx2norm(px,py).ny);
+    tgt = { nx: clamp(cur.nx + gnx), ny: clamp(cur.ny + gny) };
   }
-  if (dragTarget === 'cur') cur = {nx,ny};
-  else                       tgt = {nx,ny};
   redrawAll();
 }
 

@@ -178,7 +178,7 @@ h1.page-title { font-size: 1.8rem; font-weight: 900; letter-spacing: -0.5px; mar
       <div class="legend-item"><div class="ldot" style="background:#ef4444"></div>현재</div>
       <div class="legend-item"><div class="ldot" style="background:#4ade80"></div>목표</div>
     </div>
-    <p style="font-size:0.73rem;color:#444;text-align:center;margin-top:6px">화면을 눌러 현재 위치를 설정하세요</p>
+    <p style="font-size:0.73rem;color:#444;text-align:center;margin-top:6px">● 현재·목표 두 점 모두 드래그로 이동할 수 있습니다</p>
   </div>
 
   <div class="divider"></div>
@@ -242,13 +242,11 @@ h1.page-title { font-size: 1.8rem; font-weight: 900; letter-spacing: -0.5px; mar
 
 <script>
 // ─── STATE ───────────────────────────────────────────────
-// curPos: {nx, ny} in units of the compass grid
-// target is always (0, 0) = center = ideal
-// X axis: yield offset  (right = higher yield)
-// Y axis: strength offset (up = stronger)
-let curPos = { nx: -0.15, ny: -0.1 };
+// nx,ny: -1..1 (x=yield offset, y=strength offset)
+let curPos = { nx:  0.0,  ny:  0.0 };  // 현재 (red)
+let tgtPos = { nx:  0.2,  ny:  0.3 };  // 목표 (green)
 let roast = 'light';
-let isDragging = false;
+let dragging = null; // 'cur' | 'tgt' | null
 
 // ─── COMPASS CANVAS ──────────────────────────────────────
 const CC = document.getElementById('compassCanvas');
@@ -420,21 +418,20 @@ function drawCompass() {
   cx.textBaseline = 'middle';
   cx.fillText('균형잡힌', MX, MY);
 
-  // Target dot (always center = ideal)
-  const TPX = MX, TPY = MY;
+  // Target dot (목표 — movable)
+  const tpx = nx2px(tgtPos.nx), tpy = ny2py(tgtPos.ny);
   cx.beginPath();
-  cx.arc(TPX, TPY, 13, 0, Math.PI * 2);
+  cx.arc(tpx, tpy, 13, 0, Math.PI * 2);
   cx.fillStyle = '#4ade80';
   cx.fill();
   cx.font = 'bold 9px Apple SD Gothic Neo, sans-serif';
   cx.fillStyle = '#111';
   cx.textAlign = 'center';
   cx.textBaseline = 'middle';
-  cx.fillText('목표', TPX, TPY);
+  cx.fillText('목표', tpx, tpy);
 
-  // Current dot
-  const cpx = nx2px(curPos.nx);
-  const cpy = ny2py(curPos.ny);
+  // Current dot (현재 — movable)
+  const cpx = nx2px(curPos.nx), cpy = ny2py(curPos.ny);
   cx.beginPath();
   cx.arc(cpx, cpy, 13, 0, Math.PI * 2);
   cx.fillStyle = '#ef4444';
@@ -446,7 +443,7 @@ function drawCompass() {
   cx.fillText('현재', cpx, cpy);
 
   // Arrow from current to target
-  drawArrow(cpx, cpy, TPX, TPY);
+  drawArrow(cpx, cpy, tpx, tpy);
 }
 
 function drawArrow(x1, y1, x2, y2) {
@@ -475,40 +472,62 @@ function drawArrow(x1, y1, x2, y2) {
 }
 
 // ─── INTERACTION ─────────────────────────────────────────
-function getPos(e) {
+function getCanvasXY(e) {
   const rect = CC.getBoundingClientRect();
   const scX = W / rect.width, scY = H / rect.height;
-  const cx_ = e.touches ? e.touches[0].clientX : e.clientX;
-  const cy_ = e.touches ? e.touches[0].clientY : e.clientY;
-  const px = (cx_ - rect.left) * scX;
-  const py = (cy_ - rect.top)  * scY;
-  return { px, py };
+  const cl = e.touches ? e.touches[0] : e;
+  return {
+    px: (cl.clientX - rect.left) * scX,
+    py: (cl.clientY - rect.top)  * scY,
+  };
 }
 
-function applyPos(px, py) {
-  let nx = px2nx(px), ny = py2ny(py);
-  nx = Math.max(-1, Math.min(1, nx));
-  ny = Math.max(-1, Math.min(1, ny));
-  curPos = { nx, ny };
+function clampNorm(v) { return Math.max(-1, Math.min(1, v)); }
+
+function distPx(ax, ay, bx, by) { return Math.sqrt((ax-bx)**2 + (ay-by)**2); }
+
+function onDown(e) {
+  e.preventDefault();
+  const { px, py } = getCanvasXY(e);
+  const cpx = nx2px(curPos.nx), cpy = ny2py(curPos.ny);
+  const tpx = nx2px(tgtPos.nx), tpy = ny2py(tgtPos.ny);
+  const dCur = distPx(px, py, cpx, cpy);
+  const dTgt = distPx(px, py, tpx, tpy);
+  const HIT = 28; // hit radius in canvas px
+  if (dCur < HIT && dCur <= dTgt) dragging = 'cur';
+  else if (dTgt < HIT) dragging = 'tgt';
+  else dragging = 'cur'; // default: move 현재
+  onMove(e);
+}
+
+function onMove(e) {
+  if (!dragging) return;
+  e.preventDefault();
+  const { px, py } = getCanvasXY(e);
+  const nx = clampNorm(px2nx(px));
+  const ny = clampNorm(py2ny(py));
+  if (dragging === 'cur') curPos = { nx, ny };
+  else                    tgtPos = { nx, ny };
   drawCompass();
   updateRec();
   updateECC();
 }
 
-CC.addEventListener('mousedown',  e => { e.preventDefault(); isDragging = true; applyPos(...Object.values(getPos(e))); });
-CC.addEventListener('mousemove',  e => { if (!isDragging) return; e.preventDefault(); applyPos(...Object.values(getPos(e))); });
-CC.addEventListener('mouseup',    () => { isDragging = false; });
-CC.addEventListener('mouseleave', () => { isDragging = false; });
-CC.addEventListener('touchstart', e => { e.preventDefault(); isDragging = true; applyPos(...Object.values(getPos(e))); }, { passive:false });
-CC.addEventListener('touchmove',  e => { e.preventDefault(); if (isDragging) applyPos(...Object.values(getPos(e))); }, { passive:false });
-CC.addEventListener('touchend',   () => { isDragging = false; });
+function onUp() { dragging = null; }
+
+CC.addEventListener('mousedown',  onDown);
+CC.addEventListener('mousemove',  onMove);
+CC.addEventListener('mouseup',    onUp);
+CC.addEventListener('mouseleave', onUp);
+CC.addEventListener('touchstart', onDown, { passive:false });
+CC.addEventListener('touchmove',  onMove, { passive:false });
+CC.addEventListener('touchend',   onUp);
 
 // ─── RECOMMENDATION ──────────────────────────────────────
-// dx = 0 - curPos.nx → positive means need more yield
-// dy = 0 - curPos.ny → positive means need more strength
+// Vector from 현재 → 목표
 function updateRec() {
-  const dx = -curPos.nx;
-  const dy = -curPos.ny;
+  const dx = tgtPos.nx - curPos.nx;  // positive = move right = more yield
+  const dy = tgtPos.ny - curPos.ny;  // positive = move up   = more strength
   const THRESH = 0.08;
 
   const needMoreYield  = dx >  THRESH;

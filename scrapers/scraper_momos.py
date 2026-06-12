@@ -64,6 +64,13 @@ def fetch(url, session):
     r.raise_for_status()
     return r.text
 
+def is_soldout_block(el):
+    if el is None: return False
+    if el.select_one('img[alt*="품절"], img[alt*="SOLD"], img[src*="soldout"]'): return True
+    if el.select_one('.soldout, .ec-soldout, [class*="soldout"]'): return True
+    if re.search(r'품절|SOLD.?OUT', el.get_text()): return True
+    return False
+
 def parse_page(html):
     soup = BeautifulSoup(html, 'html.parser')
     items = []

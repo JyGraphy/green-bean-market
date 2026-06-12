@@ -25,21 +25,21 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCRAPERS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 SCRAPERS = [
-    # (파일명, 설명)
+    # 가나다 순 (더블유빈 제외 — 클라이언트렌더링/차단)
     ('scraper_momos.py',       '모모스커피'),
+    ('scraper_blessbean.py',   '블레스빈'),
+    ('scraper_ayantu.py',      '아얀투'),
+    ('scraper_micoffee.py',    '엠아이커피'),
+    ('scraper_oromia.py',      '오로미아코리아'),
+    ('scraper_mayforest.py',   '오월의숲'),
+    ('scraper_gsc.py',         '지에스씨(GSC)'),
+    ('scraper_comansa.py',     '커만사'),
     ('scraper_coffeelibre.py', '커피리브레'),
+    ('scraper_coffeehouse.py', '커피창고'),
     # 이후 추가 예정:
-    # ('scraper_blessbean.py',   '블레스빈'),
-    # ('scraper_ayantu.py',      '아얀투'),
-    # ('scraper_micoffee.py',    '엠아이커피'),
-    # ('scraper_oromia.py',      '오로미아코리아'),
-    # ('scraper_mayforest.py',   '오월의숲'),
-    # ('scraper_gsc.py',         '지에스씨(GSC)'),
-    # ('scraper_comansa.py',     '커만사'),
-    # ('scraper_coffeehouse.py', '커피창고'),
     # ('scraper_coffeeplant.py', '커피플랜트'),
     # ('scraper_cobeans.py',     '코빈즈커피'),
-    # ('scraper_compass.py',     '콤파스커피'),
+    # ('scraper_compass.py',     '콤파스커피'),  # Sixshop JS 필요
     # ('scraper_falcon.py',      '팔콘커피'),
 ]
 

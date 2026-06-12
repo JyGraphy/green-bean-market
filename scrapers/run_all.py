@@ -36,11 +36,10 @@ SCRAPERS = [
     ('scraper_comansa.py',     '커만사'),
     ('scraper_coffeelibre.py', '커피리브레'),
     ('scraper_coffeehouse.py', '커피창고'),
-    # 이후 추가 예정:
-    # ('scraper_coffeeplant.py', '커피플랜트'),
-    # ('scraper_cobeans.py',     '코빈즈커피'),
-    # ('scraper_compass.py',     '콤파스커피'),  # Sixshop JS 필요
-    # ('scraper_falcon.py',      '팔콘커피'),
+    ('scraper_coffeeplant.py', '커피플랜트'),
+    ('scraper_cobeans.py',     '코빈즈커피'),
+    # 콤파스커피: Sixshop JS렌더링 — 별도 처리 필요
+    ('scraper_falcon.py',      '팔콘커피'),
 ]
 
 errors = []

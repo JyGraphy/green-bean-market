@@ -17,13 +17,10 @@ def parse(html):
         if not name_el: continue
         name = name_el.get_text(strip=True)
         if not name or len(name) < 3: continue
-        if name in ['장바구니','찜하기','SOLD OUT','품절']: continue
+        if name in ['장바구니','찜하기']: continue
 
-        # 가격
-        price_m = re.search(r'([\d,]+)원', card.get_text())
-        if not price_m: continue
-        price = int(price_m.group(1).replace(',',''))
-        if price < 1000: continue
+        card_text = card.get_text()
+        soldout = bool(re.search(r'품절|SOLD.?OUT', card_text))
 
         # URL: 부모 li나 상위에서 goods_view 링크
         parent = card.parent
@@ -33,7 +30,12 @@ def parse(html):
         if href.startswith('..'): href = href.replace('..', '/goods')
         url = BASE + href if href.startswith('/') else href
 
-        items.append({'name': name, 'price': price, 'url': url})
+        # 가격 (품절이면 0 허용, update_json에서 기존 가격 복원)
+        price_m = re.search(r'([\d,]+)원', card_text)
+        price = int(price_m.group(1).replace(',','')) if price_m else 0
+        if price < 1000 and not soldout: continue
+
+        items.append({'name': name, 'price': price, 'url': url, 'is_soldout': soldout})
     return items
 
 def get_total_pages_wbeans(html):

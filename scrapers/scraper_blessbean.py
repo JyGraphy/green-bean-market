@@ -23,7 +23,7 @@ def parse_list(html):
         name = a.get_text(strip=True)
         # 이름이 없거나 배지 텍스트면 skip
         if not name or len(name) < 3: continue
-        if name in ['DC','SOLD','품절','준비중','간편주문','생두']: continue
+        if name in ['DC','SOLD','준비중','간편주문','생두']: continue
         if code in seen_code: continue
         seen_code.add(code)
         url = BASE + f'/shop/{code}'
@@ -31,27 +31,25 @@ def parse_list(html):
     return items
 
 def fetch_price(url, session):
-    """개별 상품 페이지에서 1kg 가격 추출"""
+    """개별 상품 페이지에서 1kg 가격 및 품절 여부 반환 → (price, is_soldout)"""
     try:
         html = fetch(url, session)
-        text = html
+        # 품절 감지
+        soldout = bool(re.search(r'품절|SOLD.?OUT|sold.?out', html))
         # "1kg + XX,XXX원" 패턴 우선
-        m = re.search(r'1kg\s*\+\s*([\d,]+)원', text)
-        if m: return int(m.group(1).replace(',',''))
-        # "1 kg + XX,XXX원" 변형
-        m = re.search(r'1\s*kg[^<]{0,20}([\d,]+)원', text)
-        if m: return int(m.group(1).replace(',',''))
-        # 첫 번째 의미있는 가격 (0원 제외)
-        from bs4 import BeautifulSoup
+        m = re.search(r'1kg\s*\+\s*([\d,]+)원', html)
+        if m: return int(m.group(1).replace(',','')), soldout
+        m = re.search(r'1\s*kg[^<]{0,20}([\d,]+)원', html)
+        if m: return int(m.group(1).replace(',','')), soldout
         soup = BeautifulSoup(html, 'html.parser')
         for t in soup.find_all(string=re.compile(r'\d[\d,]+원')):
             p_m = re.search(r'([\d,]+)원', t)
             if p_m:
                 p = int(p_m.group(1).replace(',',''))
-                if p >= 5000: return p
-        return 0
+                if p >= 5000: return p, soldout
+        return 0, soldout
     except Exception:
-        return 0
+        return 0, False
 
 def scrape():
     print(f"[{STORE}] 시작...")
@@ -78,8 +76,11 @@ def scrape():
     # 개별 가격 수집
     result = []
     for i, item in enumerate(unique):
-        price = fetch_price(item['url'], s)
-        if price > 0:
+        price, soldout = fetch_price(item['url'], s)
+        if soldout:
+            result.append({'name': item['name'], 'price': price, 'url': item['url'], 'is_soldout': True})
+            print(f"  [{i+1}/{len(unique)}] 품절: {item['name'][:40]}")
+        elif price > 0:
             result.append({'name': item['name'], 'price': price, 'url': item['url']})
             print(f"  [{i+1}/{len(unique)}] {item['name'][:40]} → {price:,}원")
         else:

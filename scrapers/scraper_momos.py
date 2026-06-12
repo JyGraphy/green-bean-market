@@ -94,8 +94,11 @@ def parse_page(html):
         href = name_el.get('href', '')
         url = BASE + href if href.startswith('/') else href
 
+        # 품절 감지 (Cafe24: soldout 클래스 또는 텍스트)
+        soldout = bool(card.select_one('.soldout, .ec-soldout, [class*="soldout"]')) or \
+                  bool(re.search(r'품절|SOLD.?OUT', card.get_text()))
+
         # 가격
-        price_el = card.select_one('.description span')  # 판매가 span
         price = 0
         for span in card.select('span'):
             m = re.search(r'([\d,]+)원', span.get_text())
@@ -103,10 +106,10 @@ def parse_page(html):
                 price = int(m.group(1).replace(',', ''))
                 break
 
-        if not price or not name:
-            continue
+        if not name: continue
+        if not price and not soldout: continue
 
-        items.append({'name': name, 'price': price, 'url': url})
+        items.append({'name': name, 'price': price, 'url': url, 'is_soldout': soldout})
     return items
 
 def get_total_pages(html):

@@ -17,15 +17,16 @@ def parse(html):
         name_el = card.select_one('strong, .name')
         name = (name_el or a).get_text(strip=True)
         if not name or len(name) < 3: continue
-        m = re.search(r'판매가.*?([\d,]+)원', card.get_text(), re.DOTALL)
-        if not m:
-            m = re.search(r'([\d,]+)원', card.get_text())
-        if not m: continue
-        price = int(m.group(1).replace(',',''))
-        if price < 1000: continue
+        card_text = card.get_text()
+        soldout = bool(card.select_one('.soldout, .ec-soldout, [class*="soldout"]')) or \
+                  bool(re.search(r'품절|SOLD.?OUT', card_text))
+        m = re.search(r'판매가.*?([\d,]+)원', card_text, re.DOTALL)
+        if not m: m = re.search(r'([\d,]+)원', card_text)
+        price = int(m.group(1).replace(',','')) if m else 0
+        if price < 1000 and not soldout: continue
         href = a.get('href','')
         url = BASE + href if href.startswith('/') else href
-        items.append({'name': name, 'price': price, 'url': url})
+        items.append({'name': name, 'price': price, 'url': url, 'is_soldout': soldout})
     return items
 
 def scrape():

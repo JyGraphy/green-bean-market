@@ -20,7 +20,7 @@ def sql_str(s):
 lines = []
 for p in products:
     lines.append(
-        "  ({},{},{},{},{},{},{},{},{},{},{},{})".format(
+        "  ({},{},{},{},{},{},{},{},{},{},{},{},{})".format(
             p['id'],
             "'" + sql_str(p['store']) + "'",
             "'" + sql_str(p['name']) + "'",
@@ -33,6 +33,7 @@ for p in products:
             1 if p['is_new'] else 0,
             1 if p['is_decaf'] else 0,
             1 if p['is_special'] else 0,
+            1 if p.get('is_soldout') else 0,
         )
     )
 
@@ -53,9 +54,10 @@ header = (
     "  url TEXT NOT NULL,\n"
     "  isNew INTEGER DEFAULT 0,\n"
     "  isDecaf INTEGER DEFAULT 0,\n"
-    "  isSpecial INTEGER DEFAULT 0\n"
+    "  isSpecial INTEGER DEFAULT 0,\n"
+    "  isSoldout INTEGER DEFAULT 0\n"
     ");\n\n"
-    "INSERT INTO products (id,store,name,price,origin,region,process,notes,url,isNew,isDecaf,isSpecial) VALUES\n"
+    "INSERT INTO products (id,store,name,price,origin,region,process,notes,url,isNew,isDecaf,isSpecial,isSoldout) VALUES\n"
 )
 
 with open(SQL_FILE, 'w', encoding='utf-8') as f:

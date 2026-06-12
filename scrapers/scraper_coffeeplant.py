@@ -16,17 +16,21 @@ def parse(html):
         if not name or len(name) < 3: continue
         parent = a
         price = 0
+        soldout = False
         for _ in range(8):
             parent = parent.parent
             if parent is None: break
-            m = re.search(r'([\d,]+)원', parent.get_text())
+            block_text = parent.get_text()
+            if not soldout:
+                soldout = bool(re.search(r'품절|SOLD.?OUT', block_text))
+            m = re.search(r'([\d,]+)원', block_text)
             if m:
                 price = int(m.group(1).replace(',',''))
                 if price > 1000: break
-        if not price: continue
+        if not price and not soldout: continue
         href = a.get('href','')
         url = BASE + href if href.startswith('/') else href
-        items.append({'name': name, 'price': price, 'url': url})
+        items.append({'name': name, 'price': price, 'url': url, 'is_soldout': soldout})
     return items
 
 def scrape():

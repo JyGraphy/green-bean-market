@@ -24,7 +24,7 @@ function showLoading(on) {
 }
 
 function queryAll() {
-  const result = DB.exec('SELECT id,store,name,price,origin,region,process,notes,url,isNew,isDecaf,isSpecial FROM products');
+  const result = DB.exec('SELECT id,store,name,price,origin,region,process,notes,url,isNew,isDecaf,isSpecial,isSoldout FROM products');
   if (!result.length) return [];
   const { columns, values } = result[0];
   return values.map(row => {
@@ -33,6 +33,7 @@ function queryAll() {
     p.isNew     = p.isNew     === 1;
     p.isDecaf   = p.isDecaf   === 1;
     p.isSpecial = p.isSpecial === 1;
+    p.isSoldout = p.isSoldout === 1;
     return p;
   });
 }
@@ -221,7 +222,10 @@ function renderTable(items, ctr) {
         p.isSpecial ? `<span class="bsm bsm-special">스페셜티</span>` : '',
       ].filter(Boolean).join(' ');
       const notes = p.notes ? `<div class="name-notes">☕ ${p.notes}</div>` : '';
-      return `<tr>
+      const buyBtn = p.isSoldout
+        ? `<span class="soldout-badge">품절</span>`
+        : `<a href="${p.url}" target="_blank" rel="noopener" class="buy-lnk">구매 →</a>`;
+      return `<tr class="${p.isSoldout ? 'row-soldout' : ''}">
         <td><div class="origin-cell"><span class="oflag">${flag}</span><span class="oname">${p.origin}</span></div></td>
         <td class="name-wrap">
           <div class="name-main">${p.name}</div>
@@ -231,7 +235,7 @@ function renderTable(items, ctr) {
         <td><span class="proc-badge ${pc}">${p.process}</span></td>
         <td class="td-price"><span class="price-val">₩${p.price.toLocaleString()}</span><span class="price-kg">/kg</span></td>
         <td><span class="sp ${sc}">${p.store}</span></td>
-        <td><a href="${p.url}" target="_blank" rel="noopener" class="buy-lnk">구매 →</a></td>
+        <td>${buyBtn}</td>
       </tr>`;
     }).join('')}</tbody>
   </table></div>`;
@@ -249,7 +253,10 @@ function renderCards(items, ctr) {
       p.isSpecial ? `<span class="bsm bsm-special">스페셜티</span>` : '',
     ].filter(Boolean).join('');
     const notes = p.notes ? `<div class="c-notes">☕ ${p.notes}</div>` : '';
-    return `<div class="c-card">
+    const buyBtn2 = p.isSoldout
+      ? `<span class="soldout-badge">품절</span>`
+      : `<a href="${p.url}" target="_blank" rel="noopener" class="buy-lnk">구매 →</a>`;
+    return `<div class="c-card${p.isSoldout ? ' card-soldout' : ''}">
       <div class="c-top"><div class="c-badges">${bdgs}</div><span class="sp ${sc}">${p.store}</span></div>
       <div class="c-mid">
         <div class="c-title">${p.name}</div>
@@ -259,7 +266,7 @@ function renderCards(items, ctr) {
       </div>
       <div class="c-bot">
         <div><div class="c-price">₩${p.price.toLocaleString()}</div><div class="c-price-unit">1kg 기준</div></div>
-        <a href="${p.url}" target="_blank" rel="noopener" class="buy-lnk">구매 →</a>
+        ${buyBtn2}
       </div>
     </div>`;
   }).join('')}</div>`;
@@ -389,7 +396,9 @@ function renderTableMobile(items, ctr) {
       ${notes}
       <div class="mob-row-bot">
         <span class="sp ${sc}">${p.store}</span>
-        <a href="${p.url}" target="_blank" rel="noopener" class="buy-lnk">구매 →</a>
+        ${p.isSoldout
+          ? `<span class="soldout-badge">품절</span>`
+          : `<a href="${p.url}" target="_blank" rel="noopener" class="buy-lnk">구매 →</a>`}
       </div>
     </div>`;
   }).join('');

@@ -16,19 +16,22 @@ def parse(html):
         if not name or len(name) < 3: continue
         parent = a
         price = 0
+        soldout = False
         for _ in range(8):
             parent = parent.parent
             if parent is None: break
-            # 할인가 우선: 마지막 가격 (원본→할인)
-            prices = re.findall(r'([\d,]+)원', parent.get_text())
+            block_text = parent.get_text()
+            if not soldout:
+                soldout = bool(re.search(r'품절|SOLD.?OUT', block_text))
+            prices = re.findall(r'([\d,]+)원', block_text)
             valid = [int(p.replace(',','')) for p in prices if int(p.replace(',','')) > 1000]
             if valid:
-                price = valid[-1]  # 할인가가 마지막에 오는 경우
+                price = valid[-1]
                 break
-        if not price: continue
+        if not price and not soldout: continue
         href = a.get('href','')
         url = BASE + '/shop/' + href if href.startswith('detail') else (BASE + href if href.startswith('/') else href)
-        items.append({'name': name, 'price': price, 'url': url})
+        items.append({'name': name, 'price': price, 'url': url, 'is_soldout': soldout})
     return items
 
 def scrape():

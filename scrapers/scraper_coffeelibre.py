@@ -76,24 +76,28 @@ def parse_page(html):
         if not name:
             continue
 
-        # 부모 블록에서 가격 찾기
+        # 부모 블록에서 가격 및 품절 찾기
         parent = a
         price = 0
+        soldout = False
         for _ in range(10):
             parent = parent.parent
             if parent is None:
                 break
-            price_text = parent.get_text()
-            m = re.search(r'([\d,]+)원', price_text)
+            block_text = parent.get_text()
+            if not soldout:
+                soldout = bool(re.search(r'품절|SOLD.?OUT', block_text)) or \
+                          bool(parent.select_one('.soldout, .ec-soldout, [class*="soldout"]'))
+            m = re.search(r'([\d,]+)원', block_text)
             if m:
                 price = int(m.group(1).replace(',', ''))
-                if price > 1000:  # 유효한 가격
+                if price > 1000:
                     break
 
-        if not price:
+        if not price and not soldout:
             continue
 
-        items.append({'name': name, 'price': price, 'url': url})
+        items.append({'name': name, 'price': price, 'url': url, 'is_soldout': soldout})
 
     return items
 

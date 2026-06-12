@@ -74,28 +74,48 @@ def to_products(items, store, id_start):
         origin, region = guess_origin(item['name'])
         name = item['name']
         results.append({
-            "id":         id_start + i,
-            "store":      store,
-            "name":       name,
-            "price":      item['price'],
-            "origin":     origin,
-            "region":     region,
-            "process":    guess_process(name),
-            "notes":      item.get('notes', ''),
-            "url":        item['url'],
-            "is_new":     any(x in name for x in ['2026','25/26','2025/26','2025/2026','-26CROP-']),
-            "is_decaf":   '디카페인' in name or 'decaf' in name.lower(),
-            "is_special": any(x in name for x in ['게이샤','Geisha','파카마라','Pacamara','에스메랄다']) or item['price'] >= 50000,
+            "id":          id_start + i,
+            "store":       store,
+            "name":        name,
+            "price":       item['price'],
+            "origin":      origin,
+            "region":      region,
+            "process":     guess_process(name),
+            "notes":       item.get('notes', ''),
+            "url":         item['url'],
+            "is_new":      any(x in name for x in ['2026','25/26','2025/26','2025/2026','-26CROP-']),
+            "is_decaf":    '디카페인' in name or 'decaf' in name.lower(),
+            "is_special":  any(x in name for x in ['게이샤','Geisha','파카마라','Pacamara','에스메랄다']) or item['price'] >= 50000,
+            "is_soldout":  item.get('is_soldout', False),
         })
     return results
 
 def update_json(store, new_products):
+    """
+    - new_products에 is_soldout=True 항목: DB에 품절로 보존 (가격은 기존 DB 값 유지)
+    - new_products에 있는 정상 항목: 업데이트
+    - 기존 DB에 있었지만 new_products에 없는 항목: 완전 삭제
+    """
     root = os.path.join(os.path.dirname(__file__), '..')
     json_path = os.path.join(root, 'data', 'products.json')
     with open(json_path, encoding='utf-8') as f:
         data = json.load(f)
+
+    # 이전 DB에서 이 공급사 항목의 URL→가격 매핑 (품절 가격 복원용)
+    prev_price = {p['url']: p['price'] for p in data['products'] if p['store'] == store}
+
+    # 품절 항목: 기존 가격 복원
+    for p in new_products:
+        if p.get('is_soldout') and p['price'] == 0 and p['url'] in prev_price:
+            p['price'] = prev_price[p['url']]
+
     kept = [p for p in data['products'] if p['store'] != store]
     data['products'] = kept + new_products
     with open(json_path, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
-    print(f"✅ {store}: {len(new_products)}개 저장완료")
+
+    available = sum(1 for p in new_products if not p.get('is_soldout'))
+    soldout   = sum(1 for p in new_products if p.get('is_soldout'))
+    msg = f"✅ {store}: {available}개 저장완료"
+    if soldout: msg += f" (품절 {soldout}개)"
+    print(msg)

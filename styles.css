@@ -369,6 +369,22 @@
   }
   .buy-lnk:hover { background: var(--accent-hover); }
 
+  .soldout-badge {
+    display: inline-block;
+    padding: 5px 13px;
+    background: #f1f5f9;
+    color: #94a3b8;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+    border: 1px solid #e2e8f0;
+    cursor: default;
+  }
+  .row-soldout td { opacity: 0.55; }
+  .row-soldout td:last-child { opacity: 1; }
+  .card-soldout { opacity: 0.6; }
+
   /* CARD GRID */
   .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(272px, 1fr)); gap: 14px; }
   .c-card {

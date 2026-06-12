@@ -94,9 +94,8 @@ def parse_page(html):
         href = name_el.get('href', '')
         url = BASE + href if href.startswith('/') else href
 
-        # 품절 감지 (Cafe24: soldout 클래스 또는 텍스트)
-        soldout = bool(card.select_one('.soldout, .ec-soldout, [class*="soldout"]')) or \
-                  bool(re.search(r'품절|SOLD.?OUT', card.get_text()))
+        # 품절 감지 (Cafe24: img alt="품절", soldout 클래스, 텍스트)
+        soldout = is_soldout_block(card)
 
         # 가격
         price = 0

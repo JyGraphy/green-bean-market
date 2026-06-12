@@ -22,7 +22,7 @@ def parse(html):
             if parent is None: break
             block_text = parent.get_text()
             if not soldout:
-                soldout = bool(re.search(r'품절|SOLD.?OUT', block_text))
+                soldout = is_soldout_block(parent)
             m = re.search(r'([\d,]+)원', block_text)
             if m:
                 price = int(m.group(1).replace(',',''))

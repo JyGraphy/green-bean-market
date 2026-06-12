@@ -18,8 +18,7 @@ def parse(html):
         name = (name_el or a).get_text(strip=True)
         if not name or len(name) < 3: continue
         card_text = card.get_text()
-        soldout = bool(card.select_one('.soldout, .ec-soldout, [class*="soldout"]')) or \
-                  bool(re.search(r'품절|SOLD.?OUT', card_text))
+        soldout = is_soldout_block(card)
         m = re.search(r'판매가.*?([\d,]+)원', card_text, re.DOTALL)
         if not m: m = re.search(r'([\d,]+)원', card_text)
         price = int(m.group(1).replace(',','')) if m else 0

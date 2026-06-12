@@ -20,7 +20,7 @@ def parse(html):
         if name in ['장바구니','찜하기']: continue
 
         card_text = card.get_text()
-        soldout = bool(re.search(r'품절|SOLD.?OUT', card_text))
+        soldout = is_soldout_block(card)
 
         # URL: 부모 li나 상위에서 goods_view 링크
         parent = card.parent

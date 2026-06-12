@@ -86,8 +86,7 @@ def parse_page(html):
                 break
             block_text = parent.get_text()
             if not soldout:
-                soldout = bool(re.search(r'품절|SOLD.?OUT', block_text)) or \
-                          bool(parent.select_one('.soldout, .ec-soldout, [class*="soldout"]'))
+                soldout = is_soldout_block(parent)
             m = re.search(r'([\d,]+)원', block_text)
             if m:
                 price = int(m.group(1).replace(',', ''))

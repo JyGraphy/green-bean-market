@@ -53,6 +53,18 @@ def guess_process(name):
     if any(x in n for x in ['wet hulled','wet hul','웻훌']): return '웻훌드'
     return '알수없음'
 
+def is_soldout_block(el):
+    """BeautifulSoup 요소에서 품절 여부 감지 (텍스트, 클래스, img alt 모두 체크)"""
+    if el is None:
+        return False
+    if el.select_one('img[alt*="품절"], img[alt*="SOLD"], img[src*="soldout"]'):
+        return True
+    if el.select_one('.soldout, .ec-soldout, [class*="soldout"]'):
+        return True
+    if re.search(r'품절|SOLD.?OUT', el.get_text()):
+        return True
+    return False
+
 def new_session():
     s = requests.Session()
     s.headers.update(HEADERS)

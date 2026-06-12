@@ -11,31 +11,39 @@ URL   = BASE + '/product/list.html?cate_no=50&page={page}'
 def parse(html):
     soup = BeautifulSoup(html, 'html.parser')
     items = []
-    # 가격 span → 부모 체인 → 상품명 링크
-    for price_span in soup.find_all(string=re.compile(r'\d[\d,]+원')):
-        price_m = re.search(r'([\d,]+)원', price_span)
-        if not price_m: continue
-        price = int(price_m.group(1).replace(',',''))
-        if price < 1000: continue
-        # 부모 체인에서 상품 URL, 이름 찾기
-        parent = price_span.parent
-        name, url = None, None
-        for _ in range(10):
-            parent = parent.parent
-            if parent is None: break
-            a = parent.select_one('a[href*="/product/"]')
-            if a:
-                raw = a.get_text(strip=True)
-                # "상품명:[커피생두] " 접두어 제거
-                raw = re.sub(r'^상품명:', '', raw).strip()
-                raw = re.sub(r'^\[커피생두\]\s*', '', raw).strip()
-                if raw and len(raw) > 3:
-                    name = raw
-                    href = a.get('href','')
-                    url = BASE + href if href.startswith('/') else href
-                    break
-        if name and url:
-            items.append({'name': name, 'price': price, 'url': url})
+    seen = set()
+
+    for li in soup.select('ul.prdList li, li.xans-record-'):
+        # 상품 링크
+        a = li.select_one('a[href*="/product/"]')
+        if not a: continue
+        href = a.get('href', '')
+        if not href or href in seen or '/list' in href: continue
+        seen.add(href)
+        url = BASE + href if href.startswith('/') else href
+
+        # 상품명
+        li_text = li.get_text(separator=' ', strip=True)
+        raw = a.get('title') or a.get_text(strip=True)
+        raw = re.sub(r'^상품명[:\s]*', '', raw).strip()
+        raw = re.sub(r'^\[커피생두\]\s*', '', raw).strip()
+        # 텍스트에서 "상품명 :" 패턴으로 추출
+        m = re.search(r'상품명\s*[:\s]+([^\n판]{4,80})', li_text)
+        if m and len(m.group(1).strip()) > 3:
+            raw = re.sub(r'^\[커피생두\]\s*', '', m.group(1).strip()).strip()
+        if not raw or len(raw) < 3: continue
+
+        # 품절 감지: img alt="품절", soldout 클래스, 텍스트
+        soldout = is_soldout_block(li)
+
+        # 가격
+        price_m = re.search(r'판매가[^0-9]*([\d,]+)원', li_text)
+        if not price_m:
+            price_m = re.search(r'([\d,]+)원', li_text)
+        price = int(price_m.group(1).replace(',', '')) if price_m else 0
+        if price < 1000 and not soldout: continue
+
+        items.append({'name': raw, 'price': price, 'url': url, 'is_soldout': soldout})
     return items
 
 def scrape():

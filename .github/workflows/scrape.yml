@@ -23,7 +23,8 @@ jobs:
 
       - name: 의존성 설치
         run: |
-          pip install requests beautifulsoup4 lxml
+          pip install requests beautifulsoup4 lxml playwright
+          python -m playwright install chromium --with-deps
 
       - name: 스크래퍼 실행
         run: python scrapers/run_all.py
@@ -31,14 +32,14 @@ jobs:
       - name: 변경사항 확인
         id: check_changes
         run: |
-          git diff --quiet data/products.json data.js || echo "changed=true" >> $GITHUB_OUTPUT
+          git diff --quiet data/products.json database.sql || echo "changed=true" >> $GITHUB_OUTPUT
 
       - name: 변경사항 커밋 & 푸시
         if: steps.check_changes.outputs.changed == 'true'
         run: |
           git config user.name "GreenBeanBot"
           git config user.email "bot@green-bean-market"
-          git add data/products.json data.js
+          git add data/products.json database.sql
           git commit -m "자동 갱신: $(date '+%Y-%m-%d') 생두 데이터 업데이트"
           git push
 

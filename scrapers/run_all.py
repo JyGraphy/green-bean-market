@@ -3,21 +3,21 @@
 GitHub Actions에서 호출됨
 
 가나다 순:
-- 더블유빈     → wbeans.com (클라이언트 렌더링, 현재 미지원)
+- 더블유빈     ✅ (Godomall goods_search)
 - 모모스커피   ✅
-- 블레스빈     🔜
-- 아얀투       🔜
-- 엠아이커피   🔜
-- 오로미아코리아 🔜
-- 오월의숲     🔜
-- 지에스씨(GSC) 🔜
-- 커만사       🔜
+- 블레스빈     ✅
+- 아얀투       ✅
+- 엠아이커피   ✅
+- 오로미아코리아 ✅
+- 오월의숲     ✅
+- 지에스씨(GSC) ✅
+- 커만사       ✅
 - 커피리브레   ✅ (생두소분 카테고리)
-- 커피창고     🔜
-- 커피플랜트   🔜
-- 코빈즈커피   🔜
-- 콤파스커피   🔜 (Sixshop, JS 필요)
-- 팔콘커피     🔜
+- 커피창고     ✅
+- 커피플랜트   ✅
+- 코빈즈커피   ✅
+- 콤파스커피   ✅ (Sixshop, Playwright)
+- 팔콘커피     ✅
 """
 import subprocess, sys, os
 
@@ -25,7 +25,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCRAPERS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 SCRAPERS = [
-    # 가나다 순 (더블유빈 제외 — 클라이언트렌더링/차단)
+    # 가나다 순
+    ('scraper_wbeans.py',      '더블유빈'),
     ('scraper_momos.py',       '모모스커피'),
     ('scraper_blessbean.py',   '블레스빈'),
     ('scraper_ayantu.py',      '아얀투'),
@@ -38,7 +39,7 @@ SCRAPERS = [
     ('scraper_coffeehouse.py', '커피창고'),
     ('scraper_coffeeplant.py', '커피플랜트'),
     ('scraper_cobeans.py',     '코빈즈커피'),
-    # 콤파스커피: Sixshop JS렌더링 — 별도 처리 필요
+    ('scraper_compass.py',     '콤파스커피'),
     ('scraper_falcon.py',      '팔콘커피'),
 ]
 
@@ -57,14 +58,14 @@ for filename, name in SCRAPERS:
         print(f"✅ {name} 완료")
 
 print(f"\n{'='*50}")
-print("▶ data.js 재생성 중...")
+print("▶ database.sql 재생성 중...")
 result = subprocess.run(
-    [sys.executable, os.path.join(ROOT, 'scripts', 'generate_data_js.py')],
+    [sys.executable, os.path.join(ROOT, 'scripts', 'generate_sql.py')],
     capture_output=False
 )
 if result.returncode != 0:
-    print("❌ data.js 재생성 실패")
-    errors.append('generate_data_js')
+    print("❌ database.sql 재생성 실패")
+    errors.append('generate_sql')
 
 print(f"\n{'='*50}")
 if errors:

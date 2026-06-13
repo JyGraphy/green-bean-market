@@ -65,29 +65,21 @@ def fetch(url, session):
     return r.text
 
 def is_soldout_block(el):
+    """품절 감지 — 이미지 오버레이만 신뢰 (CSS 클래스는 숨겨진 템플릿 버튼도 매칭되어 오탐 발생)"""
     if el is None: return False
-    if el.select_one('img[alt*="품절"], img[alt*="SOLD"], img[src*="soldout"], img[src*="sold_out"]'): return True
-    if el.select_one('.soldout, .ec-soldout, [class*="soldout"], [class*="sold-out"]'): return True
-    if el.select_one('button[disabled], a.btnSoldout, [class*="btn-soldout"]'): return True
+    if el.select_one('img[alt*="품절"], img[alt*="SOLD OUT"], img[src*="soldout"], img[src*="sold_out"]'): return True
     return False
 
 
 def check_detail_soldout(url, session):
-    """상품 상세 페이지에서 품절 여부 확인 (목록 페이지에서 감지 실패 시 fallback)"""
+    """상품 상세 페이지 JSON 데이터에서 품절 여부 확인"""
     try:
         r = session.get(url, timeout=10)
         html = r.text
-        soup = BeautifulSoup(html, 'html.parser')
-        # Cafe24: 구매 버튼 영역에서만 품절 확인 (전체 페이지 검색은 오탐 발생)
-        buy_area = soup.select_one('#buy_button_area, .buy-button-area, .btnArea, #btn_basket_wrap, .xans-product-action')
-        if buy_area:
-            if buy_area.select_one('[class*="soldout"], img[alt*="품절"]'): return True
-            # 구매 버튼 영역에서만 품절 텍스트 확인 (정확한 버튼 텍스트)
-            for btn in buy_area.select('button, a, span, input[type="button"]'):
-                txt = btn.get_text(strip=True)
-                if txt in ('품절', 'SOLD OUT', 'SOLDOUT'): return True
-        # soldout_yn 값이 Y로 직접 설정되는 패턴만 (== 'Y' 비교는 제외)
-        if re.search(r'''soldout_yn\s*[:=]\s*['"]Y['"]''', html): return True
+        # Cafe24 상품 데이터 JSON: "soldout_yn":"Y" 패턴만 확인
+        # 클래스/버튼 기반 감지는 display:none 숨겨진 요소로 인한 오탐 발생
+        if re.search(r'"soldout_yn"\s*:\s*"Y"', html): return True
+        if re.search(r"'soldout_yn'\s*:\s*'Y'", html): return True
     except Exception:
         pass
     return False
@@ -122,19 +114,9 @@ def parse_page(html):
         href = name_el.get('href', '')
         url = BASE + href if href.startswith('/') else href
 
-        # 품절 감지 — Cafe24는 li 레벨 클래스나 img overlay로 표시
+        # 품절 감지 — img overlay만 신뢰 (li 전체 검색)
         li_el = card.find_parent('li')
         soldout = is_soldout_block(card) or is_soldout_block(li_el)
-        # li 클래스에 soldout 포함 여부 확인
-        if not soldout and li_el is not None:
-            li_cls = ' '.join(li_el.get('class', []))
-            if re.search(r'soldout', li_cls, re.I):
-                soldout = True
-        # Cafe24 list-addon 방식: li 내 soldout 스팬/링크 텍스트도 확인
-        if not soldout and li_el is not None:
-            for el in li_el.select('[class*="soldout"], [id*="soldout"]'):
-                soldout = True
-                break
 
         # 가격
         price = 0

@@ -39,7 +39,11 @@ def scrape():
     s = new_session()
     all_items, page, total = [], 1, 1
     while True:
-        html = fetch(URL.format(page=page), s)
+        try:
+            html = fetch(URL.format(page=page), s)
+        except Exception as e:
+            print(f"  ❌ 네트워크 오류 (p{page}): {e}")
+            break
         if page == 1: total = get_total_pages(html)
         items = parse(html)
         if not items and page > 1: break

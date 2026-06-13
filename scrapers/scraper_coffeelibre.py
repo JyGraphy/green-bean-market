@@ -174,6 +174,7 @@ def to_products(items, id_start):
             "is_new":     any(x in name for x in ['2026', '25/26', '2025/26', '2025/2026']),
             "is_decaf":   '디카페인' in name,
             "is_special": any(x in name for x in ['게이샤','파카마라','에스메랄다']) or item['price'] >= 50000,
+            "is_soldout": item.get('is_soldout', False),
         })
     return results
 

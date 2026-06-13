@@ -66,9 +66,36 @@ def fetch(url, session):
 
 def is_soldout_block(el):
     if el is None: return False
-    if el.select_one('img[alt*="품절"], img[alt*="SOLD"], img[src*="soldout"]'): return True
-    if el.select_one('.soldout, .ec-soldout, [class*="soldout"]'): return True
-    if re.search(r'품절|SOLD.?OUT', el.get_text()): return True
+    if el.select_one('img[alt*="품절"], img[alt*="SOLD"], img[src*="soldout"], img[src*="sold_out"]'): return True
+    if el.select_one('.soldout, .ec-soldout, [class*="soldout"], [class*="sold-out"]'): return True
+    if el.select_one('button[disabled], a.btnSoldout, [class*="btn-soldout"]'): return True
+    # data 속성으로 품절 표시하는 경우
+    for tag in el.find_all(True, limit=30):
+        for attr_val in tag.attrs.values():
+            if isinstance(attr_val, str) and re.search(r'soldout|sold.?out|품절', attr_val, re.I):
+                return True
+    txt = el.get_text()
+    if re.search(r'품절|SOLD.?OUT', txt, re.I): return True
+    return False
+
+
+def check_detail_soldout(url, session):
+    """상품 상세 페이지에서 품절 여부 확인 (목록 페이지에서 감지 실패 시 fallback)"""
+    try:
+        r = session.get(url, timeout=10)
+        html = r.text
+        # Cafe24 상세 페이지 품절 패턴
+        if re.search(r'soldout_yn.*?["\']Y["\']|["\']soldout_yn["\'].*?Y', html, re.I): return True
+        soup = BeautifulSoup(html, 'html.parser')
+        # 구매 버튼 영역 확인
+        buy_area = soup.select_one('#buy_button_area, .buy-button-area, .btnArea, #btn_basket_wrap')
+        if buy_area and re.search(r'품절|SOLD.?OUT', buy_area.get_text(), re.I): return True
+        if buy_area and buy_area.select_one('[class*="soldout"], img[alt*="품절"]'): return True
+        # 전체 페이지에서 품절 버튼 텍스트 확인
+        for btn in soup.select('button, a.btn, input[type="button"]'):
+            if re.search(r'^품절$|^SOLD.?OUT$', btn.get_text(strip=True), re.I): return True
+    except Exception:
+        pass
     return False
 
 def parse_page(html):
@@ -101,9 +128,19 @@ def parse_page(html):
         href = name_el.get('href', '')
         url = BASE + href if href.startswith('/') else href
 
-        # 품절 감지 — Cafe24는 img[alt="품절"]을 li 레벨에 두므로 부모까지 검사
-        li_el = card.parent
+        # 품절 감지 — Cafe24는 li 레벨 클래스나 img overlay로 표시
+        li_el = card.find_parent('li')
         soldout = is_soldout_block(card) or is_soldout_block(li_el)
+        # li 클래스에 soldout 포함 여부 확인
+        if not soldout and li_el is not None:
+            li_cls = ' '.join(li_el.get('class', []))
+            if re.search(r'soldout', li_cls, re.I):
+                soldout = True
+        # Cafe24 list-addon 방식: li 내 soldout 스팬/링크 텍스트도 확인
+        if not soldout and li_el is not None:
+            for el in li_el.select('[class*="soldout"], [id*="soldout"]'):
+                soldout = True
+                break
 
         # 가격
         price = 0
@@ -165,7 +202,17 @@ def scrape():
             seen.add(i['url'])
             unique.append(i)
 
-    print(f"[{STORE}] 총 {len(unique)}개 수집")
+    # 목록 페이지에서 품절 감지 못한 경우 상세 페이지 fallback 확인
+    not_detected = [it for it in unique if not it['is_soldout']]
+    print(f"[{STORE}] 상세 페이지 품절 확인: {len(not_detected)}개...")
+    soldout_count = sum(1 for it in unique if it['is_soldout'])
+    for it in not_detected:
+        if check_detail_soldout(it['url'], session):
+            it['is_soldout'] = True
+            soldout_count += 1
+        time.sleep(0.3)
+
+    print(f"[{STORE}] 총 {len(unique)}개 수집 (품절 {soldout_count}개)")
     return unique
 
 def to_products(items, id_start):
@@ -186,6 +233,7 @@ def to_products(items, id_start):
             "is_new":     any(x in name for x in ['2026', '25/26', '2025/26', '2025/2026']),
             "is_decaf":   '디카페인' in name.lower() or 'decaf' in name.lower(),
             "is_special": any(x in name for x in ['게이샤','Geisha','파카마라','Pacamara','에스메랄다']) or item['price'] >= 50000,
+            "is_soldout": item.get('is_soldout', False),
         })
     return results
 

@@ -104,11 +104,12 @@ def parse_page(html):
         if not name_el:
             continue
 
-        name = name_el.get_text(strip=True)
+        name = name_el.get('title') or name_el.get_text(strip=True)
         # [생두] 태그가 있는 것만 (원두/드립백 제외)
         if not ('[생두]' in name or 'green' in name.lower()):
             continue
-        # [생두] 접두어 제거
+        # "상품명:" 레이블 및 [생두] 접두어 제거
+        name = re.sub(r'^상품명:\s*', '', name).strip()
         name = re.sub(r'^\[생두\]\s*', '', name).strip()
 
         href = name_el.get('href', '')

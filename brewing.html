@@ -147,7 +147,7 @@ canvas { width: 100%; height: auto; display: block; touch-action: none; cursor: 
 
   <div class="card" id="ycard" style="display:none">
     <div class="card-head" id="yhead">수율을 높히기 위해서는</div>
-    <div class="card-body" id="ybody">분쇄도를 약 30미크로 만큼 가늘게 가져가주세요.</div>
+    <div class="card-body" id="ybody">분쇄도를 약 30마이크론 만큼 가늘게 가져가주세요.</div>
     <div class="card-note">수율이란 일정량의 커피에서 얼마만큼의 커피 성분을 추출했는지를 나타냅니다. (예시 1g의 커피에서 0.5g의 커피 성분을 추출했다면 50%의 수율을 가지게 되는 것 입니다.)</div>
   </div>
 
@@ -376,7 +376,7 @@ function drawDot(ctx, px, py, bg, fg, label) {
 const GC  = document.getElementById('grid');
 const gc  = GC.getContext('2d');
 const GS  = 360;
-const PAD = { l:58, r:14, t:14, b:50 };
+const PAD = { l:58, r:54, t:14, b:50 };
 const GW  = GS - PAD.l - PAD.r;
 const GH  = GS - PAD.t - PAD.b;
 const GX0 = PAD.l, GY0 = PAD.t;
@@ -456,8 +456,8 @@ function drawGrid() {
   gc.fillText('농도 낮추기', GX0+GW/2, GY0+GH+34);
   gc.textAlign = 'right'; gc.textBaseline = 'middle';
   gc.fillText('수율 낮추기', GX0-2, GY0+GH/2);
-  gc.textAlign = 'left';
-  gc.fillText('수율 높이기', GX0+GW+2, GY0+GH/2);
+  gc.textAlign = 'right';
+  gc.fillText('수율 높이기', GS-2, GY0+GH/2);
 
   // Grid uses delta: 현재 fixed at (0,0), 목표 at (tgt - cur)
   const gdx = clamp(tgt.nx - cur.nx), gdy = clamp(tgt.ny - cur.ny);
@@ -583,11 +583,11 @@ function updateRec() {
   const ybody=document.getElementById('ybody');
   if (moreY) {
     yhead.textContent='수율을 높히기 위해서는';
-    ybody.textContent='분쇄도를 약 30미크로 만큼 가늘게 가져가주세요.';
+    ybody.textContent='분쇄도를 약 30마이크론 만큼 가늘게 가져가주세요.';
     ycard.style.display='';
   } else if (lessY) {
     yhead.textContent='수율을 낮추기 위해서는';
-    ybody.textContent='분쇄도를 약 30미크로 만큼 굵게 가져가주세요.';
+    ybody.textContent='분쇄도를 약 30마이크론 만큼 굵게 가져가주세요.';
     ycard.style.display='';
   } else { ycard.style.display='none'; }
 

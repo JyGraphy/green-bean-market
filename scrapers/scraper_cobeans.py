@@ -14,15 +14,14 @@ def parse(html):
     for a in soup.select('a[href*="detail.php?pno="]'):
         name = a.get_text(strip=True)
         if not name or len(name) < 3: continue
+        # 품절은 상품 자신의 li 안에서만 확인 (가격 탐색 루프와 독립)
+        soldout = is_soldout_block(a.find_parent('li'))
         parent = a
         price = 0
-        soldout = False
         for _ in range(8):
             parent = parent.parent
             if parent is None: break
             block_text = parent.get_text()
-            if not soldout:
-                soldout = is_soldout_block(parent)
             prices = re.findall(r'([\d,]+)원', block_text)
             valid = [int(p.replace(',','')) for p in prices if int(p.replace(',','')) > 1000]
             if valid:

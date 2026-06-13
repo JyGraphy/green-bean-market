@@ -11,31 +11,29 @@ URL   = BASE + '/product/list.html?cate_no=50&page={page}'
 def parse(html):
     soup = BeautifulSoup(html, 'html.parser')
     items = []
-    # 가격 span → 부모 체인 → 상품명 링크
-    for price_span in soup.find_all(string=re.compile(r'\d[\d,]+원')):
-        price_m = re.search(r'([\d,]+)원', price_span)
-        if not price_m: continue
-        price = int(price_m.group(1).replace(',',''))
-        if price < 1000: continue
-        # 부모 체인에서 상품 URL, 이름 찾기
-        parent = price_span.parent
-        name, url = None, None
-        for _ in range(10):
-            parent = parent.parent
-            if parent is None: break
-            a = parent.select_one('a[href*="/product/"]')
-            if a:
-                raw = a.get_text(strip=True)
-                # "상품명:[커피생두] " 접두어 제거
-                raw = re.sub(r'^상품명:', '', raw).strip()
-                raw = re.sub(r'^\[커피생두\]\s*', '', raw).strip()
-                if raw and len(raw) > 3:
-                    name = raw
-                    href = a.get('href','')
-                    url = BASE + href if href.startswith('/') else href
-                    break
-        if name and url:
-            items.append({'name': name, 'price': price, 'url': url})
+    # 메인 상품목록만 순회 (추천위젯 ul.prdList 제외, price_span 역추적은 공통 조상 오탐)
+    for li in soup.select('.xans-product-listnormal ul.prdList > li'):
+        a = li.select_one('a[href*="/product/"]')
+        if not a:
+            continue
+        name_el = li.select_one('.description .name') or li.select_one('.name')
+        raw = (name_el.get_text(' ', strip=True) if name_el else '')
+        # "상품명 : [커피생두] " 접두어 제거
+        raw = re.sub(r'^상품명\s*:\s*', '', raw).strip()
+        raw = re.sub(r'^\[커피생두\]\s*', '', raw).strip()
+        if not raw or len(raw) < 3:
+            continue
+        m = re.search(r'([\d,]+)\s*원', li.get_text())
+        if not m:
+            continue
+        price = int(m.group(1).replace(',', ''))
+        if price < 1000:
+            continue
+        href = a.get('href', '')
+        url = BASE + href if href.startswith('/') else href
+        # 품절: 상품 자신의 li 안 이미지 오버레이만 신뢰
+        soldout = is_soldout_block(li)
+        items.append({'name': raw, 'price': price, 'url': url, 'is_soldout': soldout})
     return items
 
 def scrape():
@@ -53,7 +51,8 @@ def scrape():
         page += 1; time.sleep(0.8)
     seen, unique = set(), []
     for i in all_items:
-        if i['url'] not in seen: seen.add(i['url']); unique.append(i)
+        key = i['url'].split('?')[0]  # 쿼리스트링(display 변형) 제거 후 중복 제거
+        if key not in seen: seen.add(key); unique.append(i)
     print(f"[{STORE}] 총 {len(unique)}개")
     return unique
 

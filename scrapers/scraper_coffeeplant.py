@@ -12,7 +12,7 @@ def parse(html):
     soup = BeautifulSoup(html, 'html.parser')
     items = []
     for a in soup.select('a[href*="/?idx="]'):
-        name = a.get_text(strip=True)
+        name = a.get_text(' ', strip=True)
         if not name or len(name) < 3: continue
         parent = a
         price = 0

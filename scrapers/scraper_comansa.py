@@ -16,6 +16,8 @@ def parse(html):
         # "(커피생두)" 접두어 제거
         name = re.sub(r'^\(커피생두\)\s*', '', name).strip()
         if not name or len(name) < 3: continue
+        # 품절 오버레이/배지 링크 텍스트는 상품명이 아님 → 스킵
+        if re.fullmatch(r'(SOLD\s?OUT|SOLDOUT|품절|준비중|일시품절)', name, re.I): continue
         parent = a
         price = 0
         for _ in range(8):

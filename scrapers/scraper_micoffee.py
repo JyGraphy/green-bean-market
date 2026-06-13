@@ -37,7 +37,11 @@ def scrape():
     for cat in CATS:
         page, total = 1, 1
         while True:
-            html = fetch(LIST_URL.format(cat=cat, page=page), s)
+            try:
+                html = fetch(LIST_URL.format(cat=cat, page=page), s)
+            except Exception as e:
+                print(f"  ⚠️ cat={cat} p{page} 요청 실패({e}) — 해당 카테고리 중단")
+                break
             if page == 1:
                 total = get_total_pages(html)
             items = parse(html)
@@ -45,7 +49,7 @@ def scrape():
             all_items.extend(items)
             print(f"  cat={cat} p{page}/{total} → {len(items)}개")
             if page >= total: break
-            page += 1; time.sleep(0.8)
+            page += 1; time.sleep(1.5)
     seen, unique = set(), []
     for i in all_items:
         if i['url'] not in seen: seen.add(i['url']); unique.append(i)

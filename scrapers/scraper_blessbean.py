@@ -58,7 +58,11 @@ def scrape():
     s = new_session()
     all_items, page, total = [], 1, 1
     while True:
-        html = fetch(LIST_URL.format(page=page), s)
+        try:
+            html = fetch(LIST_URL.format(page=page), s)
+        except Exception as e:
+            print(f"  ⚠️ p{page} 요청 실패({e}) — 목록 수집 중단")
+            break
         if page == 1:
             # 블레스빈은 page=1&page=N 이중 파라미터 형태
             nums = re.findall(r'page=(\d+)', html)

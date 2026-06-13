@@ -59,10 +59,11 @@ def fetch(url, session):
     return r.text
 
 def is_soldout_block(el):
+    """품절 감지 — 썸네일 위 이미지 오버레이만 신뢰.
+    (CSS 클래스/텍스트 검색은 Cafe24 숨김 템플릿·공통 조상까지 매칭되어 오탐 발생)"""
     if el is None: return False
-    if el.select_one('img[alt*="품절"], img[alt*="SOLD"], img[src*="soldout"]'): return True
-    if el.select_one('.soldout, .ec-soldout, [class*="soldout"]'): return True
-    if re.search(r'품절|SOLD.?OUT', el.get_text()): return True
+    if el.select_one('img[alt*="품절"], img[alt*="SOLD OUT"], img[alt*="Sold out"], '
+                     'img[src*="soldout"], img[src*="sold_out"], img[src*="icon_soldout"]'): return True
     return False
 
 def parse_page(html):
@@ -83,17 +84,18 @@ def parse_page(html):
         if not name:
             continue
 
-        # 부모 블록에서 가격 및 품절 찾기
+        # 품절은 상품 자신의 li 안에서만 확인 (상위 공통 조상까지 올라가면 전체 오염)
+        li_el = a.find_parent('li')
+        soldout = is_soldout_block(li_el)
+
+        # 부모 블록에서 가격 찾기
         parent = a
         price = 0
-        soldout = False
         for _ in range(10):
             parent = parent.parent
             if parent is None:
                 break
             block_text = parent.get_text()
-            if not soldout:
-                soldout = is_soldout_block(parent)
             m = re.search(r'([\d,]+)원', block_text)
             if m:
                 price = int(m.group(1).replace(',', ''))

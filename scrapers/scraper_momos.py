@@ -101,8 +101,9 @@ def parse_page(html):
         href = name_el.get('href', '')
         url = BASE + href if href.startswith('/') else href
 
-        # 품절 감지 (Cafe24: img alt="품절", soldout 클래스, 텍스트)
-        soldout = is_soldout_block(card)
+        # 품절 감지 — Cafe24는 img[alt="품절"]을 li 레벨에 두므로 부모까지 검사
+        li_el = card.parent
+        soldout = is_soldout_block(card) or is_soldout_block(li_el)
 
         # 가격
         price = 0

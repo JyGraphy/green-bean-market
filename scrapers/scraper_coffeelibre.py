@@ -58,6 +58,13 @@ def fetch(url, session):
     r.raise_for_status()
     return r.text
 
+def is_soldout_block(el):
+    if el is None: return False
+    if el.select_one('img[alt*="품절"], img[alt*="SOLD"], img[src*="soldout"]'): return True
+    if el.select_one('.soldout, .ec-soldout, [class*="soldout"]'): return True
+    if re.search(r'품절|SOLD.?OUT', el.get_text()): return True
+    return False
+
 def parse_page(html):
     soup = BeautifulSoup(html, 'html.parser')
     items = []
@@ -76,24 +83,27 @@ def parse_page(html):
         if not name:
             continue
 
-        # 부모 블록에서 가격 찾기
+        # 부모 블록에서 가격 및 품절 찾기
         parent = a
         price = 0
+        soldout = False
         for _ in range(10):
             parent = parent.parent
             if parent is None:
                 break
-            price_text = parent.get_text()
-            m = re.search(r'([\d,]+)원', price_text)
+            block_text = parent.get_text()
+            if not soldout:
+                soldout = is_soldout_block(parent)
+            m = re.search(r'([\d,]+)원', block_text)
             if m:
                 price = int(m.group(1).replace(',', ''))
-                if price > 1000:  # 유효한 가격
+                if price > 1000:
                     break
 
-        if not price:
+        if not price and not soldout:
             continue
 
-        items.append({'name': name, 'price': price, 'url': url})
+        items.append({'name': name, 'price': price, 'url': url, 'is_soldout': soldout})
 
     return items
 
@@ -164,6 +174,7 @@ def to_products(items, id_start):
             "is_new":     any(x in name for x in ['2026', '25/26', '2025/26', '2025/2026']),
             "is_decaf":   '디카페인' in name,
             "is_special": any(x in name for x in ['게이샤','파카마라','에스메랄다']) or item['price'] >= 50000,
+            "is_soldout": item.get('is_soldout', False),
         })
     return results
 

@@ -368,6 +368,17 @@
     transition: background 0.15s;
   }
   .buy-lnk:hover { background: var(--accent-hover); }
+  .soldout-lnk {
+    display: inline-block;
+    padding: 5px 13px;
+    background: #9ca3af;
+    color: white;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: default;
+  }
 
   /* CARD GRID */
   .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(272px, 1fr)); gap: 14px; }

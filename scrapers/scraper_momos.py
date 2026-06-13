@@ -64,6 +64,26 @@ def fetch(url, session):
     r.raise_for_status()
     return r.text
 
+def is_soldout_block(el):
+    """품절 감지 — 이미지 오버레이만 신뢰 (CSS 클래스는 숨겨진 템플릿 버튼도 매칭되어 오탐 발생)"""
+    if el is None: return False
+    if el.select_one('img[alt*="품절"], img[alt*="SOLD OUT"], img[src*="soldout"], img[src*="sold_out"]'): return True
+    return False
+
+
+def check_detail_soldout(url, session):
+    """상품 상세 페이지 JSON 데이터에서 품절 여부 확인"""
+    try:
+        r = session.get(url, timeout=10)
+        html = r.text
+        # Cafe24 상품 데이터 JSON: "soldout_yn":"Y" 패턴만 확인
+        # 클래스/버튼 기반 감지는 display:none 숨겨진 요소로 인한 오탐 발생
+        if re.search(r'"soldout_yn"\s*:\s*"Y"', html): return True
+        if re.search(r"'soldout_yn'\s*:\s*'Y'", html): return True
+    except Exception:
+        pass
+    return False
+
 def parse_page(html):
     soup = BeautifulSoup(html, 'html.parser')
     items = []
@@ -94,8 +114,11 @@ def parse_page(html):
         href = name_el.get('href', '')
         url = BASE + href if href.startswith('/') else href
 
+        # 품절 감지 — img overlay만 신뢰 (li 전체 검색)
+        li_el = card.find_parent('li')
+        soldout = is_soldout_block(card) or is_soldout_block(li_el)
+
         # 가격
-        price_el = card.select_one('.description span')  # 판매가 span
         price = 0
         for span in card.select('span'):
             m = re.search(r'([\d,]+)원', span.get_text())
@@ -103,10 +126,10 @@ def parse_page(html):
                 price = int(m.group(1).replace(',', ''))
                 break
 
-        if not price or not name:
-            continue
+        if not name: continue
+        if not price and not soldout: continue
 
-        items.append({'name': name, 'price': price, 'url': url})
+        items.append({'name': name, 'price': price, 'url': url, 'is_soldout': soldout})
     return items
 
 def get_total_pages(html):
@@ -155,7 +178,17 @@ def scrape():
             seen.add(i['url'])
             unique.append(i)
 
-    print(f"[{STORE}] 총 {len(unique)}개 수집")
+    # 목록 페이지에서 품절 감지 못한 경우 상세 페이지 fallback 확인
+    not_detected = [it for it in unique if not it['is_soldout']]
+    print(f"[{STORE}] 상세 페이지 품절 확인: {len(not_detected)}개...")
+    soldout_count = sum(1 for it in unique if it['is_soldout'])
+    for it in not_detected:
+        if check_detail_soldout(it['url'], session):
+            it['is_soldout'] = True
+            soldout_count += 1
+        time.sleep(0.3)
+
+    print(f"[{STORE}] 총 {len(unique)}개 수집 (품절 {soldout_count}개)")
     return unique
 
 def to_products(items, id_start):
@@ -176,6 +209,7 @@ def to_products(items, id_start):
             "is_new":     any(x in name for x in ['2026', '25/26', '2025/26', '2025/2026']),
             "is_decaf":   '디카페인' in name.lower() or 'decaf' in name.lower(),
             "is_special": any(x in name for x in ['게이샤','Geisha','파카마라','Pacamara','에스메랄다']) or item['price'] >= 50000,
+            "is_soldout": item.get('is_soldout', False),
         })
     return results
 

@@ -67,6 +67,16 @@ if result.returncode != 0:
     errors.append('generate_data_js')
 
 print(f"\n{'='*50}")
+print("▶ database.sql 재생성 중...")
+result = subprocess.run(
+    [sys.executable, os.path.join(ROOT, 'scripts', 'generate_sql.py')],
+    capture_output=False
+)
+if result.returncode != 0:
+    print("❌ database.sql 재생성 실패")
+    errors.append('generate_sql')
+
+print(f"\n{'='*50}")
 if errors:
     print(f"⚠️  오류 발생: {', '.join(errors)}")
     sys.exit(1)

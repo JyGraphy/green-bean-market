@@ -1,90 +1,71 @@
-/* ── DB 레이어 — 추후 서버 API로 교체 시 이 섹션만 교체하면 됨 ── */
-const STORAGE_KEY = 'roastery_beans_db';
-let SQL, db;
+/* ── Supabase DB 레이어 ── */
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+let currentUserId = null;
 
 async function initDB() {
-  SQL = await initSqlJs({
-    locateFile: f => `https://cdn.jsdelivr.net/npm/sql.js@1.12.0/dist/${f}`
-  });
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (saved) {
-    const buf = Uint8Array.from(atob(saved), c => c.charCodeAt(0));
-    db = new SQL.Database(buf);
-  } else {
-    db = new SQL.Database();
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { location.href = 'auth.html?next=roastery.html'; return; }
+  currentUserId = session.user.id;
+
+  const logoutBtn = document.getElementById('btnLogout');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async () => {
+      await sb.auth.signOut();
+      location.href = 'auth.html';
+    });
   }
-  db.run(`CREATE TABLE IF NOT EXISTS beans (
-    id        INTEGER PRIMARY KEY AUTOINCREMENT,
-    name      TEXT NOT NULL,
-    roastery  TEXT NOT NULL,
-    country   TEXT,
-    farm      TEXT,
-    altitude  INTEGER,
-    process   TEXT,
-    roast     TEXT,
-    variety   TEXT,
-    notes     TEXT,
-    memo      TEXT,
-    created   TEXT DEFAULT (datetime('now','localtime'))
-  )`);
-  saveDB();
 }
 
-function saveDB() {
-  const data = db.export();
-  localStorage.setItem(STORAGE_KEY, btoa(String.fromCharCode(...data)));
+async function dbInsert(bean) {
+  const { error } = await sb.from('beans').insert({
+    name: bean.name, roastery: bean.roastery, country: bean.country || null,
+    farm: bean.farm || null, altitude: bean.altitude || null,
+    process: bean.process || null, roast: bean.roast || null,
+    variety: bean.variety || null, notes: bean.notes || null,
+    memo: bean.memo || null, created_by: currentUserId
+  });
+  if (error) throw error;
 }
 
-function dbInsert(bean) {
-  db.run(
-    `INSERT INTO beans (name,roastery,country,farm,altitude,process,roast,variety,notes,memo)
-     VALUES (?,?,?,?,?,?,?,?,?,?)`,
-    [bean.name, bean.roastery, bean.country, bean.farm,
-     bean.altitude || null, bean.process, bean.roast,
-     bean.variety, bean.notes, bean.memo]
-  );
-  saveDB();
+async function dbUpdate(bean) {
+  const { error } = await sb.from('beans').update({
+    name: bean.name, roastery: bean.roastery, country: bean.country || null,
+    farm: bean.farm || null, altitude: bean.altitude || null,
+    process: bean.process || null, roast: bean.roast || null,
+    variety: bean.variety || null, notes: bean.notes || null,
+    memo: bean.memo || null
+  }).eq('id', bean.id);
+  if (error) throw error;
 }
 
-function dbUpdate(bean) {
-  db.run(
-    `UPDATE beans SET name=?,roastery=?,country=?,farm=?,altitude=?,
-     process=?,roast=?,variety=?,notes=?,memo=? WHERE id=?`,
-    [bean.name, bean.roastery, bean.country, bean.farm,
-     bean.altitude || null, bean.process, bean.roast,
-     bean.variety, bean.notes, bean.memo, bean.id]
-  );
-  saveDB();
+async function dbDelete(id) {
+  const { error } = await sb.from('beans').delete().eq('id', id);
+  if (error) throw error;
 }
 
-function dbDelete(id) {
-  db.run('DELETE FROM beans WHERE id=?', [id]);
-  saveDB();
-}
-
-function dbGetAll() {
-  const stmt = db.prepare('SELECT * FROM beans ORDER BY id DESC');
-  const rows = [];
-  while (stmt.step()) rows.push(stmt.getAsObject());
-  stmt.free();
-  return rows;
+async function dbGetAll() {
+  const { data, error } = await sb.from('beans').select('*').order('id', { ascending: false });
+  if (error) throw error;
+  return data;
 }
 
 /* ── UI 상태 ── */
 let allBeans = [];
 let pendingDeleteId = null;
 
-const grid        = document.getElementById('beanGrid');
-const emptyState  = document.getElementById('emptyState');
-const beanCount   = document.getElementById('beanCount');
-const searchInput = document.getElementById('searchInput');
+const grid          = document.getElementById('beanGrid');
+const emptyState    = document.getElementById('emptyState');
+const beanCount     = document.getElementById('beanCount');
+const searchInput   = document.getElementById('searchInput');
 const filterProcess = document.getElementById('filterProcess');
 const filterRoast   = document.getElementById('filterRoast');
 
-const modalOverlay  = document.getElementById('modalOverlay');
-const modal         = document.getElementById('modal');
-const modalTitle    = document.getElementById('modalTitle');
-const beanForm      = document.getElementById('beanForm');
+const modalOverlay   = document.getElementById('modalOverlay');
+const modal          = document.getElementById('modal');
+const modalTitle     = document.getElementById('modalTitle');
+const beanForm       = document.getElementById('beanForm');
 const confirmOverlay = document.getElementById('confirmOverlay');
 
 /* ── 렌더링 ── */
@@ -122,7 +103,6 @@ function renderCards(beans) {
     grid.appendChild(card);
   });
 
-  /* 이벤트 위임 */
   grid.querySelectorAll('[data-edit]').forEach(btn =>
     btn.addEventListener('click', () => openEdit(+btn.dataset.edit))
   );
@@ -161,8 +141,8 @@ function applyFilter() {
   updateRoasteryDatalist();
 }
 
-function refresh() {
-  allBeans = dbGetAll();
+async function refresh() {
+  allBeans = await dbGetAll();
   applyFilter();
 }
 
@@ -223,7 +203,7 @@ function getFormBean() {
   };
 }
 
-beanForm.addEventListener('submit', e => {
+beanForm.addEventListener('submit', async e => {
   e.preventDefault();
   clearInvalid();
   const bean = getFormBean();
@@ -236,13 +216,21 @@ beanForm.addEventListener('submit', e => {
   }
   if (!valid) return;
 
-  if (bean.id) {
-    dbUpdate(bean);
-  } else {
-    dbInsert(bean);
+  const saveBtn = beanForm.querySelector('.rb-btn-save');
+  saveBtn.disabled = true;
+  try {
+    if (bean.id) {
+      await dbUpdate(bean);
+    } else {
+      await dbInsert(bean);
+    }
+    closeModal();
+    await refresh();
+  } catch (err) {
+    alert('저장 중 오류가 발생했습니다: ' + err.message);
+  } finally {
+    saveBtn.disabled = false;
   }
-  closeModal();
-  refresh();
 });
 
 /* ── 삭제 확인 ── */
@@ -251,12 +239,16 @@ function openConfirm(id) {
   confirmOverlay.classList.add('open');
 }
 
-document.getElementById('btnConfirmYes').addEventListener('click', () => {
+document.getElementById('btnConfirmYes').addEventListener('click', async () => {
   if (pendingDeleteId) {
-    dbDelete(pendingDeleteId);
-    pendingDeleteId = null;
-    confirmOverlay.classList.remove('open');
-    refresh();
+    try {
+      await dbDelete(pendingDeleteId);
+      pendingDeleteId = null;
+      confirmOverlay.classList.remove('open');
+      await refresh();
+    } catch (err) {
+      alert('삭제 중 오류가 발생했습니다: ' + err.message);
+    }
   }
 });
 document.getElementById('btnConfirmNo').addEventListener('click', () => {

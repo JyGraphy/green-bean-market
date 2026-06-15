@@ -135,7 +135,20 @@ async function signup() {
   });
 
   if (authError) {
-    showMsg('회원가입 중 오류가 발생했습니다: ' + authError.message);
+    const msg = authError.message;
+    if (msg.includes('already registered') || msg.includes('already been registered')) {
+      if (email) {
+        showMsg('이미 사용 중인 이메일입니다.<br>이메일 칸을 비워두고 다시 시도해 주세요.');
+        markInvalid('signupEmail');
+      } else {
+        showMsg('이미 가입된 계정입니다. 로그인해 주세요.');
+      }
+    } else if (msg.includes('Password should be')) {
+      showMsg('비밀번호는 8자 이상이어야 합니다.');
+      markInvalid('signupPassword');
+    } else {
+      showMsg('회원가입 중 오류가 발생했습니다: ' + msg);
+    }
     btn.restore();
     return;
   }

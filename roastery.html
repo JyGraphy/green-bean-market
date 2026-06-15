@@ -180,29 +180,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="supabase.config.js"></script>
-<script>
-/* 인증 게이트 — 미로그인 시 auth.html로 리다이렉트 */
-(async () => {
-  const { createClient } = supabase;
-  const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
-  const { data: { session } } = await sb.auth.getSession();
-  if (!session) {
-    location.href = 'auth.html?next=roastery.html';
-    return;
-  }
-  /* 로그아웃 버튼에 세션 정보 표시 */
-  const email = session.user.email;
-  const logoutBtn = document.getElementById('btnLogout');
-  if (logoutBtn) {
-    logoutBtn.title = email;
-    logoutBtn.addEventListener('click', async () => {
-      await sb.auth.signOut();
-      location.href = 'auth.html';
-    });
-  }
-})();
-</script>
-<script src="https://cdn.jsdelivr.net/npm/sql.js@1.12.0/dist/sql-wasm.js"></script>
 <script src="roastery.js"></script>
 </body>
 </html>

@@ -1,0 +1,255 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --brown:   #6b3f2a;
+  --brown2:  #8b5e42;
+  --tan:     #d4a97a;
+  --tan2:    #e8cca8;
+  --cream:   #fdf6ee;
+  --cream2:  #f5ece0;
+  --border:  #ddc9b0;
+  --text:    #2c1a0e;
+  --text2:   #6b4f3a;
+  --text3:   #9e7b62;
+  --white:   #ffffff;
+  --error:   #dc2626;
+  --success: #16a34a;
+  --radius:  14px;
+  --radius-sm: 8px;
+  --shadow:  0 8px 40px rgba(107,63,42,.18);
+}
+
+body {
+  min-height: 100vh;
+  font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  color: var(--text);
+}
+
+/* ── 배경 ── */
+.auth-bg {
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(212,169,122,.18) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(107,63,42,.10) 0%, transparent 55%),
+    var(--cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+/* ── 카드 ── */
+.auth-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 36px 40px;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── 로고 ── */
+.auth-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+  margin-bottom: 4px;
+}
+.auth-logo span        { font-size: 36px; }
+.auth-logo-title       { font-size: 18px; font-weight: 700; color: var(--brown); }
+.auth-logo-sub         { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+/* ── 탭 ── */
+.auth-tabs {
+  display: flex;
+  background: var(--cream2);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  gap: 4px;
+}
+.auth-tab {
+  flex: 1;
+  padding: 9px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text2);
+  cursor: pointer;
+  transition: background .15s, color .15s, box-shadow .15s;
+}
+.auth-tab.active {
+  background: var(--white);
+  color: var(--brown);
+  font-weight: 700;
+  box-shadow: 0 1px 6px rgba(107,63,42,.12);
+}
+
+/* ── 메시지 ── */
+.auth-msg {
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.auth-msg.error   { background: #fef2f2; color: var(--error);   border: 1px solid #fecaca; }
+.auth-msg.success { background: #f0fdf4; color: var(--success); border: 1px solid #bbf7d0; }
+.auth-msg.info    { background: #eff6ff; color: #1d4ed8;        border: 1px solid #bfdbfe; }
+
+/* ── 필드 ── */
+.auth-field { display: flex; flex-direction: column; gap: 6px; }
+.auth-field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.auth-field input {
+  padding: 11px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  color: var(--text);
+  background: var(--cream);
+  outline: none;
+  transition: border-color .15s, background .15s;
+  font-family: inherit;
+  letter-spacing: .5px;
+}
+.auth-field input:focus {
+  border-color: var(--tan);
+  background: var(--white);
+}
+.auth-field input.invalid { border-color: var(--error); }
+
+/* OTP 입력 큰 스타일 */
+#otpInput {
+  font-size: 24px;
+  letter-spacing: 6px;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* ── 버튼 ── */
+.auth-btn-primary {
+  width: 100%;
+  padding: 13px;
+  background: var(--brown);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .15s, transform .1s;
+}
+.auth-btn-primary:hover   { background: var(--brown2); }
+.auth-btn-primary:active  { transform: scale(.98); }
+.auth-btn-primary:disabled { opacity: .6; cursor: not-allowed; }
+
+.auth-btn-ghost {
+  width: 100%;
+  padding: 10px;
+  background: none;
+  color: var(--text3);
+  border: none;
+  font-size: 13px;
+  cursor: pointer;
+  transition: color .12s;
+  text-align: center;
+}
+.auth-btn-ghost:hover { color: var(--brown); }
+
+/* ── OTP 안내 ── */
+.auth-otp-info {
+  background: var(--cream2);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.5;
+  text-align: center;
+}
+.auth-otp-info strong { color: var(--brown); display: block; margin-bottom: 2px; }
+
+.auth-timer {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--error);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 구분선 ── */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text3);
+  font-size: 12px;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── 소셜 버튼 ── */
+.auth-social { display: flex; flex-direction: column; gap: 8px; }
+.auth-social-btn {
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--white);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: not-allowed;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: .55;
+  transition: opacity .15s;
+  color: var(--text);
+  position: relative;
+}
+.auth-social-btn:not(:disabled):hover { opacity: .8; }
+.auth-social-btn.kakao { background: #FEE500; border-color: #FEE500; color: #191919; }
+.auth-social-btn.naver { color: #03C75A; }
+
+.auth-soon {
+  margin-left: auto;
+  font-size: 10px;
+  background: var(--cream2);
+  color: var(--text3);
+  padding: 2px 7px;
+  border-radius: 100px;
+}
+.kakao .auth-soon { background: rgba(0,0,0,.08); color: #666; }
+
+/* ── 하단 링크 ── */
+.auth-footer {
+  text-align: center;
+  font-size: 12px;
+}
+.auth-footer a {
+  color: var(--text3);
+  text-decoration: none;
+  transition: color .12s;
+}
+.auth-footer a:hover { color: var(--brown); }
+
+/* ── 반응형 ── */
+@media (max-width: 480px) {
+  .auth-card { padding: 28px 24px; }
+}

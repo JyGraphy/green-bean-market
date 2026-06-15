@@ -67,6 +67,19 @@ body {
 }
 .rb-btn-back:hover { background: rgba(255,255,255,.12); color: var(--white); }
 
+.rb-btn-logout {
+  color: rgba(255,255,255,.65);
+  background: none;
+  font-size: 13px;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255,255,255,.20);
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  white-space: nowrap;
+}
+.rb-btn-logout:hover { background: rgba(255,255,255,.12); color: var(--white); }
+
 .rb-btn-add {
   background: var(--tan);
   color: var(--brown);

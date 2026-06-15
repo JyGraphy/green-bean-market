@@ -249,6 +249,60 @@ body {
 }
 .auth-footer a:hover { color: var(--brown); }
 
+/* ── 필드 힌트 / 선택사항 ── */
+.auth-field-hint {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text3);
+  margin-left: 4px;
+}
+.auth-optional {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text3);
+  background: var(--cream2);
+  padding: 1px 6px;
+  border-radius: 100px;
+  margin-left: 4px;
+}
+.req { color: var(--error); }
+
+/* ── 비밀번호 래퍼 ── */
+.auth-pw-wrap {
+  position: relative;
+}
+.auth-pw-wrap input {
+  width: 100%;
+  padding-right: 40px;
+}
+.auth-pw-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0;
+  line-height: 1;
+}
+
+/* ── 아이디 입력 상태 표시 ── */
+.auth-input-wrap { position: relative; }
+.auth-input-wrap input { width: 100%; padding-right: 140px; }
+.auth-input-status {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  white-space: nowrap;
+  color: var(--text3);
+}
+.auth-input-status.good { color: var(--success); }
+.auth-input-status.bad  { color: var(--error); }
+
 /* ── 반응형 ── */
 @media (max-width: 480px) {
   .auth-card { padding: 28px 24px; }

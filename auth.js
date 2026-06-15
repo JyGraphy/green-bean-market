@@ -1,145 +1,205 @@
-/* ── Supabase 클라이언트 초기화 ── */
+/* ── Supabase 클라이언트 ── */
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
 
-/* ── 상태 ── */
-let currentTab   = 'login';   // 'login' | 'signup'
-let pendingEmail = '';
-let timerInterval = null;
-
-/* ── 이미 로그인된 경우 리다이렉트 ── */
+/* ── 이미 로그인된 경우 ── */
 (async () => {
   const { data: { session } } = await sb.auth.getSession();
   if (session) redirectAfterLogin();
 })();
 
 /* ── 탭 전환 ── */
+let currentTab = 'login';
 function switchTab(tab) {
   currentTab = tab;
   document.getElementById('tabLogin').classList.toggle('active',  tab === 'login');
   document.getElementById('tabSignup').classList.toggle('active', tab === 'signup');
-  backToEmail();
+  document.getElementById('loginForm').style.display  = tab === 'login'  ? '' : 'none';
+  document.getElementById('signupForm').style.display = tab === 'signup' ? '' : 'none';
   hideMsg();
+  clearInvalid();
 }
 
 /* ── 메시지 ── */
 function showMsg(text, type = 'error') {
   const el = document.getElementById('authMsg');
-  el.textContent = text;
+  el.innerHTML = text;
   el.className = `auth-msg ${type}`;
   el.style.display = '';
 }
-function hideMsg() {
-  document.getElementById('authMsg').style.display = 'none';
+function hideMsg() { document.getElementById('authMsg').style.display = 'none'; }
+
+/* ── 유효성 초기화 ── */
+function clearInvalid() {
+  document.querySelectorAll('.invalid').forEach(e => e.classList.remove('invalid'));
+}
+function markInvalid(id) {
+  document.getElementById(id)?.classList.add('invalid');
 }
 
-/* ── Step 1: 인증코드 발송 ── */
-async function sendCode() {
-  const email = document.getElementById('emailInput').value.trim();
-  if (!email || !email.includes('@')) {
-    showMsg('올바른 이메일 주소를 입력해 주세요.');
-    document.getElementById('emailInput').classList.add('invalid');
-    return;
-  }
-  document.getElementById('emailInput').classList.remove('invalid');
-
-  const btn = document.getElementById('btnSendCode');
-  btn.disabled = true;
-  btn.textContent = '발송 중…';
-  hideMsg();
-
-  const { error } = await sb.auth.signInWithOtp({
-    email,
-    options: { shouldCreateUser: true }
-  });
-
-  btn.disabled = false;
-  btn.textContent = '인증코드 받기';
-
-  if (error) {
-    showMsg('인증코드 발송에 실패했습니다: ' + error.message);
-    return;
-  }
-
-  pendingEmail = email;
-  document.getElementById('stepEmail').style.display = 'none';
-  document.getElementById('stepOtp').style.display   = '';
-  document.getElementById('otpInfo').innerHTML =
-    `<strong>${email}</strong>로 8자리 인증코드를 발송했습니다.<br>메일함을 확인해 주세요 (스팸 폴더도 확인)`;
-  document.getElementById('otpInput').value = '';
-  document.getElementById('otpInput').focus();
-  startTimer(300); // 5분
+/* ── 비밀번호 토글 ── */
+function togglePw(inputId, btn) {
+  const el = document.getElementById(inputId);
+  if (el.type === 'password') { el.type = 'text';     btn.textContent = '🙈'; }
+  else                        { el.type = 'password'; btn.textContent = '👁'; }
 }
 
-/* ── Step 2: OTP 검증 ── */
-async function verifyCode() {
-  const token = document.getElementById('otpInput').value.trim();
-  if (!token || token.length !== 8) {
-    showMsg('8자리 인증코드를 입력해 주세요.');
+/* ── 아이디 중복 실시간 체크 ── */
+let usernameTimer = null;
+async function checkUsername(input) {
+  const val = input.value.trim();
+  const status = document.getElementById('usernameStatus');
+  clearTimeout(usernameTimer);
+
+  if (!val) { status.textContent = ''; status.className = 'auth-input-status'; return; }
+  if (!/^[a-zA-Z0-9_]{4,20}$/.test(val)) {
+    status.textContent = '영문·숫자·_ (4~20자)';
+    status.className = 'auth-input-status bad';
     return;
   }
 
-  const btn = document.getElementById('btnVerify');
-  btn.disabled = true;
-  btn.textContent = '확인 중…';
-  hideMsg();
+  status.textContent = '확인 중…';
+  status.className = 'auth-input-status';
 
-  const { data, error } = await sb.auth.verifyOtp({
-    email: pendingEmail,
-    token,
-    type: 'email'
-  });
-
-  btn.disabled = false;
-  btn.textContent = '인증 확인';
-
-  if (error) {
-    showMsg('인증코드가 올바르지 않거나 만료되었습니다. 다시 시도해 주세요.');
-    return;
-  }
-
-  clearTimer();
-  showMsg('인증 완료! 이동 중…', 'success');
-  setTimeout(redirectAfterLogin, 800);
-}
-
-/* ── 이전 단계로 ── */
-function backToEmail() {
-  clearTimer();
-  pendingEmail = '';
-  document.getElementById('stepEmail').style.display = '';
-  document.getElementById('stepOtp').style.display   = 'none';
-  document.getElementById('emailInput').value = '';
-  document.getElementById('otpInput').value   = '';
-  hideMsg();
-}
-
-/* ── 타이머 ── */
-function startTimer(seconds) {
-  clearTimer();
-  let remain = seconds;
-  updateTimerDisplay(remain);
-  timerInterval = setInterval(() => {
-    remain--;
-    updateTimerDisplay(remain);
-    if (remain <= 0) {
-      clearTimer();
-      showMsg('인증코드가 만료되었습니다. 이메일을 다시 입력해 주세요.', 'info');
-      backToEmail();
+  usernameTimer = setTimeout(async () => {
+    const { data } = await sb.rpc('username_exists', { uname: val });
+    if (data) {
+      status.textContent = '이미 사용 중인 아이디입니다';
+      status.className = 'auth-input-status bad';
+    } else {
+      status.textContent = '사용 가능한 아이디입니다';
+      status.className = 'auth-input-status good';
     }
-  }, 1000);
+  }, 400);
 }
 
-function updateTimerDisplay(sec) {
-  const m = String(Math.floor(sec / 60)).padStart(2, '0');
-  const s = String(sec % 60).padStart(2, '0');
-  document.getElementById('otpTimer').textContent = `${m}:${s}`;
+/* ── 회원가입 ── */
+async function signup() {
+  clearInvalid();
+  hideMsg();
+
+  const username = document.getElementById('signupUsername').value.trim();
+  const nickname = document.getElementById('signupNickname').value.trim();
+  const password = document.getElementById('signupPassword').value;
+  const confirm  = document.getElementById('signupPasswordConfirm').value;
+  const email    = document.getElementById('signupEmail').value.trim();
+
+  /* 유효성 검사 */
+  let valid = true;
+  if (!/^[a-zA-Z0-9_]{4,20}$/.test(username)) {
+    markInvalid('signupUsername');
+    showMsg('아이디는 영문·숫자·_ 조합 4~20자로 입력해 주세요.');
+    valid = false;
+  }
+  if (!nickname) {
+    markInvalid('signupNickname');
+    if (valid) showMsg('닉네임을 입력해 주세요.');
+    valid = false;
+  }
+  if (password.length < 8) {
+    markInvalid('signupPassword');
+    if (valid) showMsg('비밀번호는 8자 이상이어야 합니다.');
+    valid = false;
+  }
+  if (password !== confirm) {
+    markInvalid('signupPasswordConfirm');
+    if (valid) showMsg('비밀번호가 일치하지 않습니다.');
+    valid = false;
+  }
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    markInvalid('signupEmail');
+    if (valid) showMsg('이메일 형식이 올바르지 않습니다.');
+    valid = false;
+  }
+  if (!valid) return;
+
+  const btn = setBtnLoading('signupForm', '가입 중…');
+
+  /* 아이디 중복 최종 확인 */
+  const { data: exists } = await sb.rpc('username_exists', { uname: username });
+  if (exists) {
+    showMsg('이미 사용 중인 아이디입니다.');
+    markInvalid('signupUsername');
+    btn.restore();
+    return;
+  }
+
+  /* auth 이메일: 실제 이메일 or 내부 식별자 */
+  const authEmail = email || `${username}@users.greenbean.market`;
+
+  /* Supabase Auth 가입 */
+  const { data: authData, error: authError } = await sb.auth.signUp({
+    email: authEmail,
+    password,
+    options: { data: { username, nickname } }
+  });
+
+  if (authError) {
+    showMsg('회원가입 중 오류가 발생했습니다: ' + authError.message);
+    btn.restore();
+    return;
+  }
+
+  /* profiles 테이블에 저장 */
+  const userId = authData.user?.id;
+  if (userId) {
+    await sb.from('profiles').insert({
+      id: userId,
+      username,
+      nickname,
+      email: email || null
+    });
+  }
+
+  btn.restore();
+  showMsg('🎉 회원가입이 완료되었습니다! 로그인해 주세요.', 'success');
+  setTimeout(() => switchTab('login'), 1500);
 }
 
-function clearTimer() {
-  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-  const el = document.getElementById('otpTimer');
-  if (el) el.textContent = '';
+/* ── 로그인 ── */
+async function login() {
+  clearInvalid();
+  hideMsg();
+
+  const username = document.getElementById('loginUsername').value.trim();
+  const password = document.getElementById('loginPassword').value;
+
+  if (!username) { markInvalid('loginUsername'); showMsg('아이디를 입력해 주세요.'); return; }
+  if (!password)  { markInvalid('loginPassword');  showMsg('비밀번호를 입력해 주세요.'); return; }
+
+  const btn = setBtnLoading('loginForm', '로그인 중…');
+
+  /* username → auth 이메일 변환 */
+  const { data: authEmail, error: fnError } = await sb.rpc('get_auth_email', { uname: username });
+
+  if (fnError || !authEmail) {
+    showMsg('존재하지 않는 아이디입니다.');
+    markInvalid('loginUsername');
+    btn.restore();
+    return;
+  }
+
+  /* 비밀번호 로그인 */
+  const { error } = await sb.auth.signInWithPassword({ email: authEmail, password });
+
+  if (error) {
+    showMsg('비밀번호가 올바르지 않습니다.');
+    markInvalid('loginPassword');
+    btn.restore();
+    return;
+  }
+
+  btn.restore();
+  redirectAfterLogin();
+}
+
+/* ── 버튼 로딩 헬퍼 ── */
+function setBtnLoading(formId, text) {
+  const btn = document.querySelector(`#${formId} .auth-btn-primary`);
+  const orig = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = text;
+  return { restore: () => { btn.disabled = false; btn.textContent = orig; } };
 }
 
 /* ── 로그인 후 리다이렉트 ── */

@@ -68,47 +68,103 @@ const modalTitle     = document.getElementById('modalTitle');
 const beanForm       = document.getElementById('beanForm');
 const confirmOverlay = document.getElementById('confirmOverlay');
 
+/* ── 나라 국기 매핑 ── */
+const COUNTRY_FLAG = {
+  '에티오피아':'🇪🇹','케냐':'🇰🇪','탄자니아':'🇹🇿','르완다':'🇷🇼','우간다':'🇺🇬','부룬디':'🇧🇮',
+  '브라질':'🇧🇷','콜롬비아':'🇨🇴','과테말라':'🇬🇹','코스타리카':'🇨🇷','파나마':'🇵🇦',
+  '엘살바도르':'🇸🇻','온두라스':'🇭🇳','멕시코':'🇲🇽','자메이카':'🇯🇲','페루':'🇵🇪',
+  '볼리비아':'🇧🇴','에콰도르':'🇪🇨','니카라과':'🇳🇮','인도네시아':'🇮🇩','인도':'🇮🇳',
+  '베트남':'🇻🇳','예멘':'🇾🇪','중국':'🇨🇳','파푸아뉴기니':'🇵🇬','하와이':'🌺',
+  '세인트헬레나':'🌍','콩고민주공화국':'🇨🇩',
+};
+
+const openSections = new Set();
+
 /* ── 렌더링 ── */
 function renderCards(beans) {
-  const cards = grid.querySelectorAll('.rb-card');
-  cards.forEach(c => c.remove());
+  grid.querySelectorAll('.rb-country-section').forEach(s => s.remove());
 
   emptyState.style.display = beans.length ? 'none' : '';
   beanCount.textContent = `${beans.length}개`;
+  if (!beans.length) return;
 
+  /* 나라별 그룹핑, 원두 수 내림차순 */
+  const groups = {};
   beans.forEach(b => {
-    const card = document.createElement('div');
-    card.className = 'rb-card';
-    card.innerHTML = `
-      <div class="rb-card-header">
-        <div class="rb-card-name">${esc(b.name)}</div>
-        <div class="rb-card-actions">
-          <button class="rb-icon-btn" data-edit="${b.id}" title="수정">✏️</button>
-          <button class="rb-icon-btn del" data-del="${b.id}" title="삭제">🗑️</button>
-        </div>
-      </div>
-      ${b.roastery ? `<div class="rb-card-roastery">${esc(b.roastery)}</div>` : ''}
-      <div class="rb-card-meta">
-        ${b.country  ? `<span class="rb-badge country">🌍 ${esc(b.country)}</span>` : ''}
-        ${b.process  ? `<span class="rb-badge process">${esc(b.process)}</span>` : ''}
-        ${b.roast    ? `<span class="rb-badge roast">${esc(b.roast)}</span>` : ''}
-        ${b.altitude ? `<span class="rb-badge altitude">▲ ${b.altitude}m</span>` : ''}
-      </div>
-      ${b.farm ? `<div class="rb-tag" style="width:fit-content">📍 ${esc(b.farm)}</div>` : ''}
-      ${b.variety || b.notes ? `<hr class="rb-card-divider">` : ''}
-      ${b.variety ? renderTags(b.variety, 'variety', '🌱') : ''}
-      ${b.notes   ? renderTags(b.notes,   'note',    '☕') : ''}
-      ${b.memo    ? `<hr class="rb-card-divider"><div class="rb-card-memo">${esc(b.memo)}</div>` : ''}
-    `;
-    grid.appendChild(card);
+    const key = b.country || '기타';
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(b);
   });
+  const countries = Object.keys(groups).sort((a, b) => groups[b].length - groups[a].length);
 
-  grid.querySelectorAll('[data-edit]').forEach(btn =>
-    btn.addEventListener('click', () => openEdit(+btn.dataset.edit))
-  );
-  grid.querySelectorAll('[data-del]').forEach(btn =>
-    btn.addEventListener('click', () => openConfirm(+btn.dataset.del))
-  );
+  /* 처음 로드 시 첫 번째 나라만 열기 */
+  if (openSections.size === 0) openSections.add(countries[0]);
+
+  countries.forEach(country => {
+    const list = groups[country];
+    const flag = COUNTRY_FLAG[country] || '🌍';
+    const isOpen = openSections.has(country);
+
+    const section = document.createElement('div');
+    section.className = 'rb-country-section';
+
+    section.innerHTML = `
+      <button class="rb-country-header${isOpen ? ' open' : ''}" type="button">
+        <span class="rb-country-flag">${flag}</span>
+        <span class="rb-country-name">${esc(country)}</span>
+        <span class="rb-country-count">${list.length}개</span>
+        <span class="rb-country-arrow">▾</span>
+      </button>
+      <div class="rb-country-body${isOpen ? ' open' : ''}">
+        <div class="rb-card-grid"></div>
+      </div>
+    `;
+
+    const cardGrid = section.querySelector('.rb-card-grid');
+    list.forEach(b => {
+      const card = document.createElement('div');
+      card.className = 'rb-card';
+      card.innerHTML = `
+        <div class="rb-card-header">
+          <div class="rb-card-name">${esc(b.name)}</div>
+          <div class="rb-card-actions">
+            <button class="rb-icon-btn" data-edit="${b.id}" title="수정">✏️</button>
+            <button class="rb-icon-btn del" data-del="${b.id}" title="삭제">🗑️</button>
+          </div>
+        </div>
+        ${b.roastery ? `<div class="rb-card-roastery">${esc(b.roastery)}</div>` : ''}
+        <div class="rb-card-meta">
+          ${b.process  ? `<span class="rb-badge process">${esc(b.process)}</span>` : ''}
+          ${b.roast    ? `<span class="rb-badge roast">${esc(b.roast)}</span>` : ''}
+          ${b.altitude ? `<span class="rb-badge altitude">▲ ${b.altitude}m</span>` : ''}
+        </div>
+        ${b.farm ? `<div class="rb-tag" style="width:fit-content">📍 ${esc(b.farm)}</div>` : ''}
+        ${b.variety || b.notes ? `<hr class="rb-card-divider">` : ''}
+        ${b.variety ? renderTags(b.variety, 'variety', '🌱') : ''}
+        ${b.notes   ? renderTags(b.notes,   'note',    '☕') : ''}
+        ${b.memo    ? `<hr class="rb-card-divider"><div class="rb-card-memo">${esc(b.memo)}</div>` : ''}
+      `;
+      cardGrid.appendChild(card);
+    });
+
+    section.querySelector('.rb-country-header').addEventListener('click', () => {
+      const header = section.querySelector('.rb-country-header');
+      const body   = section.querySelector('.rb-country-body');
+      const nowOpen = body.classList.toggle('open');
+      header.classList.toggle('open', nowOpen);
+      if (nowOpen) openSections.add(country);
+      else openSections.delete(country);
+    });
+
+    section.querySelectorAll('[data-edit]').forEach(btn =>
+      btn.addEventListener('click', () => openEdit(+btn.dataset.edit))
+    );
+    section.querySelectorAll('[data-del]').forEach(btn =>
+      btn.addEventListener('click', () => openConfirm(+btn.dataset.del))
+    );
+
+    grid.appendChild(section);
+  });
 }
 
 function renderTags(csv, cls, icon) {

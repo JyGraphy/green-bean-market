@@ -137,19 +137,64 @@ body {
   margin-left: 4px;
 }
 
-/* ── 카드 그리드 ── */
-.rb-grid {
+/* ── 나라별 섹션 컨테이너 ── */
+.rb-sections {
   max-width: 1280px;
   margin: 20px auto 60px;
   padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── 나라 헤더 ── */
+.rb-country-section { border-radius: var(--radius); overflow: hidden; }
+
+.rb-country-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: var(--white);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  text-align: left;
+  box-shadow: var(--shadow);
+  transition: background .15s;
+}
+.rb-country-header:hover { background: var(--cream2); }
+.rb-country-header.open  { border-radius: var(--radius) var(--radius) 0 0; background: var(--brown); color: var(--white); }
+
+.rb-country-flag  { font-size: 24px; line-height: 1; }
+.rb-country-name  { font-size: 16px; font-weight: 700; flex: 1; }
+.rb-country-count { font-size: 13px; opacity: .7; }
+.rb-country-arrow {
+  font-size: 18px;
+  transition: transform .2s;
+  display: inline-block;
+}
+.rb-country-header.open .rb-country-arrow { transform: rotate(180deg); }
+
+/* ── 펼쳐지는 바디 ── */
+.rb-country-body {
+  display: none;
+  background: var(--cream);
+  border-radius: 0 0 var(--radius) var(--radius);
+  padding: 16px;
+}
+.rb-country-body.open { display: block; }
+
+/* ── 카드 그리드 (바디 내부) ── */
+.rb-card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
 }
 
 /* ── 빈 상태 ── */
 .rb-empty {
-  grid-column: 1 / -1;
   text-align: center;
   padding: 80px 20px;
   color: var(--text3);

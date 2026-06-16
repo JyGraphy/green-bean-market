@@ -52,7 +52,7 @@ coffeebeanweb/
 | 코빈즈커피 | sp-cobeans | #0284c7 | 69 | cobeans.com |
 | 아얀투 | sp-ayantu | #7c3aed | 13 | ayantu.co.kr |
 | 오로미아코리아 | sp-oromia | #b45309 | 9 | oromiakorea.com |
-| 지에스씨(GSC) | sp-gsc | #0d9488 | 6 | gsc-coffee.com |
+| 지에스씨(GSC) | sp-gsc | #0d9488 | 6 | gsc.coffee |
 | 오월의숲 | sp-mayforest | #15803d | 37 | mayforest.kr |
 | 커피리브레 | sp-cl | #d97706 | 77 | coffeelibre.kr |
 | 블레스빈 | sp-bb | #0e7490 | 84 | blessbean.co.kr |

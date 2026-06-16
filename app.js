@@ -232,7 +232,7 @@ function renderTable(items, ctr) {
         <td><span class="proc-badge ${pc}">${p.process}</span></td>
         <td class="td-price"><span class="price-val">₩${p.price.toLocaleString()}</span><span class="price-kg">/kg</span></td>
         <td><span class="sp ${sc}">${p.store}</span></td>
-        <td>${p.isSoldout ? '<span class="soldout-lnk">품절</span>' : `<a href="${p.url}" target="_blank" rel="noopener" class="buy-lnk">구매 →</a>`}</td>
+        <td>${p.isSoldout ? '<span class="soldout-lnk">품절</span>' : `<a href="${p.url}" target="_blank" rel="noopener noreferrer" class="buy-lnk">구매 →</a>`}</td>
       </tr>`;
     }).join('')}</tbody>
   </table></div>`;
@@ -260,7 +260,7 @@ function renderCards(items, ctr) {
       </div>
       <div class="c-bot">
         <div><div class="c-price">₩${p.price.toLocaleString()}</div><div class="c-price-unit">1kg 기준</div></div>
-        ${p.isSoldout ? '<span class="soldout-lnk">품절</span>' : `<a href="${p.url}" target="_blank" rel="noopener" class="buy-lnk">구매 →</a>`}
+        ${p.isSoldout ? '<span class="soldout-lnk">품절</span>' : `<a href="${p.url}" target="_blank" rel="noopener noreferrer" class="buy-lnk">구매 →</a>`}
       </div>
     </div>`;
   }).join('')}</div>`;
@@ -390,7 +390,7 @@ function renderTableMobile(items, ctr) {
       ${notes}
       <div class="mob-row-bot">
         <span class="sp ${sc}">${p.store}</span>
-        <a href="${p.url}" target="_blank" rel="noopener" class="buy-lnk">구매 →</a>
+        <a href="${p.url}" target="_blank" rel="noopener noreferrer" class="buy-lnk">구매 →</a>
       </div>
     </div>`;
   }).join('');

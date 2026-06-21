@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roasting Profile — 로스팅 프로파일 분석</title>
+<link rel="stylesheet" href="roasting.css">
+</head>
+<body>
+
+<!-- ── 헤더 ── -->
+<header class="rp-header">
+  <div class="rp-header-inner">
+    <div class="rp-logo">
+      <span class="rp-logo-icon">🔥</span>
+      <div>
+        <h1>Roasting Profile</h1>
+        <p>로스팅 프로파일 분석 &amp; 피드백</p>
+      </div>
+    </div>
+    <div class="rp-header-actions">
+      <a href="index.html" class="rp-btn-ghost">← 생두 비교</a>
+      <a href="roastery.html" class="rp-btn-ghost">☕ 원두 컬렉션</a>
+      <button class="rp-btn-ghost" id="btnLogout">로그아웃</button>
+      <button class="rp-btn-add" id="btnNewProfile">+ 새 프로파일</button>
+    </div>
+  </div>
+</header>
+
+<div class="rp-layout">
+
+  <!-- ── 사이드바: 저장된 프로파일 ── -->
+  <aside class="rp-sidebar">
+    <div class="rp-sidebar-head">
+      <span class="rp-sidebar-title">내 프로파일</span>
+      <span class="rp-count" id="profileCount">0</span>
+    </div>
+    <input class="rp-search" id="searchInput" type="text" placeholder="생두명·판매사 검색…">
+    <div class="rp-list" id="profileList">
+      <div class="rp-list-empty" id="listEmpty">아직 저장된 프로파일이 없습니다</div>
+    </div>
+  </aside>
+
+  <!-- ── 메인 ── -->
+  <main class="rp-main">
+
+    <!-- 환영 화면 -->
+    <section class="rp-welcome" id="welcomeView">
+      <div class="rp-welcome-icon">🌡️</div>
+      <h2>로스팅 프로파일을 분석해 보세요</h2>
+      <p>
+        프로파일 <strong>사진을 업로드</strong>하고 곡선 위 포인트를 클릭하면<br>
+        깔끔한 그래프로 재생성하고 <strong>DTR</strong>·로스팅 포인트를 자동 분석합니다.<br>
+        원하는 다음 로스팅 포인트를 선택하면 맞춤 피드백을 드립니다.
+      </p>
+      <button class="rp-btn-primary rp-btn-lg" id="btnWelcomeNew">+ 첫 프로파일 만들기</button>
+    </section>
+
+    <!-- ════════ 생성 마법사 ════════ -->
+    <section class="rp-wizard" id="wizardView" style="display:none">
+
+      <!-- 진행 표시 -->
+      <div class="rp-steps">
+        <div class="rp-step active" data-step="1"><span class="rp-step-num">1</span> 기본 정보</div>
+        <div class="rp-step" data-step="2"><span class="rp-step-num">2</span> 사진 디지타이징</div>
+        <div class="rp-step" data-step="3"><span class="rp-step-num">3</span> 그래프 &amp; 피드백</div>
+      </div>
+
+      <!-- ── STEP 1: 기본 정보 ── -->
+      <div class="rp-panel" id="step1">
+        <h3 class="rp-panel-title">☕ 기본 정보</h3>
+        <div class="rp-form-grid">
+          <div class="rp-field rp-field-full">
+            <label>생두 이름 <span class="req">*</span></label>
+            <input type="text" id="fBeanName" placeholder="예: 에티오피아 예가체프 코체레 워시드" required>
+            <span class="rp-field-hint">필수 입력 항목입니다</span>
+          </div>
+          <div class="rp-field">
+            <label>생두 판매사 <span class="opt">선택</span></label>
+            <input type="text" id="fSeller" placeholder="예: 커피리브레, 모모스">
+          </div>
+          <div class="rp-field">
+            <label>로스팅 날짜 <span class="opt">선택</span></label>
+            <input type="date" id="fRoastDate">
+          </div>
+          <div class="rp-field">
+            <label>실내 온도 (°C) <span class="opt">선택</span></label>
+            <input type="number" id="fAmbientTemp" placeholder="예: 22" min="-10" max="50" step="0.1">
+          </div>
+          <div class="rp-field">
+            <label>실내 습도 (%) <span class="opt">선택</span></label>
+            <input type="number" id="fAmbientHumidity" placeholder="예: 55" min="0" max="100" step="1">
+          </div>
+          <div class="rp-field rp-field-full">
+            <label>메모 <span class="opt">선택</span></label>
+            <textarea id="fMemo" rows="2" placeholder="가스 조절, 관찰 사항 등"></textarea>
+          </div>
+        </div>
+        <div class="rp-panel-actions">
+          <button class="rp-btn-cancel" id="btnWizCancel1">취소</button>
+          <button class="rp-btn-primary" id="btnToStep2">다음: 사진 업로드 →</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 2: 사진 디지타이징 ── -->
+      <div class="rp-panel" id="step2" style="display:none">
+        <h3 class="rp-panel-title">📷 프로파일 사진 디지타이징</h3>
+
+        <!-- 업로드 영역 -->
+        <div class="rp-file-drop" id="fileDrop">
+          <div class="rp-file-drop-icon">⬆</div>
+          <p>로스팅 프로파일 <strong>사진</strong>을 드래그하거나 클릭하여 업로드</p>
+          <p class="rp-file-sub">Artisan·Cropster·Firescope 등 어떤 프로그램의 캡처도 가능합니다</p>
+          <input type="file" id="fileInput" accept="image/*" style="display:none">
+        </div>
+
+        <!-- 디지타이저 (업로드 후 표시) -->
+        <div class="rp-digitizer" id="digitizer" style="display:none">
+
+          <div class="rp-digi-help" id="digiHelp">
+            먼저 <strong>축 보정</strong>을 한 뒤, 곡선 위 <strong>이벤트 포인트</strong>를 찍어주세요.
+          </div>
+
+          <div class="rp-digi-body">
+            <!-- 캔버스 -->
+            <div class="rp-canvas-wrap">
+              <canvas id="digiCanvas"></canvas>
+            </div>
+
+            <!-- 컨트롤 패널 -->
+            <div class="rp-digi-controls">
+
+              <!-- 1. 축 보정 -->
+              <div class="rp-digi-section">
+                <div class="rp-digi-section-title">1. 축 보정 (Calibration)</div>
+                <p class="rp-digi-note">그래프의 눈금값을 아는 4개 지점을 찍어 좌표를 보정합니다.</p>
+
+                <div class="rp-cal-row">
+                  <button class="rp-cal-btn" data-mode="cal-x1">시간축 점1</button>
+                  <input type="text" class="rp-cal-input" id="calX1Val" placeholder="0:00">
+                  <span class="rp-cal-dot" id="calX1Dot">○</span>
+                </div>
+                <div class="rp-cal-row">
+                  <button class="rp-cal-btn" data-mode="cal-x2">시간축 점2</button>
+                  <input type="text" class="rp-cal-input" id="calX2Val" placeholder="10:00">
+                  <span class="rp-cal-dot" id="calX2Dot">○</span>
+                </div>
+                <div class="rp-cal-row">
+                  <button class="rp-cal-btn" data-mode="cal-y1">온도축 점1</button>
+                  <input type="number" class="rp-cal-input" id="calY1Val" placeholder="100">
+                  <span class="rp-cal-dot" id="calY1Dot">○</span>
+                </div>
+                <div class="rp-cal-row">
+                  <button class="rp-cal-btn" data-mode="cal-y2">온도축 점2</button>
+                  <input type="number" class="rp-cal-input" id="calY2Val" placeholder="200">
+                  <span class="rp-cal-dot" id="calY2Dot">○</span>
+                </div>
+                <p class="rp-cal-hint">시간은 <code>분:초</code>(예 10:30) 또는 초 단위, 온도는 °C 숫자로 입력</p>
+              </div>
+
+              <!-- 2. 이벤트 마킹 -->
+              <div class="rp-digi-section">
+                <div class="rp-digi-section-title">2. 이벤트 포인트 마킹</div>
+                <p class="rp-digi-note">버튼을 누른 뒤 그래프 곡선 위 해당 지점을 클릭하세요.</p>
+                <div class="rp-event-btns">
+                  <button class="rp-event-btn" data-mode="ev-charge"   style="--ec:#6366f1">투입(CHARGE) <span class="rp-ev-mark" id="mk-charge"></span></button>
+                  <button class="rp-event-btn" data-mode="ev-tp"       style="--ec:#8b5cf6">터닝포인트 <span class="rp-ev-mark" id="mk-tp"></span></button>
+                  <button class="rp-event-btn" data-mode="ev-dry"      style="--ec:#f59e0b">건조종료 <span class="rp-ev-mark" id="mk-dry"></span></button>
+                  <button class="rp-event-btn" data-mode="ev-fcs"      style="--ec:#ef4444">1차크랙 시작 <span class="rp-ev-mark" id="mk-fcs"></span></button>
+                  <button class="rp-event-btn" data-mode="ev-fce"      style="--ec:#f97316">1차크랙 종료 <span class="rp-ev-mark" id="mk-fce"></span></button>
+                  <button class="rp-event-btn" data-mode="ev-drop"     style="--ec:#16a34a">배출(DROP) <span class="rp-ev-mark" id="mk-drop"></span></button>
+                </div>
+                <p class="rp-cal-hint">DTR 계산에는 <strong>투입·1차크랙시작·배출</strong>이 필요합니다.</p>
+              </div>
+
+              <!-- 3. 곡선 추가점 (선택) -->
+              <div class="rp-digi-section">
+                <div class="rp-digi-section-title">3. 곡선 추가점 <span class="opt">선택</span></div>
+                <p class="rp-digi-note">곡선을 더 매끄럽게 만들려면 BT 곡선 위 여러 점을 추가로 찍으세요.</p>
+                <div class="rp-event-btns">
+                  <button class="rp-event-btn" data-mode="curve" style="--ec:#0ea5e9">곡선점 추가 <span class="rp-ev-mark" id="mk-curve"></span></button>
+                  <button class="rp-event-btn" id="btnUndoCurve" style="--ec:#64748b">마지막 점 취소</button>
+                  <button class="rp-event-btn" id="btnClearAll" style="--ec:#dc2626">전체 초기화</button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="rp-panel-actions">
+          <button class="rp-btn-cancel" id="btnBackStep1">← 이전</button>
+          <button class="rp-btn-primary" id="btnGenerate" disabled>그래프 생성 &amp; 분석 →</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 3: 그래프 & 피드백 ── -->
+      <div class="rp-panel" id="step3" style="display:none">
+        <h3 class="rp-panel-title">📈 분석 결과</h3>
+
+        <!-- 지표 -->
+        <div class="rp-metrics" id="metricsRow"></div>
+
+        <!-- 그래프 -->
+        <div class="rp-chart-card">
+          <div class="rp-chart-head">
+            <span class="rp-chart-title" id="chartTitle">로스팅 곡선</span>
+            <div class="rp-chart-legend">
+              <span class="lg"><i style="background:#e07b2a"></i>BT</span>
+              <span class="lg"><i style="background:#22c55e"></i>ROR</span>
+            </div>
+          </div>
+          <div class="rp-chart-box"><canvas id="roastChart"></canvas></div>
+        </div>
+
+        <!-- 원하는 로스팅 포인트 선택 -->
+        <div class="rp-target-card">
+          <div class="rp-card-title">🎯 원하는 다음 로스팅 포인트를 선택하세요</div>
+          <div class="rp-target-btns" id="targetBtns"></div>
+        </div>
+
+        <!-- 피드백 -->
+        <div class="rp-feedback" id="feedbackPanel"></div>
+
+        <div class="rp-panel-actions">
+          <button class="rp-btn-cancel" id="btnBackStep2">← 디지타이징 수정</button>
+          <button class="rp-btn-primary" id="btnSaveProfile">💾 프로파일 저장</button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ════════ 저장된 프로파일 상세 ════════ -->
+    <section class="rp-detail" id="detailView" style="display:none">
+      <div class="rp-detail-head">
+        <div>
+          <h2 id="detailName"></h2>
+          <p class="rp-detail-meta" id="detailMeta"></p>
+        </div>
+        <div class="rp-detail-actions">
+          <button class="rp-btn-ghost-dark" id="btnDelete">삭제</button>
+        </div>
+      </div>
+      <div class="rp-metrics" id="detailMetrics"></div>
+      <div class="rp-chart-card">
+        <div class="rp-chart-head">
+          <span class="rp-chart-title">로스팅 곡선</span>
+          <div class="rp-chart-legend">
+            <span class="lg"><i style="background:#e07b2a"></i>BT</span>
+            <span class="lg"><i style="background:#22c55e"></i>ROR</span>
+          </div>
+        </div>
+        <div class="rp-chart-box"><canvas id="detailChart"></canvas></div>
+      </div>
+      <div class="rp-target-card">
+        <div class="rp-card-title">🎯 다른 로스팅 포인트로 바꾼다면?</div>
+        <div class="rp-target-btns" id="detailTargetBtns"></div>
+      </div>
+      <div class="rp-feedback" id="detailFeedback"></div>
+    </section>
+
+  </main>
+</div>
+
+<!-- 삭제 확인 -->
+<div class="rp-overlay" id="confirmOverlay" style="display:none">
+  <div class="rp-confirm">
+    <p>이 프로파일을 삭제할까요?</p>
+    <div class="rp-confirm-actions">
+      <button class="rp-btn-cancel" id="btnConfirmNo">취소</button>
+      <button class="rp-btn-delete" id="btnConfirmYes">삭제</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3/dist/chartjs-plugin-annotation.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase.config.js"></script>
+<script src="roasting.js"></script>
+</body>
+</html>

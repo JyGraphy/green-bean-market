@@ -35,6 +35,14 @@
   </div>
 </header>
 
+<!-- Update banner -->
+<div id="updateBanner">
+  <span class="update-banner-icon">✨</span>
+  <span class="update-banner-text" id="updateBannerText"></span>
+  <button class="update-banner-new" id="updateBannerNew">NEW 상품 보기</button>
+  <button class="update-banner-close" id="updateBannerClose">✕</button>
+</div>
+
 <!-- Mobile filter drawer overlay -->
 <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
 
@@ -208,6 +216,7 @@
         <select class="sort-sel" id="sortSelect" onchange="applyFilters()">
           <option value="price_asc">가격 낮은순</option>
           <option value="price_desc">가격 높은순</option>
+          <option value="latest">최신 등록순</option>
           <option value="name_asc">이름순</option>
           <option value="origin_asc">원산지순</option>
           <option value="process_asc">가공방식순</option>
@@ -217,6 +226,14 @@
           <button class="vbtn" id="btnCard" onclick="setView('card')" title="카드">⊞</button>
         </div>
       </div>
+    </div>
+
+    <!-- Quick filter bar -->
+    <div class="quick-filter-bar">
+      <button class="quick-btn active" data-quick="all" onclick="setQuick('all')">전체</button>
+      <button class="quick-btn" data-quick="new" onclick="setQuick('new')">✨ 신규 입고 <span class="qcount" id="newCount">0</span></button>
+      <button class="quick-btn" data-quick="special" onclick="setQuick('special')">🏆 스페셜티</button>
+      <button class="quick-btn" data-quick="decaf" onclick="setQuick('decaf')">디카페인</button>
     </div>
 
     <div id="productContainer"></div>

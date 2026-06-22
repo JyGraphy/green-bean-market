@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS products (
   isNew INTEGER DEFAULT 0,
   isDecaf INTEGER DEFAULT 0,
   isSpecial INTEGER DEFAULT 0,
-  isSoldout INTEGER DEFAULT 0
+  isSoldout INTEGER DEFAULT 0,
+  added_date TEXT DEFAULT NULL
 );
 DELETE FROM products;
 INSERT INTO products (id,store,name,price,origin,region,process,notes,url,isNew,isDecaf,isSpecial,isSoldout) VALUES

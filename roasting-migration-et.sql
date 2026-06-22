@@ -10,3 +10,7 @@ alter table public.roasting_profiles
   add column if not exists drop_weight     numeric,
   add column if not exists weight_loss     numeric,
   add column if not exists et_ror_series   numeric[];
+
+-- 로스팅기 컬럼 추가
+alter table public.roasting_profiles
+  add column if not exists roaster text;

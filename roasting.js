@@ -131,6 +131,7 @@ async function saveProfile() {
     user_id: currentUserId,
     bean_name: wizardData.bean_name,
     seller: wizardData.seller || null,
+    roaster: wizardData.roaster || null,
     ambient_temp: wizardData.ambient_temp,
     ambient_humidity: wizardData.ambient_humidity,
     roast_date: wizardData.roast_date || null,
@@ -205,9 +206,8 @@ function showView(name) {
 }
 function openWizard() {
   wizardData = null; selectedTarget = null; clearDigi();
-  $('fBeanName').value=''; $('fSeller').value=''; $('fRoastDate').value='';
+  $('fBeanName').value=''; $('fSeller').value=''; $('fRoastDate').value=''; $('fRoaster').value='';
   $('fAmbientTemp').value=''; $('fAmbientHumidity').value=''; $('fMemo').value='';
-  $('fChargeWeight').value=''; $('fDropWeight').value='';
   $('fChargeWeight').value=''; $('fDropWeight').value='';
   digitizer.style.display='none'; fileDrop.style.display='';
   $('aiPanel').style.display='none';
@@ -384,6 +384,7 @@ async function autoScan() {
     wizardData = {
       bean_name:         $('fBeanName').value.trim(),
       seller:            $('fSeller').value.trim(),
+      roaster:           $('fRoaster').value.trim() || null,
       roast_date:        $('fRoastDate').value,
       ambient_temp:      numOrNull('fAmbientTemp'),
       ambient_humidity:  numOrNull('fAmbientHumidity'),
@@ -980,7 +981,7 @@ function comprehensiveAnalysis(d) {
 function showDetail(p) {
   activeId = p.id; renderList();
   $('detailName').textContent = p.bean_name;
-  $('detailMeta').textContent = [p.seller, p.roast_date,
+  $('detailMeta').textContent = [p.seller, p.roaster, p.roast_date,
     p.ambient_temp!=null?`${p.ambient_temp}°C`:null,
     p.ambient_humidity!=null?`습도 ${p.ambient_humidity}%`:null].filter(Boolean).join(' · ');
   renderMetrics($('detailMetrics'), p);

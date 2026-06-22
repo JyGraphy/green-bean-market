@@ -2,6 +2,7 @@
 let DB = null;
 let dbReady = false;
 let curStore = 'all', curOrigin = 'all', curRegion = 'all', curView = 'table', curPage = 1;
+let curQuick = 'all';
 const PAGE_SZ = 50;
 
 // ── DB init ───────────────────────────────────────────────
@@ -17,6 +18,7 @@ async function initDB() {
   dbReady = true;
   showLoading(false);
   init();
+  loadUpdateLog();
 }
 
 function showLoading(on) {
@@ -24,7 +26,7 @@ function showLoading(on) {
 }
 
 function queryAll() {
-  const result = DB.exec('SELECT id,store,name,price,origin,region,process,notes,url,isNew,isDecaf,isSpecial,isSoldout FROM products');
+  const result = DB.exec('SELECT id,store,name,price,origin,region,process,notes,url,isNew,isDecaf,isSpecial,isSoldout,added_date FROM products');
   if (!result.length) return [];
   const { columns, values } = result[0];
   return values.map(row => {
@@ -46,8 +48,49 @@ function init() {
   document.getElementById('totalCount').textContent = products.length;
   document.getElementById('originCount').textContent = origins.length;
 
+  // 신규 입고 배지 카운트
+  const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const newCount = products.filter(p => p.added_date && p.added_date >= cutoff).length;
+  const el = document.getElementById('newCount');
+  if (el) el.textContent = newCount;
+
   buildStatBars(products);
   applyFilters();
+}
+
+// ── Update log banner ─────────────────────────────────────
+async function loadUpdateLog() {
+  try {
+    const res = await fetch('data/update_log.json');
+    if (!res.ok) return;
+    const log = await res.json();
+    if (!log.total_new || log.total_new === 0) return;
+    if (!log.updated_at) return;
+
+    // 3일 이내 업데이트만 표시
+    const daysDiff = (Date.now() - new Date(log.updated_at)) / (1000 * 60 * 60 * 24);
+    if (daysDiff > 3) return;
+
+    // 이미 닫은 경우 표시 안 함
+    if (sessionStorage.getItem('update_seen_' + log.updated_at)) return;
+
+    const storeNames = log.stores.map(s => `${s.name}(${s.new_count})`).join(', ');
+    document.getElementById('updateBannerText').textContent =
+      `신규 입고 ${log.total_new}개 · ${storeNames}`;
+
+    const banner = document.getElementById('updateBanner');
+    banner.style.display = 'flex';
+
+    document.getElementById('updateBannerNew').onclick = () => {
+      banner.style.display = 'none';
+      sessionStorage.setItem('update_seen_' + log.updated_at, '1');
+      setQuick('new');
+    };
+    document.getElementById('updateBannerClose').onclick = () => {
+      banner.style.display = 'none';
+      sessionStorage.setItem('update_seen_' + log.updated_at, '1');
+    };
+  } catch(e) {}
 }
 
 // ── Statistics sidebar ────────────────────────────────────
@@ -122,15 +165,23 @@ function setView(v) {
   document.getElementById('btnCard').classList.toggle('active', v==='card');
   applyFilters();
 }
+function setQuick(val) {
+  curQuick = val;
+  document.querySelectorAll('.quick-btn').forEach(b => b.classList.toggle('active', b.dataset.quick === val));
+  curPage = 1;
+  applyFilters();
+}
+
 function resetFilters() {
   ['searchInput','searchInputMob'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['processSelect','processSelectMob'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['priceMin','priceMinMob'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['priceMax','priceMaxMob'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('sortSelect').value = 'price_asc';
-  curStore = 'all'; curOrigin = 'all'; curRegion = 'all'; curPage = 1;
+  curStore = 'all'; curOrigin = 'all'; curRegion = 'all'; curQuick = 'all'; curPage = 1;
   document.querySelectorAll('#storeFilter .tag-btn, #storeFilterMob .tag-btn').forEach(b=>b.classList.toggle('active',b.dataset.store==='all'));
   document.querySelectorAll('.region-btn').forEach(b=>b.classList.toggle('active',b.dataset.region==='all'));
+  document.querySelectorAll('.quick-btn').forEach(b=>b.classList.toggle('active',b.dataset.quick==='all'));
   rebuildOriginButtons('all');
   applyFilters();
 }
@@ -144,7 +195,12 @@ function applyFilters() {
   const pMax    = parseFloat(document.getElementById('priceMax').value)||Infinity;
   const sortVal = document.getElementById('sortSelect').value;
 
+  const cutoff7 = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
   let filtered = queryAll().filter(p => {
+    if (curQuick === 'new'     && !(p.added_date && p.added_date >= cutoff7)) return false;
+    if (curQuick === 'special' && !p.isSpecial) return false;
+    if (curQuick === 'decaf'   && !p.isDecaf)   return false;
     if (curRegion !== 'all') {
       const inRegion = curRegion === '아시아' ? p.region.startsWith('아시아') : p.region === curRegion;
       if (!inRegion) return false;
@@ -163,6 +219,12 @@ function applyFilters() {
   ({
     price_asc:   ()=>filtered.sort((a,b)=>a.price-b.price),
     price_desc:  ()=>filtered.sort((a,b)=>b.price-a.price),
+    latest:      ()=>filtered.sort((a,b)=>{
+      if (!a.added_date && !b.added_date) return 0;
+      if (!a.added_date) return 1;
+      if (!b.added_date) return -1;
+      return b.added_date.localeCompare(a.added_date);
+    }),
     name_asc:    ()=>filtered.sort((a,b)=>a.name.localeCompare(b.name,'ko')),
     origin_asc:  ()=>filtered.sort((a,b)=>a.origin.localeCompare(b.origin,'ko')),
     process_asc: ()=>filtered.sort((a,b)=>a.process.localeCompare(b.process,'ko')),
@@ -358,6 +420,7 @@ function updateFilterBadge() {
     curStore !== 'all',
     curOrigin !== 'all',
     curRegion !== 'all',
+    curQuick !== 'all',
   ].filter(Boolean).length;
   const badge = document.getElementById('filterCount');
   if (badge) {

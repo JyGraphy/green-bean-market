@@ -37,6 +37,89 @@
     line-height: 1.5;
   }
 
+  /* UPDATE BANNER */
+  #updateBanner {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    background: #fff7ed;
+    border-bottom: 1px solid #fed7aa;
+    padding: 10px 24px;
+    font-size: 0.83rem;
+    color: #9a3412;
+    position: sticky;
+    top: 64px;
+    z-index: 290;
+    flex-wrap: wrap;
+  }
+  .update-banner-icon { font-size: 1rem; flex-shrink: 0; }
+  .update-banner-text { flex: 1; min-width: 0; font-weight: 500; }
+  .update-banner-new {
+    padding: 4px 12px;
+    background: #c2410c;
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s;
+    flex-shrink: 0;
+  }
+  .update-banner-new:hover { background: #9a3412; }
+  .update-banner-close {
+    width: 22px; height: 22px;
+    border: none;
+    background: rgba(154,52,18,0.12);
+    border-radius: 50%;
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9a3412;
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+  .update-banner-close:hover { background: rgba(154,52,18,0.22); }
+
+  /* QUICK FILTER BAR */
+  .quick-filter-bar {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .quick-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 13px;
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    background: white;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .quick-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .quick-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+  .quick-btn .qcount {
+    background: rgba(255,255,255,0.25);
+    border-radius: 10px;
+    padding: 0 5px;
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+  .quick-btn:not(.active) .qcount {
+    background: var(--border-light);
+    color: var(--text-muted);
+  }
+
   /* LOADING OVERLAY */
   #loadingOverlay {
     display: flex;

@@ -17,11 +17,13 @@ They are your highest-accuracy data points even if the image has glare or angle 
 == STEP 2: IDENTIFY APP LAYOUT ==
 
 Roastware (dark background, Korean UI):
-- Two main curves: "원두 표면" (bean surface = BT, pink/red curve) and "내부" (internal = ET, gray/white curve)
+- Two main curves in the top chart:
+  "원두 표면" (bean surface = BT, pink/red curve) — this is your bt_curve
+  "내부" (internal drum temp = ET, gray/white/yellow curve) — this is your et_curve
 - Labeled dots appear at key inflection points with "MM:SS temp°C" text
 - Phase bars at top show timing: e.g. "02:48 | 40.0%" = 2 min 48 sec phase
 - Time axis: MM:SS format (00:00 to ~10:00)
-- ROR curve in bottom sub-chart — IGNORE this, only use top chart
+- Bottom sub-chart shows gas/ROR controls — IGNORE, only extract data from the top temperature chart
 
 Artisan (light or dark background):
 - BT = orange/red curve (Bean Temp), ET = blue curve (Environment Temp)
@@ -48,6 +50,7 @@ Return ONLY a valid JSON object, no markdown, no explanation:
 {
   "labeled_points": [[time_sec, temp_celsius, "label_or_empty"], ...],
   "bt_curve": [[time_sec, temp_celsius], ...],
+  "et_curve": [[time_sec, temp_celsius], ...],
   "events": {
     "charge": 0,
     "tp": <seconds or null>,
@@ -66,7 +69,9 @@ Return ONLY a valid JSON object, no markdown, no explanation:
 Rules:
 - charge is always 0 (your reference point)
 - drop is REQUIRED — use last visible BT data point if DROP label absent
-- bt_curve must include labeled_points merged in, sorted by time, spanning 0 to drop time, 25-60 total points
+- bt_curve: BT (bean/surface temp) points spanning 0 to drop, 25-60 points, sorted by time
+- et_curve: ET (environment/drum internal temp) points, same time range, 25-60 points. Use [] if ET curve not visible.
+- labeled_points: include all text-annotated time+temp values found on the chart
 - If a value is genuinely unreadable, use null (never guess wildly)
 - confidence: "high" if text labels clear + image sharp; "medium" if some glare/angle; "low" if heavily obscured`
 
@@ -100,7 +105,7 @@ serve(async (req: Request) => {
       },
       body: JSON.stringify({
         model: 'claude-opus-4-8',
-        max_tokens: 4096,
+        max_tokens: 6000,
         messages: [{
           role: 'user',
           content: [

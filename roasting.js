@@ -122,6 +122,7 @@ async function saveProfile() {
     target_roast_point: selectedTarget,
     time_series: wizardData.time_series,
     bt_series: wizardData.bt_series,
+    et_series: wizardData.et_series?.length ? wizardData.et_series : null,
     events: wizardData.events,
   };
   const { error } = await sb.from('roasting_profiles').insert(payload);
@@ -277,6 +278,7 @@ async function autoScan() {
     // labeled_points가 있으면 우선 포함
     const labeled = (result.labeled_points || []).map(([t, bt]) => ({ t: +t, bt: +bt }));
     const rawCurve = (result.bt_curve || []).map(([t, bt]) => ({ t: +t, bt: +bt }));
+    const rawEt    = (result.et_curve  || []).map(([t, bt]) => ({ t: +t, bt: +bt }));
 
     // 두 배열 합쳐 중복 제거 (0.5초 이내는 동일 점으로 처리)
     const merged = [...labeled, ...rawCurve].sort((a, b) => a.t - b.t);
@@ -304,6 +306,12 @@ async function autoScan() {
     const bts   = series.map(s => s.bt);
     const ror   = computeRoR(times, bts, 30);
 
+    // ET 리샘플 (없으면 빈 배열)
+    const etSorted = rawEt.sort((a, b) => a.t - b.t);
+    const ets = etSorted.length >= 2
+      ? resample(etSorted, 5, dropT).map(s => s.bt)
+      : [];
+
     const chargeTemp = result.charge_temp != null ? +result.charge_temp : +interp(curve, 0).toFixed(1);
     const dropTemp   = result.drop_temp   != null ? +result.drop_temp   : +interp(curve, dropT).toFixed(1);
     const dtr = evTimes.fcs != null ? +(((dropT - evTimes.fcs) / dropT) * 100).toFixed(1) : null;
@@ -318,7 +326,7 @@ async function autoScan() {
       memo:              $('fMemo').value.trim(),
       charge_temp: chargeTemp, drop_temp: dropTemp, total_time: dropT, dtr,
       current_roast_point: current ? current.key : null,
-      time_series: times, bt_series: bts, ror, events: evTimes,
+      time_series: times, bt_series: bts, et_series: ets, ror, events: evTimes,
     };
 
     const conf = result.confidence || 'medium';
@@ -328,7 +336,7 @@ async function autoScan() {
 
     // STEP 3으로 이동
     renderMetrics($('metricsRow'), wizardData);
-    chartInstance = buildChart('roastChart', times, bts, ror, evTimes, chartInstance);
+    chartInstance = buildChart('roastChart', times, bts, ets, ror, evTimes, chartInstance);
     $('chartTitle').textContent = wizardData.bean_name;
     selectedTarget = null;
     const renderTargets = () => renderTargetButtons($('targetBtns'), wizardData, (key) => {
@@ -485,7 +493,7 @@ function generateProfile() {
 
   // 6) STEP 3 렌더
   renderMetrics($('metricsRow'), wizardData);
-  chartInstance = buildChart('roastChart', times, bts, ror, evTimes, chartInstance);
+  chartInstance = buildChart('roastChart', times, bts, [], ror, evTimes, chartInstance);
   $('chartTitle').textContent = wizardData.bean_name;
   selectedTarget = null;
   const renderTargets = () => renderTargetButtons($('targetBtns'), wizardData, (key) => {
@@ -554,7 +562,7 @@ function renderMetrics(el, d) {
 }
 
 /* ════════ 차트 ════════ */
-function buildChart(canvasId, times, bts, ror, events, prev) {
+function buildChart(canvasId, times, bts, ets, ror, events, prev) {
   if (prev) prev.destroy();
   const labels = times.map(t => fmtTime(t));
   const annotations = {};
@@ -566,14 +574,25 @@ function buildChart(canvasId, times, bts, ror, events, prev) {
     annotations['ev_'+k] = { type:'line', xMin:idx, xMax:idx, borderColor:color, borderWidth:1.5,
       borderDash:[4,3], label:{ display:true, content:label, position:'start', font:{size:10}, color, backgroundColor:'rgba(255,255,255,.8)' } };
   });
+
+  const datasets = [
+    { label:'BT (°C)', data:bts, borderColor:'#e07b2a', backgroundColor:'rgba(224,123,42,.08)',
+      borderWidth:2.5, pointRadius:0, tension:.35, yAxisID:'yT' },
+  ];
+  if (ets && ets.length > 0) {
+    datasets.push(
+      { label:'ET (°C)', data:ets, borderColor:'#60a5fa', backgroundColor:'rgba(96,165,250,.06)',
+        borderWidth:1.8, pointRadius:0, tension:.35, yAxisID:'yT', borderDash:[4,2] }
+    );
+  }
+  datasets.push(
+    { label:'ROR (°C/min)', data:ror, borderColor:'#22c55e', borderWidth:1.5,
+      pointRadius:0, tension:.35, yAxisID:'yR' }
+  );
+
   return new Chart($(canvasId), {
     type:'line',
-    data:{ labels, datasets:[
-      { label:'BT (°C)', data:bts, borderColor:'#e07b2a', backgroundColor:'rgba(224,123,42,.08)',
-        borderWidth:2.5, pointRadius:0, tension:.35, yAxisID:'yT' },
-      { label:'ROR (°C/min)', data:ror, borderColor:'#22c55e', borderWidth:1.5,
-        pointRadius:0, tension:.35, yAxisID:'yR' },
-    ]},
+    data:{ labels, datasets },
     options:{ responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false},
       plugins:{ legend:{display:false}, annotation:{annotations},
         tooltip:{ callbacks:{ label:c=>`${c.dataset.label}: ${c.parsed.y?.toFixed(1) ?? '—'}` } } },
@@ -762,7 +781,7 @@ function showDetail(p) {
     p.ambient_temp!=null?`${p.ambient_temp}°C`:null,
     p.ambient_humidity!=null?`습도 ${p.ambient_humidity}%`:null].filter(Boolean).join(' · ');
   renderMetrics($('detailMetrics'), p);
-  detailChartInstance = buildChart('detailChart', p.time_series||[], p.bt_series||[], p.ror||computeRoR(p.time_series||[], p.bt_series||[]), p.events||{}, detailChartInstance);
+  detailChartInstance = buildChart('detailChart', p.time_series||[], p.bt_series||[], p.et_series||[], p.ror||computeRoR(p.time_series||[], p.bt_series||[]), p.events||{}, detailChartInstance);
 
   let sel = p.target_roast_point || null;
   const render = () => renderTargetButtons($('detailTargetBtns'), p, (key)=>{ sel=key; render(); renderFeedback($('detailFeedback'), p, key); }, sel);

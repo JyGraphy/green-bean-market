@@ -1,20 +1,15 @@
 // ── State ─────────────────────────────────────────────────
-let DB = null;
+let PRODUCTS = null;
 let dbReady = false;
 let curStore = 'all', curOrigin = 'all', curRegion = 'all', curView = 'table', curPage = 1;
 let curQuick = 'all';
 const PAGE_SZ = 50;
 
-// ── DB init ───────────────────────────────────────────────
+// ── Data init ─────────────────────────────────────────────
 async function initDB() {
   showLoading(true);
-  const SQL = await initSqlJs({
-    locateFile: f => `https://cdn.jsdelivr.net/npm/sql.js@1.12.0/dist/${f}`
-  });
-  const res = await fetch('database.sql');
-  const sql = await res.text();
-  DB = new SQL.Database();
-  DB.exec(sql);
+  const res = await fetch('data/products_web.json');
+  PRODUCTS = await res.json();
   dbReady = true;
   showLoading(false);
   init();
@@ -26,18 +21,7 @@ function showLoading(on) {
 }
 
 function queryAll() {
-  const result = DB.exec('SELECT id,store,name,price,origin,region,process,notes,url,isNew,isDecaf,isSpecial,isSoldout,added_date FROM products');
-  if (!result.length) return [];
-  const { columns, values } = result[0];
-  return values.map(row => {
-    const p = {};
-    columns.forEach((c, i) => p[c] = row[i]);
-    p.isNew      = p.isNew     === 1;
-    p.isDecaf    = p.isDecaf   === 1;
-    p.isSpecial  = p.isSpecial === 1;
-    p.isSoldout  = p.isSoldout === 1;
-    return p;
-  });
+  return PRODUCTS || [];
 }
 
 // ── Init ──────────────────────────────────────────────────

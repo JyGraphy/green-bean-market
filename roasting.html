@@ -114,7 +114,22 @@
           <input type="file" id="fileInput" accept="image/*" style="display:none">
         </div>
 
-        <!-- 디지타이저 (업로드 후 표시) -->
+        <!-- AI 분석 패널 (업로드 후 표시) -->
+        <div class="rp-ai-panel" id="aiPanel" style="display:none">
+          <div class="rp-ai-preview-row">
+            <img class="rp-ai-thumb" id="aiThumb" alt="업로드된 프로파일 이미지">
+            <div class="rp-ai-actions">
+              <button class="rp-btn-ai" id="btnAutoScan">🤖 AI 자동 분석</button>
+              <button class="rp-btn-ghost-sm" id="btnChangeImage">↺ 다른 사진으로</button>
+            </div>
+          </div>
+          <div class="rp-ai-status" id="aiStatus">
+            <span class="rp-ai-msg">AI가 BT 곡선·이벤트 마커·축 눈금을 자동으로 읽어 그래프를 생성합니다.</span>
+          </div>
+          <div class="rp-ai-divider"><span>── 또는 수동으로 직접 찍기 ──</span></div>
+        </div>
+
+        <!-- 디지타이저 (수동 클릭, 업로드 후 표시) -->
         <div class="rp-digitizer" id="digitizer" style="display:none">
 
           <div class="rp-digi-help" id="digiHelp">

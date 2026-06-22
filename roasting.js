@@ -30,7 +30,7 @@ let wizardData = null;      // 생성 중인 프로파일 데이터
 let selectedTarget = null;  // 선택된 타겟 포인트(생성 화면)
 
 /* 디지타이저 상태 */
-const digi = { img:null, cal:{x1:null,x2:null,y1:null,y2:null}, events:{}, curve:[], mode:null, scale:1 };
+const digi = { img:null, cal:{x1:null,x2:null,y1:null,y2:null}, events:{}, curve:[], mode:null, scale:1, imgBase64:null, imgMediaType:null };
 
 /* ── DOM ── */
 const $ = id => document.getElementById(id);
@@ -70,6 +70,16 @@ function wireUI() {
   fileDrop.addEventListener('dragover', e => { e.preventDefault(); fileDrop.classList.add('drag-over'); });
   fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('drag-over'));
   fileDrop.addEventListener('drop', e => { e.preventDefault(); fileDrop.classList.remove('drag-over'); loadImage(e.dataTransfer.files[0]); });
+
+  // AI 자동 분석
+  $('btnAutoScan').addEventListener('click', autoScan);
+  $('btnChangeImage').addEventListener('click', () => {
+    $('aiPanel').style.display = 'none';
+    digitizer.style.display = 'none';
+    fileDrop.style.display = '';
+    digi.imgBase64 = null; digi.imgMediaType = null;
+    fileInput.value = '';
+  });
 
   // 디지타이저 모드 버튼
   document.querySelectorAll('[data-mode]').forEach(btn => {
@@ -165,6 +175,8 @@ function openWizard() {
   $('fBeanName').value=''; $('fSeller').value=''; $('fRoastDate').value='';
   $('fAmbientTemp').value=''; $('fAmbientHumidity').value=''; $('fMemo').value='';
   digitizer.style.display='none'; fileDrop.style.display='';
+  $('aiPanel').style.display='none';
+  digi.imgBase64 = null; digi.imgMediaType = null;
   activeId = null; renderList();
   showView('wizard'); showStep(1);
 }
@@ -191,8 +203,13 @@ function gotoStep2() {
 /* ════════ 디지타이저 ════════ */
 function loadImage(file) {
   if (!file || !file.type.startsWith('image/')) return;
+  digi.imgMediaType = file.type;
   const reader = new FileReader();
   reader.onload = e => {
+    const dataUrl = e.target.result;
+    // base64 부분만 추출 (data:image/jpeg;base64,XXX → XXX)
+    digi.imgBase64 = dataUrl.split(',')[1];
+
     const img = new Image();
     img.onload = () => {
       digi.img = img;
@@ -202,12 +219,119 @@ function loadImage(file) {
       canvas.height = Math.round(img.height * digi.scale);
       digi.cal = {x1:null,x2:null,y1:null,y2:null}; digi.events={}; digi.curve=[]; digi.mode=null;
       fileDrop.style.display='none';
-      digitizer.style.display='';
+
+      // AI 패널 썸네일
+      $('aiThumb').src = dataUrl;
+      $('aiPanel').style.display = '';
+      setAiStatus('idle');
+
+      // 수동 digitizer도 canvas에 이미지 올려두기
       redraw(); updateMarks(); updateGenerateBtn();
     };
-    img.src = e.target.result;
+    img.src = dataUrl;
   };
   reader.readAsDataURL(file);
+}
+
+/* ════════ AI 자동 분석 ════════ */
+function setAiStatus(state, msg) {
+  const el = $('aiStatus');
+  if (state === 'idle') {
+    el.innerHTML = '<span class="rp-ai-msg">AI가 BT 곡선·이벤트 마커·축 눈금을 자동으로 읽어 그래프를 생성합니다.</span>';
+  } else if (state === 'loading') {
+    el.innerHTML = '<span class="rp-ai-spinner"></span><span class="rp-ai-msg">AI가 프로파일을 분석 중입니다… (10~20초)</span>';
+  } else if (state === 'error') {
+    el.innerHTML = `<span class="rp-ai-err">❌ ${esc(msg || '분석 실패')}</span><span class="rp-ai-msg"> — 아래 수동 디지타이징을 이용하세요.</span>`;
+  } else if (state === 'ok') {
+    el.innerHTML = `<span class="rp-ai-ok">✅ ${esc(msg || '분석 완료')}</span>`;
+  }
+}
+
+async function autoScan() {
+  if (!digi.imgBase64) { alert('이미지를 먼저 업로드해 주세요.'); return; }
+  $('btnAutoScan').disabled = true;
+  setAiStatus('loading');
+  digitizer.style.display = 'none';
+
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const resp = await fetch(`${SUPABASE_URL}/functions/v1/analyze-roast`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
+        'apikey': SUPABASE_ANON,
+      },
+      body: JSON.stringify({
+        image_base64: digi.imgBase64,
+        media_type: digi.imgMediaType || 'image/jpeg',
+      })
+    });
+
+    const result = await resp.json();
+    if (!resp.ok || result.error) throw new Error(result.error || `HTTP ${resp.status}`);
+
+    // AI 결과 → wizardData 구성
+    const curve = (result.bt_curve || []).map(([t, bt]) => ({ t: +t, bt: +bt }));
+    curve.sort((a, b) => a.t - b.t);
+    if (curve.length < 2) throw new Error('BT 곡선 데이터를 추출하지 못했습니다.');
+
+    const evRaw = result.events || {};
+    const dropT = typeof evRaw.drop === 'number' ? +evRaw.drop : curve[curve.length - 1].t;
+    if (dropT <= 0) throw new Error('배출 시간을 읽지 못했습니다.');
+
+    const evTimes = {};
+    ['charge','tp','dry','fcs','fce','drop'].forEach(k => {
+      if (evRaw[k] != null) evTimes[k] = +evRaw[k];
+    });
+    evTimes.charge = 0;
+
+    const series = resample(curve, 5, dropT);
+    const times = series.map(s => s.t);
+    const bts   = series.map(s => s.bt);
+    const ror   = computeRoR(times, bts, 30);
+
+    const chargeTemp = result.charge_temp != null ? +result.charge_temp : +interp(curve, 0).toFixed(1);
+    const dropTemp   = result.drop_temp   != null ? +result.drop_temp   : +interp(curve, dropT).toFixed(1);
+    const dtr = evTimes.fcs != null ? +(((dropT - evTimes.fcs) / dropT) * 100).toFixed(1) : null;
+    const current = analyzeCurrentPoint(dropTemp, dtr);
+
+    wizardData = {
+      bean_name:         $('fBeanName').value.trim(),
+      seller:            $('fSeller').value.trim(),
+      roast_date:        $('fRoastDate').value,
+      ambient_temp:      numOrNull('fAmbientTemp'),
+      ambient_humidity:  numOrNull('fAmbientHumidity'),
+      memo:              $('fMemo').value.trim(),
+      charge_temp: chargeTemp, drop_temp: dropTemp, total_time: dropT, dtr,
+      current_roast_point: current ? current.key : null,
+      time_series: times, bt_series: bts, ror, events: evTimes,
+    };
+
+    const conf = result.confidence || 'medium';
+    setAiStatus('ok', `분석 완료 (신뢰도: ${conf === 'high' ? '높음' : conf === 'medium' ? '보통' : '낮음'})`);
+
+    // STEP 3으로 이동
+    renderMetrics($('metricsRow'), wizardData);
+    chartInstance = buildChart('roastChart', times, bts, ror, evTimes, chartInstance);
+    $('chartTitle').textContent = wizardData.bean_name;
+    selectedTarget = null;
+    const renderTargets = () => renderTargetButtons($('targetBtns'), wizardData, (key) => {
+      selectedTarget = key;
+      renderTargets();
+      renderFeedback($('feedbackPanel'), wizardData, key);
+    }, selectedTarget);
+    renderTargets();
+    renderFeedback($('feedbackPanel'), wizardData, null);
+    showStep(3);
+
+  } catch (err) {
+    console.error('AI scan error:', err);
+    setAiStatus('error', err.message);
+    digitizer.style.display = '';
+  } finally {
+    $('btnAutoScan').disabled = false;
+  }
 }
 
 function armMode(mode, btn) {

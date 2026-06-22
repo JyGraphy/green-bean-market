@@ -216,3 +216,97 @@ code { background: var(--cream2); padding: 1px 5px; border-radius: 4px; font-siz
   .rp-header-actions .rp-btn-ghost { display: none; }
   .rp-metrics { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* ── AI 자동 분석 패널 ── */
+.rp-ai-panel {
+  margin-bottom: 20px;
+}
+.rp-ai-preview-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+.rp-ai-thumb {
+  width: 180px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.rp-ai-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 4px;
+}
+.rp-btn-ai {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, var(--fire) 0%, #f97316 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity .15s, transform .1s;
+  box-shadow: 0 2px 8px rgba(224,123,42,.35);
+}
+.rp-btn-ai:hover { opacity: .9; transform: translateY(-1px); }
+.rp-btn-ai:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+.rp-btn-ghost-sm {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 7px 14px;
+  font-size: 13px;
+  color: var(--text2);
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.rp-btn-ghost-sm:hover { border-color: var(--brown3); color: var(--brown); }
+.rp-ai-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 28px;
+  font-size: 13.5px;
+  color: var(--text2);
+  margin-bottom: 4px;
+}
+.rp-ai-msg { color: var(--text2); }
+.rp-ai-ok  { color: #16a34a; font-weight: 600; }
+.rp-ai-err { color: var(--red); font-weight: 600; }
+@keyframes rp-spin { to { transform: rotate(360deg); } }
+.rp-ai-spinner {
+  width: 18px; height: 18px; flex-shrink: 0;
+  border: 2.5px solid var(--cream2);
+  border-top-color: var(--fire);
+  border-radius: 50%;
+  animation: rp-spin .75s linear infinite;
+  display: inline-block;
+}
+.rp-ai-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: var(--text3);
+  font-size: 12.5px;
+  gap: 10px;
+  margin: 16px 0 12px;
+}
+.rp-ai-divider::before,
+.rp-ai-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+@media (max-width: 600px) {
+  .rp-ai-preview-row { flex-direction: column; }
+  .rp-ai-thumb { width: 100%; height: 140px; }
+}

@@ -1,5 +1,5 @@
 """
-전체 스크래퍼 순서대로 실행 후 data.js 재생성
+전체 스크래퍼 순서대로 실행 후 database.sql 재생성
 GitHub Actions에서 호출됨
 
 가나다 순:
@@ -55,16 +55,6 @@ for filename, name in SCRAPERS:
         errors.append(name)
     else:
         print(f"✅ {name} 완료")
-
-print(f"\n{'='*50}")
-print("▶ data.js 재생성 중...")
-result = subprocess.run(
-    [sys.executable, os.path.join(ROOT, 'scripts', 'generate_data_js.py')],
-    capture_output=False
-)
-if result.returncode != 0:
-    print("❌ data.js 재생성 실패")
-    errors.append('generate_data_js')
 
 print(f"\n{'='*50}")
 print("▶ database.sql 재생성 중...")

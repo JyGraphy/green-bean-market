@@ -425,6 +425,33 @@ async function autoScan() {
   }
 }
 
+/* ════════ 1차 크랙 수동 입력 ════════ */
+function applyManualFcs() {
+  if (!wizardData) return;
+  const raw = $('fcsManualInput').value.trim();
+  const sec = parseTimeStr(raw);
+  if (!sec || sec <= 0 || sec >= wizardData.total_time) {
+    $('fcsManualInput').style.borderColor = 'var(--red)'; return;
+  }
+  $('fcsManualInput').style.borderColor = '';
+  wizardData.events.fcs = sec;
+  wizardData.dtr = +(((wizardData.total_time - sec) / wizardData.total_time) * 100).toFixed(1);
+  const pt = analyzeCurrentPoint(wizardData.drop_temp, wizardData.dtr);
+  if (pt) wizardData.current_roast_point = pt.key;
+  $('fcsInputRow').style.display = 'none';
+  renderMetrics($('metricsRow'), wizardData);
+  chartInstance = buildChart('roastChart',
+    wizardData.time_series, wizardData.bt_series, wizardData.et_series||[],
+    wizardData.agitation_series||[], wizardData.ror||[], wizardData.et_ror||[],
+    wizardData.events, chartInstance);
+  const renderTargets = () => renderTargetButtons($('targetBtns'), wizardData, (key) => {
+    selectedTarget = key; renderTargets();
+    renderFeedback($('feedbackPanel'), wizardData, key);
+  }, selectedTarget);
+  renderTargets();
+  renderFeedback($('feedbackPanel'), wizardData, selectedTarget);
+}
+
 function armMode(mode, btn) {
   digi.mode = (digi.mode===mode) ? null : mode;
   document.querySelectorAll('.rp-cal-btn,.rp-event-btn').forEach(b => b.classList.remove('armed'));

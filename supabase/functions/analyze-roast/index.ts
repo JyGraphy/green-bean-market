@@ -5,80 +5,112 @@ const cors = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const PROMPT = `You are a coffee roasting expert analyzing a roasting profile chart image.
-The image may come from apps like Roastware, Artisan, Cropster, Firescope, RoasTime, or Stronghold Boost.
-The image may be a direct screenshot or a photo taken of a screen (possibly with glare or slight angle).
+const PROMPT = `You are a coffee roasting expert with deep knowledge of roasting software chart layouts.
+Analyze the roasting profile chart image carefully and extract precise data.
+The image may be a direct screenshot or a photo taken of a screen (possibly with slight glare or angle).
 
-== STEP 1: READ TEXT LABELS FIRST (most reliable) ==
-Many apps print time+temperature labels directly on the chart as text like "07:00 216.7°C" or "01:15 115.1°C".
-READ THESE PRINTED NUMBERS before attempting to trace curves visually.
-They are your highest-accuracy data points even if the image has glare or angle distortion.
+════════════════════════════════════════
+PHASE 1 — IDENTIFY THE APP & CURVE COLORS
+════════════════════════════════════════
+Before reading any numbers, identify which app this is and map each curve to its color.
 
-== STEP 2: IDENTIFY APP LAYOUT ==
+▶ Roastware / Stronghold (dark background, Korean UI "원두 표면 / 내부"):
+  TOP CHART — two temperature curves:
+    • BT ("원두 표면", bean surface) = PINK / MAGENTA / RED curve
+    • ET ("내부", internal drum)     = WHITE / LIGHT GRAY / PALE YELLOW curve
+  The legend at bottom-left of the top chart shows "■ 원두 표면  ■ 내부" with matching colors.
+  BT (pink) typically rises faster and finishes HIGHER than ET (white) at the drop point.
 
-Roastware (dark background, Korean UI):
-- Two main curves in the top chart:
-  "원두 표면" (bean surface = BT, pink/red curve) — this is your bt_curve
-  "내부" (internal drum temp = ET, gray/white/yellow curve) — this is your et_curve
-- Labeled dots appear at key inflection points with "MM:SS temp°C" text
-- Phase bars at top show timing: e.g. "02:48 | 40.0%" = 2 min 48 sec phase
-- Time axis: MM:SS format (00:00 to ~10:00)
-- Bottom sub-chart shows gas/ROR controls — IGNORE, only extract data from the top temperature chart
+  BOTTOM CHART — four control step-curves (all different colors):
+    • 열풍   (hot air)       = ORANGE / YELLOW step
+    • 할로겐 (halogen)       = PINK / MAGENTA step
+    • 드럼히터 (drum heater) = TEAL / GREEN step
+    • 교반   (agitation)     = BLUE / CYAN step   ← THIS IS WHAT WE NEED
+  The legend at bottom-left reads "● 열풍  ■ 할로겐  ■ 드럼히터  ■ 교반".
+  교반 is the BLUE step line. Read its step changes (0–10 integer scale).
+  The thin white noisy line in the bottom chart is ROR — ignore it here.
 
-Artisan (light or dark background):
-- BT = orange/red curve (Bean Temp), ET = blue curve (Environment Temp)
-- Event markers: CHARGE, TP, DRY END, FC START, FC END, DROP as vertical lines with labels
-- X-axis in MM:SS or decimal minutes
+▶ Artisan (light or dark background):
+  BT = orange/red thick curve, ET = blue curve
+  Events: vertical lines labeled CHARGE, DRY END, FC START, FC END, DROP/SCO
 
-Cropster / Firescope / RoasTime:
-- BT curve is typically the boldest colored curve
-- Vertical dashed lines mark events with text labels
+▶ Cropster / Firescope / RoasTime:
+  BT = boldest colored curve, events marked by vertical dashed lines with text
 
-== STEP 3: EXTRACT DATA ==
+════════════════════════════════════════
+PHASE 2 — DISAMBIGUATE OVERLAPPING LABELS
+════════════════════════════════════════
+Roastware prints "MM:SS  temp°C" labels with a colored dot at key inflection points.
+When TWO labels appear at nearly the same x-position (same time), one belongs to BT and one to ET.
 
-From text labels and curve: collect time+temperature pairs along the BT curve.
-Convert all times to SECONDS from CHARGE (charge moment = 0 seconds).
-If time is shown as MM:SS, convert: minutes×60 + seconds.
-If temperature is in °F, convert to °C: (F - 32) × 5/9.
+DISAMBIGUATION RULES (apply in order):
+1. COLOR OF DOT: The dot next to each label matches its curve color.
+   Pink/red dot → BT label. White/gray dot → ET label.
+2. ANCHOR RULE: The rightmost labeled point (latest time, near DROP) always has the highest temperature — this is BT's drop_temp. Anchor BT to this point, then trace back.
+3. Y-POSITION RULE: At any given time after the first minute, the curve that is PHYSICALLY HIGHER on the chart is BT (pink). Assign the higher temperature value to BT, lower to ET.
+4. CONSISTENCY RULE: BT must always be a smooth monotonically increasing curve that is above ET after the turning point. If your assignment creates a contradiction (e.g. BT < ET mid-roast), swap the assignments.
 
-Collect at minimum: CHARGE, any labeled mid-curve points, and DROP.
-Then estimate 10-20 additional unlabeled points by visually interpolating the curve shape.
+════════════════════════════════════════
+PHASE 3 — READ ALL LABELED TEXT VALUES
+════════════════════════════════════════
+Carefully read every "MM:SS  temp°C" text annotation printed on the top chart.
+These are your ground-truth data points — more reliable than pixel tracing.
+Convert MM:SS to seconds: minutes×60 + seconds.
+CHARGE time = 0s (reference). All other times are relative to CHARGE.
+Temperatures are in °C. If in °F, convert: (F-32)×5/9.
 
-== OUTPUT FORMAT ==
-Return ONLY a valid JSON object, no markdown, no explanation:
+Assign each label to BT or ET using the disambiguation rules above.
 
+════════════════════════════════════════
+PHASE 4 — TRACE CURVES BETWEEN LABELS
+════════════════════════════════════════
+Between labeled points, visually interpolate each curve's shape:
+- Extract 30–50 additional unlabeled data points per curve
+- Keep BT (pink) and ET (white) as separate arrays
+- Respect the physical shape: BT has S-curve rise; ET rises more linearly/gradually
+
+For the bottom chart 교반 (blue step line):
+- Record each step VALUE change as [time_sec, integer_value]
+- Typical values: 4, 5, 6, 7, 8 etc. (integer 0–10 scale)
+- Only record when the step changes, not every second
+
+════════════════════════════════════════
+OUTPUT — return ONLY this JSON, no markdown, no explanation:
+════════════════════════════════════════
 {
-  "labeled_points": [[time_sec, temp_celsius, "label_or_empty"], ...],
+  "curve_identification": {
+    "bt_color": "<color you identified for BT>",
+    "et_color": "<color you identified for ET>",
+    "agitation_color": "<color you identified for 교반>"
+  },
+  "labeled_points": [
+    { "time_sec": <number>, "temp_celsius": <number>, "curve": "BT"|"ET", "label_text": "<raw text>" }
+  ],
   "bt_curve": [[time_sec, temp_celsius], ...],
   "et_curve": [[time_sec, temp_celsius], ...],
-  "agitation": [[time_sec, value_0_to_10], ...],
+  "agitation": [[time_sec, integer_value], ...],
   "events": {
     "charge": 0,
-    "tp": <seconds or null>,
+    "tp":  <seconds or null>,
     "dry": <seconds or null>,
     "fcs": <seconds or null>,
     "fce": <seconds or null>,
     "drop": <seconds>
   },
-  "charge_temp": <celsius>,
-  "drop_temp": <celsius>,
+  "charge_temp": <BT celsius at charge>,
+  "drop_temp":   <BT celsius at drop>,
   "total_time_sec": <seconds>,
   "confidence": "high" | "medium" | "low",
-  "notes": "<brief note about image quality or any uncertainty>"
+  "notes": "<note any close-overlap situations and how you resolved them>"
 }
 
-Rules:
-- charge is always 0 (your reference point)
-- drop is REQUIRED — use last visible BT data point if DROP label absent
-- bt_curve: BT (bean/surface temp) points spanning 0 to drop, 25-60 points, sorted by time
-- et_curve: ET (environment/drum internal temp) points, same time range, 25-60 points. Use [] if ET curve not visible.
-- agitation: extract the "교반" (drum agitation/stirring) step curve from the bottom control sub-chart.
-  It is a step function with values typically 0–10 (integer steps). Record each step change as a [time_sec, value] pair.
-  In Roastware the bottom chart shows: 열풍, 원적외선, 드럼 히터, 교반 — extract only 교반.
-  Use [] if the agitation curve is not visible.
-- labeled_points: all text-annotated time+temp values on the chart
-- If a value is genuinely unreadable, use null
-- confidence: "high" if labels clear + image sharp; "medium" if some glare/angle; "low" if heavily obscured`
+CRITICAL RULES:
+- drop is REQUIRED
+- bt_curve and et_curve must each have 25–60 points, sorted by time, spanning 0 → drop
+- bt_curve must always be >= et_curve at corresponding times after the first 2 minutes
+- agitation: use [] only if bottom chart is completely absent from the image
+- labeled_points: include ALL text annotations visible in the top chart
+- Never swap BT and ET — verify with the anchor rule before finalizing`
 
 serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })

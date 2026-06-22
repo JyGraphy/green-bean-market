@@ -276,17 +276,29 @@ async function autoScan() {
     const result = data;
 
     // AI 결과 → wizardData 구성
-    // labeled_points가 있으면 우선 포함
-    const labeled = (result.labeled_points || []).map(([t, bt]) => ({ t: +t, bt: +bt }));
+    // labeled_points: 새 포맷 { time_sec, temp_celsius, curve } 또는 구 배열 포맷 모두 허용
+    const labeled = (result.labeled_points || [])
+      .filter(p => (p.curve === 'BT' || Array.isArray(p)))  // BT 레이블만 BT 곡선에 반영
+      .map(p => Array.isArray(p) ? { t: +p[0], bt: +p[1] } : { t: +p.time_sec, bt: +p.temp_celsius });
+    const labeledEt = (result.labeled_points || [])
+      .filter(p => !Array.isArray(p) && p.curve === 'ET')
+      .map(p => ({ t: +p.time_sec, bt: +p.temp_celsius }));
     const rawCurve = (result.bt_curve || []).map(([t, bt]) => ({ t: +t, bt: +bt }));
     const rawEt    = (result.et_curve   || []).map(([t, bt]) => ({ t: +t, bt: +bt }));
     const rawAgit  = (result.agitation  || []).map(([t, v])  => ({ t: +t, v: +v  }));
 
-    // 두 배열 합쳐 중복 제거 (0.5초 이내는 동일 점으로 처리)
-    const merged = [...labeled, ...rawCurve].sort((a, b) => a.t - b.t);
+    // BT: labeled BT points + bt_curve 합쳐 중복 제거
+    const mergedBt = [...labeled, ...rawCurve].sort((a, b) => a.t - b.t);
     const curve = [];
-    for (const p of merged) {
+    for (const p of mergedBt) {
       if (!curve.length || Math.abs(p.t - curve[curve.length - 1].t) > 0.4) curve.push(p);
+    }
+
+    // ET: labeled ET points + et_curve 합쳐 중복 제거
+    const mergedEt = [...labeledEt, ...rawEt].sort((a, b) => a.t - b.t);
+    const etCurve = [];
+    for (const p of mergedEt) {
+      if (!etCurve.length || Math.abs(p.t - etCurve[etCurve.length - 1].t) > 0.4) etCurve.push(p);
     }
 
     if (curve.length < 2) throw new Error('BT 곡선 데이터를 추출하지 못했습니다. 이미지를 더 선명하게 캡처해 보세요.');
@@ -309,9 +321,8 @@ async function autoScan() {
     const ror   = computeRoR(times, bts, 30);
 
     // ET 리샘플 (없으면 빈 배열)
-    const etSorted = rawEt.sort((a, b) => a.t - b.t);
-    const ets = etSorted.length >= 2
-      ? resample(etSorted, 5, dropT).map(s => s.bt)
+    const ets = etCurve.length >= 2
+      ? resample(etCurve, 5, dropT).map(s => s.bt)
       : [];
 
     // 교반: step 함수 → 5초 간격으로 확장 (hold 방식)

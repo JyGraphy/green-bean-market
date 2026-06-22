@@ -89,10 +89,31 @@ function wireUI() {
   $('btnClearAll').addEventListener('click', clearDigi);
   canvas.addEventListener('click', onCanvasClick);
 
+  // 1차 크랙 수동 입력
+  $('btnFcsApply').addEventListener('click', () => {
+    const raw = $('fcsManualInput').value.trim();
+    const sec = parseTimeStr(raw);
+    if (!sec || sec <= 0 || sec >= wizardData.total_time) {
+      $('fcsManualInput').style.borderColor = 'var(--red)'; return;
+    }
+    $('fcsManualInput').style.borderColor = '';
+    wizardData.events.fcs = sec;
+    wizardData.dtr = +(((wizardData.total_time - sec) / wizardData.total_time) * 100).toFixed(1);
+    wizardData.current_roast_point = analyzeCurrentPoint(wizardData.drop_temp, wizardData.dtr)?.key || wizardData.current_roast_point;
+    $('fcsInputRow').style.display = 'none';
+    renderMetrics($('metricsRow'), wizardData);
+    // 이벤트 선 다시 그리기
+    chartInstance = buildChart('roastChart', wizardData.time_series, wizardData.bt_series, wizardData.et_series||[], wizardData.agitation_series||[], wizardData.ror||[], wizardData.et_ror||[], wizardData.events, chartInstance);
+    renderFeedback($('feedbackPanel'), wizardData, selectedTarget);
+  });
+
   // 삭제
   $('btnDelete').addEventListener('click', () => { deleteTargetId = activeId; confirmOverlay.style.display = 'flex'; });
   $('btnConfirmNo').addEventListener('click', () => confirmOverlay.style.display = 'none');
   $('btnConfirmYes').addEventListener('click', deleteProfile);
+
+  // 1차 크랙 수동 입력
+  $('btnFcsApply').addEventListener('click', applyManualFcs);
 }
 
 /* ════════ Supabase CRUD ════════ */
@@ -124,7 +145,17 @@ async function saveProfile() {
     bt_series: wizardData.bt_series,
     et_series: wizardData.et_series?.length ? wizardData.et_series : null,
     agitation_series: wizardData.agitation_series?.length ? wizardData.agitation_series : null,
+    et_ror_series: wizardData.et_ror?.length ? wizardData.et_ror : null,
+    et_drop_temp: wizardData.et_drop_temp ?? null,
+    charge_weight: wizardData.charge_weight ?? null,
+    drop_weight: wizardData.drop_weight ?? null,
+    weight_loss: wizardData.weight_loss ?? null,
     events: wizardData.events,
+    et_drop_temp: wizardData.et_drop_temp ?? null,
+    charge_weight: wizardData.charge_weight ?? null,
+    drop_weight: wizardData.drop_weight ?? null,
+    weight_loss: wizardData.weight_loss ?? null,
+    et_ror_series: wizardData.et_ror?.length ? wizardData.et_ror : null,
   };
   const { error } = await sb.from('roasting_profiles').insert(payload);
   if (error) { alert('저장 실패: ' + error.message); return; }
@@ -176,8 +207,11 @@ function openWizard() {
   wizardData = null; selectedTarget = null; clearDigi();
   $('fBeanName').value=''; $('fSeller').value=''; $('fRoastDate').value='';
   $('fAmbientTemp').value=''; $('fAmbientHumidity').value=''; $('fMemo').value='';
+  $('fChargeWeight').value=''; $('fDropWeight').value='';
+  $('fChargeWeight').value=''; $('fDropWeight').value='';
   digitizer.style.display='none'; fileDrop.style.display='';
   $('aiPanel').style.display='none';
+  $('fcsInputRow').style.display='none';
   digi.imgBase64 = null; digi.imgMediaType = null;
   activeId = null; renderList();
   showView('wizard'); showStep(1);
@@ -325,11 +359,22 @@ async function autoScan() {
       ? resample(etCurve, 5, dropT).map(s => s.bt)
       : [];
 
+    // ET ROR (있을 때만)
+    const etRor = etCurve.length >= 2 ? computeRoR(times, ets, 30) : [];
+
+    // etCurve가 있으면 drop 시점 ET 온도 계산
+    const etDropTemp = etCurve.length >= 2 ? +interp(etCurve, dropT).toFixed(1) : null;
+
     // 교반: step 함수 → 5초 간격으로 확장 (hold 방식)
     const agitSorted = rawAgit.sort((a, b) => a.t - b.t);
     const agits = agitSorted.length >= 1
       ? resampleStep(agitSorted, 5, dropT)
       : [];
+
+    const chargeWeight = numOrNull('fChargeWeight');
+    const dropWeight = numOrNull('fDropWeight');
+    const weightLoss = (chargeWeight && dropWeight && chargeWeight > 0)
+      ? +(((chargeWeight - dropWeight) / chargeWeight) * 100).toFixed(1) : null;
 
     const chargeTemp = result.charge_temp != null ? +result.charge_temp : +interp(curve, 0).toFixed(1);
     const dropTemp   = result.drop_temp   != null ? +result.drop_temp   : +interp(curve, dropT).toFixed(1);
@@ -345,7 +390,9 @@ async function autoScan() {
       memo:              $('fMemo').value.trim(),
       charge_temp: chargeTemp, drop_temp: dropTemp, total_time: dropT, dtr,
       current_roast_point: current ? current.key : null,
-      time_series: times, bt_series: bts, et_series: ets, agitation_series: agits, ror, events: evTimes,
+      time_series: times, bt_series: bts, et_series: ets, agitation_series: agits, ror, et_ror: etRor,
+      et_drop_temp: etDropTemp, charge_weight: chargeWeight, drop_weight: dropWeight, weight_loss: weightLoss,
+      events: evTimes,
     };
 
     const conf = result.confidence || 'medium';
@@ -355,7 +402,7 @@ async function autoScan() {
 
     // STEP 3으로 이동
     renderMetrics($('metricsRow'), wizardData);
-    chartInstance = buildChart('roastChart', times, bts, ets, agits, ror, evTimes, chartInstance);
+    chartInstance = buildChart('roastChart', times, bts, ets, agits, ror, etRor, evTimes, chartInstance);
     $('chartTitle').textContent = wizardData.bean_name;
     selectedTarget = null;
     const renderTargets = () => renderTargetButtons($('targetBtns'), wizardData, (key) => {
@@ -365,6 +412,8 @@ async function autoScan() {
     }, selectedTarget);
     renderTargets();
     renderFeedback($('feedbackPanel'), wizardData, null);
+    // fcs 없으면 수동 입력 행 표시
+    $('fcsInputRow').style.display = wizardData.events.fcs == null ? '' : 'none';
     showStep(3);
 
   } catch (err) {
@@ -498,6 +547,11 @@ function generateProfile() {
   const dtr = (evTimes.fcs!=null) ? +(((dropT - evTimes.fcs) / dropT) * 100).toFixed(1) : null;
   const current = analyzeCurrentPoint(dropTemp, dtr);
 
+  const chargeWeight = numOrNull('fChargeWeight');
+  const dropWeight = numOrNull('fDropWeight');
+  const weightLoss = (chargeWeight && dropWeight && chargeWeight > 0)
+    ? +(((chargeWeight - dropWeight) / chargeWeight) * 100).toFixed(1) : null;
+
   wizardData = {
     bean_name: $('fBeanName').value.trim(),
     seller: $('fSeller').value.trim(),
@@ -507,12 +561,14 @@ function generateProfile() {
     memo: $('fMemo').value.trim(),
     charge_temp: chargeTemp, drop_temp: dropTemp, total_time: dropT, dtr,
     current_roast_point: current ? current.key : null,
-    time_series: times, bt_series: bts, ror, events: evTimes,
+    time_series: times, bt_series: bts, ror, et_ror: [], et_drop_temp: null,
+    charge_weight: chargeWeight, drop_weight: dropWeight, weight_loss: weightLoss,
+    events: evTimes,
   };
 
   // 6) STEP 3 렌더
   renderMetrics($('metricsRow'), wizardData);
-  chartInstance = buildChart('roastChart', times, bts, [], [], ror, evTimes, chartInstance);
+  chartInstance = buildChart('roastChart', times, bts, [], [], ror, [], evTimes, chartInstance);
   $('chartTitle').textContent = wizardData.bean_name;
   selectedTarget = null;
   const renderTargets = () => renderTargetButtons($('targetBtns'), wizardData, (key) => {
@@ -522,6 +578,8 @@ function generateProfile() {
   }, selectedTarget);
   renderTargets();
   renderFeedback($('feedbackPanel'), wizardData, null);
+  // fcs 없으면 수동 입력 행 표시
+  $('fcsInputRow').style.display = wizardData.events.fcs == null ? '' : 'none';
   showStep(3);
 }
 
@@ -580,7 +638,10 @@ function renderMetrics(el, d) {
     { label:'DTR', value: d.dtr!=null? d.dtr.toFixed(1):'—', unit:'%',
       cls: d.dtr==null?'':d.dtr<15?'bad':d.dtr>30?'warn':'good' },
     { label:'투입온도', value: d.charge_temp ?? '—', unit:'°C', cls:'' },
-    { label:'배출온도', value: d.drop_temp ?? '—', unit:'°C', cls:'' },
+    { label:'배출(BT)', value: d.drop_temp ?? '—', unit:'°C', cls:'' },
+    ...(d.et_drop_temp != null ? [{ label:'배출(ET)', value: d.et_drop_temp, unit:'°C', cls:'' }] : []),
+    ...(d.weight_loss != null ? [{ label:'무게 손실률', value: d.weight_loss.toFixed(1), unit:'%',
+      cls: d.weight_loss < 12 ? 'warn' : d.weight_loss > 20 ? 'warn' : 'good' }] : []),
     { label:'로스팅 포인트', value: d.current_roast_point || '—', unit:'', cls:'accent' },
   ];
   if (d.events && d.events.fcs!=null)
@@ -594,7 +655,7 @@ function renderMetrics(el, d) {
 }
 
 /* ════════ 차트 ════════ */
-function buildChart(canvasId, times, bts, ets, agits, ror, events, prev) {
+function buildChart(canvasId, times, bts, ets, agits, btRor, etRor, events, prev) {
   if (prev) prev.destroy();
   const labels = times.map(t => fmtTime(t));
 
@@ -619,9 +680,13 @@ function buildChart(canvasId, times, bts, ets, agits, ror, events, prev) {
     datasets.push({ label:'ET (°C)', data:ets, borderColor:'#60a5fa', backgroundColor:'rgba(96,165,250,.05)',
       borderWidth:1.8, pointRadius:0, tension:.35, yAxisID:'yT', borderDash:[5,3], order:2 });
 
-  // ROR (초록 실선, 오른쪽 ROR 축)
-  datasets.push({ label:'ROR (°C/min)', data:ror, borderColor:'#22c55e', borderWidth:1.5,
+  // BT ROR (초록 실선, 오른쪽 ROR 축)
+  datasets.push({ label:'BT ROR (°C/min)', data:btRor, borderColor:'#22c55e', borderWidth:1.5,
     pointRadius:0, tension:.35, yAxisID:'yR', order:3 });
+  // ET ROR (있을 때만, 연초록 점선)
+  if (etRor && etRor.length > 0)
+    datasets.push({ label:'ET ROR (°C/min)', data:etRor, borderColor:'#86efac', borderWidth:1.3,
+      pointRadius:0, tension:.35, yAxisID:'yR', borderDash:[3,2], order:4, opacity:0.75 });
 
   // 교반 (보라 계단 라인, 있을 때만)
   if (agits && agits.length > 0)
@@ -821,6 +886,19 @@ function comprehensiveAnalysis(d) {
     items.push({type:'info',icon:'🌍',title:'아프리카 고지대 추정 — 고밀도',
       text:'단단한 고밀도 콩은 더 높은 열을 견딥니다. hot drum / low flame로 투입 후 후반 모멘텀을 유지하세요.'});
 
+  // 무게 손실률
+  if (d.weight_loss != null) {
+    if (d.weight_loss < 12)
+      items.push({type:'warn', icon:'⚖️', title:`무게 손실률 ${d.weight_loss.toFixed(1)}% — 낮음`,
+        text:'손실률이 낮으면 수분 제거가 불충분하거나 배출이 너무 빠를 수 있습니다. 라이트 로스팅은 12~14%, 다크는 18~20% 범위가 일반적입니다.'});
+    else if (d.weight_loss > 20)
+      items.push({type:'warn', icon:'⚖️', title:`무게 손실률 ${d.weight_loss.toFixed(1)}% — 높음`,
+        text:'손실률이 높으면 과배전이거나 총 시간이 길 수 있습니다. 다크 이상 로스팅이 아니라면 배출 시점을 앞당기는 것을 고려하세요.'});
+    else
+      items.push({type:'good', icon:'⚖️', title:`무게 손실률 ${d.weight_loss.toFixed(1)}% — 정상`,
+        text:`일반적인 스페셜티 로스팅 손실 범위(12~20%)에 있습니다. 로스팅 포인트(${d.current_roast_point||'—'})에 맞는 적절한 수준입니다.`});
+  }
+
   if (!items.length) items.push({type:'info',icon:'ℹ️',title:'데이터를 더 입력해 보세요',
     text:'이벤트 포인트와 곡선점을 더 추가하면 상세한 분석이 가능합니다.'});
   return items;
@@ -834,7 +912,7 @@ function showDetail(p) {
     p.ambient_temp!=null?`${p.ambient_temp}°C`:null,
     p.ambient_humidity!=null?`습도 ${p.ambient_humidity}%`:null].filter(Boolean).join(' · ');
   renderMetrics($('detailMetrics'), p);
-  detailChartInstance = buildChart('detailChart', p.time_series||[], p.bt_series||[], p.et_series||[], p.agitation_series||[], p.ror||computeRoR(p.time_series||[], p.bt_series||[]), p.events||{}, detailChartInstance);
+  detailChartInstance = buildChart('detailChart', p.time_series||[], p.bt_series||[], p.et_series||[], p.agitation_series||[], p.ror||computeRoR(p.time_series||[], p.bt_series||[]), p.et_ror||[], p.events||{}, detailChartInstance);
 
   let sel = p.target_roast_point || null;
   const render = () => renderTargetButtons($('detailTargetBtns'), p, (key)=>{ sel=key; render(); renderFeedback($('detailFeedback'), p, key); }, sel);

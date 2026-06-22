@@ -10,6 +10,7 @@ JSON_FILE  = os.path.join(ROOT, 'data', 'products.json')
 SQL_FILE   = os.path.join(ROOT, 'database.sql')
 DATES_FILE = os.path.join(ROOT, 'data', 'product_dates.json')
 LOG_FILE   = os.path.join(ROOT, 'data', 'update_log.json')
+WEB_FILE   = os.path.join(ROOT, 'data', 'products_web.json')
 
 with open(JSON_FILE, encoding='utf-8') as f:
     data = json.load(f)
@@ -97,9 +98,33 @@ lines.append(',\n'.join(rows) + ';')
 with open(SQL_FILE, 'w', encoding='utf-8') as f:
     f.write('\n'.join(lines) + '\n')
 
+# --- 웹 앱용 JSON 생성 (sql.js 없이 직접 로드) ---
+web_products = []
+for p in products:
+    added = product_dates.get(str(p['id']))
+    web_products.append({
+        'id': p['id'],
+        'store': p['store'],
+        'name': p['name'],
+        'price': p['price'],
+        'origin': p['origin'],
+        'region': p['region'],
+        'process': p['process'],
+        'notes': p['notes'],
+        'url': p['url'],
+        'isNew': bool(p.get('is_new')),
+        'isDecaf': bool(p.get('is_decaf')),
+        'isSpecial': bool(p.get('is_special')),
+        'isSoldout': bool(p.get('is_soldout')),
+        'added_date': added,
+    })
+
+with open(WEB_FILE, 'w', encoding='utf-8') as f:
+    json.dump(web_products, f, ensure_ascii=False, separators=(',', ':'))
+
 soldout_count = sum(1 for p in products if p.get('is_soldout'))
 new_count = sum(new_by_store.values())
 if is_init:
-    print(f"✅ {len(products)}개 상품 → database.sql 초기화 완료 (품절 {soldout_count}개, {updated_at})")
+    print(f"✅ {len(products)}개 상품 → database.sql + products_web.json 초기화 완료 (품절 {soldout_count}개, {updated_at})")
 else:
-    print(f"✅ {len(products)}개 상품 → database.sql 재생성 완료 (품절 {soldout_count}개, 신규 {new_count}개, {updated_at})")
+    print(f"✅ {len(products)}개 상품 → database.sql + products_web.json 재생성 완료 (품절 {soldout_count}개, 신규 {new_count}개, {updated_at})")

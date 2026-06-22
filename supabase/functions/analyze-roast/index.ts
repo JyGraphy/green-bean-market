@@ -51,6 +51,7 @@ Return ONLY a valid JSON object, no markdown, no explanation:
   "labeled_points": [[time_sec, temp_celsius, "label_or_empty"], ...],
   "bt_curve": [[time_sec, temp_celsius], ...],
   "et_curve": [[time_sec, temp_celsius], ...],
+  "agitation": [[time_sec, value_0_to_10], ...],
   "events": {
     "charge": 0,
     "tp": <seconds or null>,
@@ -71,9 +72,13 @@ Rules:
 - drop is REQUIRED — use last visible BT data point if DROP label absent
 - bt_curve: BT (bean/surface temp) points spanning 0 to drop, 25-60 points, sorted by time
 - et_curve: ET (environment/drum internal temp) points, same time range, 25-60 points. Use [] if ET curve not visible.
-- labeled_points: include all text-annotated time+temp values found on the chart
-- If a value is genuinely unreadable, use null (never guess wildly)
-- confidence: "high" if text labels clear + image sharp; "medium" if some glare/angle; "low" if heavily obscured`
+- agitation: extract the "교반" (drum agitation/stirring) step curve from the bottom control sub-chart.
+  It is a step function with values typically 0–10 (integer steps). Record each step change as a [time_sec, value] pair.
+  In Roastware the bottom chart shows: 열풍, 원적외선, 드럼 히터, 교반 — extract only 교반.
+  Use [] if the agitation curve is not visible.
+- labeled_points: all text-annotated time+temp values on the chart
+- If a value is genuinely unreadable, use null
+- confidence: "high" if labels clear + image sharp; "medium" if some glare/angle; "low" if heavily obscured`
 
 serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })

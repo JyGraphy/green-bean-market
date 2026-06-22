@@ -123,6 +123,7 @@ async function saveProfile() {
     time_series: wizardData.time_series,
     bt_series: wizardData.bt_series,
     et_series: wizardData.et_series?.length ? wizardData.et_series : null,
+    agitation_series: wizardData.agitation_series?.length ? wizardData.agitation_series : null,
     events: wizardData.events,
   };
   const { error } = await sb.from('roasting_profiles').insert(payload);
@@ -278,7 +279,8 @@ async function autoScan() {
     // labeled_points가 있으면 우선 포함
     const labeled = (result.labeled_points || []).map(([t, bt]) => ({ t: +t, bt: +bt }));
     const rawCurve = (result.bt_curve || []).map(([t, bt]) => ({ t: +t, bt: +bt }));
-    const rawEt    = (result.et_curve  || []).map(([t, bt]) => ({ t: +t, bt: +bt }));
+    const rawEt    = (result.et_curve   || []).map(([t, bt]) => ({ t: +t, bt: +bt }));
+    const rawAgit  = (result.agitation  || []).map(([t, v])  => ({ t: +t, v: +v  }));
 
     // 두 배열 합쳐 중복 제거 (0.5초 이내는 동일 점으로 처리)
     const merged = [...labeled, ...rawCurve].sort((a, b) => a.t - b.t);
@@ -312,6 +314,12 @@ async function autoScan() {
       ? resample(etSorted, 5, dropT).map(s => s.bt)
       : [];
 
+    // 교반: step 함수 → 5초 간격으로 확장 (hold 방식)
+    const agitSorted = rawAgit.sort((a, b) => a.t - b.t);
+    const agits = agitSorted.length >= 1
+      ? resampleStep(agitSorted, 5, dropT)
+      : [];
+
     const chargeTemp = result.charge_temp != null ? +result.charge_temp : +interp(curve, 0).toFixed(1);
     const dropTemp   = result.drop_temp   != null ? +result.drop_temp   : +interp(curve, dropT).toFixed(1);
     const dtr = evTimes.fcs != null ? +(((dropT - evTimes.fcs) / dropT) * 100).toFixed(1) : null;
@@ -326,7 +334,7 @@ async function autoScan() {
       memo:              $('fMemo').value.trim(),
       charge_temp: chargeTemp, drop_temp: dropTemp, total_time: dropT, dtr,
       current_roast_point: current ? current.key : null,
-      time_series: times, bt_series: bts, et_series: ets, ror, events: evTimes,
+      time_series: times, bt_series: bts, et_series: ets, agitation_series: agits, ror, events: evTimes,
     };
 
     const conf = result.confidence || 'medium';
@@ -336,7 +344,7 @@ async function autoScan() {
 
     // STEP 3으로 이동
     renderMetrics($('metricsRow'), wizardData);
-    chartInstance = buildChart('roastChart', times, bts, ets, ror, evTimes, chartInstance);
+    chartInstance = buildChart('roastChart', times, bts, ets, agits, ror, evTimes, chartInstance);
     $('chartTitle').textContent = wizardData.bean_name;
     selectedTarget = null;
     const renderTargets = () => renderTargetButtons($('targetBtns'), wizardData, (key) => {
@@ -493,7 +501,7 @@ function generateProfile() {
 
   // 6) STEP 3 렌더
   renderMetrics($('metricsRow'), wizardData);
-  chartInstance = buildChart('roastChart', times, bts, [], ror, evTimes, chartInstance);
+  chartInstance = buildChart('roastChart', times, bts, [], [], ror, evTimes, chartInstance);
   $('chartTitle').textContent = wizardData.bean_name;
   selectedTarget = null;
   const renderTargets = () => renderTargetButtons($('targetBtns'), wizardData, (key) => {
@@ -521,6 +529,19 @@ function interp(pts, t) {
     if (t>=a.t && t<=b.t) return b.t===a.t ? a.bt : a.bt+(b.bt-a.bt)*(t-a.t)/(b.t-a.t); }
   return pts[pts.length-1].bt;
 }
+/* step 함수 리샘플: [{t,v}] → 5초 간격 값 배열 (계단 유지) */
+function resampleStep(pts, step, endT) {
+  const out = [];
+  for (let t = 0; t <= endT + 0.001; t += step) {
+    let val = pts[0].v;
+    for (let i = 0; i < pts.length; i++) {
+      if (pts[i].t <= t) val = pts[i].v; else break;
+    }
+    out.push(+val.toFixed(1));
+  }
+  return out;
+}
+
 function computeRoR(times, bts, span=30) {
   return times.map((t,i)=>{ if(i===0) return null;
     let k=i; while(k>0 && t-times[k] < span) k--;
@@ -562,9 +583,10 @@ function renderMetrics(el, d) {
 }
 
 /* ════════ 차트 ════════ */
-function buildChart(canvasId, times, bts, ets, ror, events, prev) {
+function buildChart(canvasId, times, bts, ets, agits, ror, events, prev) {
   if (prev) prev.destroy();
   const labels = times.map(t => fmtTime(t));
+
   const annotations = {};
   const evMap = [['charge','투입','#6366f1'],['tp','TP','#8b5cf6'],['dry','건조','#f59e0b'],
     ['fcs','1차크랙','#ef4444'],['fce','FC종료','#f97316'],['drop','배출','#16a34a']];
@@ -572,23 +594,47 @@ function buildChart(canvasId, times, bts, ets, ror, events, prev) {
     if (events[k]==null) return;
     const idx = times.reduce((best,t,i)=> Math.abs(t-events[k])<Math.abs(times[best]-events[k])?i:best, 0);
     annotations['ev_'+k] = { type:'line', xMin:idx, xMax:idx, borderColor:color, borderWidth:1.5,
-      borderDash:[4,3], label:{ display:true, content:label, position:'start', font:{size:10}, color, backgroundColor:'rgba(255,255,255,.8)' } };
+      borderDash:[4,3], label:{ display:true, content:label, position:'start', font:{size:10}, color, backgroundColor:'rgba(255,255,255,.85)' } };
   });
 
-  const datasets = [
-    { label:'BT (°C)', data:bts, borderColor:'#e07b2a', backgroundColor:'rgba(224,123,42,.08)',
-      borderWidth:2.5, pointRadius:0, tension:.35, yAxisID:'yT' },
-  ];
-  if (ets && ets.length > 0) {
-    datasets.push(
-      { label:'ET (°C)', data:ets, borderColor:'#60a5fa', backgroundColor:'rgba(96,165,250,.06)',
-        borderWidth:1.8, pointRadius:0, tension:.35, yAxisID:'yT', borderDash:[4,2] }
-    );
+  const datasets = [];
+
+  // BT
+  datasets.push({ label:'BT (°C)', data:bts, borderColor:'#e07b2a', backgroundColor:'rgba(224,123,42,.07)',
+    borderWidth:2.5, pointRadius:0, tension:.35, yAxisID:'yT', order:1 });
+
+  // ET (파란 점선, 있을 때만)
+  if (ets && ets.length > 0)
+    datasets.push({ label:'ET (°C)', data:ets, borderColor:'#60a5fa', backgroundColor:'rgba(96,165,250,.05)',
+      borderWidth:1.8, pointRadius:0, tension:.35, yAxisID:'yT', borderDash:[5,3], order:2 });
+
+  // ROR (초록 실선, 오른쪽 ROR 축)
+  datasets.push({ label:'ROR (°C/min)', data:ror, borderColor:'#22c55e', borderWidth:1.5,
+    pointRadius:0, tension:.35, yAxisID:'yR', order:3 });
+
+  // 교반 (보라 계단 라인, 있을 때만)
+  if (agits && agits.length > 0)
+    datasets.push({ label:'교반', data:agits, borderColor:'#a855f7', backgroundColor:'rgba(168,85,247,.08)',
+      borderWidth:1.5, pointRadius:0, stepped:'before', yAxisID:'yG', fill:false, order:4 });
+
+  const scales = {
+    x:  { ticks:{ maxTicksLimit:12, font:{size:11} }, grid:{color:'rgba(0,0,0,.05)'} },
+    yT: { type:'linear', position:'left',
+          title:{display:true, text:'온도 (°C)', font:{size:11}},
+          grid:{color:'rgba(0,0,0,.05)'} },
+    yR: { type:'linear', position:'right',
+          title:{display:true, text:'ROR (°C/min)', font:{size:11}},
+          grid:{drawOnChartArea:false}, min:0, suggestedMax:30 },
+  };
+
+  if (agits && agits.length > 0) {
+    scales.yG = { type:'linear', position:'right',
+      title:{display:true, text:'교반', font:{size:11}, color:'#a855f7'},
+      grid:{drawOnChartArea:false}, min:0, max:10,
+      ticks:{ stepSize:1, color:'#a855f7', font:{size:10} },
+      // ROR 축과 겹치지 않게 offset
+      offset: true };
   }
-  datasets.push(
-    { label:'ROR (°C/min)', data:ror, borderColor:'#22c55e', borderWidth:1.5,
-      pointRadius:0, tension:.35, yAxisID:'yR' }
-  );
 
   return new Chart($(canvasId), {
     type:'line',
@@ -596,11 +642,7 @@ function buildChart(canvasId, times, bts, ets, ror, events, prev) {
     options:{ responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false},
       plugins:{ legend:{display:false}, annotation:{annotations},
         tooltip:{ callbacks:{ label:c=>`${c.dataset.label}: ${c.parsed.y?.toFixed(1) ?? '—'}` } } },
-      scales:{
-        x:{ ticks:{ maxTicksLimit:10, font:{size:11} }, grid:{color:'rgba(0,0,0,.05)'} },
-        yT:{ type:'linear', position:'left', title:{display:true,text:'온도 (°C)',font:{size:11}}, grid:{color:'rgba(0,0,0,.05)'} },
-        yR:{ type:'linear', position:'right', title:{display:true,text:'ROR (°C/min)',font:{size:11}}, grid:{drawOnChartArea:false}, min:0, suggestedMax:30 },
-      } }
+      scales }
   });
 }
 
@@ -781,7 +823,7 @@ function showDetail(p) {
     p.ambient_temp!=null?`${p.ambient_temp}°C`:null,
     p.ambient_humidity!=null?`습도 ${p.ambient_humidity}%`:null].filter(Boolean).join(' · ');
   renderMetrics($('detailMetrics'), p);
-  detailChartInstance = buildChart('detailChart', p.time_series||[], p.bt_series||[], p.et_series||[], p.ror||computeRoR(p.time_series||[], p.bt_series||[]), p.events||{}, detailChartInstance);
+  detailChartInstance = buildChart('detailChart', p.time_series||[], p.bt_series||[], p.et_series||[], p.agitation_series||[], p.ror||computeRoR(p.time_series||[], p.bt_series||[]), p.events||{}, detailChartInstance);
 
   let sel = p.target_roast_point || null;
   const render = () => renderTargetButtons($('detailTargetBtns'), p, (key)=>{ sel=key; render(); renderFeedback($('detailFeedback'), p, key); }, sel);

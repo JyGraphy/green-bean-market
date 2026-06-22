@@ -1,5 +1,10 @@
 {
-  "updated_at": "2026-06-22T15:53:27Z",
-  "stores": [],
-  "total_new": 0
+  "updated_at": "2026-06-22T22:34:49Z",
+  "stores": [
+    {
+      "name": "아얀투",
+      "new_count": 12
+    }
+  ],
+  "total_new": 12
 }

@@ -254,30 +254,43 @@ async function autoScan() {
   digitizer.style.display = 'none';
 
   try {
-    const { data: { session } } = await sb.auth.getSession();
-    const resp = await fetch(`${SUPABASE_URL}/functions/v1/analyze-roast`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session.access_token}`,
-        'apikey': SUPABASE_ANON,
-      },
-      body: JSON.stringify({
+    const { data, error } = await sb.functions.invoke('analyze-roast', {
+      body: {
         image_base64: digi.imgBase64,
         media_type: digi.imgMediaType || 'image/jpeg',
-      })
+      }
     });
 
-    const result = await resp.json();
-    if (!resp.ok || result.error) throw new Error(result.error || `HTTP ${resp.status}`);
+    if (error) {
+      // edge function not deployed → FunctionsHttpError or FunctionsRelayError
+      const msg = error.message || String(error);
+      if (msg.includes('Failed to fetch') || msg.includes('relay') || msg.includes('404') || msg.includes('not found')) {
+        throw new Error('Edge Function이 아직 배포되지 않았습니다. Supabase 대시보드에서 배포해 주세요.');
+      }
+      throw new Error(msg);
+    }
+    if (data?.error) throw new Error(data.error);
+
+    const result = data;
 
     // AI 결과 → wizardData 구성
-    const curve = (result.bt_curve || []).map(([t, bt]) => ({ t: +t, bt: +bt }));
-    curve.sort((a, b) => a.t - b.t);
-    if (curve.length < 2) throw new Error('BT 곡선 데이터를 추출하지 못했습니다.');
+    // labeled_points가 있으면 우선 포함
+    const labeled = (result.labeled_points || []).map(([t, bt]) => ({ t: +t, bt: +bt }));
+    const rawCurve = (result.bt_curve || []).map(([t, bt]) => ({ t: +t, bt: +bt }));
+
+    // 두 배열 합쳐 중복 제거 (0.5초 이내는 동일 점으로 처리)
+    const merged = [...labeled, ...rawCurve].sort((a, b) => a.t - b.t);
+    const curve = [];
+    for (const p of merged) {
+      if (!curve.length || Math.abs(p.t - curve[curve.length - 1].t) > 0.4) curve.push(p);
+    }
+
+    if (curve.length < 2) throw new Error('BT 곡선 데이터를 추출하지 못했습니다. 이미지를 더 선명하게 캡처해 보세요.');
 
     const evRaw = result.events || {};
-    const dropT = typeof evRaw.drop === 'number' ? +evRaw.drop : curve[curve.length - 1].t;
+    const dropT = typeof evRaw.drop === 'number' ? +evRaw.drop
+      : result.total_time_sec ? +result.total_time_sec
+      : curve[curve.length - 1].t;
     if (dropT <= 0) throw new Error('배출 시간을 읽지 못했습니다.');
 
     const evTimes = {};
@@ -309,7 +322,9 @@ async function autoScan() {
     };
 
     const conf = result.confidence || 'medium';
-    setAiStatus('ok', `분석 완료 (신뢰도: ${conf === 'high' ? '높음' : conf === 'medium' ? '보통' : '낮음'})`);
+    const confLabel = conf === 'high' ? '높음 🟢' : conf === 'medium' ? '보통 🟡' : '낮음 🔴';
+    const notes = result.notes ? ` · ${result.notes}` : '';
+    setAiStatus('ok', `분석 완료 (신뢰도: ${confLabel}${notes})`);
 
     // STEP 3으로 이동
     renderMetrics($('metricsRow'), wizardData);

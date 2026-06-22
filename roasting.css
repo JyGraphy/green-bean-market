@@ -326,3 +326,11 @@ code { background: var(--cream2); padding: 1px 5px; border-radius: 4px; font-siz
   border: none; border-radius: 6px; font-size: 13px; cursor: pointer;
 }
 .rp-btn-fcs:hover, .rp-btn-fcs-apply:hover { opacity: .88; }
+
+/* DTR 미계산 인라인 입력 */
+.rp-fcs-inline {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  align-items: center;
+}

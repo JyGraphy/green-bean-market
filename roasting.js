@@ -783,12 +783,57 @@ function renderFeedback(el, d, targetKey) {
 
   // 블록 2: 종합 분석
   html += `<div class="rp-fb-block"><div class="rp-fb-block-title">🔬 전체 종합 분석</div>`;
-  html += `<div class="rp-fb-list">${comprehensiveAnalysis(d).map(fbItem).join('')}</div></div>`;
+  html += `<div class="rp-fb-list">${comprehensiveAnalysis(d).map(item =>
+    item._fcsInput ? renderFcsInlineItem(item) : fbItem(item)
+  ).join('')}</div></div>`;
 
   el.innerHTML = html;
+
+  // DTR 인라인 입력 이벤트 연결 (DTR 미계산일 때만 존재)
+  const inlineApply = el.querySelector('#btnFcsInlineApply');
+  if (inlineApply) {
+    inlineApply.addEventListener('click', () => {
+      const inp = el.querySelector('#fcsInlineInput');
+      const sec = parseTimeStr(inp.value.trim());
+      if (!sec || sec <= 0 || sec >= d.total_time) { inp.style.borderColor='var(--red)'; return; }
+      inp.style.borderColor = '';
+      d.events = d.events || {};
+      d.events.fcs = sec;
+      d.dtr = +(((d.total_time - sec) / d.total_time) * 100).toFixed(1);
+      const pt = analyzeCurrentPoint(d.drop_temp, d.dtr);
+      if (pt) d.current_roast_point = pt.key;
+      // step3 상단 fcsInputRow도 숨기기
+      const row = $('fcsInputRow'); if (row) row.style.display = 'none';
+      // 지표 카드 재렌더
+      const metricsEl = $('metricsRow') || $('detailMetrics');
+      if (metricsEl) renderMetrics(metricsEl, d);
+      // 차트 이벤트 선 재그리기 (wizardData와 같은 객체라면 자동 반영)
+      if (d === wizardData) {
+        chartInstance = buildChart('roastChart',
+          d.time_series, d.bt_series, d.et_series||[], d.agitation_series||[],
+          d.ror||[], d.et_ror||[], d.events, chartInstance);
+      }
+      // 피드백 전체 재렌더
+      renderFeedback(el, d, targetKey);
+    });
+  }
 }
 function fbItem(i){ return `<div class="rp-fb-item ${i.type}"><span class="rp-fb-icon">${i.icon}</span>
   <div class="rp-fb-text"><strong>${i.title}</strong>${i.text}</div></div>`; }
+
+function renderFcsInlineItem(i) {
+  return `<div class="rp-fb-item ${i.type}">
+    <span class="rp-fb-icon">${i.icon}</span>
+    <div class="rp-fb-text">
+      <strong>${i.title}</strong>
+      <span>${i.text}</span>
+      <div class="rp-fcs-inline">
+        <input type="text" id="fcsInlineInput" class="rp-fcs-input" placeholder="예: 4:30">
+        <button id="btnFcsInlineApply" class="rp-btn-fcs">DTR 계산</button>
+      </div>
+    </div>
+  </div>`;
+}
 
 /* 포인트 변경 가이드 */
 function pointChangeGuide(d, targetKey) {
@@ -849,8 +894,8 @@ function comprehensiveAnalysis(d) {
     else items.push({type:'good',icon:'✅',title:`DTR ${dtr.toFixed(1)}% — 양호`,
       text:'일반적 권장 범위(15~30%) 안에 있습니다. 마이야르·캐러멜화 균형이 적절할 가능성이 높습니다.'});
   } else {
-    items.push({type:'info',icon:'ℹ️',title:'DTR 미계산',
-      text:'1차 크랙 시작 포인트를 찍지 않아 DTR을 계산하지 못했습니다. 디지타이징에서 1차크랙 시작을 추가해 주세요.'});
+    items.push({type:'info', icon:'ℹ️', title:'DTR 미계산', _fcsInput: true,
+      text:'1차 크랙 시작 시간을 입력하면 DTR을 바로 계산합니다.'});
   }
 
   // 페이즈 비율

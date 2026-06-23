@@ -239,6 +239,11 @@ function gotoStep2() {
 /* ════════ 디지타이저 ════════ */
 function loadImages(files) {
   if (!files || !files.length) return;
+
+  // 데이터 파일(.alog/.csv/.json)이 있으면 직접 파싱 경로로
+  const dataFile = Array.from(files).find(f => /\.(alog|csv|json)$/i.test(f.name));
+  if (dataFile) { loadDataFile(dataFile); return; }
+
   const validFiles = Array.from(files).filter(f => f.type.startsWith('image/')).slice(0, 4);
   if (!validFiles.length) return;
 
@@ -286,6 +291,198 @@ function renderAiThumbs() {
     el.alt = `사진 ${i+1}`;
     container.appendChild(el);
   });
+}
+
+/* ════════ 데이터 파일 파싱 (.alog / .csv / .json) ════════ */
+function loadDataFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      let parsed;
+      if (/\.(alog|json)$/i.test(file.name)) {
+        parsed = parseArtisanAlog(e.target.result, file.name);
+      } else if (/\.csv$/i.test(file.name)) {
+        parsed = parseCsvProfile(e.target.result, file.name);
+      } else {
+        throw new Error('지원하지 않는 파일 형식입니다.');
+      }
+      applyParsedData(parsed);
+    } catch (err) {
+      alert('파일 파싱 실패: ' + err.message);
+    }
+  };
+  reader.readAsText(file, 'utf-8');
+}
+
+function parseArtisanAlog(text, filename) {
+  // Artisan .alog는 표준 JSON이거나 Python 스타일(단따옴표, None, True/False)일 수 있음
+  let d;
+  try {
+    d = JSON.parse(text);
+  } catch {
+    const cleaned = text
+      .replace(/'/g, '"')
+      .replace(/\bNone\b/g, 'null')
+      .replace(/\bTrue\b/g, 'true')
+      .replace(/\bFalse\b/g, 'false');
+    d = JSON.parse(cleaned);
+  }
+
+  const timex = (d.timex || []).map(Number);
+  // Artisan 기본: temp1=ET, temp2=BT
+  const rawBt = (d.temp2 || d.BT || []).map(Number);
+  const rawEt = (d.temp1 || d.ET || []).map(Number);
+
+  if (timex.length < 2 || rawBt.length < 2) throw new Error('BT 데이터를 찾지 못했습니다.');
+
+  const btPts = timex.map((t, i) => ({ t, bt: rawBt[i] })).filter(p => !isNaN(p.bt) && p.bt > 10);
+  const etPts = rawEt.length
+    ? timex.map((t, i) => ({ t, bt: rawEt[i] })).filter(p => !isNaN(p.bt) && p.bt > 10)
+    : [];
+
+  const dropT = btPts[btPts.length - 1].t;
+  const evTimes = { charge: 0, drop: dropT };
+
+  // TP
+  if (d.TP_idx != null && timex[d.TP_idx] != null) evTimes.tp = timex[d.TP_idx];
+
+  // specialevents 배열로 이벤트 추출
+  const evIdxs = d.specialevents || [];
+  const evStrs = d.specialeventsStrings || [];
+  evIdxs.forEach((idx, i) => {
+    const label = (evStrs[i] || '').toUpperCase().replace(/\s+/g, '');
+    const t = timex[idx];
+    if (t == null) return;
+    if (label.includes('DRYE') || label.includes('DRYEND')) evTimes.dry = t;
+    else if (label === 'FCS' || label.includes('FCSTART') || label.includes('FIRSTCRACKSTART')) evTimes.fcs = t;
+    else if (label === 'FCE' || label.includes('FCEND') || label.includes('FIRSTCRACKEND')) evTimes.fce = t;
+    else if (label === 'DROP' || label.includes('SCO')) evTimes.drop = t;
+    else if (label === 'TP' || label.includes('TURNING')) evTimes.tp = t;
+  });
+
+  // 직접 시간값 필드 (일부 버전)
+  ['DRYe','FCs','FCe'].forEach(k => {
+    if (d[k] != null && d[k] > 0) {
+      const map = { DRYe:'dry', FCs:'fcs', FCe:'fce' };
+      evTimes[map[k]] = +d[k];
+    }
+  });
+
+  return {
+    btPts, etPts, evTimes,
+    dropT: evTimes.drop,
+    title: d.title || d.name || filename.replace(/\.[^.]+$/, ''),
+    ambient_temp: d.ambient != null ? +d.ambient : null,
+    ambient_humidity: d.humidity != null ? +d.humidity : null,
+  };
+}
+
+function parseCsvProfile(text, filename) {
+  const lines = text.trim().split(/\r?\n/).filter(l => l.trim());
+  if (lines.length < 3) throw new Error('CSV 데이터가 너무 짧습니다.');
+
+  // 헤더 행 찾기 (숫자가 아닌 첫 행)
+  let hdrLine = 0;
+  for (let i = 0; i < Math.min(5, lines.length); i++) {
+    if (/[a-z]/i.test(lines[i])) { hdrLine = i; break; }
+  }
+  const sep = lines[hdrLine].includes(';') ? ';' : ',';
+  const cols = lines[hdrLine].split(sep).map(c => c.trim().replace(/^"|"$/g, '').toLowerCase());
+
+  const findCol = (...patterns) => cols.findIndex(c => patterns.some(p => p.test(c)));
+  const tIdx  = findCol(/^(time|t|seconds?|sec|zeit)$/, /time.*sec/, /^hh:mm:ss/);
+  const btIdx = findCol(/^(bt|bean.?temp|temp2|beansurface|bohnentemp)$/, /^bean/, /temp.*2/);
+  const etIdx = findCol(/^(et|env.?temp|temp1|drum|internal|trommeltemp)$/, /temp.*1/);
+  const fcsIdx = findCol(/fc.?start|first.?crack.?s|fcs/);
+  const dropIdx = findCol(/^(drop|sco|ende)$/);
+
+  if (tIdx === -1) throw new Error(`Time 컬럼을 찾지 못했습니다. (헤더: ${cols.join(', ')})`);
+  if (btIdx === -1) throw new Error(`BT 컬럼을 찾지 못했습니다. (헤더: ${cols.join(', ')})`);
+
+  const btPts = [], etPts = [];
+  const evTimes = { charge: 0 };
+
+  for (let i = hdrLine + 1; i < lines.length; i++) {
+    const vals = lines[i].split(sep).map(v => v.trim().replace(/^"|"$/g, ''));
+    const rawT = vals[tIdx] || '';
+    // HH:MM:SS 또는 MM:SS 또는 초(숫자)
+    const t = rawT.includes(':')
+      ? rawT.split(':').reverse().reduce((acc, v, i) => acc + (+v) * Math.pow(60, i), 0)
+      : parseFloat(rawT);
+    const bt = parseFloat(vals[btIdx]);
+    if (isNaN(t) || isNaN(bt) || bt <= 0) continue;
+    btPts.push({ t, bt });
+    if (etIdx !== -1) {
+      const et = parseFloat(vals[etIdx]);
+      if (!isNaN(et) && et > 0) etPts.push({ t, bt: et });
+    }
+    if (fcsIdx !== -1 && vals[fcsIdx] && parseFloat(vals[fcsIdx]) > 0) evTimes.fcs = t;
+    if (dropIdx !== -1 && vals[dropIdx] && parseFloat(vals[dropIdx]) > 0) evTimes.drop = t;
+  }
+
+  if (btPts.length < 2) throw new Error('유효한 BT 포인트가 부족합니다.');
+  if (!evTimes.drop) evTimes.drop = btPts[btPts.length - 1].t;
+
+  return { btPts, etPts, evTimes, dropT: evTimes.drop, title: filename.replace(/\.[^.]+$/, ''), ambient_temp: null, ambient_humidity: null };
+}
+
+function applyParsedData(parsed) {
+  const { btPts, etPts, evTimes, dropT } = parsed;
+
+  const series = resample(btPts, 5, dropT);
+  const times = series.map(s => s.t);
+  const bts   = series.map(s => s.bt);
+  const ror   = computeRoR(times, bts, 30);
+
+  const ets   = etPts.length >= 2 ? resample(etPts, 5, dropT).map(s => s.bt) : [];
+  const etRor = etPts.length >= 2 ? computeRoR(times, ets, 30) : [];
+  const etDropTemp = etPts.length >= 2 ? +interp(etPts, dropT).toFixed(1) : null;
+
+  const chargeWeight = numOrNull('fChargeWeight');
+  const dropWeight   = numOrNull('fDropWeight');
+  const weightLoss   = (chargeWeight && dropWeight && chargeWeight > 0)
+    ? +(((chargeWeight - dropWeight) / chargeWeight) * 100).toFixed(1) : null;
+
+  const chargeTemp = +interp(btPts, 0).toFixed(1);
+  const dropTemp   = +interp(btPts, dropT).toFixed(1);
+  const dtr = evTimes.fcs != null ? +(((dropT - evTimes.fcs) / dropT) * 100).toFixed(1) : null;
+  const current = analyzeCurrentPoint(dropTemp, dtr);
+
+  wizardData = {
+    bean_name:        $('fBeanName').value.trim() || parsed.title || '',
+    seller:           $('fSeller').value.trim(),
+    roaster:          $('fRoaster').value.trim() || null,
+    roast_date:       $('fRoastDate').value,
+    ambient_temp:     numOrNull('fAmbientTemp') != null ? numOrNull('fAmbientTemp') : parsed.ambient_temp,
+    ambient_humidity: numOrNull('fAmbientHumidity') != null ? numOrNull('fAmbientHumidity') : parsed.ambient_humidity,
+    memo:             $('fMemo').value.trim(),
+    charge_temp: chargeTemp, drop_temp: dropTemp, total_time: dropT, dtr,
+    current_roast_point: current ? current.key : null,
+    time_series: times, bt_series: bts, et_series: ets, agitation_series: [], ror, et_ror: etRor,
+    et_drop_temp: etDropTemp, charge_weight: chargeWeight, drop_weight: dropWeight, weight_loss: weightLoss,
+    events: evTimes,
+  };
+
+  // 파일 이름이 bean_name 기본값으로 들어갔으면 Step1 필드도 반영
+  if (!$('fBeanName').value.trim() && parsed.title) $('fBeanName').value = parsed.title;
+
+  // Step 2 UI 정리
+  fileDrop.style.display = 'none';
+  $('aiPanel').style.display = 'none';
+  digitizer.style.display = 'none';
+
+  renderMetrics($('metricsRow'), wizardData);
+  chartInstance = buildChart('roastChart', times, bts, ets, [], ror, etRor, evTimes, chartInstance);
+  $('chartTitle').textContent = wizardData.bean_name;
+  selectedTarget = null;
+  const renderTargets = () => renderTargetButtons($('targetBtns'), wizardData, key => {
+    selectedTarget = key; renderTargets();
+    renderFeedback($('feedbackPanel'), wizardData, key);
+  }, selectedTarget);
+  renderTargets();
+  renderFeedback($('feedbackPanel'), wizardData, null);
+  $('fcsInputRow').style.display = wizardData.events.fcs == null ? '' : 'none';
+  showStep(3);
 }
 
 /* ════════ AI 자동 분석 ════════ */

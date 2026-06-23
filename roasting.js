@@ -30,7 +30,7 @@ let wizardData = null;      // 생성 중인 프로파일 데이터
 let selectedTarget = null;  // 선택된 타겟 포인트(생성 화면)
 
 /* 디지타이저 상태 */
-const digi = { img:null, cal:{x1:null,x2:null,y1:null,y2:null}, events:{}, curve:[], mode:null, scale:1, imgBase64:null, imgMediaType:null };
+const digi = { img:null, cal:{x1:null,x2:null,y1:null,y2:null}, events:{}, curve:[], mode:null, scale:1, images:[] };
 
 /* ── DOM ── */
 const $ = id => document.getElementById(id);
@@ -66,10 +66,10 @@ function wireUI() {
 
   // 파일 업로드
   fileDrop.addEventListener('click', () => fileInput.click());
-  fileInput.addEventListener('change', e => loadImage(e.target.files[0]));
+  fileInput.addEventListener('change', e => loadImages(e.target.files));
   fileDrop.addEventListener('dragover', e => { e.preventDefault(); fileDrop.classList.add('drag-over'); });
   fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('drag-over'));
-  fileDrop.addEventListener('drop', e => { e.preventDefault(); fileDrop.classList.remove('drag-over'); loadImage(e.dataTransfer.files[0]); });
+  fileDrop.addEventListener('drop', e => { e.preventDefault(); fileDrop.classList.remove('drag-over'); loadImages(e.dataTransfer.files); });
 
   // AI 자동 분석
   $('btnAutoScan').addEventListener('click', autoScan);
@@ -77,7 +77,7 @@ function wireUI() {
     $('aiPanel').style.display = 'none';
     digitizer.style.display = 'none';
     fileDrop.style.display = '';
-    digi.imgBase64 = null; digi.imgMediaType = null;
+    digi.images = [];
     fileInput.value = '';
   });
 
@@ -212,7 +212,7 @@ function openWizard() {
   digitizer.style.display='none'; fileDrop.style.display='';
   $('aiPanel').style.display='none';
   $('fcsInputRow').style.display='none';
-  digi.imgBase64 = null; digi.imgMediaType = null;
+  digi.images = [];
   activeId = null; renderList();
   showView('wizard'); showStep(1);
 }
@@ -237,36 +237,55 @@ function gotoStep2() {
 }
 
 /* ════════ 디지타이저 ════════ */
-function loadImage(file) {
-  if (!file || !file.type.startsWith('image/')) return;
-  digi.imgMediaType = file.type;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const dataUrl = e.target.result;
-    // base64 부분만 추출 (data:image/jpeg;base64,XXX → XXX)
-    digi.imgBase64 = dataUrl.split(',')[1];
+function loadImages(files) {
+  if (!files || !files.length) return;
+  const validFiles = Array.from(files).filter(f => f.type.startsWith('image/')).slice(0, 4);
+  if (!validFiles.length) return;
 
-    const img = new Image();
-    img.onload = () => {
-      digi.img = img;
-      const maxW = 720;
-      digi.scale = Math.min(1, maxW / img.width);
-      canvas.width = Math.round(img.width * digi.scale);
-      canvas.height = Math.round(img.height * digi.scale);
-      digi.cal = {x1:null,x2:null,y1:null,y2:null}; digi.events={}; digi.curve=[]; digi.mode=null;
-      fileDrop.style.display='none';
+  digi.images = [];
+  let loaded = 0;
 
-      // AI 패널 썸네일
-      $('aiThumb').src = dataUrl;
-      $('aiPanel').style.display = '';
-      setAiStatus('idle');
+  validFiles.forEach((file, idx) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const dataUrl = e.target.result;
+      digi.images[idx] = { base64: dataUrl.split(',')[1], mediaType: file.type, dataUrl };
+      loaded++;
+      if (loaded === validFiles.length) {
+        digi.images = digi.images.filter(Boolean);
+        fileDrop.style.display = 'none';
+        renderAiThumbs();
+        $('aiPanel').style.display = '';
+        setAiStatus('idle');
 
-      // 수동 digitizer도 canvas에 이미지 올려두기
-      redraw(); updateMarks(); updateGenerateBtn();
+        // 첫 이미지를 canvas에 올려두기
+        const img = new Image();
+        img.onload = () => {
+          digi.img = img;
+          const maxW = 720;
+          digi.scale = Math.min(1, maxW / img.width);
+          canvas.width = Math.round(img.width * digi.scale);
+          canvas.height = Math.round(img.height * digi.scale);
+          digi.cal = {x1:null,x2:null,y1:null,y2:null}; digi.events={}; digi.curve=[]; digi.mode=null;
+          redraw(); updateMarks(); updateGenerateBtn();
+        };
+        img.src = digi.images[0].dataUrl;
+      }
     };
-    img.src = dataUrl;
-  };
-  reader.readAsDataURL(file);
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderAiThumbs() {
+  const container = $('aiThumbs');
+  container.innerHTML = '';
+  digi.images.forEach((img, i) => {
+    const el = document.createElement('img');
+    el.className = 'rp-ai-thumb';
+    el.src = img.dataUrl;
+    el.alt = `사진 ${i+1}`;
+    container.appendChild(el);
+  });
 }
 
 /* ════════ AI 자동 분석 ════════ */
@@ -284,7 +303,7 @@ function setAiStatus(state, msg) {
 }
 
 async function autoScan() {
-  if (!digi.imgBase64) { alert('이미지를 먼저 업로드해 주세요.'); return; }
+  if (!digi.images.length) { alert('이미지를 먼저 업로드해 주세요.'); return; }
   $('btnAutoScan').disabled = true;
   setAiStatus('loading');
   digitizer.style.display = 'none';
@@ -292,8 +311,7 @@ async function autoScan() {
   try {
     const { data, error } = await sb.functions.invoke('analyze-roast', {
       body: {
-        image_base64: digi.imgBase64,
-        media_type: digi.imgMediaType || 'image/jpeg',
+        images: digi.images.map(img => ({ base64: img.base64, media_type: img.mediaType })),
       }
     });
 

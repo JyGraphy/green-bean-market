@@ -227,9 +227,15 @@ code { background: var(--cream2); padding: 1px 5px; border-radius: 4px; font-siz
   align-items: flex-start;
   margin-bottom: 12px;
 }
+.rp-ai-thumbs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
 .rp-ai-thumb {
-  width: 180px;
-  height: 110px;
+  width: 150px;
+  height: 95px;
   object-fit: cover;
   border-radius: 8px;
   border: 1px solid var(--border);
@@ -308,7 +314,8 @@ code { background: var(--cream2); padding: 1px 5px; border-radius: 4px; font-siz
 }
 @media (max-width: 600px) {
   .rp-ai-preview-row { flex-direction: column; }
-  .rp-ai-thumb { width: 100%; height: 140px; }
+  .rp-ai-thumbs { gap: 6px; }
+  .rp-ai-thumb { width: calc(50% - 3px); height: 80px; }
 }
 .rp-fcs-row, .rp-fcs-input-row {
   display: flex; flex-wrap: wrap; align-items: center; gap: 10px;

@@ -1,14 +1,10 @@
 {
-  "updated_at": "2026-06-25T22:19:37Z",
+  "updated_at": "2026-06-26T22:05:14Z",
   "stores": [
     {
       "name": "커만사",
-      "new_count": 1
-    },
-    {
-      "name": "커피플랜트",
-      "new_count": 1
+      "new_count": 4
     }
   ],
-  "total_new": 2
+  "total_new": 4
 }

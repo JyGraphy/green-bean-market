@@ -25,16 +25,21 @@ jobs:
         run: |
           pip install requests beautifulsoup4 lxml
 
+      # 일부 스크래퍼가 실패해도(SystemExit) 정상 수집된 store는 커밋해야 하므로
+      # continue-on-error로 잡고, 결과는 마지막 스텝에서 표면화한다.
       - name: 스크래퍼 실행
+        id: scrape
+        continue-on-error: true
         run: python scrapers/run_all.py
 
       - name: 변경사항 확인
         id: check_changes
+        if: always()
         run: |
           git diff --quiet data/products.json database.sql data/product_dates.json data/update_log.json data/products_web.json || echo "changed=true" >> $GITHUB_OUTPUT
 
       - name: 변경사항 커밋 & 푸시
-        if: steps.check_changes.outputs.changed == 'true'
+        if: always() && steps.check_changes.outputs.changed == 'true'
         run: |
           git config user.name "GreenBeanBot"
           git config user.email "bot@green-bean-market"
@@ -43,5 +48,14 @@ jobs:
           git push
 
       - name: 변경 없음
-        if: steps.check_changes.outputs.changed != 'true'
+        if: always() && steps.check_changes.outputs.changed != 'true'
         run: echo "📦 데이터 변경 없음 — 커밋 스킵"
+
+      # 일부 스크래퍼가 실패했으면 정상 데이터를 커밋·푸시한 뒤 잡을 실패로 표시
+      # (빨간 X로 알림 — 어떤 사이트가 실패했는지 로그에서 확인)
+      - name: 스크래퍼 실패 표면화
+        if: always() && steps.scrape.outcome == 'failure'
+        run: |
+          echo "⚠️ 일부 스크래퍼가 실패했습니다. 위 '스크래퍼 실행' 로그에서 실패한 사이트를 확인하세요."
+          echo "실패한 사이트의 기존 데이터는 보존되었으며, 성공한 사이트는 정상 갱신·커밋되었습니다."
+          exit 1

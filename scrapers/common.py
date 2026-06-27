@@ -143,12 +143,32 @@ def to_products(items, store, id_start):
     return results
 
 def update_json(store, new_products):
+    """해당 store의 상품을 새 목록으로 교체.
+
+    안전장치: 스크래핑 일시 실패로 빈/부분 결과가 넘어오면 기존 데이터를
+    덮어쓰지 않고 보존한다. (네트워크 오류·차단 시 store 전체가 0개로
+    날아가던 버그 방지)
+    """
     root = os.path.join(os.path.dirname(__file__), '..')
     json_path = os.path.join(root, 'data', 'products.json')
     with open(json_path, encoding='utf-8') as f:
         data = json.load(f)
+
+    old_count = sum(1 for p in data['products'] if p['store'] == store)
+    new_count = len(new_products)
+
+    # 1) 결과가 비었는데 기존 데이터가 있으면 = 스크래핑 실패로 간주 → 보존
+    if new_count == 0 and old_count > 0:
+        print(f"⚠️  {store}: 0개 수집됨 — 스크래핑 실패로 판단, 기존 {old_count}개 보존 (덮어쓰기 생략)")
+        raise SystemExit(1)
+
+    # 2) 기존이 충분히 많았는데(≥10) 절반 미만으로 급감 = 부분 실패 의심 → 보존
+    if old_count >= 10 and new_count < old_count * 0.5:
+        print(f"⚠️  {store}: {old_count}개 → {new_count}개로 급감 — 부분 실패 의심, 기존 데이터 보존 (덮어쓰기 생략)")
+        raise SystemExit(1)
+
     kept = [p for p in data['products'] if p['store'] != store]
     data['products'] = kept + new_products
     with open(json_path, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
-    print(f"✅ {store}: {len(new_products)}개 저장완료")
+    print(f"✅ {store}: {new_count}개 저장완료" + (f" (이전 {old_count}개)" if old_count else ""))

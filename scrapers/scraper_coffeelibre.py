@@ -158,13 +158,18 @@ def scrape():
     print(f"[{STORE}] 총 {len(unique)}개 수집")
     return unique
 
-def to_products(items, id_start):
+def to_products(items, id_start, taken=None):
+    import sys as _sys, os as _os
+    _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+    from common import alloc_ids, is_non_bean
+    items = [it for it in items if not is_non_bean(it['name'])]  # 비생두 제외
+    ids = alloc_ids(len(items), id_start, taken)
     results = []
     for i, item in enumerate(items):
         origin, region = guess_origin(item['name'])
         name = item['name']
         results.append({
-            "id":         id_start + i,
+            "id":         ids[i],
             "store":      STORE,
             "name":       name,
             "price":      item['price'],
@@ -196,10 +201,18 @@ if __name__ == '__main__':
     while id_start in existing_ids:
         id_start += 1
 
-    new_products = to_products(items, id_start)
+    new_products = to_products(items, id_start, existing_ids)
+
+    # 안전장치: 공용 가드로 빈/부분 결과 시 기존 데이터 보존 (단일 진실 공급원)
+    import sys as _sys
+    _sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from common import guard_store_replacement
+    old_count = sum(1 for p in data['products'] if p['store'] == STORE)
+    guard_store_replacement(STORE, old_count, len(new_products))
+
     data['products'] = kept + new_products
 
     with open(json_path, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-    print(f"✅ products.json 업데이트: {STORE} {len(new_products)}개")
+    print(f"✅ products.json 업데이트: {STORE} {len(new_products)}개 (이전 {old_count}개)")

@@ -84,6 +84,26 @@ coffeebeanweb/
 2. **`index.html`**: 공급사 필터 버튼, 사이드바 범례 색상 도트 추가, 헤더 쇼핑몰 수 업데이트
 3. **`data.js`**: `STORE_CLS`에 `'공급사명':'sp-XXX'` 추가, PRODUCTS 배열에 상품 추가
 
+## 데이터 안전장치 (스크래핑 사고 방지)
+
+매일 자동 갱신 시 데이터가 사라지거나 깨지는 것을 막는 다층 방어 구조.
+**새 스크래퍼를 추가할 때 아래 규칙을 반드시 따를 것.**
+
+1. **빈/부분 결과 보존** — 저장 직전 `common.guard_store_replacement(store, old_count, new_count)`를
+   호출한다. 수집 0개거나 기존 대비 50% 미만 급감이면 `SystemExit(1)`로 기존 데이터를 보존한다.
+   `common.update_json()`은 이미 내장. 자체 저장 로직을 쓰면 직접 호출해야 한다.
+2. **ID 충돌 방지** — ID는 반드시 `common.alloc_ids(count, id_start, taken=existing_ids)` 또는
+   `to_products(items, store, id_start, existing_ids)`로 발급한다. `id_start + i` 순차 부여는
+   다른 store 구간과 겹쳐 중복 ID를 만든다(금지).
+3. **비생두 품목 차단** — `to_products()`는 `common.is_non_bean(name)`으로 장비·서적·굿즈·
+   결제·깨진 이름(예: 'SOLD OUT') 등을 자동 제외한다. 패턴은 `_NON_BEAN_PATTERNS`에 있으며,
+   정상 생두명과 충돌 0건이 검증된 정밀 키워드만 추가할 것('컵','잔','세트','스틱' 등 금지).
+4. **검증 게이트** — `scripts/validate_data.py`가 커밋 직전 워킹트리를 직전 커밋(HEAD)과 비교해
+   스키마·중복ID·store 소멸·급감을 검사한다. 실패 시 워크플로가 커밋을 차단한다.
+   의도적 대량 변경은 `FORCE_DATA_UPDATE=1`로 급감 검사만 우회(스키마·중복 검사는 유지).
+5. **워크플로 동작** — 개별 스크래퍼 실패는 격리(`continue-on-error`)되어 정상 store는 커밋되고,
+   실패/검증불가 시 잡이 빨간 X로 표시된다.
+
 ## 스크래핑 플랫폼 메모
 
 | 플랫폼 | 스크래핑 방법 |

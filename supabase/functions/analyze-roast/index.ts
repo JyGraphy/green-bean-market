@@ -116,9 +116,17 @@ serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
 
   try {
-    const { image_base64, media_type = 'image/jpeg' } = await req.json()
+    const body = await req.json()
 
-    if (!image_base64) {
+    // Accept both new array format and legacy single-image format
+    let imageList: Array<{ base64: string; media_type: string }> = []
+    if (body.images && Array.isArray(body.images) && body.images.length > 0) {
+      imageList = body.images.slice(0, 4)
+    } else if (body.image_base64) {
+      imageList = [{ base64: body.image_base64, media_type: body.media_type || 'image/jpeg' }]
+    }
+
+    if (!imageList.length) {
       return new Response(
         JSON.stringify({ error: '이미지 데이터가 없습니다.' }),
         { status: 400, headers: { ...cors, 'Content-Type': 'application/json' } }
@@ -133,6 +141,17 @@ serve(async (req: Request) => {
       )
     }
 
+    // Build content array: all images first, then the prompt text
+    const content: unknown[] = imageList.map(img => ({
+      type: 'image',
+      source: { type: 'base64', media_type: img.media_type, data: img.base64 }
+    }))
+    if (imageList.length > 1) {
+      content.push({ type: 'text', text: `You have been provided ${imageList.length} photos of the same roasting profile from different angles or zoom levels. Synthesize all images to extract the most accurate data possible. Image 1 is typically the full overview; subsequent images may show close-ups of specific chart sections or the agitation sub-chart.\n\n` + PROMPT })
+    } else {
+      content.push({ type: 'text', text: PROMPT })
+    }
+
     const aiResp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -143,13 +162,7 @@ serve(async (req: Request) => {
       body: JSON.stringify({
         model: 'claude-opus-4-8',
         max_tokens: 6000,
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'image', source: { type: 'base64', media_type, data: image_base64 } },
-            { type: 'text', text: PROMPT }
-          ]
-        }]
+        messages: [{ role: 'user', content }]
       })
     })
 

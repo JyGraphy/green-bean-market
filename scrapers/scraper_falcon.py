@@ -89,4 +89,4 @@ if __name__ == '__main__':
     existing_ids = {p['id'] for p in kept}
     id_start = 801
     while id_start in existing_ids: id_start += 1
-    update_json(STORE, to_products(items, STORE, id_start))
+    update_json(STORE, to_products(items, STORE, id_start, existing_ids))

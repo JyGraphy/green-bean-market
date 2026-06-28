@@ -117,8 +117,26 @@ def get_total_pages(html):
     nums = re.findall(r'[?&]page=(\d+)', html)
     return max((int(n) for n in nums), default=1)
 
-def to_products(items, store, id_start):
+def alloc_ids(count, id_start, taken=None):
+    """taken(이미 사용 중인 ID 집합)과 겹치지 않는 ID를 count개 순서대로 발급.
+
+    기존엔 id_start+i 를 순차 부여해, 다른 store가 그 구간을 점유하면 ID가
+    충돌(중복)했다. 이 함수는 점유된 ID를 건너뛰어 항상 고유 ID를 보장한다.
+    """
+    taken = set(taken or ())
+    ids, nid = [], id_start
+    for _ in range(count):
+        while nid in taken:
+            nid += 1
+        ids.append(nid)
+        taken.add(nid)
+        nid += 1
+    return ids
+
+
+def to_products(items, store, id_start, taken=None):
     results = []
+    ids = alloc_ids(len(items), id_start, taken)
     for i, item in enumerate(items):
         raw = item['name']
         # 상품명 접두어가 [품절]이면 품절로 표시 후 정제
@@ -126,7 +144,7 @@ def to_products(items, store, id_start):
         name = clean_name(raw)
         origin, region = guess_origin(name)
         results.append({
-            "id":         id_start + i,
+            "id":         ids[i],
             "store":      store,
             "name":       name,
             "price":      item['price'],
@@ -142,12 +160,31 @@ def to_products(items, store, id_start):
         })
     return results
 
+# 스크래핑 부분 실패 판정 임계값 (기존 대비 이 비율 미만이면 보존)
+SUSPICIOUS_DROP_RATIO = 0.5
+SUSPICIOUS_MIN_BASELINE = 10  # 기존이 이 개수 이상일 때만 급감 검사
+
+def guard_store_replacement(store, old_count, new_count):
+    """store 교체 전 안전성 검사 (단일 진실 공급원).
+
+    스크래핑 일시 실패로 빈/부분 결과가 넘어오면 기존 데이터를 덮어쓰지 않도록
+    SystemExit(1)을 던진다. 모든 저장 경로(common.update_json 및 자체 저장
+    스크래퍼)는 반드시 이 함수를 거쳐야 한다.
+    """
+    # 1) 결과가 비었는데 기존 데이터가 있으면 = 스크래핑 실패로 간주 → 보존
+    if new_count == 0 and old_count > 0:
+        print(f"⚠️  {store}: 0개 수집됨 — 스크래핑 실패로 판단, 기존 {old_count}개 보존 (덮어쓰기 생략)")
+        raise SystemExit(1)
+    # 2) 기존이 충분히 많았는데 절반 미만으로 급감 = 부분 실패 의심 → 보존
+    if old_count >= SUSPICIOUS_MIN_BASELINE and new_count < old_count * SUSPICIOUS_DROP_RATIO:
+        print(f"⚠️  {store}: {old_count}개 → {new_count}개로 급감 — 부분 실패 의심, 기존 데이터 보존 (덮어쓰기 생략)")
+        raise SystemExit(1)
+
+
 def update_json(store, new_products):
     """해당 store의 상품을 새 목록으로 교체.
 
-    안전장치: 스크래핑 일시 실패로 빈/부분 결과가 넘어오면 기존 데이터를
-    덮어쓰지 않고 보존한다. (네트워크 오류·차단 시 store 전체가 0개로
-    날아가던 버그 방지)
+    안전장치: guard_store_replacement()가 빈/부분 결과를 막아 기존 데이터를 보존한다.
     """
     root = os.path.join(os.path.dirname(__file__), '..')
     json_path = os.path.join(root, 'data', 'products.json')
@@ -157,15 +194,7 @@ def update_json(store, new_products):
     old_count = sum(1 for p in data['products'] if p['store'] == store)
     new_count = len(new_products)
 
-    # 1) 결과가 비었는데 기존 데이터가 있으면 = 스크래핑 실패로 간주 → 보존
-    if new_count == 0 and old_count > 0:
-        print(f"⚠️  {store}: 0개 수집됨 — 스크래핑 실패로 판단, 기존 {old_count}개 보존 (덮어쓰기 생략)")
-        raise SystemExit(1)
-
-    # 2) 기존이 충분히 많았는데(≥10) 절반 미만으로 급감 = 부분 실패 의심 → 보존
-    if old_count >= 10 and new_count < old_count * 0.5:
-        print(f"⚠️  {store}: {old_count}개 → {new_count}개로 급감 — 부분 실패 의심, 기존 데이터 보존 (덮어쓰기 생략)")
-        raise SystemExit(1)
+    guard_store_replacement(store, old_count, new_count)
 
     kept = [p for p in data['products'] if p['store'] != store]
     data['products'] = kept + new_products

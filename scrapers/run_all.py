@@ -57,6 +57,16 @@ for filename, name in SCRAPERS:
         print(f"✅ {name} 완료")
 
 print(f"\n{'='*50}")
+print("▶ 상품 링크 연결성 검증 중...")
+# 죽은 링크(404/410)만 제거. 체커 자체 오류는 비치명적(데이터 보존).
+result = subprocess.run(
+    [sys.executable, os.path.join(ROOT, 'scripts', 'check_links.py')],
+    capture_output=False
+)
+if result.returncode != 0:
+    print("⚠️  링크 검증 비정상 종료 — 데이터는 보존됨(계속 진행)")
+
+print(f"\n{'='*50}")
 print("▶ database.sql 재생성 중...")
 result = subprocess.run(
     [sys.executable, os.path.join(ROOT, 'scripts', 'generate_sql.py')],

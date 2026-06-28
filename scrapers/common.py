@@ -92,6 +92,32 @@ def name_is_soldout(name):
     return bool(_SOLDOUT_LABEL.search(name or ''))
 
 
+# 비생두 품목 차단 패턴 — 장비/도구/서적/굿즈/결제/식품 등.
+# 모두 실전 데이터 전수 검증으로 정상 생두명과 충돌 0건 확인된 정밀 패턴만 포함.
+# (주의: '컵','잔','세트','스틱' 등은 정상 생두명에도 흔히 등장해 사용 금지)
+_NON_BEAN_PATTERNS = [
+    '커핑스푼', '커핑 스푼', 'cupping spoon', '커핑보울', '커핑 보울', 'cupping bowl', '커핑볼',
+    '컨테이너박스', '캐니스터', '보관용기',
+    '샘플 튜브', '샘플튜브', '데스크 패드', '그레이딩 데스크', 'grading desk',
+    'handbook', 'glossary', '매거진', 'magazine',
+    '커피 퀄리티 part', '업체결제', '카다이프', '커피지도',
+    '샘플 패키지', '샘플패키지',
+    '그라인더', 'grinder', '드리퍼', 'dripper', '저울', '케틀', 'kettle',
+    '텀블러', '머그컵', '에코백', '티셔츠', '스티커', '앞치마',
+]
+
+def is_non_bean(name):
+    """생두가 아닌 품목(장비·서적·굿즈·결제 등)이거나 이름이 깨졌으면 True → 수집 제외."""
+    if not name or not name.strip():
+        return True
+    # 상태 텍스트만 캡처된 깨진 이름 (예: GSC 'SOLD OUT') — 기호/공백 제거 후 판별
+    stripped = re.sub(r'[\s\W_]+', '', name).lower()
+    if stripped in ('soldout', '품절', 'sold', ''):
+        return True
+    low = name.lower()
+    return any(pat.lower() in low for pat in _NON_BEAN_PATTERNS)
+
+
 def guess_process(name):
     n = name.lower()
     if any(x in n for x in ['anaerobic','무산소','카보닉','carbonic','infused','인퓨즈드']): return '무산소발효'
@@ -135,6 +161,8 @@ def alloc_ids(count, id_start, taken=None):
 
 
 def to_products(items, store, id_start, taken=None):
+    # 비생두 품목 제외 (정제된 이름 기준)
+    items = [it for it in items if not is_non_bean(clean_name(it['name']))]
     results = []
     ids = alloc_ids(len(items), id_start, taken)
     for i, item in enumerate(items):

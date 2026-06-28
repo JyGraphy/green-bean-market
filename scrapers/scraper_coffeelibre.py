@@ -161,7 +161,8 @@ def scrape():
 def to_products(items, id_start, taken=None):
     import sys as _sys, os as _os
     _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
-    from common import alloc_ids
+    from common import alloc_ids, is_non_bean
+    items = [it for it in items if not is_non_bean(it['name'])]  # 비생두 제외
     ids = alloc_ids(len(items), id_start, taken)
     results = []
     for i, item in enumerate(items):

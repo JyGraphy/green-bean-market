@@ -1,0 +1,33 @@
+name: 사이트 상태 점검 (진단)
+
+# 라이브 사이트가 실제로 200으로 뜨는지 GitHub 러너에서 직접 확인한다.
+# 수동 실행(workflow_dispatch)으로 응답 상태/헤더/리다이렉트/본문을 그대로 출력해
+# 403 등의 원인(인증게이트/봇차단/도메인오류)을 진단한다.
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: HTTP 응답 점검
+        run: |
+          set +e
+          for url in \
+            "https://green-bean-market.vercel.app" \
+            "https://green-bean-market.netlify.app" ; do
+            echo "==================================================================="
+            echo "URL: $url"
+            echo "--- 상태 / 헤더 (리다이렉트 추적) ---"
+            curl -sS -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" \
+                 -L -D - -o /dev/null \
+                 -w "\n>>> FINAL_HTTP=%{http_code}  REDIRECTS=%{num_redirects}  FINAL_URL=%{url_effective}\n" \
+                 --max-time 30 "$url"
+            echo "rc=$?"
+            echo "--- 본문 첫 25줄 ---"
+            curl -sS -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" \
+                 -L --max-time 30 "$url" | head -25
+            echo ""
+          done
+          echo "==================================================================="
+          echo "점검 완료"

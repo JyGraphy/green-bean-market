@@ -10,32 +10,59 @@ Analyze the roasting profile chart image carefully and extract precise data.
 The image may be a direct screenshot or a photo taken of a screen (possibly with slight glare or angle).
 
 ════════════════════════════════════════
-PHASE 1 — IDENTIFY THE APP & CURVE COLORS
+PHASE 0 — READ THE LEGEND FIRST (MOST IMPORTANT STEP)
 ════════════════════════════════════════
-Before reading any numbers, identify which app this is and map each curve to its color.
+DO NOT assume any curve's color from memory. Colors differ between apps, firmware
+versions, themes, and even between the top and bottom chart of the SAME screen.
+The ONLY reliable source of truth is the legend printed on the image.
+
+For EVERY chart region (top temperature chart AND bottom control chart), locate the
+legend — a row of small colored swatches (●/■/—) each followed by a text label.
+Read each swatch's ACTUAL color (look at the pixels of the swatch itself) and bind
+that exact color to its label. Build an explicit color→label map before tracing
+anything. Example of what you must produce internally:
+  "the swatch before 할로겐 is pink (#e84a8a); the swatch before 교반 is cyan (#3ba9d4)"
+Then, to read a curve, find the line whose color MATCHES its legend swatch — never
+guess from the label name alone.
+
+════════════════════════════════════════
+PHASE 1 — IDENTIFY THE APP & MAP CURVES VIA THE LEGEND
+════════════════════════════════════════
+Identify the app, then map each curve using the legend you read in PHASE 0.
 
 ▶ Roastware / Stronghold (dark background, Korean UI "원두 표면 / 내부"):
-  TOP CHART — two temperature curves:
-    • BT ("원두 표면", bean surface) = PINK / MAGENTA / RED curve
-    • ET ("내부", internal drum)     = WHITE / LIGHT GRAY / PALE YELLOW curve
-  The legend at bottom-left of the top chart shows "■ 원두 표면  ■ 내부" with matching colors.
-  BT (pink) typically rises faster and finishes HIGHER than ET (white) at the drop point.
+  TOP CHART — two temperature curves, legend "■ 원두 표면  ■ 내부":
+    • BT = "원두 표면" (bean surface) — match its legend swatch color
+    • ET = "내부" (internal drum)     — match its legend swatch color
+  Sanity check (use ONLY to catch a mistake, NOT as the primary method):
+  BT usually rises faster and finishes HIGHER than ET at the drop point.
 
-  BOTTOM CHART — four control step-curves (all different colors):
-    • 열풍   (hot air)       = ORANGE / YELLOW step
-    • 할로겐 (halogen)       = PINK / MAGENTA step
-    • 드럼히터 (drum heater) = TEAL / GREEN step
-    • 교반   (agitation)     = BLUE / CYAN step   ← THIS IS WHAT WE NEED
-  The legend at bottom-left reads "● 열풍  ■ 할로겐  ■ 드럼히터  ■ 교반".
-  교반 is the BLUE step line. Read its step changes (0–10 integer scale).
-  The thin white noisy line in the bottom chart is ROR — ignore it here.
+  BOTTOM CHART — up to four control STEP curves, legend reads
+  "● 열풍  ■ 할로겐  ■ 드럼히터  ■ 교반" (order/colors vary by firmware):
+    • 열풍   = hot air
+    • 할로겐 = halogen
+    • 드럼히터 = drum heater
+    • 교반   = agitation   ← THIS IS WHAT WE NEED (0–10 integer scale)
+  ⚠️ CRITICAL — 할로겐(halogen) and 교반(agitation) are the most commonly CONFUSED
+  pair. They are often similar hues (one warmer pink/red, one cooler blue/cyan) and
+  their step lines overlap. To avoid swapping them:
+    1. Read the EXACT swatch color next to 교반 in the bottom-chart legend.
+    2. Trace ONLY the step line whose color matches that swatch pixel-for-pixel.
+    3. Verify: halogen typically toggles between just two levels (on/off-like,
+       e.g. 0 and a high value), while 교반(agitation) usually steps through several
+       mid-range integer levels (e.g. 4→5→6→7). If your "교반" line looks like a
+       binary on/off toggle, you probably picked 할로겐 — re-check the swatch color.
+    4. If you cannot confidently distinguish them from color, lower "confidence"
+       to "low" and say so in "notes" rather than guessing.
+  The thin noisy line in the bottom chart is ROR — ignore it here.
 
-▶ Artisan (light or dark background):
-  BT = orange/red thick curve, ET = blue curve
+▶ Artisan (light or dark background): read its legend too.
+  Commonly BT = orange/red thick curve, ET = blue curve, but CONFIRM via legend.
   Events: vertical lines labeled CHARGE, DRY END, FC START, FC END, DROP/SCO
 
 ▶ Cropster / Firescope / RoasTime:
-  BT = boldest colored curve, events marked by vertical dashed lines with text
+  BT = boldest colored curve; confirm names against the legend.
+  Events marked by vertical dashed lines with text.
 
 ════════════════════════════════════════
 PHASE 2 — DISAMBIGUATE OVERLAPPING LABELS
@@ -69,19 +96,33 @@ Between labeled points, visually interpolate each curve's shape:
 - Keep BT (pink) and ET (white) as separate arrays
 - Respect the physical shape: BT has S-curve rise; ET rises more linearly/gradually
 
-For the bottom chart 교반 (blue step line):
+For the bottom chart 교반 (agitation) STEP line — use the swatch color from PHASE 0:
+- Identify the step line whose color EXACTLY matches the 교반 legend swatch.
 - Record each step VALUE change as [time_sec, integer_value]
-- Typical values: 4, 5, 6, 7, 8 etc. (integer 0–10 scale)
+- Typical agitation values: step through several mid levels e.g. 4, 5, 6, 7, 8 (0–10 scale)
 - Only record when the step changes, not every second
+- Do NOT trace the 할로겐(halogen) line by mistake — re-confirm its color differs
+  from the 교반 swatch before recording.
+
+════════════════════════════════════════
+PHASE 5 — SELF-VERIFY BEFORE OUTPUT
+════════════════════════════════════════
+Re-check each binding against its legend swatch color one last time:
+- Does the BT curve color == 원두 표면 swatch? Does ET == 내부 swatch?
+- Does the agitation line color == 교반 swatch (NOT 할로겐)?
+- Is agitation a multi-level mid-range step (not a binary on/off like halogen)?
+If any check fails, fix the assignment. If still uncertain, set confidence "low".
 
 ════════════════════════════════════════
 OUTPUT — return ONLY this JSON, no markdown, no explanation:
 ════════════════════════════════════════
 {
   "curve_identification": {
-    "bt_color": "<color you identified for BT>",
-    "et_color": "<color you identified for ET>",
-    "agitation_color": "<color you identified for 교반>"
+    "bt_color": "<exact color of 원두 표면 / BT swatch>",
+    "et_color": "<exact color of 내부 / ET swatch>",
+    "agitation_color": "<exact color of 교반 swatch>",
+    "halogen_color": "<exact color of 할로겐 swatch, or null if no bottom chart>",
+    "agitation_vs_halogen_check": "<one sentence: how you confirmed 교반 is not 할로겐>"
   },
   "labeled_points": [
     { "time_sec": <number>, "temp_celsius": <number>, "curve": "BT"|"ET", "label_text": "<raw text>" }
@@ -109,8 +150,12 @@ CRITICAL RULES:
 - bt_curve and et_curve must each have 25–60 points, sorted by time, spanning 0 → drop
 - bt_curve must always be >= et_curve at corresponding times after the first 2 minutes
 - agitation: use [] only if bottom chart is completely absent from the image
+- agitation MUST be traced from the line matching the 교반 swatch color — NEVER the
+  할로겐(halogen) line. When in doubt, prefer [] + low confidence over a wrong guess.
 - labeled_points: include ALL text annotations visible in the top chart
-- Never swap BT and ET — verify with the anchor rule before finalizing`
+- Never swap BT and ET — verify with the anchor rule before finalizing
+- All curve/line assignments MUST be justified by a matching legend swatch color,
+  not by the label name or memorized defaults`
 
 serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })

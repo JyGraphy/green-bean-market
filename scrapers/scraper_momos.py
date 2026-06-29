@@ -195,7 +195,7 @@ def scrape():
 def to_products(items, id_start, taken=None):
     import sys as _sys, os as _os
     _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
-    from common import alloc_ids, is_non_bean
+    from common import alloc_ids, is_non_bean, guess_process as _cgp
     items = [it for it in items if not is_non_bean(it['name'])]  # 비생두 제외
     ids = alloc_ids(len(items), id_start, taken)
     results = []
@@ -209,7 +209,7 @@ def to_products(items, id_start, taken=None):
             "price":      item['price'],
             "origin":     origin,
             "region":     region,
-            "process":    guess_process(name),
+            "process":    _cgp(name),  # 공용 가공방식 추출(보강판)
             "notes":      "",
             "url":        item['url'],
             "is_new":     any(x in name for x in ['2026', '25/26', '2025/26', '2025/2026']),

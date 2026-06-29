@@ -60,19 +60,26 @@ coffeebeanweb/
 
 **총 500개 상품, ID 범위 1~845**
 
-## 가공방식 자동 추출 (`extractProcess`)
+## 가공방식 자동 추출
 
-`data.js`의 `extractProcess(name)` 함수가 상품명 정규식으로 가공방식을 분류:
+`scrapers/common.py`의 `guess_process(text)`가 가공방식을 분류한다(상품명 + 상세페이지 텍스트
+공용). 모든 스크래퍼가 이 함수를 사용한다(momos/coffeelibre 포함). 프론트 `data.js`의
+`PROC_CLS`/`PROC_COLORS`와 리턴값이 일치해야 한다.
 
 | 리턴값 | CSS 클래스 | 키워드 예시 |
 |--------|-----------|------------|
-| 워시드 | proc-washed | 워시드, washed |
-| 내추럴 | proc-natural | 내추럴, natural, 레포사도 |
-| 허니 | proc-honey | 허니, honey, 레드허니, 화이트허니 |
-| 무산소발효 | proc-anaerobic | 무산소, anaerobic, 카보닉, 인퓨즈드 |
-| 펄프드내추럴 | proc-pulped | 펄프드내추럴, pulped natural |
-| 웻훌드 | proc-wethulled | 웻훌, wet hul |
+| 펄프드내추럴 | proc-pulped | 펄프드내추럴, pulped natural (natural 포함 → 먼저 검사) |
+| 무산소발효 | proc-anaerobic | 무산소, anaerobic, 카보닉, 인퓨즈드, 공동발효, maceration, lactic, yeast |
+| 허니 | proc-honey | 허니, honey, 레드/옐로우/화이트/블랙허니 |
+| 웻훌드 | proc-wethulled | 웻훌, 웻-헐, wet hul, 세미워시, semi washed, wet polished (워시 포함 → 워시드보다 먼저) |
+| 내추럴 | proc-natural | 내추럴, 내츄럴, natural, 레포사도 |
+| 워시드 | proc-washed | 워시드, 워시, washed, fully washed, 수세식 |
+| 디카페인 | proc-decaf | 디카페인, decaf, 마운틴워터, 슈가케인, swiss water (베이스 가공 미명시 시 맨 뒤에서 검사) |
 | 알수없음 | proc-unknown | 위 패턴 미매칭 |
+
+**상세페이지 보강** — 상품명으로 못 잡아 '알수없음'인 상품은 `scripts/enrich_process.py`가
+상세페이지를 받아 '가공/프로세스/process' 라벨 주변(우선) 또는 본문에서 추출한다.
+`run_all.py`에서 링크검증 직후·generate_sql 직전에 실행(네트워크 필요 → CI에서 동작).
 
 ## 원산지 국기 (FLAG)
 

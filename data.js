@@ -16,12 +16,14 @@ const STORE_CLS = {
 
 const PROC_CLS = {
   '워시드':'proc-washed','내추럴':'proc-natural','허니':'proc-honey',
-  '무산소발효':'proc-anaerobic','펄프드내추럴':'proc-pulped','웻훌드':'proc-wethulled','알수없음':'proc-unknown'
+  '무산소발효':'proc-anaerobic','펄프드내추럴':'proc-pulped','웻훌드':'proc-wethulled',
+  '디카페인':'proc-decaf','알수없음':'proc-unknown'
 };
 
 const PROC_COLORS = {
   '워시드':'#1d4ed8','내추럴':'#92400e','허니':'#9d174d',
-  '무산소발효':'#6b21a8','펄프드내추럴':'#9a3412','웻훌드':'#166534','알수없음':'#9ca3af'
+  '무산소발효':'#6b21a8','펄프드내추럴':'#9a3412','웻훌드':'#166534',
+  '디카페인':'#0f766e','알수없음':'#9ca3af'
 };
 
 function extractProcess(name) {

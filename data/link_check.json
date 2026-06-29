@@ -1,0 +1,85 @@
+{
+  "checked_at": "2026-06-29T22:18:23Z",
+  "total": 1258,
+  "removed": [],
+  "held_stores": [
+    "더블유빈: dead 42/42 (100%) — URL 구조 변경 의심, 제거 보류"
+  ],
+  "per_store": {
+    "더블유빈": {
+      "ok": 0,
+      "dead": 42,
+      "ambiguous": 0
+    },
+    "콤파스커피": {
+      "ok": 49,
+      "dead": 0,
+      "ambiguous": 0
+    },
+    "모모스커피": {
+      "ok": 114,
+      "dead": 0,
+      "ambiguous": 0
+    },
+    "블레스빈": {
+      "ok": 86,
+      "dead": 0,
+      "ambiguous": 0
+    },
+    "아얀투": {
+      "ok": 13,
+      "dead": 0,
+      "ambiguous": 0
+    },
+    "엠아이커피": {
+      "ok": 81,
+      "dead": 0,
+      "ambiguous": 0
+    },
+    "오로미아코리아": {
+      "ok": 7,
+      "dead": 0,
+      "ambiguous": 0
+    },
+    "오월의숲": {
+      "ok": 37,
+      "dead": 0,
+      "ambiguous": 0
+    },
+    "지에스씨(GSC)": {
+      "ok": 136,
+      "dead": 0,
+      "ambiguous": 0
+    },
+    "커만사": {
+      "ok": 423,
+      "dead": 0,
+      "ambiguous": 0
+    },
+    "커피리브레": {
+      "ok": 94,
+      "dead": 0,
+      "ambiguous": 0
+    },
+    "커피창고": {
+      "ok": 16,
+      "dead": 0,
+      "ambiguous": 0
+    },
+    "커피플랜트": {
+      "ok": 48,
+      "dead": 0,
+      "ambiguous": 0
+    },
+    "코빈즈커피": {
+      "ok": 83,
+      "dead": 0,
+      "ambiguous": 0
+    },
+    "팔콘커피": {
+      "ok": 29,
+      "dead": 0,
+      "ambiguous": 0
+    }
+  }
+}

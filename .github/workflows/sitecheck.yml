@@ -10,6 +10,20 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
+      - name: 상품 링크 점검 (교정된 3개 store 샘플)
+        run: |
+          set +e
+          echo "### 교정된 store의 실제 상품 링크가 쇼핑몰로 연결되는지 확인"
+          for url in \
+            "https://comansa.kr/goods/goods_view.php?goodsNo=1000002870" \
+            "https://www.micoffee.co.kr/goods/goods_view.php?goodsNo=1000007517" \
+            "https://www.gsc.coffee/goods/goods_view.php?goodsNo=1000000328" ; do
+            code=$(curl -sS -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" \
+                   -L -o /dev/null -w "%{http_code}" --max-time 30 "$url")
+            echo "  [$code] $url"
+          done
+          echo ""
+
       - name: HTTP 응답 점검
         run: |
           set +e

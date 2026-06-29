@@ -95,17 +95,21 @@ coffeebeanweb/
 2. **ID 충돌 방지** — ID는 반드시 `common.alloc_ids(count, id_start, taken=existing_ids)` 또는
    `to_products(items, store, id_start, existing_ids)`로 발급한다. `id_start + i` 순차 부여는
    다른 store 구간과 겹쳐 중복 ID를 만든다(금지).
-3. **비생두 품목 차단** — `to_products()`는 `common.is_non_bean(name)`으로 장비·서적·굿즈·
+3. **상품 url은 절대경로** — 상품 링크는 반드시 `common.abs_url(base, href)`로 절대 URL을
+   만든다. `../goods/...` 같은 상대경로를 그대로 저장하면 우리 사이트 도메인으로 해석되어
+   (예: `green-bean-market.vercel.app/goods/...`) 클릭 시 403이 난다. 검증 게이트가
+   `http(s)://`로 시작하지 않는 url을 발견하면 커밋을 차단한다.
+4. **비생두 품목 차단** — `to_products()`는 `common.is_non_bean(name)`으로 장비·서적·굿즈·
    결제·깨진 이름(예: 'SOLD OUT') 등을 자동 제외한다. 패턴은 `_NON_BEAN_PATTERNS`에 있으며,
    정상 생두명과 충돌 0건이 검증된 정밀 키워드만 추가할 것('컵','잔','세트','스틱' 등 금지).
-4. **검증 게이트** — `scripts/validate_data.py`가 커밋 직전 워킹트리를 직전 커밋(HEAD)과 비교해
-   스키마·중복ID·store 소멸·급감을 검사한다. 실패 시 워크플로가 커밋을 차단한다.
-   의도적 대량 변경은 `FORCE_DATA_UPDATE=1`로 급감 검사만 우회(스키마·중복 검사는 유지).
-5. **상품 링크 검증** — `scripts/check_links.py`가 각 상품 url에 HTTP 요청을 보내 연결성을
+5. **검증 게이트** — `scripts/validate_data.py`가 커밋 직전 워킹트리를 직전 커밋(HEAD)과 비교해
+   스키마·중복ID·상대경로url·store 소멸·급감을 검사한다. 실패 시 워크플로가 커밋을 차단한다.
+   의도적 대량 변경은 `FORCE_DATA_UPDATE=1`로 급감 검사만 우회(스키마·중복·url 검사는 유지).
+6. **상품 링크 검증** — `scripts/check_links.py`가 각 상품 url에 HTTP 요청을 보내 연결성을
    확인한다. **404/410(페이지 없음)만 제거**하고 403/429/타임아웃 등 모호한 응답은 보존한다
    (쇼핑몰 봇차단 오탐 방지). 한 store의 dead 비율이 30% 초과면 URL 스킴 변경 의심으로
    제거를 보류한다. `run_all.py`에서 스크래퍼 직후·generate_sql 직전에 실행.
-6. **워크플로 동작** — 개별 스크래퍼 실패는 격리(`continue-on-error`)되어 정상 store는 커밋되고,
+7. **워크플로 동작** — 개별 스크래퍼 실패는 격리(`continue-on-error`)되어 정상 store는 커밋되고,
    실패/검증불가 시 잡이 빨간 X로 표시된다.
 
 ## 스크래핑 플랫폼 메모

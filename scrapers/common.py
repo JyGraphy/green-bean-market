@@ -1,6 +1,17 @@
 """공통 유틸리티: ORIGIN_MAP, REGION_MAP, guess_origin, guess_process, fetch, to_products"""
 import re, json, os
 import requests
+from urllib.parse import urljoin
+
+
+def abs_url(base, href):
+    """상품 링크를 항상 절대 URL로 변환.
+
+    href가 '../goods/...', '/goods/...', 'goods_view.php?...' 등 상대경로여도
+    base 기준으로 절대화한다. 상대경로 그대로 저장되면 우리 사이트 도메인으로
+    해석되어(예: green-bean-market.vercel.app/goods/...) 403이 난다 — 이를 방지.
+    """
+    return urljoin(base, (href or '').strip())
 
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',

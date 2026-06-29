@@ -17,7 +17,7 @@
 이 스크립트는 run_all.py의 개별 스크래퍼 가드와 독립적으로 동작하므로,
 미래에 새 스크래퍼가 가드를 우회하더라도 망가진 데이터의 커밋을 막는다.
 """
-import json, os, sys, subprocess
+import json, os, re, sys, subprocess
 from collections import Counter
 
 ROOT      = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -54,6 +54,7 @@ def load_head():
 
 def check_schema(products):
     ids = []
+    url_errs = []
     for i, p in enumerate(products):
         for field in REQUIRED_FIELDS:
             if field not in p or p[field] in (None, ''):
@@ -61,8 +62,18 @@ def check_schema(products):
         price = p.get('price')
         if not isinstance(price, int) or isinstance(price, bool) or price <= 0:
             errors.append(f"가격 이상: id={p.get('id')} store={p.get('store')} name={p.get('name')} price={price!r}")
+        # url은 반드시 절대경로(http/https). 상대경로면 우리 도메인으로 새서 403 발생 → 차단.
+        url = p.get('url', '')
+        if not re.match(r'^https?://', str(url)):
+            url_errs.append(f"상대/잘못된 url: id={p.get('id')} store={p.get('store')} url={url!r}")
         if 'id' in p:
             ids.append(p['id'])
+
+    if url_errs:
+        # store별로 묶어 요약(개별 나열은 과다)
+        by_store = Counter(e.split('store=')[1].split(' ')[0] for e in url_errs)
+        errors.append(f"절대경로 아닌 url {len(url_errs)}건: " +
+                      ", ".join(f"{s}×{c}" for s, c in by_store.items()))
 
     dupes = [pid for pid, c in Counter(ids).items() if c > 1]
     if dupes:

@@ -50,7 +50,7 @@ def parse(html):
         if not price: continue
 
         href = g['href']
-        url = BASE + '/goods/' + href if href.startswith('goods_view') else (BASE + href if href.startswith('/') else href)
+        url = abs_url(BASE + '/goods/', href)  # 상대경로(../goods/...)도 절대화
         items.append({'name': name, 'price': price, 'url': url, 'is_soldout': soldout})
     return items
 

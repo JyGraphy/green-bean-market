@@ -67,6 +67,16 @@ if result.returncode != 0:
     print("⚠️  링크 검증 비정상 종료 — 데이터는 보존됨(계속 진행)")
 
 print(f"\n{'='*50}")
+print("▶ 가공방식 보강 중 (상세페이지)...")
+# 상품명으로 못 잡은 '알수없음'만 상세페이지에서 추출. 오류는 비치명적.
+result = subprocess.run(
+    [sys.executable, os.path.join(ROOT, 'scripts', 'enrich_process.py')],
+    capture_output=False
+)
+if result.returncode != 0:
+    print("⚠️  가공방식 보강 비정상 종료 — 데이터는 보존됨(계속 진행)")
+
+print(f"\n{'='*50}")
 print("▶ database.sql 재생성 중...")
 result = subprocess.run(
     [sys.executable, os.path.join(ROOT, 'scripts', 'generate_sql.py')],

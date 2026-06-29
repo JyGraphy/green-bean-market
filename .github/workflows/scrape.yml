@@ -44,7 +44,7 @@ jobs:
         id: check_changes
         if: always()
         run: |
-          git diff --quiet data/products.json database.sql data/product_dates.json data/update_log.json data/products_web.json data/link_check.json || echo "changed=true" >> $GITHUB_OUTPUT
+          git diff --quiet data/products.json database.sql data/product_dates.json data/update_log.json data/products_web.json data/link_check.json data/process_enrich.json || echo "changed=true" >> $GITHUB_OUTPUT
 
       # 커밋은 '검증 통과 + 변경 있음'일 때만. 검증 실패 시 망가진 데이터가 커밋되지 않음.
       - name: 변경사항 커밋 & 푸시
@@ -52,7 +52,7 @@ jobs:
         run: |
           git config user.name "GreenBeanBot"
           git config user.email "bot@green-bean-market"
-          git add data/products.json database.sql data/product_dates.json data/update_log.json data/products_web.json data/link_check.json
+          git add data/products.json database.sql data/product_dates.json data/update_log.json data/products_web.json data/link_check.json data/process_enrich.json
           git commit -m "자동 갱신: $(date '+%Y-%m-%d') 생두 데이터 업데이트"
           git push
 

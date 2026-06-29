@@ -130,13 +130,37 @@ def is_non_bean(name):
 
 
 def guess_process(name):
+    """상품명 또는 상세페이지 텍스트에서 가공방식 추출.
+
+    순서 주의:
+      - '펄프드내추럴'은 'natural'을 포함하므로 내추럴보다 먼저
+      - '세미워시/웻헐'은 '워시'를 포함하므로 워시드보다 먼저
+      - '디카페인'은 베이스 가공(워시드/내추럴 등)이 명시되지 않은 경우에만
+        잡히도록 맨 뒤에 둔다 (디카페인 여부는 is_decaf 배지로 별도 표시됨)
+    """
     n = name.lower()
-    if any(x in n for x in ['anaerobic','무산소','카보닉','carbonic','infused','인퓨즈드']): return '무산소발효'
-    if any(x in n for x in ['honey','허니','레드허니','화이트허니','옐로우허니','yellow honey','red honey','white honey']): return '허니'
-    if any(x in n for x in ['pulped natural','pulped','펄프드']): return '펄프드내추럴'
-    if any(x in n for x in ['natural','내추럴','reposado','레포사도']): return '내추럴'
-    if any(x in n for x in ['washed','fully washed','워시드']): return '워시드'
-    if any(x in n for x in ['wet hulled','wet hul','웻훌']): return '웻훌드'
+    # 펄프드내추럴 (natural 포함 → 먼저)
+    if any(x in n for x in ['pulped natural','펄프드내추럴','펄프드','pulped']): return '펄프드내추럴'
+    # 무산소/발효 계열
+    if any(x in n for x in ['anaerobic','무산소','카보닉','carbonic','infused','인퓨즈드',
+                            '공동발효','co-ferment','co ferment','코퍼멘','마세라시온','maceration',
+                            '써멀','thermal','젖산','lactic','효모','yeast','더블 퍼멘','double ferment',
+                            '카보닉 마세라시온','natural anaerobic']): return '무산소발효'
+    # 허니
+    if any(x in n for x in ['honey','허니','레드허니','화이트허니','옐로우허니','블랙허니','골든허니',
+                            'red honey','yellow honey','white honey','black honey']): return '허니'
+    # 웻훌드/세미워시 (워시 포함 → 워시드보다 먼저)
+    if any(x in n for x in ['wet hulled','wet hul','wet-hull','웻훌','웻-헐','웻헐','웻 헐',
+                            'giling','길링','세미워시','세미 워시','semi washed','semi-washed',
+                            'wet polished','wet polish']): return '웻훌드'
+    # 내추럴
+    if any(x in n for x in ['natural','내추럴','내츄럴','reposado','레포사도']): return '내추럴'
+    # 워시드
+    if any(x in n for x in ['washed','fully washed','fully-washed','워시드','워시','풀리워시',
+                            'double washed','더블워시','수세식','습식']): return '워시드'
+    # 디카페인 방식 (베이스 가공 미명시 시) — 맨 뒤
+    if any(x in n for x in ['디카페인','decaf','마운틴워터','mountain water','스위스워터','swiss water',
+                            '슈가케인','sugar cane','sugarcane','ethyl acetate']): return '디카페인'
     return '알수없음'
 
 def new_session():

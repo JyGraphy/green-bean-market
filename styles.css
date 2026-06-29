@@ -410,6 +410,7 @@
   .proc-anaerobic{ background: #f3e8ff; color: #6b21a8; }
   .proc-pulped   { background: #ffedd5; color: #9a3412; }
   .proc-wethulled{ background: #dcfce7; color: #166534; }
+  .proc-decaf    { background: #ccfbf1; color: #0f766e; }
   .proc-unknown  { background: var(--border-light); color: var(--text-muted); }
 
   .td-price { text-align: right; white-space: nowrap; }

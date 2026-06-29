@@ -24,6 +24,23 @@ jobs:
           done
           echo ""
 
+      - name: 라이브 데이터 반영 확인 (가공방식 분포)
+        run: |
+          set +e
+          echo "### 배포된 products_web.json의 가공방식 분포 (페이지가 실제 받는 데이터)"
+          curl -sS -A "Mozilla/5.0" -L --max-time 30 \
+            "https://green-bean-market.vercel.app/data/products_web.json" -o /tmp/web.json
+          echo "HTTP/크기: $(wc -c </tmp/web.json) bytes"
+          python3 - <<'PY'
+          import json, collections
+          d=json.load(open('/tmp/web.json'))
+          c=collections.Counter(p.get('process','?') for p in d)
+          print(f"총 {len(d)}개")
+          for k,v in c.most_common(): print(f"  {v:4d}  {k}")
+          print("디카페인 카테고리 반영:", "✅" if c.get('디카페인',0)>0 else "❌ 없음")
+          PY
+          echo ""
+
       - name: HTTP 응답 점검
         run: |
           set +e

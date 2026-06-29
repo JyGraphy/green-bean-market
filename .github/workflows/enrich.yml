@@ -1,0 +1,59 @@
+name: 가공방식 보강 (수동 즉시 실행)
+
+# 스크래핑 없이, 현재 데이터의 '알수없음' 가공방식만 상세페이지에서 보강해 즉시 반영.
+# 검증 게이트 통과 시에만 커밋한다.
+on:
+  workflow_dispatch:
+
+jobs:
+  enrich:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: 저장소 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Python 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 의존성 설치
+        run: pip install requests beautifulsoup4 lxml
+
+      - name: 가공방식 보강 (상세페이지)
+        run: python scripts/enrich_process.py
+
+      - name: 파생 파일 재생성
+        run: python scripts/generate_sql.py
+
+      - name: 데이터 무결성 검증
+        id: validate
+        continue-on-error: true
+        run: python scripts/validate_data.py
+
+      - name: 변경사항 확인
+        id: check_changes
+        if: always()
+        run: |
+          git diff --quiet data/products.json database.sql data/product_dates.json data/products_web.json data/process_enrich.json || echo "changed=true" >> $GITHUB_OUTPUT
+
+      - name: 변경사항 커밋 & 푸시
+        if: always() && steps.validate.outcome == 'success' && steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config user.name "GreenBeanBot"
+          git config user.email "bot@green-bean-market"
+          git add data/products.json database.sql data/product_dates.json data/products_web.json data/process_enrich.json
+          git commit -m "가공방식 보강: $(date '+%Y-%m-%d %H:%M') 상세페이지 추출"
+          git push
+
+      - name: 변경 없음
+        if: always() && steps.validate.outcome == 'success' && steps.check_changes.outputs.changed != 'true'
+        run: echo "📦 보강 변경 없음 — 커밋 스킵"
+
+      - name: 검증 실패 표면화
+        if: always() && steps.validate.outcome == 'failure'
+        run: |
+          echo "❌ 무결성 검증 실패 — 커밋하지 않음"
+          exit 1

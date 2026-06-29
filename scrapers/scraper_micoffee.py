@@ -26,7 +26,7 @@ def parse(html):
                 if price > 1000: break
         if not price: continue
         href = a.get('href','')
-        url = BASE + '/goods/' + href if href.startswith('goods_view') else (BASE + href if href.startswith('/') else href)
+        url = abs_url(BASE + '/goods/', href)  # 상대경로(../goods/...)도 절대화
         items.append({'name': name, 'price': price, 'url': url})
     return items
 

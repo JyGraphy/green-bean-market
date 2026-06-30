@@ -4,9 +4,11 @@ URL: https://coffeelibre.kr/product/list.html?cate_no=57
 플랫폼: Cafe24 (서버렌더링)
 [소분] 태그가 붙은 상품 = 1kg 단위 구매 가능
 """
-import re, json, time, os
+import re, json, time, os, sys
 import requests
 from bs4 import BeautifulSoup
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from common import abs_url
 
 STORE   = '커피리브레'
 BASE    = 'https://coffeelibre.kr'
@@ -77,7 +79,7 @@ def parse_page(html):
             continue
 
         href = a.get('href', '')
-        url = BASE + href if href.startswith('/') else href
+        url = abs_url(BASE, href)
 
         # 상품명에서 [소분] 제거
         name = re.sub(r'^\[소분\]\s*', '', text).strip()

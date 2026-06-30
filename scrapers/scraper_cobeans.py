@@ -29,7 +29,7 @@ def parse(html):
                 break
         if not price and not soldout: continue
         href = a.get('href','')
-        url = BASE + '/shop/' + href if href.startswith('detail') else (BASE + href if href.startswith('/') else href)
+        url = BASE + '/shop/' + href if href.startswith('detail') else (abs_url(BASE, href))
         items.append({'name': name, 'price': price, 'url': url, 'is_soldout': soldout})
     return items
 

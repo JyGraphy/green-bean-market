@@ -28,7 +28,7 @@ def parse(html):
         a = card.select_one('a[href*="/products/"]')
         if not a: continue
         href = a.get('href','')
-        url = BASE + href if href.startswith('/') else href
+        url = abs_url(BASE, href)
         items.append({'name': name, 'price': price, 'url': url})
     return items
 
@@ -56,7 +56,7 @@ def parse_v2(html):
                 price = int(m.group(1).replace(',',''))
                 if price > 1000: break
         if not price: continue
-        url = BASE + href if href.startswith('/') else href
+        url = abs_url(BASE, href)
         items.append({'name': name, 'price': price, 'url': url})
     return items
 

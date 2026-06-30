@@ -8,7 +8,9 @@ const PAGE_SZ = 50;
 // ── Data init ─────────────────────────────────────────────
 async function initDB() {
   showLoading(true);
-  const res = await fetch('data/products_web.json');
+  // 캐시 버스팅: 날짜 기준 쿼리로 옛 데이터(상대경로 등) 캐시 방지. 데이터는 매일 06시 갱신.
+  const v = new Date().toISOString().slice(0, 10);
+  const res = await fetch(`data/products_web.json?v=${v}`, { cache: 'no-cache' });
   PRODUCTS = await res.json();
   dbReady = true;
   showLoading(false);
@@ -45,7 +47,8 @@ function init() {
 // ── Update log banner ─────────────────────────────────────
 async function loadUpdateLog() {
   try {
-    const res = await fetch('data/update_log.json');
+    const v = new Date().toISOString().slice(0, 10);
+    const res = await fetch(`data/update_log.json?v=${v}`, { cache: 'no-cache' });
     if (!res.ok) return;
     const log = await res.json();
     if (!log.total_new || log.total_new === 0) return;

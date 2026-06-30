@@ -1,64 +1,40 @@
-name: 사이트 상태 점검 (진단)
+name: 라이브 사이트 헬스체크
 
-# 라이브 사이트가 실제로 200으로 뜨는지 GitHub 러너에서 직접 확인한다.
-# 수동 실행(workflow_dispatch)으로 응답 상태/헤더/리다이렉트/본문을 그대로 출력해
-# 403 등의 원인(인증게이트/봇차단/도메인오류)을 진단한다.
+# 매일 갱신·배포가 끝난 뒤 실제 라이브 사이트를 자동 점검한다.
+# 문제(사이트 다운/403, 상대경로·우리도메인 링크, 상품 급감, store 소멸)가 있으면
+# 잡이 실패(빨간 X) → 저장소 소유자에게 알림 → 사용자가 발견하기 전에 잡는다.
 on:
+  schedule:
+    - cron: '15 22 * * *'   # KST 07:15 (06:00 갱신·배포 이후)
   workflow_dispatch:
 
 jobs:
-  check:
+  healthcheck:
     runs-on: ubuntu-latest
     steps:
-      - name: 상품 링크 점검 (교정된 3개 store 샘플)
-        run: |
-          set +e
-          echo "### 교정된 store의 실제 상품 링크가 쇼핑몰로 연결되는지 확인"
-          for url in \
-            "https://comansa.kr/goods/goods_view.php?goodsNo=1000002870" \
-            "https://www.micoffee.co.kr/goods/goods_view.php?goodsNo=1000007517" \
-            "https://www.gsc.coffee/goods/goods_view.php?goodsNo=1000000328" ; do
-            code=$(curl -sS -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" \
-                   -L -o /dev/null -w "%{http_code}" --max-time 30 "$url")
-            echo "  [$code] $url"
-          done
-          echo ""
+      - name: 저장소 체크아웃
+        uses: actions/checkout@v4
 
-      - name: 라이브 데이터 반영 확인 (가공방식 분포)
-        run: |
-          set +e
-          echo "### 배포된 products_web.json의 가공방식 분포 (페이지가 실제 받는 데이터)"
-          curl -sS -A "Mozilla/5.0" -L --max-time 30 \
-            "https://green-bean-market.vercel.app/data/products_web.json" -o /tmp/web.json
-          echo "HTTP/크기: $(wc -c </tmp/web.json) bytes"
-          python3 - <<'PY'
-          import json, collections
-          d=json.load(open('/tmp/web.json'))
-          c=collections.Counter(p.get('process','?') for p in d)
-          print(f"총 {len(d)}개")
-          for k,v in c.most_common(): print(f"  {v:4d}  {k}")
-          print("디카페인 카테고리 반영:", "✅" if c.get('디카페인',0)>0 else "❌ 없음")
-          PY
-          echo ""
+      - name: Python 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-      - name: HTTP 응답 점검
+      - name: 의존성 설치
+        run: pip install requests
+
+      - name: 라이브 헬스체크 (Vercel)
+        run: python scripts/healthcheck.py https://green-bean-market.vercel.app
+
+      # 진단용 원시 응답(실패 분석에 도움) — 항상 출력, 실패시키지 않음
+      - name: 원시 응답 덤프 (진단)
+        if: always()
         run: |
           set +e
           for url in \
             "https://green-bean-market.vercel.app" \
             "https://green-bean-market.netlify.app" ; do
-            echo "==================================================================="
-            echo "URL: $url"
-            echo "--- 상태 / 헤더 (리다이렉트 추적) ---"
-            curl -sS -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" \
-                 -L -D - -o /dev/null \
-                 -w "\n>>> FINAL_HTTP=%{http_code}  REDIRECTS=%{num_redirects}  FINAL_URL=%{url_effective}\n" \
-                 --max-time 30 "$url"
-            echo "rc=$?"
-            echo "--- 본문 첫 25줄 ---"
-            curl -sS -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" \
-                 -L --max-time 30 "$url" | head -25
-            echo ""
+            echo "=== $url ==="
+            curl -sS -A "Mozilla/5.0" -L -o /dev/null \
+              -w "HTTP=%{http_code} FINAL=%{url_effective}\n" --max-time 30 "$url"
           done
-          echo "==================================================================="
-          echo "점검 완료"

@@ -276,6 +276,22 @@ code { background: var(--cream2); padding: 1px 5px; border-radius: 4px; font-siz
   border: 1px solid var(--border);
   flex-shrink: 0;
 }
+.rp-ai-datachip {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  min-width: 120px;
+  height: 95px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px dashed var(--brown3);
+  background: var(--cream2);
+  font-size: 13px;
+  color: var(--brown);
+}
+.rp-ai-datachip strong { font-size: 13px; word-break: break-all; }
+.rp-ai-datachip span { font-size: 11px; color: var(--text3); }
 .rp-ai-actions {
   display: flex;
   flex-direction: column;

@@ -30,7 +30,7 @@ let wizardData = null;      // 생성 중인 프로파일 데이터
 let selectedTarget = null;  // 선택된 타겟 포인트(생성 화면)
 
 /* 디지타이저 상태 */
-const digi = { img:null, cal:{x1:null,x2:null,y1:null,y2:null}, events:{}, curve:[], mode:null, scale:1, images:[] };
+const digi = { img:null, cal:{x1:null,x2:null,y1:null,y2:null}, events:{}, curve:[], mode:null, scale:1, images:[], dataParsed:null };
 
 /* ── DOM ── */
 const $ = id => document.getElementById(id);
@@ -66,10 +66,10 @@ function wireUI() {
 
   // 파일 업로드
   fileDrop.addEventListener('click', () => fileInput.click());
-  fileInput.addEventListener('change', e => loadImages(e.target.files));
+  fileInput.addEventListener('change', e => loadFiles(e.target.files));
   fileDrop.addEventListener('dragover', e => { e.preventDefault(); fileDrop.classList.add('drag-over'); });
   fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('drag-over'));
-  fileDrop.addEventListener('drop', e => { e.preventDefault(); fileDrop.classList.remove('drag-over'); loadImages(e.dataTransfer.files); });
+  fileDrop.addEventListener('drop', e => { e.preventDefault(); fileDrop.classList.remove('drag-over'); loadFiles(e.dataTransfer.files); });
 
   // AI 자동 분석
   $('btnAutoScan').addEventListener('click', autoScan);
@@ -78,6 +78,7 @@ function wireUI() {
     digitizer.style.display = 'none';
     fileDrop.style.display = '';
     digi.images = [];
+    digi.dataParsed = null;
     fileInput.value = '';
   });
 
@@ -213,6 +214,7 @@ function openWizard() {
   $('aiPanel').style.display='none';
   $('fcsInputRow').style.display='none';
   digi.images = [];
+  digi.dataParsed = null;
   activeId = null; renderList();
   showView('wizard'); showStep(1);
 }
@@ -237,16 +239,44 @@ function gotoStep2() {
 }
 
 /* ════════ 디지타이저 ════════ */
-function loadImages(files) {
+function loadFiles(files) {
   if (!files || !files.length) return;
+  const arr = Array.from(files);
 
-  // 데이터 파일(.alog/.csv/.json)이 있으면 직접 파싱 경로로
-  const dataFile = Array.from(files).find(f => /\.(alog|csv|json)$/i.test(f.name));
-  if (dataFile) { loadDataFile(dataFile); return; }
+  // 데이터 파일(.alog/.csv/.json/.xlsx/.xls)과 이미지를 분리
+  const dataFile   = arr.find(f => /\.(alog|csv|json|xlsx|xls)$/i.test(f.name));
+  const imageFiles = arr.filter(f => f.type.startsWith('image/')).slice(0, 4);
 
-  const validFiles = Array.from(files).filter(f => f.type.startsWith('image/')).slice(0, 4);
-  if (!validFiles.length) return;
+  if (dataFile) {
+    parseDataFileAsync(dataFile, (parse, err) => {
+      if (err) {
+        // 데이터 파싱 실패 → 사진이 있으면 사진만으로 진행
+        if (imageFiles.length) {
+          digi.dataParsed = null;
+          alert('데이터 파일 파싱 실패 — 사진만 사용합니다.\n' + err.message);
+          loadImageFiles(imageFiles);
+        } else {
+          alert('데이터 파일 파싱 실패: ' + err.message);
+        }
+        return;
+      }
+      digi.dataParsed = parse;
+      if (imageFiles.length) {
+        // 둘 다 업로드: 사진 로드 후 AI 통합 분석 대기
+        loadImageFiles(imageFiles);
+      } else {
+        // 데이터 파일만: 바로 결과 생성
+        applyParsedData(parse);
+      }
+    });
+    return;
+  }
 
+  // 이미지만
+  if (imageFiles.length) { digi.dataParsed = null; loadImageFiles(imageFiles); }
+}
+
+function loadImageFiles(validFiles) {
   digi.images = [];
   let loaded = 0;
 
@@ -261,7 +291,7 @@ function loadImages(files) {
         fileDrop.style.display = 'none';
         renderAiThumbs();
         $('aiPanel').style.display = '';
-        setAiStatus('idle');
+        updateAiMode();
 
         // 첫 이미지를 canvas에 올려두기
         const img = new Image();
@@ -281,6 +311,14 @@ function loadImages(files) {
   });
 }
 
+/* AI 패널 모드(사진 단독 vs 데이터파일 통합)에 맞춰 버튼·안내 갱신 */
+function updateAiMode() {
+  const hasData = !!digi.dataParsed;
+  const btn = $('btnAutoScan');
+  if (btn) btn.textContent = hasData ? '🤖 AI 통합 분석 (사진＋데이터)' : '🤖 AI 자동 분석';
+  setAiStatus('idle');
+}
+
 function renderAiThumbs() {
   const container = $('aiThumbs');
   container.innerHTML = '';
@@ -291,27 +329,32 @@ function renderAiThumbs() {
     el.alt = `사진 ${i+1}`;
     container.appendChild(el);
   });
+  if (digi.dataParsed) {
+    const chip = document.createElement('div');
+    chip.className = 'rp-ai-datachip';
+    chip.innerHTML = `📄 <strong>${esc(digi.dataParsed.title || '데이터 파일')}</strong><span>온도·시간 기준</span>`;
+    container.appendChild(chip);
+  }
 }
 
-/* ════════ 데이터 파일 파싱 (.alog / .csv / .json) ════════ */
-function loadDataFile(file) {
+/* ════════ 데이터 파일 파싱 (.alog / .csv / .json / .xlsx) ════════ */
+function parseDataFileAsync(file, cb) {
+  const isXlsx = /\.(xlsx|xls)$/i.test(file.name);
   const reader = new FileReader();
   reader.onload = e => {
     try {
-      let parsed;
-      if (/\.(alog|json)$/i.test(file.name)) {
-        parsed = parseArtisanAlog(e.target.result, file.name);
-      } else if (/\.csv$/i.test(file.name)) {
-        parsed = parseCsvProfile(e.target.result, file.name);
-      } else {
-        throw new Error('지원하지 않는 파일 형식입니다.');
-      }
-      applyParsedData(parsed);
+      let parse;
+      if (isXlsx) parse = parseXlsxProfile(e.target.result, file.name);
+      else if (/\.(alog|json)$/i.test(file.name)) parse = parseArtisanAlog(e.target.result, file.name);
+      else parse = parseCsvProfile(e.target.result, file.name);
+      cb(parse, null);
     } catch (err) {
-      alert('파일 파싱 실패: ' + err.message);
+      cb(null, err);
     }
   };
-  reader.readAsText(file, 'utf-8');
+  reader.onerror = () => cb(null, new Error('파일을 읽지 못했습니다.'));
+  if (isXlsx) reader.readAsArrayBuffer(file);
+  else reader.readAsText(file, 'utf-8');
 }
 
 function parseArtisanAlog(text, filename) {
@@ -378,36 +421,57 @@ function parseArtisanAlog(text, filename) {
 }
 
 function parseCsvProfile(text, filename) {
-  const lines = text.trim().split(/\r?\n/).filter(l => l.trim());
-  if (lines.length < 3) throw new Error('CSV 데이터가 너무 짧습니다.');
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
+  if (lines.length < 2) throw new Error('CSV 데이터가 너무 짧습니다.');
+  // 구분자 자동 감지: 헤더(문자 포함) 행에서 가장 많은 컬럼을 만드는 문자
+  const probe = lines.find(l => /[a-z가-힣]/i.test(l)) || lines[0];
+  let sep = ',', best = 0;
+  [',', ';', '\t'].forEach(c => { const n = probe.split(c).length; if (n > best) { best = n; sep = c; } });
+  const rows = lines.map(l => l.split(sep));
+  return parseRows(rows, filename);
+}
 
-  // 헤더 행 찾기 (숫자가 아닌 첫 행)
-  let hdrLine = 0;
-  for (let i = 0; i < Math.min(5, lines.length); i++) {
-    if (/[a-z]/i.test(lines[i])) { hdrLine = i; break; }
+function parseXlsxProfile(arrayBuffer, filename) {
+  if (typeof XLSX === 'undefined') throw new Error('엑셀 파서를 불러오지 못했습니다. 새로고침 후 다시 시도하세요.');
+  const wb = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
+  const sheet = wb.Sheets[wb.SheetNames[0]];
+  if (!sheet) throw new Error('엑셀에 시트가 없습니다.');
+  const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false, defval: '' });
+  return parseRows(rows, filename);
+}
+
+/* 행 배열(셀 배열의 배열) → 프로파일 파싱. CSV·엑셀 공용 */
+function parseRows(rows, filename) {
+  rows = (rows || []).filter(r => r && r.some(c => String(c).trim() !== ''));
+  if (rows.length < 3) throw new Error('데이터 행이 너무 적습니다.');
+
+  // 헤더 행: 문자(영문/한글)가 포함된 첫 행
+  let hdr = 0;
+  for (let i = 0; i < Math.min(6, rows.length); i++) {
+    if (rows[i].some(c => /[a-z가-힣]/i.test(String(c)))) { hdr = i; break; }
   }
-  const sep = lines[hdrLine].includes(';') ? ';' : ',';
-  const cols = lines[hdrLine].split(sep).map(c => c.trim().replace(/^"|"$/g, '').toLowerCase());
+  const cols = rows[hdr].map(c => String(c).trim().replace(/^"|"$/g, '').toLowerCase());
 
   const findCol = (...patterns) => cols.findIndex(c => patterns.some(p => p.test(c)));
-  const tIdx  = findCol(/^(time|t|seconds?|sec|zeit)$/, /time.*sec/, /^hh:mm:ss/);
-  const btIdx = findCol(/^(bt|bean.?temp|temp2|beansurface|bohnentemp)$/, /^bean/, /temp.*2/);
-  const etIdx = findCol(/^(et|env.?temp|temp1|drum|internal|trommeltemp)$/, /temp.*1/);
-  const fcsIdx = findCol(/fc.?start|first.?crack.?s|fcs/);
-  const dropIdx = findCol(/^(drop|sco|ende)$/);
+  const tIdx   = findCol(/^(time|t|seconds?|sec|zeit|시간|시각)$/, /time.*sec/, /^hh:mm:ss/, /경과/);
+  const btIdx  = findCol(/^(bt|bean.?temp|temp2|beansurface|bohnentemp|원두|원두표면|표면)$/, /^bean/, /temp.*2/, /원두|표면/);
+  const etIdx  = findCol(/^(et|env.?temp|temp1|drum|internal|trommeltemp|내부|드럼)$/, /temp.*1/, /내부|드럼/);
+  const agitIdx = findCol(/^(agit|agitation|교반|stir)$/, /교반/);
+  const fcsIdx  = findCol(/fc.?start|first.?crack.?s|fcs|1차.?크랙.?시작|1차/);
+  const dropIdx = findCol(/^(drop|sco|ende|배출)$/, /배출/);
 
-  if (tIdx === -1) throw new Error(`Time 컬럼을 찾지 못했습니다. (헤더: ${cols.join(', ')})`);
-  if (btIdx === -1) throw new Error(`BT 컬럼을 찾지 못했습니다. (헤더: ${cols.join(', ')})`);
+  if (tIdx === -1) throw new Error(`시간(Time) 컬럼을 찾지 못했습니다. (헤더: ${cols.join(', ')})`);
+  if (btIdx === -1) throw new Error(`BT(원두표면) 컬럼을 찾지 못했습니다. (헤더: ${cols.join(', ')})`);
 
-  const btPts = [], etPts = [];
+  const btPts = [], etPts = [], agitPts = [];
   const evTimes = { charge: 0 };
 
-  for (let i = hdrLine + 1; i < lines.length; i++) {
-    const vals = lines[i].split(sep).map(v => v.trim().replace(/^"|"$/g, ''));
+  for (let i = hdr + 1; i < rows.length; i++) {
+    const vals = rows[i].map(v => String(v).trim().replace(/^"|"$/g, ''));
     const rawT = vals[tIdx] || '';
     // HH:MM:SS 또는 MM:SS 또는 초(숫자)
     const t = rawT.includes(':')
-      ? rawT.split(':').reverse().reduce((acc, v, i) => acc + (+v) * Math.pow(60, i), 0)
+      ? rawT.split(':').reverse().reduce((acc, v, j) => acc + (+v) * Math.pow(60, j), 0)
       : parseFloat(rawT);
     const bt = parseFloat(vals[btIdx]);
     if (isNaN(t) || isNaN(bt) || bt <= 0) continue;
@@ -416,6 +480,10 @@ function parseCsvProfile(text, filename) {
       const et = parseFloat(vals[etIdx]);
       if (!isNaN(et) && et > 0) etPts.push({ t, bt: et });
     }
+    if (agitIdx !== -1) {
+      const ag = parseFloat(vals[agitIdx]);
+      if (!isNaN(ag)) agitPts.push({ t, v: ag });
+    }
     if (fcsIdx !== -1 && vals[fcsIdx] && parseFloat(vals[fcsIdx]) > 0) evTimes.fcs = t;
     if (dropIdx !== -1 && vals[dropIdx] && parseFloat(vals[dropIdx]) > 0) evTimes.drop = t;
   }
@@ -423,11 +491,27 @@ function parseCsvProfile(text, filename) {
   if (btPts.length < 2) throw new Error('유효한 BT 포인트가 부족합니다.');
   if (!evTimes.drop) evTimes.drop = btPts[btPts.length - 1].t;
 
-  return { btPts, etPts, evTimes, dropT: evTimes.drop, title: filename.replace(/\.[^.]+$/, ''), ambient_temp: null, ambient_humidity: null };
+  // 교반 컬럼이 있으면 변화 지점만 step 포인트로 압축
+  let agitSorted = null;
+  if (agitPts.length) {
+    agitSorted = [];
+    agitPts.forEach(p => {
+      if (!agitSorted.length || agitSorted[agitSorted.length - 1].v !== p.v) agitSorted.push(p);
+    });
+  }
+
+  return {
+    btPts, etPts, evTimes, dropT: evTimes.drop, agitSorted,
+    title: filename.replace(/\.[^.]+$/, ''), ambient_temp: null, ambient_humidity: null,
+  };
 }
 
-function applyParsedData(parsed) {
-  const { btPts, etPts, evTimes, dropT } = parsed;
+/* 파싱 결과(btPts/etPts/evTimes/dropT)로 wizardData 객체 생성.
+   extra.agitSorted: 교반 step 포인트([{t,v}]) — AI 또는 데이터파일 출처
+   extra.chargeTemp/dropTemp: 명시 온도(없으면 BT 곡선에서 보간) */
+function buildWizardFromParse(parse, extra) {
+  extra = extra || {};
+  const { btPts, etPts, evTimes, dropT } = parse;
 
   const series = resample(btPts, 5, dropT);
   const times = series.map(s => s.t);
@@ -438,41 +522,44 @@ function applyParsedData(parsed) {
   const etRor = etPts.length >= 2 ? computeRoR(times, ets, 30) : [];
   const etDropTemp = etPts.length >= 2 ? +interp(etPts, dropT).toFixed(1) : null;
 
+  // 교반: AI 보강값 우선, 없으면 데이터파일 교반 컬럼
+  const agitSrc = (extra.agitSorted && extra.agitSorted.length) ? extra.agitSorted
+    : (parse.agitSorted && parse.agitSorted.length ? parse.agitSorted : null);
+  const agits = agitSrc ? resampleStep(agitSrc, 5, dropT) : [];
+
   const chargeWeight = numOrNull('fChargeWeight');
   const dropWeight   = numOrNull('fDropWeight');
   const weightLoss   = (chargeWeight && dropWeight && chargeWeight > 0)
     ? +(((chargeWeight - dropWeight) / chargeWeight) * 100).toFixed(1) : null;
 
-  const chargeTemp = +interp(btPts, 0).toFixed(1);
-  const dropTemp   = +interp(btPts, dropT).toFixed(1);
+  const chargeTemp = extra.chargeTemp != null ? extra.chargeTemp : +interp(btPts, 0).toFixed(1);
+  const dropTemp   = extra.dropTemp   != null ? extra.dropTemp   : +interp(btPts, dropT).toFixed(1);
   const dtr = evTimes.fcs != null ? +(((dropT - evTimes.fcs) / dropT) * 100).toFixed(1) : null;
   const current = analyzeCurrentPoint(dropTemp, dtr);
 
-  wizardData = {
-    bean_name:        $('fBeanName').value.trim() || parsed.title || '',
+  return {
+    bean_name:        $('fBeanName').value.trim() || parse.title || '',
     seller:           $('fSeller').value.trim(),
     roaster:          $('fRoaster').value.trim() || null,
     roast_date:       $('fRoastDate').value,
-    ambient_temp:     numOrNull('fAmbientTemp') != null ? numOrNull('fAmbientTemp') : parsed.ambient_temp,
-    ambient_humidity: numOrNull('fAmbientHumidity') != null ? numOrNull('fAmbientHumidity') : parsed.ambient_humidity,
+    ambient_temp:     numOrNull('fAmbientTemp') != null ? numOrNull('fAmbientTemp') : (parse.ambient_temp != null ? parse.ambient_temp : null),
+    ambient_humidity: numOrNull('fAmbientHumidity') != null ? numOrNull('fAmbientHumidity') : (parse.ambient_humidity != null ? parse.ambient_humidity : null),
     memo:             $('fMemo').value.trim(),
     charge_temp: chargeTemp, drop_temp: dropTemp, total_time: dropT, dtr,
     current_roast_point: current ? current.key : null,
-    time_series: times, bt_series: bts, et_series: ets, agitation_series: [], ror, et_ror: etRor,
+    time_series: times, bt_series: bts, et_series: ets, agitation_series: agits, ror, et_ror: etRor,
     et_drop_temp: etDropTemp, charge_weight: chargeWeight, drop_weight: dropWeight, weight_loss: weightLoss,
     events: evTimes,
   };
+}
 
-  // 파일 이름이 bean_name 기본값으로 들어갔으면 Step1 필드도 반영
-  if (!$('fBeanName').value.trim() && parsed.title) $('fBeanName').value = parsed.title;
-
-  // Step 2 UI 정리
-  fileDrop.style.display = 'none';
-  $('aiPanel').style.display = 'none';
-  digitizer.style.display = 'none';
-
+/* wizardData → STEP 3 화면 렌더 (지표·차트·타겟·피드백) */
+function showWizardResult() {
   renderMetrics($('metricsRow'), wizardData);
-  chartInstance = buildChart('roastChart', times, bts, ets, [], ror, etRor, evTimes, chartInstance);
+  chartInstance = buildChart('roastChart',
+    wizardData.time_series, wizardData.bt_series, wizardData.et_series || [],
+    wizardData.agitation_series || [], wizardData.ror || [], wizardData.et_ror || [],
+    wizardData.events, chartInstance);
   $('chartTitle').textContent = wizardData.bean_name;
   selectedTarget = null;
   const renderTargets = () => renderTargetButtons($('targetBtns'), wizardData, key => {
@@ -485,11 +572,23 @@ function applyParsedData(parsed) {
   showStep(3);
 }
 
+/* 데이터 파일 단독 업로드 → 바로 결과 */
+function applyParsedData(parse) {
+  wizardData = buildWizardFromParse(parse);
+  if (!$('fBeanName').value.trim() && parse.title) $('fBeanName').value = parse.title;
+  fileDrop.style.display = 'none';
+  $('aiPanel').style.display = 'none';
+  digitizer.style.display = 'none';
+  showWizardResult();
+}
+
 /* ════════ AI 자동 분석 ════════ */
 function setAiStatus(state, msg) {
   const el = $('aiStatus');
   if (state === 'idle') {
-    el.innerHTML = '<span class="rp-ai-msg">AI가 BT 곡선·이벤트 마커·축 눈금을 자동으로 읽어 그래프를 생성합니다.</span>';
+    el.innerHTML = digi.dataParsed
+      ? '<span class="rp-ai-msg">📄 데이터 파일의 정확한 <strong>온도·시간</strong> 위에, 사진에서 읽은 <strong>교반·이벤트</strong>를 보강해 통합합니다.</span>'
+      : '<span class="rp-ai-msg">AI가 BT·ET 곡선·교반·이벤트 마커를 자동으로 읽어 그래프를 생성합니다.</span>';
   } else if (state === 'loading') {
     el.innerHTML = '<span class="rp-ai-spinner"></span><span class="rp-ai-msg">AI가 프로파일을 분석 중입니다… (10~20초)</span>';
   } else if (state === 'error') {
@@ -550,13 +649,14 @@ async function autoScan() {
       if (!etCurve.length || Math.abs(p.t - etCurve[etCurve.length - 1].t) > 0.4) etCurve.push(p);
     }
 
-    if (curve.length < 2) throw new Error('BT 곡선 데이터를 추출하지 못했습니다. 이미지를 더 선명하게 캡처해 보세요.');
+    const hasData = !!digi.dataParsed;
+    if (curve.length < 2 && !hasData) throw new Error('BT 곡선 데이터를 추출하지 못했습니다. 이미지를 더 선명하게 캡처해 보세요.');
 
     const evRaw = result.events || {};
     const dropT = typeof evRaw.drop === 'number' ? +evRaw.drop
       : result.total_time_sec ? +result.total_time_sec
-      : curve[curve.length - 1].t;
-    if (dropT <= 0) throw new Error('배출 시간을 읽지 못했습니다.');
+      : (curve.length ? curve[curve.length - 1].t : 0);
+    if (dropT <= 0 && !hasData) throw new Error('배출 시간을 읽지 못했습니다.');
 
     const evTimes = {};
     ['charge','tp','dry','fcs','fce','drop'].forEach(k => {
@@ -564,73 +664,42 @@ async function autoScan() {
     });
     evTimes.charge = 0;
 
-    const series = resample(curve, 5, dropT);
-    const times = series.map(s => s.t);
-    const bts   = series.map(s => s.bt);
-    const ror   = computeRoR(times, bts, 30);
-
-    // ET 리샘플 (없으면 빈 배열)
-    const ets = etCurve.length >= 2
-      ? resample(etCurve, 5, dropT).map(s => s.bt)
-      : [];
-
-    // ET ROR (있을 때만)
-    const etRor = etCurve.length >= 2 ? computeRoR(times, ets, 30) : [];
-
-    // etCurve가 있으면 drop 시점 ET 온도 계산
-    const etDropTemp = etCurve.length >= 2 ? +interp(etCurve, dropT).toFixed(1) : null;
-
-    // 교반: step 함수 → 5초 간격으로 확장 (hold 방식)
+    // 교반: AI step 포인트
     const agitSorted = rawAgit.sort((a, b) => a.t - b.t);
-    const agits = agitSorted.length >= 1
-      ? resampleStep(agitSorted, 5, dropT)
-      : [];
 
-    const chargeWeight = numOrNull('fChargeWeight');
-    const dropWeight = numOrNull('fDropWeight');
-    const weightLoss = (chargeWeight && dropWeight && chargeWeight > 0)
-      ? +(((chargeWeight - dropWeight) / chargeWeight) * 100).toFixed(1) : null;
+    if (hasData) {
+      // ── 통합: 데이터 파일(온도·시간) 권위 + 사진(교반·누락 이벤트) 보강 ──
+      const dp = digi.dataParsed;
+      const mergedEvents = Object.assign({}, dp.evTimes);
+      // 데이터에 없는 이벤트만 AI 값으로 채움 (범위 검증)
+      ['tp','dry','fcs','fce'].forEach(k => {
+        if (mergedEvents[k] == null && evTimes[k] != null && evTimes[k] > 0 && evTimes[k] < dp.dropT)
+          mergedEvents[k] = evTimes[k];
+      });
+      const mergedParse = Object.assign({}, dp, { evTimes: mergedEvents });
+      // 교반: 사진 추출값 우선, 없으면 데이터파일 교반 컬럼(buildWizardFromParse가 처리)
+      wizardData = buildWizardFromParse(mergedParse, agitSorted.length ? { agitSorted } : {});
 
-    const chargeTemp = result.charge_temp != null ? +result.charge_temp : +interp(curve, 0).toFixed(1);
-    const dropTemp   = result.drop_temp   != null ? +result.drop_temp   : +interp(curve, dropT).toFixed(1);
-    const dtr = evTimes.fcs != null ? +(((dropT - evTimes.fcs) / dropT) * 100).toFixed(1) : null;
-    const current = analyzeCurrentPoint(dropTemp, dtr);
+      const conf = result.confidence || 'medium';
+      const confTxt = conf === 'high' ? '높음 🟢' : conf === 'medium' ? '보통 🟡' : '낮음 🔴';
+      const agitNote = wizardData.agitation_series && wizardData.agitation_series.length ? '교반✓' : '교반 없음';
+      setAiStatus('ok', `통합 완료 · 온도/시간=데이터파일, 교반/이벤트=사진(${confTxt}, ${agitNote})`);
+    } else {
+      // ── 사진 단독 ──
+      const chargeTemp = result.charge_temp != null ? +result.charge_temp : +interp(curve, 0).toFixed(1);
+      const dropTemp   = result.drop_temp   != null ? +result.drop_temp   : +interp(curve, dropT).toFixed(1);
+      wizardData = buildWizardFromParse(
+        { btPts: curve, etPts: etCurve, evTimes, dropT, title: '', ambient_temp: null, ambient_humidity: null },
+        { agitSorted, chargeTemp, dropTemp }
+      );
 
-    wizardData = {
-      bean_name:         $('fBeanName').value.trim(),
-      seller:            $('fSeller').value.trim(),
-      roaster:           $('fRoaster').value.trim() || null,
-      roast_date:        $('fRoastDate').value,
-      ambient_temp:      numOrNull('fAmbientTemp'),
-      ambient_humidity:  numOrNull('fAmbientHumidity'),
-      memo:              $('fMemo').value.trim(),
-      charge_temp: chargeTemp, drop_temp: dropTemp, total_time: dropT, dtr,
-      current_roast_point: current ? current.key : null,
-      time_series: times, bt_series: bts, et_series: ets, agitation_series: agits, ror, et_ror: etRor,
-      et_drop_temp: etDropTemp, charge_weight: chargeWeight, drop_weight: dropWeight, weight_loss: weightLoss,
-      events: evTimes,
-    };
+      const conf = result.confidence || 'medium';
+      const confTxt = conf === 'high' ? '높음 🟢' : conf === 'medium' ? '보통 🟡' : '낮음 🔴';
+      const notes = result.notes ? ` · ${result.notes}` : '';
+      setAiStatus('ok', `분석 완료 (신뢰도: ${confTxt}${notes})`);
+    }
 
-    const conf = result.confidence || 'medium';
-    const confLabel = conf === 'high' ? '높음 🟢' : conf === 'medium' ? '보통 🟡' : '낮음 🔴';
-    const notes = result.notes ? ` · ${result.notes}` : '';
-    setAiStatus('ok', `분석 완료 (신뢰도: ${confLabel}${notes})`);
-
-    // STEP 3으로 이동
-    renderMetrics($('metricsRow'), wizardData);
-    chartInstance = buildChart('roastChart', times, bts, ets, agits, ror, etRor, evTimes, chartInstance);
-    $('chartTitle').textContent = wizardData.bean_name;
-    selectedTarget = null;
-    const renderTargets = () => renderTargetButtons($('targetBtns'), wizardData, (key) => {
-      selectedTarget = key;
-      renderTargets();
-      renderFeedback($('feedbackPanel'), wizardData, key);
-    }, selectedTarget);
-    renderTargets();
-    renderFeedback($('feedbackPanel'), wizardData, null);
-    // fcs 없으면 수동 입력 행 표시
-    $('fcsInputRow').style.display = wizardData.events.fcs == null ? '' : 'none';
-    showStep(3);
+    showWizardResult();
 
   } catch (err) {
     console.error('AI scan error:', err);

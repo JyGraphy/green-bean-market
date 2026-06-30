@@ -1,14 +1,12 @@
 {
-  "checked_at": "2026-06-29T22:18:23Z",
+  "checked_at": "2026-06-30T22:23:14Z",
   "total": 1258,
   "removed": [],
-  "held_stores": [
-    "더블유빈: dead 42/42 (100%) — URL 구조 변경 의심, 제거 보류"
-  ],
+  "held_stores": [],
   "per_store": {
     "더블유빈": {
-      "ok": 0,
-      "dead": 42,
+      "ok": 42,
+      "dead": 0,
       "ambiguous": 0
     },
     "콤파스커피": {
@@ -22,7 +20,7 @@
       "ambiguous": 0
     },
     "블레스빈": {
-      "ok": 86,
+      "ok": 85,
       "dead": 0,
       "ambiguous": 0
     },
@@ -47,7 +45,7 @@
       "ambiguous": 0
     },
     "지에스씨(GSC)": {
-      "ok": 136,
+      "ok": 137,
       "dead": 0,
       "ambiguous": 0
     },

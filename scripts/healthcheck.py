@@ -81,19 +81,27 @@ def main(base):
         if missing:
             fail(f"store 소멸: {sorted(missing)}", errs)
 
-        # 5) 표본 링크 실제 연결성 (경고만)
+        # 5) 표본 링크 실제 연결성 — store별 여러 개를 찔러본다.
+        #    한 개만 404면 단순 품절/삭제(경고), 표본 다수가 404면 store 전체 URL
+        #    형식이 깨진 것(예: 경로 중복)으로 보고 실패시킨다.
         from collections import defaultdict
         per_store = defaultdict(list)
         for p in products:
             per_store[p.get('store')].append(p.get('url'))
         for store, urls in per_store.items():
-            u = urls[0]
-            try:
-                rr = requests.head(u, headers=UA, timeout=15, allow_redirects=True)
-                if rr.status_code in (404, 410):
-                    warns.append(f"{store} 표본 링크 {rr.status_code}: {u}")
-            except Exception:
-                pass
+            sample = urls[:3]
+            dead = 0
+            for u in sample:
+                try:
+                    rr = requests.head(u, headers=UA, timeout=15, allow_redirects=True)
+                    if rr.status_code in (404, 410):
+                        dead += 1
+                except Exception:
+                    pass  # 403/타임아웃 등은 봇차단/일시장애일 수 있어 무시
+            if len(sample) >= 2 and dead == len(sample):
+                fail(f"store 링크 전멸: '{store}' 표본 {dead}/{len(sample)} 404 — URL 형식 손상 의심 ({sample[0]})", errs)
+            elif dead:
+                warns.append(f"{store} 표본 링크 {dead}/{len(sample)} 404 (개별 품절/삭제 가능)")
 
     # 결과
     print("=" * 55)

@@ -24,7 +24,7 @@ def parse(html):
         price = int(m.group(1).replace(',',''))
         if price < 1000: continue
         href = a.get('href','')
-        url = BASE + href if href.startswith('/') else href
+        url = abs_url(BASE, href)
         items.append({'name': name, 'price': price, 'url': url})
     return items
 

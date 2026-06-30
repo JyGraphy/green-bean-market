@@ -3,9 +3,11 @@
 URL: https://momos.co.kr/product/list.html?cate_no=64
 플랫폼: Cafe24 (서버렌더링)
 """
-import re, json, time, os
+import re, json, time, os, sys
 import requests
 from bs4 import BeautifulSoup
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from common import abs_url
 
 STORE   = '모모스커피'
 BASE    = 'https://momos.co.kr'
@@ -113,7 +115,7 @@ def parse_page(html):
         name = re.sub(r'^\[생두\]\s*', '', name).strip()
 
         href = name_el.get('href', '')
-        url = BASE + href if href.startswith('/') else href
+        url = abs_url(BASE, href)
 
         # 품절 감지 — img overlay만 신뢰 (li 전체 검색)
         li_el = card.find_parent('li')

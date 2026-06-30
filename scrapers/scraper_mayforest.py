@@ -30,7 +30,7 @@ def parse(html):
         if price < 1000:
             continue
         href = a.get('href', '')
-        url = BASE + href if href.startswith('/') else href
+        url = abs_url(BASE, href)
         # 품절: 상품 자신의 li 안 이미지 오버레이만 신뢰
         soldout = is_soldout_block(li)
         items.append({'name': raw, 'price': price, 'url': url, 'is_soldout': soldout})

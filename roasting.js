@@ -470,27 +470,46 @@ function parseRows(rows, filename) {
   }
   const cols = rows[hdr].map(c => String(c).trim().replace(/^"|"$/g, '').toLowerCase());
 
+  // 온도 컬럼은 RoR·히터·비율 컬럼과 혼동되면 안 됨 → 제외 패턴
+  const isRate = c => /ror|rate|히터|heater|비율|출력|파워|power|%/.test(c);
   const findCol = (...patterns) => cols.findIndex(c => patterns.some(p => p.test(c)));
-  const tIdx   = findCol(/^(time|t|seconds?|sec|zeit|시간|시각)$/, /time.*sec/, /^hh:mm:ss/, /경과/);
-  const btIdx  = findCol(/^(bt|bean.?temp|temp2|beansurface|bohnentemp|원두|원두표면|표면)$/, /^bean/, /temp.*2/, /원두|표면/);
-  const etIdx  = findCol(/^(et|env.?temp|temp1|drum|internal|trommeltemp|내부|드럼)$/, /temp.*1/, /내부|드럼/);
+  const findTemp = (...patterns) => cols.findIndex(c => !isRate(c) && patterns.some(p => p.test(c)));
+
+  const tIdx   = findCol(/^(time|t|seconds?|sec|zeit|시간|시각)$/, /time.*sec/, /^hh:mm:ss/, /경과|시간|시각/);
+  // BT = 원두 표면(bean surface) — 로스팅 레벨을 결정하는 온도
+  const btIdx  = findTemp(/^(bt|bean.?temp|temp2|beansurface|bohnentemp)$/, /^bean/, /temp.*2/, /원두.?표면|원두|표면/);
+  // ET = 내부/드럼 환경 온도
+  const etIdx  = findTemp(/^(et|env.?temp|temp1|drum|internal|trommeltemp)$/, /temp.*1/, /내부/, /드럼.?표면|드럼/);
   const agitIdx = findCol(/^(agit|agitation|교반|stir)$/, /교반/);
-  const fcsIdx  = findCol(/fc.?start|first.?crack.?s|fcs|1차.?크랙.?시작|1차/);
-  const dropIdx = findCol(/^(drop|sco|ende|배출)$/, /배출/);
+  const noteIdx = findCol(/^(비고|remark|note|event|이벤트|메모|comment)$/, /비고|remark|event|이벤트/);
+  const fcsIdx  = findCol(/^(fc.?start|first.?crack.?s|fcs|1차.?크랙.?시작)$/);
+  const dropIdx = findCol(/^(drop|sco|ende|배출)$/);
 
   if (tIdx === -1) throw new Error(`시간(Time) 컬럼을 찾지 못했습니다. (헤더: ${cols.join(', ')})`);
   if (btIdx === -1) throw new Error(`BT(원두표면) 컬럼을 찾지 못했습니다. (헤더: ${cols.join(', ')})`);
+
+  const parseTime = raw => {
+    const s = String(raw).replace(/\s+/g, '');  // "00 : 00" → "00:00"
+    if (s.includes(':')) return s.split(':').reverse().reduce((acc, v, j) => acc + (+v) * Math.pow(60, j), 0);
+    return parseFloat(s);
+  };
+
+  // 비고(remark) 텍스트에서 이벤트 시각 추출
+  const noteEvent = (txt, t) => {
+    const s = String(txt).toLowerCase().replace(/\s+/g, '');
+    if (/(t\.?p|turning|터닝|터닝포인트)/.test(s)) evTimes.tp = t;
+    else if (/(1st|firstcrack|fc(s|start)?|1차|1차크랙)/.test(s)) { if (evTimes.fcs == null) evTimes.fcs = t; }
+    else if (/(2nd|secondcrack|sc(e|start)?|2차|2차크랙)/.test(s)) { if (evTimes.fce == null) evTimes.fce = t; }
+    else if (/(dryend|dry|건조)/.test(s)) evTimes.dry = t;
+    else if (/(drop|배출|out|discharge)/.test(s)) evTimes.drop = t;
+  };
 
   const btPts = [], etPts = [], agitPts = [];
   const evTimes = { charge: 0 };
 
   for (let i = hdr + 1; i < rows.length; i++) {
     const vals = rows[i].map(v => String(v).trim().replace(/^"|"$/g, ''));
-    const rawT = vals[tIdx] || '';
-    // HH:MM:SS 또는 MM:SS 또는 초(숫자)
-    const t = rawT.includes(':')
-      ? rawT.split(':').reverse().reduce((acc, v, j) => acc + (+v) * Math.pow(60, j), 0)
-      : parseFloat(rawT);
+    const t = parseTime(vals[tIdx] || '');
     const bt = parseFloat(vals[btIdx]);
     if (isNaN(t) || isNaN(bt) || bt <= 0) continue;
     btPts.push({ t, bt });
@@ -502,7 +521,8 @@ function parseRows(rows, filename) {
       const ag = parseFloat(vals[agitIdx]);
       if (!isNaN(ag)) agitPts.push({ t, v: ag });
     }
-    if (fcsIdx !== -1 && vals[fcsIdx] && parseFloat(vals[fcsIdx]) > 0) evTimes.fcs = t;
+    if (noteIdx !== -1 && vals[noteIdx]) noteEvent(vals[noteIdx], t);
+    if (fcsIdx !== -1 && vals[fcsIdx] && parseFloat(vals[fcsIdx]) > 0 && evTimes.fcs == null) evTimes.fcs = t;
     if (dropIdx !== -1 && vals[dropIdx] && parseFloat(vals[dropIdx]) > 0) evTimes.drop = t;
   }
 
@@ -550,7 +570,16 @@ function buildWizardFromParse(parse, extra) {
   const weightLoss   = (chargeWeight && dropWeight && chargeWeight > 0)
     ? +(((chargeWeight - dropWeight) / chargeWeight) * 100).toFixed(1) : null;
 
-  const chargeTemp = extra.chargeTemp != null ? extra.chargeTemp : +interp(btPts, 0).toFixed(1);
+  // 투입온도: 투입 시점엔 원두(BT)가 차갑고 환경(ET/드럼)이 뜨겁다.
+  // 로스터가 말하는 '투입온도'는 예열된 드럼/환경 온도이므로 BT·ET 중 높은 값 사용.
+  let chargeTemp;
+  if (extra.chargeTemp != null) {
+    chargeTemp = extra.chargeTemp;
+  } else {
+    const btCharge = interp(btPts, 0);
+    const etCharge = etPts.length >= 2 ? interp(etPts, 0) : null;
+    chargeTemp = +(etCharge != null ? Math.max(btCharge, etCharge) : btCharge).toFixed(1);
+  }
   const dropTemp   = extra.dropTemp   != null ? extra.dropTemp   : +interp(btPts, dropT).toFixed(1);
   const dtr = evTimes.fcs != null ? +(((dropT - evTimes.fcs) / dropT) * 100).toFixed(1) : null;
   const current = analyzeCurrentPoint(dropTemp, dtr);

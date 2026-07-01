@@ -71,16 +71,10 @@ function wireUI() {
   fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('drag-over'));
   fileDrop.addEventListener('drop', e => { e.preventDefault(); fileDrop.classList.remove('drag-over'); loadFiles(e.dataTransfer.files); });
 
-  // AI 자동 분석
-  $('btnAutoScan').addEventListener('click', autoScan);
-  $('btnChangeImage').addEventListener('click', () => {
-    $('aiPanel').style.display = 'none';
-    digitizer.style.display = 'none';
-    fileDrop.style.display = '';
-    digi.images = [];
-    digi.dataParsed = null;
-    fileInput.value = '';
-  });
+  // 분석 실행 / 파일 추가 / 초기화
+  $('btnAutoScan').addEventListener('click', runAnalysis);
+  $('btnAddFile').addEventListener('click', () => fileInput.click());
+  $('btnChangeImage').addEventListener('click', resetUpload);
 
   // 디지타이저 모드 버튼
   document.querySelectorAll('[data-mode]').forEach(btn => {
@@ -239,83 +233,107 @@ function gotoStep2() {
 }
 
 /* ════════ 디지타이저 ════════ */
+/* 업로드는 누적식: 사진·데이터 파일을 여러 번 나눠서 추가할 수 있다.
+   (모바일은 사진앨범/파일앱을 동시에 못 고르므로 순차 추가가 필수) */
 function loadFiles(files) {
   if (!files || !files.length) return;
   const arr = Array.from(files);
 
-  // 데이터 파일(.alog/.csv/.json/.xlsx/.xls)과 이미지를 분리
   const dataFile   = arr.find(f => /\.(alog|csv|json|xlsx|xls)$/i.test(f.name));
-  const imageFiles = arr.filter(f => f.type.startsWith('image/')).slice(0, 4);
+  const imageFiles = arr.filter(f => f.type.startsWith('image/'));
 
+  const jobs = [];
+
+  // 데이터 파일: 파싱해서 digi.dataParsed에 저장(교체)
   if (dataFile) {
-    parseDataFileAsync(dataFile, (parse, err) => {
-      if (err) {
-        // 데이터 파싱 실패 → 사진이 있으면 사진만으로 진행
-        if (imageFiles.length) {
-          digi.dataParsed = null;
-          alert('데이터 파일 파싱 실패 — 사진만 사용합니다.\n' + err.message);
-          loadImageFiles(imageFiles);
-        } else {
-          alert('데이터 파일 파싱 실패: ' + err.message);
-        }
-        return;
-      }
-      digi.dataParsed = parse;
-      if (imageFiles.length) {
-        // 둘 다 업로드: 사진 로드 후 AI 통합 분석 대기
-        loadImageFiles(imageFiles);
-      } else {
-        // 데이터 파일만: 바로 결과 생성
-        applyParsedData(parse);
-      }
-    });
-    return;
+    jobs.push(new Promise(res => {
+      parseDataFileAsync(dataFile, (parse, err) => {
+        if (err) alert('데이터 파일 파싱 실패: ' + err.message);
+        else digi.dataParsed = parse;
+        res();
+      });
+    }));
   }
 
-  // 이미지만
-  if (imageFiles.length) { digi.dataParsed = null; loadImageFiles(imageFiles); }
-}
+  // 이미지: 기존 목록에 누적 (최대 4장)
+  const room = Math.max(0, 4 - digi.images.length);
+  const toAdd = imageFiles.slice(0, room);
+  if (imageFiles.length > room)
+    setTimeout(() => alert(`사진은 최대 4장까지입니다. ${imageFiles.length - room}장은 제외되었습니다.`), 0);
+  toAdd.forEach(file => {
+    jobs.push(new Promise(res => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const dataUrl = e.target.result;
+        digi.images.push({ base64: dataUrl.split(',')[1], mediaType: file.type, dataUrl });
+        res();
+      };
+      reader.onerror = () => res();
+      reader.readAsDataURL(file);
+    }));
+  });
 
-function loadImageFiles(validFiles) {
-  digi.images = [];
-  let loaded = 0;
+  if (!jobs.length) return;
 
-  validFiles.forEach((file, idx) => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const dataUrl = e.target.result;
-      digi.images[idx] = { base64: dataUrl.split(',')[1], mediaType: file.type, dataUrl };
-      loaded++;
-      if (loaded === validFiles.length) {
-        digi.images = digi.images.filter(Boolean);
-        fileDrop.style.display = 'none';
-        renderAiThumbs();
-        $('aiPanel').style.display = '';
-        updateAiMode();
-
-        // 첫 이미지를 canvas에 올려두기
-        const img = new Image();
-        img.onload = () => {
-          digi.img = img;
-          const maxW = 720;
-          digi.scale = Math.min(1, maxW / img.width);
-          canvas.width = Math.round(img.width * digi.scale);
-          canvas.height = Math.round(img.height * digi.scale);
-          digi.cal = {x1:null,x2:null,y1:null,y2:null}; digi.events={}; digi.curve=[]; digi.mode=null;
-          redraw(); updateMarks(); updateGenerateBtn();
-        };
-        img.src = digi.images[0].dataUrl;
-      }
-    };
-    reader.readAsDataURL(file);
+  Promise.all(jobs).then(() => {
+    fileInput.value = '';   // 같은 파일 재선택 허용
+    showStagePanel();
   });
 }
 
-/* AI 패널 모드(사진 단독 vs 데이터파일 통합)에 맞춰 버튼·안내 갱신 */
+/* 업로드 스테이징 패널 표시 (사진 썸네일 + 데이터 칩 + 액션 버튼) */
+function showStagePanel() {
+  fileDrop.style.display = 'none';
+  digitizer.style.display = 'none';
+  $('aiPanel').style.display = '';
+  renderAiThumbs();
+  updateAiMode();
+  if (digi.images.length) loadCanvasImage(digi.images[0].dataUrl);
+}
+
+/* 수동 디지타이저 캔버스에 이미지 올리기 */
+function loadCanvasImage(dataUrl) {
+  const img = new Image();
+  img.onload = () => {
+    digi.img = img;
+    const maxW = 720;
+    digi.scale = Math.min(1, maxW / img.width);
+    canvas.width = Math.round(img.width * digi.scale);
+    canvas.height = Math.round(img.height * digi.scale);
+    digi.cal = {x1:null,x2:null,y1:null,y2:null}; digi.events={}; digi.curve=[]; digi.mode=null;
+    redraw(); updateMarks(); updateGenerateBtn();
+  };
+  img.src = dataUrl;
+}
+
+/* 업로드 전체 초기화 → 드롭 영역 복귀 */
+function resetUpload() {
+  digi.images = [];
+  digi.dataParsed = null;
+  digi.img = null;
+  fileInput.value = '';
+  $('aiPanel').style.display = 'none';
+  digitizer.style.display = 'none';
+  fileDrop.style.display = '';
+}
+
+/* 분석 실행: 사진 있으면 AI, 데이터만 있으면 즉시 그래프 생성 */
+function runAnalysis() {
+  if (digi.images.length) { autoScan(); return; }
+  if (digi.dataParsed) { applyParsedData(digi.dataParsed); return; }
+  alert('업로드된 파일이 없습니다.');
+}
+
+/* 업로드 상태에 맞춰 기본 버튼 라벨·안내 갱신 */
 function updateAiMode() {
-  const hasData = !!digi.dataParsed;
   const btn = $('btnAutoScan');
-  if (btn) btn.textContent = hasData ? '🤖 AI 통합 분석 (사진＋데이터)' : '🤖 AI 자동 분석';
+  const hasImg = digi.images.length > 0;
+  const hasData = !!digi.dataParsed;
+  if (btn) {
+    btn.textContent = hasImg
+      ? (hasData ? '🤖 AI 통합 분석 (사진＋데이터)' : '🤖 AI 자동 분석')
+      : '📊 데이터로 그래프 생성';
+  }
   setAiStatus('idle');
 }
 
@@ -586,9 +604,18 @@ function applyParsedData(parse) {
 function setAiStatus(state, msg) {
   const el = $('aiStatus');
   if (state === 'idle') {
-    el.innerHTML = digi.dataParsed
-      ? '<span class="rp-ai-msg">📄 데이터 파일의 정확한 <strong>온도·시간</strong> 위에, 사진에서 읽은 <strong>교반·이벤트</strong>를 보강해 통합합니다.</span>'
-      : '<span class="rp-ai-msg">AI가 BT·ET 곡선·교반·이벤트 마커를 자동으로 읽어 그래프를 생성합니다.</span>';
+    const hasImg = digi.images.length > 0;
+    const hasData = !!digi.dataParsed;
+    let msg;
+    if (hasImg && hasData)
+      msg = '📄 데이터 파일의 정확한 <strong>온도·시간</strong> 위에, 사진에서 읽은 <strong>교반·이벤트</strong>를 보강해 통합합니다.';
+    else if (hasImg)
+      msg = 'AI가 BT·ET 곡선·교반·이벤트 마커를 자동으로 읽어 그래프를 생성합니다. 정확도를 높이려면 <strong>➕ 파일 추가</strong>로 엑셀·CSV도 함께 올려보세요.';
+    else if (hasData)
+      msg = '📄 데이터 파일이 준비됐습니다. <strong>➕ 파일 추가</strong>로 사진을 올리면 교반·이벤트까지 통합할 수 있습니다.';
+    else
+      msg = '파일을 업로드하세요.';
+    el.innerHTML = `<span class="rp-ai-msg">${msg}</span>`;
   } else if (state === 'loading') {
     el.innerHTML = '<span class="rp-ai-spinner"></span><span class="rp-ai-msg">AI가 프로파일을 분석 중입니다… (10~20초)</span>';
   } else if (state === 'error') {

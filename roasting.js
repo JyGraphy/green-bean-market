@@ -203,7 +203,7 @@ function openWizard() {
   wizardData = null; selectedTarget = null; clearDigi();
   $('fBeanName').value=''; $('fSeller').value=''; $('fRoastDate').value=''; $('fRoaster').value='';
   $('fAmbientTemp').value=''; $('fAmbientHumidity').value=''; $('fMemo').value='';
-  $('fChargeWeight').value=''; $('fDropWeight').value='';
+  $('fChargeWeight').value=''; $('fDropWeight').value=''; $('fChargeTemp').value='';
   digitizer.style.display='none'; fileDrop.style.display='';
   $('aiPanel').style.display='none';
   $('fcsInputRow').style.display='none';
@@ -229,6 +229,10 @@ function gotoStep2() {
   const name = $('fBeanName').value.trim();
   if (!name) { $('fBeanName').focus(); $('fBeanName').style.borderColor='var(--red)'; return; }
   $('fBeanName').style.borderColor='';
+  // 투입온도 필수
+  const charge = numOrNull('fChargeTemp');
+  if (charge == null) { $('fChargeTemp').focus(); $('fChargeTemp').style.borderColor='var(--red)'; return; }
+  $('fChargeTemp').style.borderColor='';
   showStep(2);
 }
 
@@ -570,10 +574,13 @@ function buildWizardFromParse(parse, extra) {
   const weightLoss   = (chargeWeight && dropWeight && chargeWeight > 0)
     ? +(((chargeWeight - dropWeight) / chargeWeight) * 100).toFixed(1) : null;
 
-  // 투입온도: 투입 시점엔 원두(BT)가 차갑고 환경(ET/드럼)이 뜨겁다.
-  // 로스터가 말하는 '투입온도'는 예열된 드럼/환경 온도이므로 BT·ET 중 높은 값 사용.
+  // 투입온도: 사용자가 기본정보에서 직접 입력한 값을 최우선 사용(필수 입력).
+  // 없을 때만 보정: 투입 시점엔 원두(BT)가 차갑고 환경(ET/드럼)이 뜨거우므로 높은 값 사용.
+  const userCharge = numOrNull('fChargeTemp');
   let chargeTemp;
-  if (extra.chargeTemp != null) {
+  if (userCharge != null) {
+    chargeTemp = userCharge;
+  } else if (extra.chargeTemp != null) {
     chargeTemp = extra.chargeTemp;
   } else {
     const btCharge = interp(btPts, 0);
@@ -910,7 +917,8 @@ function generateProfile() {
   const ror = computeRoR(times, bts, 30);
 
   // 5) 지표
-  const chargeTemp = +interp(dedup, 0).toFixed(1);
+  const userCharge = numOrNull('fChargeTemp');
+  const chargeTemp = userCharge != null ? userCharge : +interp(dedup, 0).toFixed(1);
   const dropTemp = +interp(dedup, dropT).toFixed(1);
   const dtr = (evTimes.fcs!=null) ? +(((dropT - evTimes.fcs) / dropT) * 100).toFixed(1) : null;
   const current = analyzeCurrentPoint(dropTemp, dtr);

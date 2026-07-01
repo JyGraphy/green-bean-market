@@ -37,22 +37,27 @@ Identify the app, then map each curve using the legend you read in PHASE 0.
   Sanity check (use ONLY to catch a mistake, NOT as the primary method):
   BT usually rises faster and finishes HIGHER than ET at the drop point.
 
-  BOTTOM CHART — up to four control STEP curves, legend reads
-  "● 열풍  ■ 할로겐  ■ 드럼히터  ■ 교반" (order/colors vary by firmware):
-    • 열풍   = hot air
-    • 할로겐 = halogen
-    • 드럼히터 = drum heater
-    • 교반   = agitation   ← THIS IS WHAT WE NEED (0–10 integer scale)
-  ⚠️ CRITICAL — 할로겐(halogen) and 교반(agitation) are the most commonly CONFUSED
-  pair. They are often similar hues (one warmer pink/red, one cooler blue/cyan) and
-  their step lines overlap. To avoid swapping them:
-    1. Read the EXACT swatch color next to 교반 in the bottom-chart legend.
+  BOTTOM CHART (labeled "열원값" in the Boost web app) — up to four control STEP
+  curves. The legend reads "● 열풍 <n>  ● 할로겐 <n>  ● 드럼 히터 <n>  ● 교반 <n>"
+  where <n> is that channel's CURRENT value. TYPICAL colors in the Boost web export:
+    • 열풍   (hot air)      = ORANGE / RED step
+    • 할로겐 (halogen)      = PURPLE / VIOLET step   ← often confused with 교반
+    • 드럼 히터 (drum heater) = PINK / MAGENTA step (usually flat)
+    • 교반   (agitation)    = GREEN step   ← THIS IS WHAT WE NEED (0–10 integer scale)
+  Colors/order can vary by firmware, so ALWAYS confirm against the legend swatch.
+  ⚠️ CRITICAL — 할로겐(halogen, purple) and 교반(agitation, green) are the most
+  commonly CONFUSED pair. To avoid swapping them:
+    1. Read the EXACT swatch color next to 교반 in the bottom-chart legend (green).
     2. Trace ONLY the step line whose color matches that swatch pixel-for-pixel.
-    3. Verify: halogen typically toggles between just two levels (on/off-like,
-       e.g. 0 and a high value), while 교반(agitation) usually steps through several
-       mid-range integer levels (e.g. 4→5→6→7). If your "교반" line looks like a
-       binary on/off toggle, you probably picked 할로겐 — re-check the swatch color.
-    4. If you cannot confidently distinguish them from color, lower "confidence"
+    3. BEHAVIOR CUE — 할로겐(halogen) usually DECREASES over the roast, often stepping
+       DOWN to 0 near the end. 교반(agitation) commonly HOLDS a mid value then STEPS UP
+       near the end of the roast (e.g. 7 → 8 → 9 → 10 in the last 1–2 minutes). If your
+       "교반" line is flat the whole time or drops to 0, you likely traced 할로겐 or the
+       drum heater — re-check the swatch color and read the FULL length of the line, all
+       the way to DROP, so you don't miss late step-ups.
+    4. Read the ENTIRE 교반 line to the end — do not assume it is constant. Record every
+       step change [time_sec, value], especially any rises in the final third.
+    5. If you cannot confidently distinguish them from color, lower "confidence"
        to "low" and say so in "notes" rather than guessing.
   The thin noisy line in the bottom chart is ROR — ignore it here.
 

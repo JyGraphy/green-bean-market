@@ -564,9 +564,9 @@ function buildWizardFromParse(parse, extra) {
   const etRor = etPts.length >= 2 ? computeRoR(times, ets, 30) : [];
   const etDropTemp = etPts.length >= 2 ? +interp(etPts, dropT).toFixed(1) : null;
 
-  // 교반: AI 보강값 우선, 없으면 데이터파일 교반 컬럼
-  const agitSrc = (extra.agitSorted && extra.agitSorted.length) ? extra.agitSorted
-    : (parse.agitSorted && parse.agitSorted.length ? parse.agitSorted : null);
+  // 교반: 데이터 파일의 교반 컬럼(초 단위 정확값)을 최우선, 없을 때만 AI(사진) 보강값 사용
+  const agitSrc = (parse.agitSorted && parse.agitSorted.length) ? parse.agitSorted
+    : (extra.agitSorted && extra.agitSorted.length ? extra.agitSorted : null);
   const agits = agitSrc ? resampleStep(agitSrc, 5, dropT) : [];
 
   const chargeWeight = numOrNull('fChargeWeight');
@@ -740,13 +740,15 @@ async function autoScan() {
           mergedEvents[k] = evTimes[k];
       });
       const mergedParse = Object.assign({}, dp, { evTimes: mergedEvents });
-      // 교반: 사진 추출값 우선, 없으면 데이터파일 교반 컬럼(buildWizardFromParse가 처리)
+      // 교반: 데이터파일 교반 컬럼(정확)을 최우선, 없을 때만 사진값 (buildWizardFromParse가 처리)
       wizardData = buildWizardFromParse(mergedParse, agitSorted.length ? { agitSorted } : {});
 
       const conf = result.confidence || 'medium';
       const confTxt = conf === 'high' ? '높음 🟢' : conf === 'medium' ? '보통 🟡' : '낮음 🔴';
-      const agitNote = wizardData.agitation_series && wizardData.agitation_series.length ? '교반✓' : '교반 없음';
-      setAiStatus('ok', `통합 완료 · 온도/시간=데이터파일, 교반/이벤트=사진(${confTxt}, ${agitNote})`);
+      const agitFromData = dp.agitSorted && dp.agitSorted.length;
+      const agitNote = (wizardData.agitation_series && wizardData.agitation_series.length)
+        ? (agitFromData ? '교반=데이터파일' : '교반=사진') : '교반 없음';
+      setAiStatus('ok', `통합 완료 · 온도/시간=데이터파일, ${agitNote}, 이벤트=보강(${confTxt})`);
     } else {
       // ── 사진 단독 ──
       const chargeTemp = result.charge_temp != null ? +result.charge_temp : +interp(curve, 0).toFixed(1);

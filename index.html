@@ -16,17 +16,17 @@
 
 <header>
   <div class="header-brand">
-    <h1>☕ 생두 가격 비교</h1>
+    <h1>생두 가격 비교</h1>
     <p>한국 주요 생두 쇼핑몰 · 가격·원산지·가공방식 통합 비교</p>
   </div>
   <nav class="region-nav">
-    <button class="region-btn active" data-region="all" onclick="setRegion(this,'all')">🌐 전체</button>
-    <button class="region-btn" data-region="아프리카" onclick="setRegion(this,'아프리카')">🌍 아프리카</button>
-    <button class="region-btn" data-region="중남미" onclick="setRegion(this,'중남미')">🌎 중남미</button>
-    <button class="region-btn" data-region="아시아" onclick="setRegion(this,'아시아')">🌏 아시아</button>
-    <a href="brewing.html" class="region-btn" style="text-decoration:none">📖 브루잉 가이드</a>
-    <a href="roastery.html" class="region-btn" style="text-decoration:none">🫘 원두 컬렉션</a>
-    <a href="roasting.html" class="region-btn" style="text-decoration:none">🔥 로스팅 프로파일</a>
+    <button class="region-btn active" data-region="all" onclick="setRegion(this,'all')">전체</button>
+    <button class="region-btn" data-region="아프리카" onclick="setRegion(this,'아프리카')">아프리카</button>
+    <button class="region-btn" data-region="중남미" onclick="setRegion(this,'중남미')">중남미</button>
+    <button class="region-btn" data-region="아시아" onclick="setRegion(this,'아시아')">아시아</button>
+    <a href="brewing.html" class="region-btn" style="text-decoration:none">브루잉 가이드</a>
+    <a href="roastery.html" class="region-btn" style="text-decoration:none">원두 컬렉션</a>
+    <a href="roasting.html" class="region-btn" style="text-decoration:none">로스팅 프로파일</a>
   </nav>
   <div class="header-stats">
     <div class="hstat"><div class="hstat-num" id="totalCount">0</div><div class="hstat-label">총 상품</div></div>
@@ -37,10 +37,9 @@
 
 <!-- Update banner -->
 <div id="updateBanner">
-  <span class="update-banner-icon">✨</span>
   <span class="update-banner-text" id="updateBannerText"></span>
   <button class="update-banner-new" id="updateBannerNew">NEW 상품 보기</button>
-  <button class="update-banner-close" id="updateBannerClose">✕</button>
+  <button class="update-banner-close" id="updateBannerClose" aria-label="닫기">×</button>
 </div>
 
 <!-- Mobile filter drawer overlay -->
@@ -51,7 +50,7 @@
   <div class="drawer-handle"></div>
   <div class="drawer-header">
     <span class="drawer-title">필터</span>
-    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+    <button class="drawer-close" onclick="closeDrawer()" aria-label="닫기">×</button>
   </div>
 
   <div class="fsec">
@@ -106,7 +105,7 @@
     </div>
   </div>
 
-  <button class="reset-btn" onclick="resetFiltersMob()">↺ 필터 초기화</button>
+  <button class="reset-btn" onclick="resetFiltersMob()">필터 초기화</button>
   <button class="drawer-apply" onclick="closeDrawer()">결과 보기</button>
 </div>
 
@@ -165,7 +164,7 @@
       </div>
     </div>
 
-    <button class="reset-btn" onclick="resetFilters()">↺ 필터 초기화</button>
+    <button class="reset-btn" onclick="resetFilters()">필터 초기화</button>
 
     <div class="fsec" style="margin-top:22px">
       <div class="fsec-title">원산지 분포</div>
@@ -177,24 +176,25 @@
       <div id="processStats"></div>
     </div>
 
-    <div style="margin-top:16px; padding-top:12px; border-top:1px solid var(--border-light); font-size:0.68rem; color:var(--text-light); line-height:1.6;">
-      ※ 가격은 1kg 기준<br>
-      최종 가격은 각 쇼핑몰 확인<br>
-      <span style="color:#dc2626">●</span> 커피플랜트 &nbsp;
-      <span style="color:#16a34a">●</span> 커피창고<br>
-      <span style="color:#1d4ed8">●</span> 엠아이커피 &nbsp;
-      <span style="color:#c2410c">●</span> 모모스커피<br>
-      <span style="color:#0284c7">●</span> 코빈즈커피<br>
-      <span style="color:#7c3aed">●</span> 아얀투 &nbsp;
-      <span style="color:#b45309">●</span> 오로미아코리아<br>
-      <span style="color:#0d9488">●</span> 지에스씨(GSC) &nbsp;
-      <span style="color:#15803d">●</span> 오월의숲<br>
-      <span style="color:#d97706">●</span> 커피리브레 &nbsp;
-      <span style="color:#0e7490">●</span> 블레스빈<br>
-      <span style="color:#be185d">●</span> 콤파스커피 &nbsp;
-      <span style="color:#ea580c">●</span> 팔콘커피<br>
-      <span style="color:#7c2d12">●</span> 더블유빈<br>
-      <span style="color:#166534">●</span> 커만사
+    <div class="legend">
+      <div class="legend-note">가격은 1kg 기준이며, 최종 가격은 각 쇼핑몰에서 확인하세요.</div>
+      <div class="legend-grid">
+        <span class="legend-item"><span class="legend-dot" style="background:#dc2626"></span>커피플랜트</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#16a34a"></span>커피창고</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#1d4ed8"></span>엠아이커피</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#c2410c"></span>모모스커피</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#0284c7"></span>코빈즈커피</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#7c3aed"></span>아얀투</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#b45309"></span>오로미아코리아</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#0d9488"></span>지에스씨(GSC)</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#15803d"></span>오월의숲</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#d97706"></span>커피리브레</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#0e7490"></span>블레스빈</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#be185d"></span>콤파스커피</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#ea580c"></span>팔콘커피</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#7c2d12"></span>더블유빈</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#166534"></span>커만사</span>
+      </div>
     </div>
   </aside>
 
@@ -202,7 +202,7 @@
     <!-- Mobile filter bar (tablet/mobile only) -->
     <div class="mob-filter-bar">
       <button class="mob-filter-btn" onclick="openDrawer()">
-        <span class="filter-icon">☰</span>
+        <span class="filter-icon"><svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 4h12M4 8h8M6 12h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
         필터
         <span class="mob-filter-badge" id="filterCount" style="display:none">0</span>
       </button>
@@ -224,8 +224,8 @@
           <option value="process_asc">가공방식순</option>
         </select>
         <div class="view-toggle">
-          <button class="vbtn active" id="btnTable" onclick="setView('table')" title="테이블">☰</button>
-          <button class="vbtn" id="btnCard" onclick="setView('card')" title="카드">⊞</button>
+          <button class="vbtn active" id="btnTable" onclick="setView('table')" title="테이블" aria-label="테이블 보기"><svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+          <button class="vbtn" id="btnCard" onclick="setView('card')" title="카드" aria-label="카드 보기"><svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/></svg></button>
         </div>
       </div>
     </div>
@@ -233,8 +233,8 @@
     <!-- Quick filter bar -->
     <div class="quick-filter-bar">
       <button class="quick-btn active" data-quick="all" onclick="setQuick('all')">전체</button>
-      <button class="quick-btn" data-quick="new" onclick="setQuick('new')">✨ 신규 입고 <span class="qcount" id="newCount">0</span></button>
-      <button class="quick-btn" data-quick="special" onclick="setQuick('special')">🏆 스페셜티</button>
+      <button class="quick-btn" data-quick="new" onclick="setQuick('new')">신규 입고 <span class="qcount" id="newCount">0</span></button>
+      <button class="quick-btn" data-quick="special" onclick="setQuick('special')">스페셜티</button>
       <button class="quick-btn" data-quick="decaf" onclick="setQuick('decaf')">디카페인</button>
     </div>
 

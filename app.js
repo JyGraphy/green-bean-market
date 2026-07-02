@@ -161,7 +161,6 @@ function setQuick(val) {
 
 function resetFilters() {
   ['searchInput','searchInputMob'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  ['processSelect','processSelectMob'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['priceMin','priceMinMob'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['priceMax','priceMaxMob'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('sortSelect').value = 'price_asc';
@@ -177,7 +176,6 @@ function resetFilters() {
 function applyFilters() {
   if (!dbReady) return;
   const search  = document.getElementById('searchInput').value.toLowerCase().trim();
-  const process = document.getElementById('processSelect').value;
   const pMin    = parseFloat(document.getElementById('priceMin').value)||0;
   const pMax    = parseFloat(document.getElementById('priceMax').value)||Infinity;
   const sortVal = document.getElementById('sortSelect').value;
@@ -193,7 +191,6 @@ function applyFilters() {
       if (!inRegion) return false;
     }
     if (curOrigin !== 'all' && p.origin !== curOrigin) return false;
-    if (process && p.process !== process) return false;
     if (curStore !== 'all' && p.store !== curStore) return false;
     if (p.price < pMin || p.price > pMax) return false;
     if (search) {
@@ -366,11 +363,6 @@ function syncSearch(el) {
   document.getElementById(other).value = el.value;
   applyFilters();
 }
-function syncProcess(el) {
-  const other = el.id === 'processSelectMob' ? 'processSelect' : 'processSelectMob';
-  document.getElementById(other).value = el.value;
-  applyFilters();
-}
 function syncPriceMin(el) {
   const other = el.id === 'priceMinMob' ? 'priceMin' : 'priceMinMob';
   document.getElementById(other).value = el.value;
@@ -389,7 +381,6 @@ function setStoreMob(el, val) {
 }
 function resetFiltersMob() {
   document.getElementById('searchInputMob').value = '';
-  document.getElementById('processSelectMob').value = '';
   document.getElementById('priceMinMob').value = '';
   document.getElementById('priceMaxMob').value = '';
   resetFilters();
@@ -399,7 +390,6 @@ function resetFiltersMob() {
 function updateFilterBadge() {
   const active = [
     document.getElementById('searchInput').value.trim() !== '',
-    document.getElementById('processSelect').value !== '',
     document.getElementById('priceMin').value !== '',
     document.getElementById('priceMax').value !== '',
     curStore !== 'all',

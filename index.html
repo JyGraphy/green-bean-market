@@ -16,7 +16,7 @@
 
 <header>
   <div class="header-brand">
-    <h1>생두 가격 비교</h1>
+    <h1><a href="index.html" class="brand-home">생두 가격 비교</a></h1>
     <p>한국 주요 생두 쇼핑몰 · 가격·원산지·가공방식 통합 비교</p>
   </div>
   <nav class="region-nav">
@@ -28,10 +28,13 @@
     <a href="roastery.html" class="region-btn" style="text-decoration:none">원두 컬렉션</a>
     <a href="roasting.html" class="region-btn" style="text-decoration:none">로스팅 프로파일</a>
   </nav>
-  <div class="header-stats">
-    <div class="hstat"><div class="hstat-num" id="totalCount">0</div><div class="hstat-label">총 상품</div></div>
-    <div class="hstat"><div class="hstat-num">15</div><div class="hstat-label">쇼핑몰</div></div>
-    <div class="hstat"><div class="hstat-num" id="originCount">0</div><div class="hstat-label">산지</div></div>
+  <div class="header-right">
+    <div class="header-stats">
+      <div class="hstat"><div class="hstat-num" id="totalCount">0</div><div class="hstat-label">총 상품</div></div>
+      <div class="hstat"><div class="hstat-num">15</div><div class="hstat-label">쇼핑몰</div></div>
+      <div class="hstat"><div class="hstat-num" id="originCount">0</div><div class="hstat-label">산지</div></div>
+    </div>
+    <div class="auth-area" id="authArea"></div>
   </div>
 </header>
 
@@ -56,21 +59,6 @@
   <div class="fsec">
     <div class="fsec-title">키워드 검색</div>
     <input class="f-input" id="searchInputMob" type="text" placeholder="품종, 농장, 가공방식..." oninput="syncSearch(this)">
-  </div>
-
-  <div class="fsec">
-    <div class="fsec-title">가공방식</div>
-    <select class="f-select" id="processSelectMob" onchange="syncProcess(this)">
-      <option value="">전체 가공방식</option>
-      <option value="워시드">워시드</option>
-      <option value="내추럴">내추럴</option>
-      <option value="허니">허니</option>
-      <option value="무산소발효">무산소발효</option>
-      <option value="펄프드내추럴">펄프드내추럴</option>
-      <option value="웻훌드">웻훌드</option>
-      <option value="디카페인">디카페인</option>
-      <option value="알수없음">알수없음</option>
-    </select>
   </div>
 
   <div class="fsec">
@@ -115,21 +103,6 @@
     <div class="fsec">
       <div class="fsec-title">키워드 검색</div>
       <input class="f-input" id="searchInput" type="text" placeholder="품종, 농장, 가공방식..." oninput="applyFilters()">
-    </div>
-
-    <div class="fsec">
-      <div class="fsec-title">가공방식</div>
-      <select class="f-select" id="processSelect" onchange="applyFilters()">
-        <option value="">전체 가공방식</option>
-        <option value="워시드">워시드</option>
-        <option value="내추럴">내추럴</option>
-        <option value="허니">허니</option>
-        <option value="무산소발효">무산소발효</option>
-        <option value="펄프드내추럴">펄프드내추럴</option>
-        <option value="웻훌드">웻훌드</option>
-        <option value="디카페인">디카페인</option>
-        <option value="알수없음">알수없음</option>
-      </select>
     </div>
 
     <div class="fsec">
@@ -244,5 +217,8 @@
 </div>
 <script src="data.js"></script>
 <script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase.config.js"></script>
+<script src="auth-nav.js"></script>
 </body>
 </html>

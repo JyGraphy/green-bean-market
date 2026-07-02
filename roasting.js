@@ -10,26 +10,32 @@ const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
 let currentUserId = null;
 
-/* ── 로스팅 포인트 레퍼런스 (SCA Agtron 색도 스케일 기준 8단계 표준) ──
+/* ── 로스팅 포인트 레퍼런스 (SCA Agtron 색도 스케일 기준 10단계) ──
+   라이트 구간을 4단계(엑스트라 라이트·라이트·시나몬·라이트 플러스)로 세분화.
    Agtron Gourmet 수치(높을수록 밝음), 배출온도(생두 기준), DTR%.
-   출처: SCA Roast Color Classification, Coffee Review, Scott Rao(DTR).
+   출처: SCA Roast Color Classification, Coffee Review, Scott Rao(DTR),
+        전통 배전 사다리(라이트→시나몬→하이).
    * 배출온도는 로스터 캘리브레이션에 따라 달라지는 실무 가이드값. */
 const ROAST_POINTS = [
-  { key:'라이트',        en:'Light / Cinnamon',   order:1, dropMin:196, dropMax:205, dtrMin:15, dtrMax:20, agtron:'85–95', agtronNum:90,
-    desc:'1차 크랙 직후 배출. 밝고 강한 산미·플로럴·과일향, 라이트 바디. 수분 제거와 건조 단계가 핵심.' },
-  { key:'라이트 플러스', en:'High / Light+',      order:2, dropMin:205, dropMax:210, dtrMin:18, dtrMax:22, agtron:'75–85', agtronNum:80,
-    desc:'산미를 유지하면서 단맛을 끌어올린 단계. 스페셜티 싱글오리진에서 선호.' },
-  { key:'미디엄 라이트', en:'City',               order:3, dropMin:210, dropMax:216, dtrMin:20, dtrMax:23, agtron:'65–75', agtronNum:70,
+  { key:'엑스트라 라이트', en:'Extra Light / Filter', order:1, dropMin:191, dropMax:200, dtrMin:14, dtrMax:18, agtron:'90+', agtronNum:95,
+    desc:'1차 크랙 직전~극초반 배출. 극도로 밝은 산미·꽃·과일, 티(tea) 같은 가벼운 바디. 필터·에어로프레스용 초경배전.' },
+  { key:'라이트',          en:'Light',              order:2, dropMin:200, dropMax:205, dtrMin:16, dtrMax:20, agtron:'83–90', agtronNum:86,
+    desc:'1차 크랙 직후. 밝고 선명한 산미·플로럴·베리. 라이트 바디, 원산지 개성 극대화.' },
+  { key:'시나몬',          en:'Cinnamon',           order:3, dropMin:205, dropMax:209, dtrMin:18, dtrMax:21, agtron:'78–83', agtronNum:80,
+    desc:'산미를 유지하며 단맛의 실마리가 나타나는 단계. 곡물·시나몬 뉘앙스, 가벼운 단맛.' },
+  { key:'라이트 플러스',   en:'High / Light+',      order:4, dropMin:209, dropMax:213, dtrMin:19, dtrMax:22, agtron:'73–78', agtronNum:75,
+    desc:'산미와 단맛의 균형이 잡히는 구간. 스페셜티 싱글오리진에서 가장 선호되는 지점.' },
+  { key:'미디엄 라이트',   en:'City',               order:5, dropMin:213, dropMax:217, dtrMin:20, dtrMax:23, agtron:'66–73', agtronNum:70,
     desc:'산미와 바디의 균형. 스페셜티 하우스 로스트의 표준 영역.' },
-  { key:'미디엄',        en:'City+ / Medium',     order:4, dropMin:216, dropMax:221, dtrMin:20, dtrMax:25, agtron:'58–68', agtronNum:63,
+  { key:'미디엄',          en:'City+ / Medium',     order:6, dropMin:217, dropMax:221, dtrMin:20, dtrMax:25, agtron:'58–66', agtronNum:62,
     desc:'단맛·바디 중심, 캐러멜·초콜릿 노트. 산미가 부드러워짐.' },
-  { key:'미디엄 다크',   en:'Full City',          order:5, dropMin:221, dropMax:225, dtrMin:22, dtrMax:25, agtron:'50–58', agtronNum:54,
+  { key:'미디엄 다크',     en:'Full City',          order:7, dropMin:221, dropMax:225, dtrMin:22, dtrMax:25, agtron:'50–58', agtronNum:54,
     desc:'2차 크랙 시작 부근. 초콜릿·견과 강화, 산미 약화. 표면에 약한 오일.' },
-  { key:'다크',          en:'Full City+ / Vienna',order:6, dropMin:225, dropMax:232, dtrMin:24, dtrMax:28, agtron:'40–50', agtronNum:45,
+  { key:'다크',            en:'Full City+ / Vienna',order:8, dropMin:225, dropMax:232, dtrMin:24, dtrMax:28, agtron:'40–50', agtronNum:45,
     desc:'2차 크랙 진행. 쓴맛·스모키·다크초콜릿, 오일 표면화. 원산지 개성 약화.' },
-  { key:'베리 다크',     en:'French',             order:7, dropMin:232, dropMax:240, dtrMin:26, dtrMax:30, agtron:'30–40', agtronNum:35,
+  { key:'베리 다크',       en:'French',             order:9, dropMin:232, dropMax:240, dtrMin:26, dtrMax:30, agtron:'30–40', agtronNum:35,
     desc:'강배전. 탄맛·카본·스모키 지배, 표면 기름기 뚜렷. 에스프레소 블렌드용.' },
-  { key:'이탈리안',      en:'Italian',            order:8, dropMin:240, dropMax:248, dtrMin:28, dtrMax:32, agtron:'25–30', agtronNum:28,
+  { key:'이탈리안',        en:'Italian',            order:10, dropMin:240, dropMax:248, dtrMin:28, dtrMax:32, agtron:'25–30', agtronNum:28,
     desc:'최강배전. 진한 쓴맛·탄향, 원두 색이 거의 검정. 향미보다 강도·바디 중심.' },
 ];
 

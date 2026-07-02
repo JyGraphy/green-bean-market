@@ -10,14 +10,27 @@ const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
 let currentUserId = null;
 
-/* ── 로스팅 포인트 레퍼런스 ── */
+/* ── 로스팅 포인트 레퍼런스 (SCA Agtron 색도 스케일 기준 8단계 표준) ──
+   Agtron Gourmet 수치(높을수록 밝음), 배출온도(생두 기준), DTR%.
+   출처: SCA Roast Color Classification, Coffee Review, Scott Rao(DTR).
+   * 배출온도는 로스터 캘리브레이션에 따라 달라지는 실무 가이드값. */
 const ROAST_POINTS = [
-  { key:'라이트',        order:1, dropMin:196, dropMax:205, dtrMin:15, dtrMax:18, agtron:'75–95', desc:'밝은 산미·플로럴·과일향. 수분 제거와 건조 단계가 핵심.' },
-  { key:'라이트 플러스', order:2, dropMin:204, dropMax:210, dtrMin:17, dtrMax:20, agtron:'70–80', desc:'산미를 유지하면서 단맛을 끌어올린 단계.' },
-  { key:'미디엄 라이트', order:3, dropMin:208, dropMax:214, dtrMin:18, dtrMax:22, agtron:'65–75', desc:'산미와 바디의 균형. 스페셜티의 표준 영역.' },
-  { key:'미디엄',        order:4, dropMin:212, dropMax:219, dtrMin:20, dtrMax:25, agtron:'55–65', desc:'단맛·바디 중심, 캐러멜·초콜릿 노트.' },
-  { key:'중약배전',      order:5, dropMin:217, dropMax:225, dtrMin:22, dtrMax:27, agtron:'45–55', desc:'초콜릿·견과 강화, 산미 약화.' },
-  { key:'다크',          order:6, dropMin:224, dropMax:236, dtrMin:25, dtrMax:32, agtron:'25–45', desc:'쓴맛·스모키, 2차 크랙 이후 오일 표면화.' },
+  { key:'라이트',        en:'Light / Cinnamon',   order:1, dropMin:196, dropMax:205, dtrMin:15, dtrMax:20, agtron:'85–95', agtronNum:90,
+    desc:'1차 크랙 직후 배출. 밝고 강한 산미·플로럴·과일향, 라이트 바디. 수분 제거와 건조 단계가 핵심.' },
+  { key:'라이트 플러스', en:'High / Light+',      order:2, dropMin:205, dropMax:210, dtrMin:18, dtrMax:22, agtron:'75–85', agtronNum:80,
+    desc:'산미를 유지하면서 단맛을 끌어올린 단계. 스페셜티 싱글오리진에서 선호.' },
+  { key:'미디엄 라이트', en:'City',               order:3, dropMin:210, dropMax:216, dtrMin:20, dtrMax:23, agtron:'65–75', agtronNum:70,
+    desc:'산미와 바디의 균형. 스페셜티 하우스 로스트의 표준 영역.' },
+  { key:'미디엄',        en:'City+ / Medium',     order:4, dropMin:216, dropMax:221, dtrMin:20, dtrMax:25, agtron:'58–68', agtronNum:63,
+    desc:'단맛·바디 중심, 캐러멜·초콜릿 노트. 산미가 부드러워짐.' },
+  { key:'미디엄 다크',   en:'Full City',          order:5, dropMin:221, dropMax:225, dtrMin:22, dtrMax:25, agtron:'50–58', agtronNum:54,
+    desc:'2차 크랙 시작 부근. 초콜릿·견과 강화, 산미 약화. 표면에 약한 오일.' },
+  { key:'다크',          en:'Full City+ / Vienna',order:6, dropMin:225, dropMax:232, dtrMin:24, dtrMax:28, agtron:'40–50', agtronNum:45,
+    desc:'2차 크랙 진행. 쓴맛·스모키·다크초콜릿, 오일 표면화. 원산지 개성 약화.' },
+  { key:'베리 다크',     en:'French',             order:7, dropMin:232, dropMax:240, dtrMin:26, dtrMax:30, agtron:'30–40', agtronNum:35,
+    desc:'강배전. 탄맛·카본·스모키 지배, 표면 기름기 뚜렷. 에스프레소 블렌드용.' },
+  { key:'이탈리안',      en:'Italian',            order:8, dropMin:240, dropMax:248, dtrMin:28, dtrMax:32, agtron:'25–30', agtronNum:28,
+    desc:'최강배전. 진한 쓴맛·탄향, 원두 색이 거의 검정. 향미보다 강도·바디 중심.' },
 ];
 
 /* ── 상태 ── */
@@ -1108,8 +1121,9 @@ function renderTargetButtons(el, d, onPick, selected) {
     btn.className = 'rp-target-btn'
       + (p.key===d.current_roast_point ? ' current' : '')
       + (p.key===selected ? ' active' : '');
-    btn.textContent = p.key;
-    btn.title = `배출 ${p.dropMin}~${p.dropMax}°C · DTR ${p.dtrMin}~${p.dtrMax}%`;
+    btn.innerHTML = `<span class="rp-target-ko">${p.key}</span>`
+      + `<span class="rp-target-sub">${esc(p.en)} · Agtron ${p.agtron}</span>`;
+    btn.title = `${p.en} · Agtron ${p.agtron} · 배출 ${p.dropMin}~${p.dropMax}°C · DTR ${p.dtrMin}~${p.dtrMax}%`;
     btn.addEventListener('click', () => onPick(p.key));
     el.appendChild(btn);
   });

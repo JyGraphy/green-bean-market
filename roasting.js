@@ -10,7 +10,7 @@ const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
 let currentUserId = null;
 
-/* ── 로스팅 포인트 레퍼런스 (SCA Agtron 색도 스케일 기준 9단계) ──
+/* ── 로스팅 포인트 레퍼런스 (SCA Agtron 색도 스케일 기준 7단계, 다크까지) ──
    라이트 구간을 3단계(엑스트라 라이트·라이트·라이트 플러스)로 세분화.
    Agtron Gourmet 수치(높을수록 밝음), 배출온도(생두 기준), DTR%.
    출처: SCA Roast Color Classification, Coffee Review, Scott Rao(DTR).
@@ -28,12 +28,8 @@ const ROAST_POINTS = [
     desc:'단맛·바디 중심, 캐러멜·초콜릿 노트. 산미가 부드러워짐.' },
   { key:'미디엄 다크',     en:'Full City',          order:6, dropMin:221, dropMax:225, dtrMin:22, dtrMax:25, agtron:'50–58', agtronNum:54,
     desc:'2차 크랙 시작 부근. 초콜릿·견과 강화, 산미 약화. 표면에 약한 오일.' },
-  { key:'다크',            en:'Full City+ / Vienna',order:7, dropMin:225, dropMax:232, dtrMin:24, dtrMax:28, agtron:'40–50', agtronNum:45,
-    desc:'2차 크랙 진행. 쓴맛·스모키·다크초콜릿, 오일 표면화. 원산지 개성 약화.' },
-  { key:'베리 다크',       en:'French',             order:8, dropMin:232, dropMax:240, dtrMin:26, dtrMax:30, agtron:'30–40', agtronNum:35,
-    desc:'강배전. 탄맛·카본·스모키 지배, 표면 기름기 뚜렷. 에스프레소 블렌드용.' },
-  { key:'이탈리안',        en:'Italian',            order:9, dropMin:240, dropMax:248, dtrMin:28, dtrMax:32, agtron:'25–30', agtronNum:28,
-    desc:'최강배전. 진한 쓴맛·탄향, 원두 색이 거의 검정. 향미보다 강도·바디 중심.' },
+  { key:'다크',            en:'Full City+ / Dark',  order:7, dropMin:225, dropMax:240, dtrMin:24, dtrMax:30, agtron:'35–50', agtronNum:43,
+    desc:'2차 크랙 진행. 쓴맛·스모키·다크초콜릿, 오일 표면화. 원산지 개성 약화, 에스프레소 블렌드에 자주 사용.' },
 ];
 
 /* ── 상태 ── */

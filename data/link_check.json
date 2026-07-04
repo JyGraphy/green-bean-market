@@ -1,6 +1,6 @@
 {
-  "checked_at": "2026-07-03T22:11:27Z",
-  "total": 1271,
+  "checked_at": "2026-07-04T22:00:02Z",
+  "total": 1269,
   "removed": [],
   "held_stores": [],
   "per_store": {
@@ -30,7 +30,7 @@
       "ambiguous": 0
     },
     "엠아이커피": {
-      "ok": 87,
+      "ok": 85,
       "dead": 0,
       "ambiguous": 0
     },

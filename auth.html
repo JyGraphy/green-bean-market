@@ -13,7 +13,6 @@
 
     <!-- 로고 -->
     <a href="index.html" class="auth-logo">
-      <span>☕</span>
       <div>
         <div class="auth-logo-title">Green Bean Market</div>
         <div class="auth-logo-sub">원두 컬렉션 관리</div>
@@ -43,7 +42,7 @@
           <input type="password" id="loginPassword" placeholder="비밀번호 입력"
                  autocomplete="current-password"
                  onkeydown="if(event.key==='Enter')login()">
-          <button class="auth-pw-toggle" type="button" onclick="togglePw('loginPassword', this)">👁</button>
+          <button class="auth-pw-toggle" type="button" onclick="togglePw('loginPassword', this)">표시</button>
         </div>
       </div>
       <button class="auth-btn-primary" onclick="login()">로그인</button>
@@ -73,7 +72,7 @@
         <div class="auth-pw-wrap">
           <input type="password" id="signupPassword" placeholder="비밀번호 입력"
                  autocomplete="new-password">
-          <button class="auth-pw-toggle" type="button" onclick="togglePw('signupPassword', this)">👁</button>
+          <button class="auth-pw-toggle" type="button" onclick="togglePw('signupPassword', this)">표시</button>
         </div>
       </div>
       <div class="auth-field">
@@ -82,7 +81,7 @@
           <input type="password" id="signupPasswordConfirm" placeholder="비밀번호 재입력"
                  autocomplete="new-password"
                  onkeydown="if(event.key==='Enter')signup()">
-          <button class="auth-pw-toggle" type="button" onclick="togglePw('signupPasswordConfirm', this)">👁</button>
+          <button class="auth-pw-toggle" type="button" onclick="togglePw('signupPasswordConfirm', this)">표시</button>
         </div>
       </div>
       <div class="auth-field">

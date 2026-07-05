@@ -68,16 +68,6 @@ const modalTitle     = document.getElementById('modalTitle');
 const beanForm       = document.getElementById('beanForm');
 const confirmOverlay = document.getElementById('confirmOverlay');
 
-/* ── 나라 국기 매핑 ── */
-const COUNTRY_FLAG = {
-  '에티오피아':'🇪🇹','케냐':'🇰🇪','탄자니아':'🇹🇿','르완다':'🇷🇼','우간다':'🇺🇬','부룬디':'🇧🇮',
-  '브라질':'🇧🇷','콜롬비아':'🇨🇴','과테말라':'🇬🇹','코스타리카':'🇨🇷','파나마':'🇵🇦',
-  '엘살바도르':'🇸🇻','온두라스':'🇭🇳','멕시코':'🇲🇽','자메이카':'🇯🇲','페루':'🇵🇪',
-  '볼리비아':'🇧🇴','에콰도르':'🇪🇨','니카라과':'🇳🇮','인도네시아':'🇮🇩','인도':'🇮🇳',
-  '베트남':'🇻🇳','예멘':'🇾🇪','중국':'🇨🇳','파푸아뉴기니':'🇵🇬','하와이':'🌺',
-  '세인트헬레나':'🌍','콩고민주공화국':'🇨🇩',
-};
-
 const openSections = new Set();
 
 /* ── 렌더링 ── */
@@ -102,7 +92,6 @@ function renderCards(beans) {
 
   countries.forEach(country => {
     const list = groups[country];
-    const flag = COUNTRY_FLAG[country] || '🌍';
     const isOpen = openSections.has(country);
 
     const section = document.createElement('div');
@@ -110,10 +99,9 @@ function renderCards(beans) {
 
     section.innerHTML = `
       <button class="rb-country-header${isOpen ? ' open' : ''}" type="button">
-        <span class="rb-country-flag">${flag}</span>
         <span class="rb-country-name">${esc(country)}</span>
         <span class="rb-country-count">${list.length}개</span>
-        <span class="rb-country-arrow">▾</span>
+        <span class="rb-country-arrow"><svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </button>
       <div class="rb-country-body${isOpen ? ' open' : ''}">
         <div class="rb-card-grid"></div>
@@ -128,20 +116,20 @@ function renderCards(beans) {
         <div class="rb-card-header">
           <div class="rb-card-name">${esc(b.name)}</div>
           <div class="rb-card-actions">
-            <button class="rb-icon-btn" data-edit="${b.id}" title="수정">✏️</button>
-            <button class="rb-icon-btn del" data-del="${b.id}" title="삭제">🗑️</button>
+            <button class="rb-icon-btn" data-edit="${b.id}" title="수정" aria-label="수정"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg></button>
+            <button class="rb-icon-btn del" data-del="${b.id}" title="삭제" aria-label="삭제"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
           </div>
         </div>
         ${b.roastery ? `<div class="rb-card-roastery">${esc(b.roastery)}</div>` : ''}
         <div class="rb-card-meta">
           ${b.process  ? `<span class="rb-badge process">${esc(b.process)}</span>` : ''}
           ${b.roast    ? `<span class="rb-badge roast">${esc(b.roast)}</span>` : ''}
-          ${b.altitude ? `<span class="rb-badge altitude">▲ ${b.altitude}m</span>` : ''}
+          ${b.altitude ? `<span class="rb-badge altitude">${b.altitude}m</span>` : ''}
         </div>
-        ${b.farm ? `<div class="rb-tag" style="width:fit-content">📍 ${esc(b.farm)}</div>` : ''}
+        ${b.farm ? `<div class="rb-tag" style="width:fit-content">${esc(b.farm)}</div>` : ''}
         ${b.variety || b.notes ? `<hr class="rb-card-divider">` : ''}
-        ${b.variety ? renderTags(b.variety, 'variety', '🌱') : ''}
-        ${b.notes   ? renderTags(b.notes,   'note',    '☕') : ''}
+        ${b.variety ? renderTags(b.variety, 'variety') : ''}
+        ${b.notes   ? renderTags(b.notes,   'note') : ''}
         ${b.memo    ? `<hr class="rb-card-divider"><div class="rb-card-memo">${esc(b.memo)}</div>` : ''}
       `;
       cardGrid.appendChild(card);
@@ -203,7 +191,7 @@ async function refresh() {
     applyFilter();
   } catch (err) {
     console.error('beans 로드 실패:', err);
-    emptyState.innerHTML = `<div class="rb-empty-icon">⚠️</div><p>원두 목록을 불러오지 못했습니다</p><p class="rb-empty-sub">${err.message}</p>`;
+    emptyState.innerHTML = `<p>원두 목록을 불러오지 못했습니다</p><p class="rb-empty-sub">${err.message}</p>`;
     emptyState.style.display = '';
     beanCount.textContent = '오류';
   }

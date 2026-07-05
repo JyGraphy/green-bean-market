@@ -347,8 +347,8 @@ function updateAiMode() {
   const hasData = !!digi.dataParsed;
   if (btn) {
     btn.textContent = hasImg
-      ? (hasData ? '🤖 AI 통합 분석 (사진＋데이터)' : '🤖 AI 자동 분석')
-      : '📊 데이터로 그래프 생성';
+      ? (hasData ? 'AI 통합 분석 (사진＋데이터)' : 'AI 자동 분석')
+      : '데이터로 그래프 생성';
   }
   setAiStatus('idle');
 }
@@ -366,7 +366,7 @@ function renderAiThumbs() {
   if (digi.dataParsed) {
     const chip = document.createElement('div');
     chip.className = 'rp-ai-datachip';
-    chip.innerHTML = `📄 <strong>${esc(digi.dataParsed.title || '데이터 파일')}</strong><span>온도·시간 기준</span>`;
+    chip.innerHTML = `<strong>${esc(digi.dataParsed.title || '데이터 파일')}</strong><span>온도·시간 기준</span>`;
     container.appendChild(chip);
   }
 }
@@ -656,20 +656,20 @@ function setAiStatus(state, msg) {
     const hasData = !!digi.dataParsed;
     let msg;
     if (hasImg && hasData)
-      msg = '📄 데이터 파일의 정확한 <strong>온도·시간</strong> 위에, 사진에서 읽은 <strong>교반·이벤트</strong>를 보강해 통합합니다.';
+      msg = '데이터 파일의 정확한 <strong>온도·시간</strong> 위에, 사진에서 읽은 <strong>교반·이벤트</strong>를 보강해 통합합니다.';
     else if (hasImg)
-      msg = 'AI가 BT·ET 곡선·교반·이벤트 마커를 자동으로 읽어 그래프를 생성합니다. 정확도를 높이려면 <strong>➕ 파일 추가</strong>로 엑셀·CSV도 함께 올려보세요.';
+      msg = 'AI가 BT·ET 곡선·교반·이벤트 마커를 자동으로 읽어 그래프를 생성합니다. 정확도를 높이려면 <strong>파일 추가</strong>로 엑셀·CSV도 함께 올려보세요.';
     else if (hasData)
-      msg = '📄 데이터 파일이 준비됐습니다. <strong>➕ 파일 추가</strong>로 사진을 올리면 교반·이벤트까지 통합할 수 있습니다.';
+      msg = '데이터 파일이 준비됐습니다. <strong>파일 추가</strong>로 사진을 올리면 교반·이벤트까지 통합할 수 있습니다.';
     else
       msg = '파일을 업로드하세요.';
     el.innerHTML = `<span class="rp-ai-msg">${msg}</span>`;
   } else if (state === 'loading') {
     el.innerHTML = '<span class="rp-ai-spinner"></span><span class="rp-ai-msg">AI가 프로파일을 분석 중입니다… (10~20초)</span>';
   } else if (state === 'error') {
-    el.innerHTML = `<span class="rp-ai-err">❌ ${esc(msg || '분석 실패')}</span><span class="rp-ai-msg"> — 아래 수동 디지타이징을 이용하세요.</span>`;
+    el.innerHTML = `<span class="rp-ai-err">${esc(msg || '분석 실패')}</span><span class="rp-ai-msg"> — 아래 수동 디지타이징을 이용하세요.</span>`;
   } else if (state === 'ok') {
-    el.innerHTML = `<span class="rp-ai-ok">✅ ${esc(msg || '분석 완료')}</span>`;
+    el.innerHTML = `<span class="rp-ai-ok">${esc(msg || '분석 완료')}</span>`;
   }
 }
 
@@ -756,7 +756,7 @@ async function autoScan() {
       wizardData = buildWizardFromParse(mergedParse, agitSorted.length ? { agitSorted } : {});
 
       const conf = result.confidence || 'medium';
-      const confTxt = conf === 'high' ? '높음 🟢' : conf === 'medium' ? '보통 🟡' : '낮음 🔴';
+      const confTxt = conf === 'high' ? '높음' : conf === 'medium' ? '보통' : '낮음';
       const agitFromData = dp.agitSorted && dp.agitSorted.length;
       const agitNote = (wizardData.agitation_series && wizardData.agitation_series.length)
         ? (agitFromData ? '교반=데이터파일' : '교반=사진') : '교반 없음';
@@ -771,7 +771,7 @@ async function autoScan() {
       );
 
       const conf = result.confidence || 'medium';
-      const confTxt = conf === 'high' ? '높음 🟢' : conf === 'medium' ? '보통 🟡' : '낮음 🔴';
+      const confTxt = conf === 'high' ? '높음' : conf === 'medium' ? '보통' : '낮음';
       const notes = result.notes ? ` · ${result.notes}` : '';
       setAiStatus('ok', `분석 완료 (신뢰도: ${confTxt}${notes})`);
     }
@@ -1137,7 +1137,7 @@ function renderFeedback(el, d, targetKey) {
   let html = '';
 
   // 블록 1: 포인트 변경 가이드
-  html += `<div class="rp-fb-block"><div class="rp-fb-block-title">🎯 로스팅 포인트 변경 가이드</div>`;
+  html += `<div class="rp-fb-block"><div class="rp-fb-block-title">로스팅 포인트 변경 가이드</div>`;
   if (!targetKey) {
     html += `<div class="rp-fb-empty">위에서 원하는 다음 로스팅 포인트를 선택하면 맞춤 가이드를 보여드립니다.</div>`;
   } else {
@@ -1146,7 +1146,7 @@ function renderFeedback(el, d, targetKey) {
   html += `</div>`;
 
   // 블록 2: 종합 분석
-  html += `<div class="rp-fb-block"><div class="rp-fb-block-title">🔬 전체 종합 분석</div>`;
+  html += `<div class="rp-fb-block"><div class="rp-fb-block-title">전체 종합 분석</div>`;
   html += `<div class="rp-fb-list">${comprehensiveAnalysis(d).map(item =>
     item._fcsInput ? renderFcsInlineItem(item) : fbItem(item)
   ).join('')}</div></div>`;
@@ -1182,12 +1182,12 @@ function renderFeedback(el, d, targetKey) {
     });
   }
 }
-function fbItem(i){ return `<div class="rp-fb-item ${i.type}"><span class="rp-fb-icon">${i.icon}</span>
+function fbItem(i){ return `<div class="rp-fb-item ${i.type}">${i.icon ? `<span class="rp-fb-icon">${i.icon}</span>` : ''}
   <div class="rp-fb-text"><strong>${i.title}</strong>${i.text}</div></div>`; }
 
 function renderFcsInlineItem(i) {
   return `<div class="rp-fb-item ${i.type}">
-    <span class="rp-fb-icon">${i.icon}</span>
+    ${i.icon ? `<span class="rp-fb-icon">${i.icon}</span>` : ''}
     <div class="rp-fb-text">
       <strong>${i.title}</strong>
       <span>${i.text}</span>
@@ -1209,7 +1209,7 @@ function pointChangeGuide(d, targetKey) {
   const tMidDtr = ((target.dtrMin+target.dtrMax)/2).toFixed(0);
 
   if (cur && cur.order===target.order) {
-    items.push({ type:'good', icon:'✅', title:`현재와 동일한 '${target.key}' 유지`,
+    items.push({ type:'good', icon:'', title:`현재와 동일한 '${target.key}' 유지`,
       text:`이미 ${target.key} 범위입니다. 배출온도 ${target.dropMin}~${target.dropMax}°C, DTR ${target.dtrMin}~${target.dtrMax}%를 유지하면 일관되게 재현됩니다. ${target.desc}` });
     return items;
   }
@@ -1220,25 +1220,25 @@ function pointChangeGuide(d, targetKey) {
 
   // 핵심 변경 방향
   if (darker) {
-    items.push({ type:'info', icon:'🔥', title:`더 다크하게 — '${target.key}'로`,
+    items.push({ type:'info', icon:'', title:`더 다크하게 — '${target.key}'로`,
       text:`${cur?cur.key+'에서 ':''}${target.key}로 가려면 더 많은 열 에너지와 발달이 필요합니다. ${target.desc}` });
     if (dropDelta!=null && dropDelta>0)
-      items.push({ type:'warn', icon:'🌡️', title:`배출온도 약 +${dropDelta}°C`,
+      items.push({ type:'warn', icon:'', title:`배출온도 약 +${dropDelta}°C`,
         text:`현재 ${d.drop_temp}°C → 목표 ${tMidDrop}°C 부근. 1차 크랙 이후 열을 유지하며 배출 시점을 늦추세요.` });
     if (dtrDelta!=null && dtrDelta>0)
-      items.push({ type:'warn', icon:'⏱️', title:`DTR 약 +${dtrDelta}%p (목표 ${target.dtrMin}~${target.dtrMax}%)`,
+      items.push({ type:'warn', icon:'', title:`DTR 약 +${dtrDelta}%p (목표 ${target.dtrMin}~${target.dtrMax}%)`,
         text:`발달 시간을 늘려야 합니다. 단, ROR이 급반등(flick)하지 않도록 가스를 과하게 올리지 말고 완만히 유지하세요.` });
   } else {
-    items.push({ type:'info', icon:'❄️', title:`더 라이트하게 — '${target.key}'로`,
+    items.push({ type:'info', icon:'', title:`더 라이트하게 — '${target.key}'로`,
       text:`${cur?cur.key+'에서 ':''}${target.key}로 가려면 발달을 줄이고 더 일찍 배출해야 합니다. ${target.desc}` });
     if (dropDelta!=null && dropDelta<0)
-      items.push({ type:'warn', icon:'🌡️', title:`배출온도 약 ${dropDelta}°C`,
+      items.push({ type:'warn', icon:'', title:`배출온도 약 ${dropDelta}°C`,
         text:`현재 ${d.drop_temp}°C → 목표 ${tMidDrop}°C 부근. 1차 크랙 후 더 이른 시점에 배출하세요.` });
     if (dtrDelta!=null && dtrDelta<0)
-      items.push({ type:'warn', icon:'⏱️', title:`DTR 약 ${dtrDelta}%p (목표 ${target.dtrMin}~${target.dtrMax}%)`,
+      items.push({ type:'warn', icon:'', title:`DTR 약 ${dtrDelta}%p (목표 ${target.dtrMin}~${target.dtrMax}%)`,
         text:`발달 시간을 줄이세요. 단, DTR이 15% 미만으로 떨어지면 풋내·신맛(언더디벨롭) 위험이 있으니 주의하세요.` });
   }
-  items.push({ type:'info', icon:'🎨', title:`목표 Agtron ${target.agtron}`,
+  items.push({ type:'info', icon:'', title:`목표 Agtron ${target.agtron}`,
     text:`색도계가 있다면 ${target.agtron} 범위를 목표로 하세요. 같은 색이라도 가스 타이밍에 따라 마이야르/캐러멜화 균형이 달라지므로 컵핑으로 검증하세요.` });
   return items;
 }
@@ -1251,14 +1251,14 @@ function comprehensiveAnalysis(d) {
 
   // DTR
   if (dtr!=null) {
-    if (dtr<15) items.push({type:'bad',icon:'⚠️',title:`DTR ${dtr.toFixed(1)}% — 발달 부족`,
+    if (dtr<15) items.push({type:'bad',icon:'',title:`DTR ${dtr.toFixed(1)}% — 발달 부족`,
       text:'권장 최소 15%에 미달합니다. 풋내·신맛·미성숙 향미(언더디벨롭) 위험. 1차 크랙 후 발달 시간을 늘리세요.'});
-    else if (dtr>30) items.push({type:'warn',icon:'⚡',title:`DTR ${dtr.toFixed(1)}% — 과발달 경향`,
+    else if (dtr>30) items.push({type:'warn',icon:'',title:`DTR ${dtr.toFixed(1)}% — 과발달 경향`,
       text:'발달이 길어 평탄하거나 쓴맛이 날 수 있습니다. 라이트~미디엄을 원한다면 더 일찍 배출하세요.'});
-    else items.push({type:'good',icon:'✅',title:`DTR ${dtr.toFixed(1)}% — 양호`,
+    else items.push({type:'good',icon:'',title:`DTR ${dtr.toFixed(1)}% — 양호`,
       text:'일반적 권장 범위(15~30%) 안에 있습니다. 마이야르·캐러멜화 균형이 적절할 가능성이 높습니다.'});
   } else {
-    items.push({type:'info', icon:'ℹ️', title:'DTR 미계산', _fcsInput: true,
+    items.push({type:'info', icon:'', title:'DTR 미계산', _fcsInput: true,
       text:'1차 크랙 시작 시간을 입력하면 DTR을 바로 계산합니다.'});
   }
 
@@ -1267,11 +1267,11 @@ function comprehensiveAnalysis(d) {
     if (events.dry!=null) {
       const dryPct = (events.dry/total_time*100);
       const maillardPct = ((events.fcs-events.dry)/total_time*100);
-      if (dryPct>45) items.push({type:'warn',icon:'🐢',title:`건조 단계 ${dryPct.toFixed(0)}% — 김`,
+      if (dryPct>45) items.push({type:'warn',icon:'',title:`건조 단계 ${dryPct.toFixed(0)}% — 김`,
         text:'건조가 길면 마이야르 반응이 위축되어 베이킹·밋밋함(Too Slow 패턴)이 생길 수 있습니다.'});
-      else if (dryPct<25) items.push({type:'warn',icon:'⚡',title:`건조 단계 ${dryPct.toFixed(0)}% — 짧음`,
+      else if (dryPct<25) items.push({type:'warn',icon:'',title:`건조 단계 ${dryPct.toFixed(0)}% — 짧음`,
         text:'건조가 짧으면 급속 승온으로 마이야르 과활성(Too Fast)이 되어 바디가 얕아질 수 있습니다.'});
-      if (maillardPct<20) items.push({type:'warn',icon:'🍞',title:`마이야르 단계 ${maillardPct.toFixed(0)}% — 짧음`,
+      if (maillardPct<20) items.push({type:'warn',icon:'',title:`마이야르 단계 ${maillardPct.toFixed(0)}% — 짧음`,
         text:'갈변·복잡한 향미 발달이 부족할 수 있습니다. 1차 크랙 전 구간에서 열을 더 유지하세요.'});
     }
   }
@@ -1285,57 +1285,57 @@ function comprehensiveAnalysis(d) {
       if (prev-curr>4 && next<curr) crash=true;
       if (curr>prev+2.5 && valid[j].i > ror.length*0.65) flick=true;
     }
-    if (crash) items.push({type:'bad',icon:'📉',title:'ROR 크래시 감지',
+    if (crash) items.push({type:'bad',icon:'',title:'ROR 크래시 감지',
       text:'ROR이 급락하는 구간이 있습니다. 베이킹 결함으로 이어질 수 있습니다. 해당 구간에서 가스를 미리 완만히 줄이세요.'});
-    if (flick) items.push({type:'warn',icon:'📈',title:'ROR 플릭(급반등) 감지',
+    if (flick) items.push({type:'warn',icon:'',title:'ROR 플릭(급반등) 감지',
       text:'발달 후반 ROR이 다시 상승하는 패턴입니다. 1차 크랙 중·후 가스를 올리면 탄 향이 날 수 있으니 화력을 낮추세요.'});
-    if (!crash && !flick) items.push({type:'good',icon:'📊',title:'ROR 곡선 양호',
+    if (!crash && !flick) items.push({type:'good',icon:'',title:'ROR 곡선 양호',
       text:'크래시·플릭 패턴이 감지되지 않았습니다. ROR이 비교적 매끄럽게 감소하고 있습니다.'});
   }
 
   // 총 시간
-  if (total_time<420) items.push({type:'bad',icon:'⚡',title:`총 ${fmtTime(total_time)} — 매우 짧음`,
+  if (total_time<420) items.push({type:'bad',icon:'',title:`총 ${fmtTime(total_time)} — 매우 짧음`,
     text:'급속 로스팅으로 겉은 타고 속은 덜 익는 불균등 로스팅 위험이 있습니다.'});
-  else if (total_time>1200) items.push({type:'warn',icon:'🐌',title:`총 ${fmtTime(total_time)} — 김`,
+  else if (total_time>1200) items.push({type:'warn',icon:'',title:`총 ${fmtTime(total_time)} — 김`,
     text:'장시간 저온 로스팅은 베이킹·평탄화 결함으로 이어질 수 있습니다.'});
 
   // 환경(온습도) 반영
   if (ambient_humidity!=null) {
-    if (ambient_humidity>=65) items.push({type:'info',icon:'💧',title:`실내 습도 ${ambient_humidity}% — 높음`,
+    if (ambient_humidity>=65) items.push({type:'info',icon:'',title:`실내 습도 ${ambient_humidity}% — 높음`,
       text:'습도가 높으면 생두가 수분을 머금어 건조 단계에 열이 더 필요합니다. 투입온도를 약간 높이거나 건조 구간 화력을 보강하세요.'});
-    else if (ambient_humidity<35) items.push({type:'info',icon:'🏜️',title:`실내 습도 ${ambient_humidity}% — 낮음`,
+    else if (ambient_humidity<35) items.push({type:'info',icon:'',title:`실내 습도 ${ambient_humidity}% — 낮음`,
       text:'건조한 환경에서는 수분 증발이 빨라 1차 크랙이 앞당겨질 수 있습니다. 후반 열 관리에 유의하세요.'});
   }
   if (ambient_temp!=null && ambient_temp<15)
-    items.push({type:'info',icon:'🥶',title:`실내 온도 ${ambient_temp}°C — 낮음`,
+    items.push({type:'info',icon:'',title:`실내 온도 ${ambient_temp}°C — 낮음`,
       text:'저온 환경은 로스터 예열·열손실에 영향을 줍니다. 충분히 예열하고 배치 간 온도 회복을 확인하세요.'});
 
   // 생두 기반(이름 키워드)
   const name = (d.bean_name||'');
   if (/내추럴|natural|무산소|anaerobic|허니|honey/i.test(name))
-    items.push({type:'info',icon:'🫘',title:'고당분 가공(내추럴/허니/무산소) 추정',
+    items.push({type:'info',icon:'',title:'고당분 가공(내추럴/허니/무산소) 추정',
       text:'잔류 당분이 많아 타기 쉽습니다. 투입온도를 워시드보다 5~10°C 낮추고 초반 열을 절제하세요.'});
   else if (/게이샤|geisha|에스메랄다/i.test(name))
-    items.push({type:'info',icon:'🌸',title:'게이샤 계열 추정 — 섬세한 향미',
+    items.push({type:'info',icon:'',title:'게이샤 계열 추정 — 섬세한 향미',
       text:'플로럴·산미 보존을 위해 라이트~미디엄, 과한 발달을 피하는 것이 일반적입니다.'});
   else if (/예가체프|yirga|시다모|코케|아리차|에티오피아|ethiopia|케냐|kenya/i.test(name))
-    items.push({type:'info',icon:'🌍',title:'아프리카 고지대 추정 — 고밀도',
+    items.push({type:'info',icon:'',title:'아프리카 고지대 추정 — 고밀도',
       text:'단단한 고밀도 콩은 더 높은 열을 견딥니다. hot drum / low flame로 투입 후 후반 모멘텀을 유지하세요.'});
 
   // 무게 손실률
   if (d.weight_loss != null) {
     if (d.weight_loss < 12)
-      items.push({type:'warn', icon:'⚖️', title:`무게 손실률 ${d.weight_loss.toFixed(1)}% — 낮음`,
+      items.push({type:'warn', icon:'', title:`무게 손실률 ${d.weight_loss.toFixed(1)}% — 낮음`,
         text:'손실률이 낮으면 수분 제거가 불충분하거나 배출이 너무 빠를 수 있습니다. 라이트 로스팅은 12~14%, 다크는 18~20% 범위가 일반적입니다.'});
     else if (d.weight_loss > 20)
-      items.push({type:'warn', icon:'⚖️', title:`무게 손실률 ${d.weight_loss.toFixed(1)}% — 높음`,
+      items.push({type:'warn', icon:'', title:`무게 손실률 ${d.weight_loss.toFixed(1)}% — 높음`,
         text:'손실률이 높으면 과배전이거나 총 시간이 길 수 있습니다. 다크 이상 로스팅이 아니라면 배출 시점을 앞당기는 것을 고려하세요.'});
     else
-      items.push({type:'good', icon:'⚖️', title:`무게 손실률 ${d.weight_loss.toFixed(1)}% — 정상`,
+      items.push({type:'good', icon:'', title:`무게 손실률 ${d.weight_loss.toFixed(1)}% — 정상`,
         text:`일반적인 스페셜티 로스팅 손실 범위(12~20%)에 있습니다. 로스팅 포인트(${d.current_roast_point||'—'})에 맞는 적절한 수준입니다.`});
   }
 
-  if (!items.length) items.push({type:'info',icon:'ℹ️',title:'데이터를 더 입력해 보세요',
+  if (!items.length) items.push({type:'info',icon:'',title:'데이터를 더 입력해 보세요',
     text:'이벤트 포인트와 곡선점을 더 추가하면 상세한 분석이 가능합니다.'});
   return items;
 }

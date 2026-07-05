@@ -12,7 +12,6 @@
 <header class="rb-header">
   <div class="rb-header-inner">
     <div class="rb-logo">
-      <span class="rb-logo-icon">☕</span>
       <div>
         <h1>Roastery Beans</h1>
         <p>로스터리 원두 정보 관리</p>
@@ -20,7 +19,7 @@
     </div>
     <div style="display:flex;gap:10px;align-items:center">
       <a href="index.html" class="rb-btn-back">← 생두 비교</a>
-      <a href="roasting.html" class="rb-btn-back">🔥 로스팅 프로파일</a>
+      <a href="roasting.html" class="rb-btn-back">로스팅 프로파일</a>
       <button class="rb-btn-logout" id="btnLogout" title="로그아웃">로그아웃</button>
       <button class="rb-btn-add" id="btnOpenForm">+ 원두 추가</button>
     </div>
@@ -55,7 +54,6 @@
 <!-- ── 나라별 섹션 컨테이너 ── -->
 <main class="rb-sections" id="beanGrid">
   <div class="rb-empty" id="emptyState">
-    <div class="rb-empty-icon">🫘</div>
     <p>아직 등록된 원두가 없습니다</p>
     <p class="rb-empty-sub">위의 "+ 원두 추가" 버튼으로 첫 번째 원두를 등록해 보세요</p>
   </div>
@@ -66,7 +64,7 @@
   <div class="rb-modal" id="modal">
     <div class="rb-modal-header">
       <h2 id="modalTitle">원두 추가</h2>
-      <button class="rb-modal-close" id="btnCloseModal">✕</button>
+      <button class="rb-modal-close" id="btnCloseModal" aria-label="닫기">×</button>
     </div>
     <form class="rb-form" id="beanForm" novalidate>
       <input type="hidden" id="fieldId">

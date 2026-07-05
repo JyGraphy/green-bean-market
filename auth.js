@@ -40,8 +40,8 @@ function markInvalid(id) {
 /* ── 비밀번호 토글 ── */
 function togglePw(inputId, btn) {
   const el = document.getElementById(inputId);
-  if (el.type === 'password') { el.type = 'text';     btn.textContent = '🙈'; }
-  else                        { el.type = 'password'; btn.textContent = '👁'; }
+  if (el.type === 'password') { el.type = 'text';     btn.textContent = '숨김'; }
+  else                        { el.type = 'password'; btn.textContent = '표시'; }
 }
 
 /* ── 아이디 중복 실시간 체크 ── */
@@ -165,7 +165,7 @@ async function signup() {
   }
 
   btn.restore();
-  showMsg('🎉 회원가입이 완료되었습니다! 로그인해 주세요.', 'success');
+  showMsg('회원가입이 완료되었습니다! 로그인해 주세요.', 'success');
   setTimeout(() => switchTab('login'), 1500);
 }
 

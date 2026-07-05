@@ -8,15 +8,15 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #111;
-  color: #f0f0f0;
+  background: #f9fafb;
+  color: #18181b;
   font-size: 15px;
   line-height: 1.6;
   min-height: 100vh;
 }
 header {
-  background: #111;
-  border-bottom: 1px solid #1e1e1e;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
   padding: 14px 20px;
   display: flex;
   align-items: center;
@@ -25,63 +25,63 @@ header {
   top: 0;
   z-index: 100;
 }
-.hback { font-size: 1.1rem; color: #aaa; text-decoration: none; padding: 4px 8px; }
+.hback { font-size: 0.9rem; font-weight: 600; color: #52525b; text-decoration: none; padding: 4px 8px; }
 .hcenter { font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 5px; }
-.hcenter .arr { font-size: 0.7rem; color: #555; }
+.hcenter .arr { font-size: 0.7rem; color: #a1a1aa; }
 .page { max-width: 480px; margin: 0 auto; padding: 26px 20px 80px; }
 h1 { font-size: 1.75rem; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 8px; }
-.sub { font-size: 0.87rem; color: #666; margin-bottom: 20px; line-height: 1.6; }
+.sub { font-size: 0.87rem; color: #71717a; margin-bottom: 20px; line-height: 1.6; }
 
 /* grinder */
 .gsw { margin-bottom: 26px; }
 .gsel {
-  width: 100%; background: #1c1c1c; border: 1px solid #2a2a2a;
-  color: #f0f0f0; padding: 12px 40px 12px 15px; border-radius: 10px;
+  width: 100%; background: #f9fafb; border: 1px solid #e5e7eb;
+  color: #18181b; padding: 12px 40px 12px 15px; border-radius: 10px;
   font-size: 0.9rem; font-family: inherit; appearance: none; cursor: pointer;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat; background-position: right 14px center;
 }
-.gsel:focus { outline: none; border-color: #4ade80; }
+.gsel:focus { outline: none; border-color: #f59e0b; }
 
 /* tabs */
-.tabs { display: flex; border-bottom: 1px solid #222; margin-bottom: 28px; }
+.tabs { display: flex; border-bottom: 1px solid #e5e7eb; margin-bottom: 28px; }
 .tab { flex: 1; padding: 12px; text-align: center; font-size: 0.9rem; font-weight: 600;
-  color: #444; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
-.tab.active { color: #f0f0f0; border-bottom-color: #f0f0f0; }
+  color: #71717a; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+.tab.active { color: #18181b; border-bottom-color: #f59e0b; }
 
 /* canvases */
 .cw { position: relative; max-width: 360px; margin: 0 auto; }
-canvas { width: 100%; height: auto; display: block; touch-action: none; cursor: crosshair; }
+canvas { width: 100%; height: auto; display: block; touch-action: none; cursor: crosshair; border-radius: 10px; border: 1px solid #e5e7eb; }
 
 .legend { display: flex; gap: 18px; justify-content: center; margin: 10px 0 4px; }
-.li { display: flex; align-items: center; gap: 5px; font-size: 0.74rem; color: #666; }
+.li { display: flex; align-items: center; gap: 5px; font-size: 0.74rem; color: #52525b; }
 .ld { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-.hint { font-size: 0.72rem; color: #3a3a3a; text-align: center; margin-bottom: 18px; }
+.hint { font-size: 0.72rem; color: #a1a1aa; text-align: center; margin-bottom: 18px; }
 
 /* divider */
-.div { height: 1px; background: #1e1e1e; margin: 28px 0; }
+.div { height: 1px; background: #e5e7eb; margin: 28px 0; }
 
 /* recommendation */
 .rec-title { font-size: 1.3rem; font-weight: 900; line-height: 1.45; margin-bottom: 18px; letter-spacing: -0.3px; }
-.rec-title .hl { color: #4ade80; }
-.card { background: #181818; border-radius: 11px; padding: 16px 18px; margin-bottom: 10px; }
-.card-head { font-size: 0.8rem; color: #555; margin-bottom: 5px; }
-.card-body { font-size: 0.9rem; color: #e0e0e0; line-height: 1.6; }
-.card-note { font-size: 0.76rem; color: #444; margin-top: 9px; line-height: 1.65; }
+.rec-title .hl { color: #b45309; }
+.card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 11px; padding: 16px 18px; margin-bottom: 10px; }
+.card-head { font-size: 0.8rem; color: #71717a; margin-bottom: 5px; }
+.card-body { font-size: 0.9rem; color: #18181b; line-height: 1.6; }
+.card-note { font-size: 0.76rem; color: #71717a; margin-top: 9px; line-height: 1.65; }
 
 /* calculator */
 .sec-title { font-size: 1.05rem; font-weight: 800; margin-bottom: 14px; }
 .cgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.cf { background: #181818; border-radius: 10px; padding: 13px 15px; }
-.cl { font-size: 0.7rem; color: #555; margin-bottom: 7px; }
+.cf { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 13px 15px; }
+.cl { font-size: 0.7rem; color: #71717a; margin-bottom: 7px; }
 .ci {
-  background: transparent; border: none; border-bottom: 1px solid #282828;
-  color: #f0f0f0; font-size: 1.25rem; font-weight: 700;
+  background: transparent; border: none; border-bottom: 1px solid #e5e7eb;
+  color: #18181b; font-size: 1.25rem; font-weight: 700;
   width: 100%; padding: 3px 0; outline: none; font-family: inherit;
 }
-.ci:focus { border-bottom-color: #4ade80; }
-.ci.res { color: #4ade80; cursor: default; }
-.cu { font-size: 0.68rem; color: #444; margin-top: 3px; }
+.ci:focus { border-bottom-color: #f59e0b; }
+.ci.res { color: #b45309; cursor: default; }
+.cu { font-size: 0.68rem; color: #71717a; margin-top: 3px; }
 
 /* ecc */
 .ew { max-width: 360px; margin: 24px auto 0; }
@@ -90,8 +90,8 @@ canvas { width: 100%; height: auto; display: block; touch-action: none; cursor: 
 <body>
 
 <header>
-  <a href="index.html" class="hback">⌂</a>
-  <div class="hcenter">가이드 <span class="arr">∨</span></div>
+  <a href="index.html" class="hback">← 홈</a>
+  <div class="hcenter">가이드</div>
   <div style="width:40px"></div>
 </header>
 
@@ -101,7 +101,7 @@ canvas { width: 100%; height: auto; display: block; touch-action: none; cursor: 
 
   <div class="gsw">
     <select class="gsel" id="gsel">
-      <option value="">내가 사용하는 그라인더 ▾</option>
+      <option value="">내가 사용하는 그라인더</option>
       <optgroup label="핸드밀">
         <option value="timemore">Timemore C2 / C3</option>
         <option value="1zpresso">1Zpresso JX / JX-Pro</option>
@@ -576,7 +576,7 @@ function updateRec() {
   if (moreS) parts.push('농도 높히기'); else if (lessS) parts.push('농도 낮추기');
   if (moreY) parts.push('수율 높히기'); else if (lessY) parts.push('수율 낮추기');
   document.getElementById('recAct').textContent =
-    parts.length ? parts.join(', ') + '가 권장됩니다.' : '균형 잡혀 있습니다 👍';
+    parts.length ? parts.join(', ') + '가 권장됩니다.' : '균형 잡혀 있습니다';
 
   const ycard=document.getElementById('ycard');
   const yhead=document.getElementById('yhead');

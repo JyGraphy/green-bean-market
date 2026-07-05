@@ -1,22 +1,22 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --brown:   #6b3f2a;
-  --brown2:  #8b5e42;
-  --tan:     #d4a97a;
-  --tan2:    #e8cca8;
-  --cream:   #fdf6ee;
-  --cream2:  #f5ece0;
-  --border:  #ddc9b0;
-  --text:    #2c1a0e;
-  --text2:   #6b4f3a;
-  --text3:   #9e7b62;
+  --brown:   #18181b;
+  --brown2:  #27272a;
+  --tan:     #f59e0b;
+  --tan2:    #fef3c7;
+  --cream:   #f9fafb;
+  --cream2:  #f3f4f6;
+  --border:  #e5e7eb;
+  --text:    #18181b;
+  --text2:   #52525b;
+  --text3:   #71717a;
   --white:   #ffffff;
   --error:   #dc2626;
   --success: #16a34a;
-  --radius:  14px;
+  --radius:  12px;
   --radius-sm: 8px;
-  --shadow:  0 8px 40px rgba(107,63,42,.18);
+  --shadow:  0 10px 40px rgba(24,24,27,.10);
 }
 
 body {
@@ -29,8 +29,8 @@ body {
 .auth-bg {
   min-height: 100vh;
   background:
-    radial-gradient(ellipse at 20% 50%, rgba(212,169,122,.18) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 20%, rgba(107,63,42,.10) 0%, transparent 55%),
+    radial-gradient(ellipse at 20% 0%, rgba(245,158,11,.08) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 15%, rgba(24,24,27,.04) 0%, transparent 55%),
     var(--cream);
   display: flex;
   align-items: center;
@@ -88,7 +88,7 @@ body {
   background: var(--white);
   color: var(--brown);
   font-weight: 700;
-  box-shadow: 0 1px 6px rgba(107,63,42,.12);
+  box-shadow: 0 1px 4px rgba(24,24,27,.10);
 }
 
 /* ── 메시지 ── */
@@ -283,10 +283,13 @@ body {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 16px;
-  padding: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text3);
+  padding: 4px 6px;
   line-height: 1;
 }
+.auth-pw-toggle:hover { color: var(--brown); }
 
 /* ── 아이디 입력 상태 표시 ── */
 .auth-input-wrap { position: relative; }

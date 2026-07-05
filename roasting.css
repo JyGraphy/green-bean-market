@@ -2,24 +2,24 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --cream:   #fdf6ee;
-  --cream2:  #f5ece0;
-  --brown:   #6b3f2a;
-  --brown2:  #8b5e42;
-  --brown3:  #c4906a;
-  --tan:     #d4a97a;
-  --tan2:    #e8cca8;
-  --text:    #2c1a0e;
-  --text2:   #6b4f3a;
-  --text3:   #9e7b62;
-  --border:  #ddc9b0;
+  --cream:   #f9fafb;
+  --cream2:  #f3f4f6;
+  --brown:   #18181b;
+  --brown2:  #27272a;
+  --brown3:  #f59e0b;
+  --tan:     #f59e0b;
+  --tan2:    #fef3c7;
+  --text:    #18181b;
+  --text2:   #52525b;
+  --text3:   #71717a;
+  --border:  #e5e7eb;
   --white:   #ffffff;
-  --shadow:  0 2px 12px rgba(107,63,42,.10);
-  --shadow2: 0 8px 32px rgba(107,63,42,.18);
-  --radius:  14px;
+  --shadow:  0 1px 2px rgba(24,24,27,.06);
+  --shadow2: 0 8px 28px rgba(24,24,27,.12);
+  --radius:  12px;
   --radius-sm: 8px;
-  --fire:    #e07b2a;
-  --green:   #22c55e;
+  --fire:    #b45309;
+  --green:   #16a34a;
   --red:     #ef4444;
 }
 
@@ -33,18 +33,18 @@ body {
 code { background: var(--cream2); padding: 1px 5px; border-radius: 4px; font-size: .92em; }
 
 /* ── 헤더 ── */
-.rp-header { background: var(--brown); color: var(--white); position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow2); }
+.rp-header { background: var(--white); color: var(--text); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
 .rp-header-inner { max-width: 1600px; margin: 0 auto; padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between; }
 .rp-logo { display: flex; align-items: center; gap: 12px; }
 .rp-logo-icon { font-size: 28px; }
 .rp-logo h1 { font-size: 20px; font-weight: 700; }
-.rp-logo p { font-size: 12px; opacity: .75; margin-top: 1px; }
+.rp-logo p { font-size: 12px; color: var(--text3); margin-top: 1px; }
 .rp-header-actions { display: flex; gap: 10px; align-items: center; }
 
-.rp-btn-ghost { background: rgba(255,255,255,.13); color: var(--white); border: 1px solid rgba(255,255,255,.22); border-radius: var(--radius-sm); padding: 7px 13px; font-size: 13px; text-decoration: none; cursor: pointer; transition: background .2s; }
-.rp-btn-ghost:hover { background: rgba(255,255,255,.25); }
+.rp-btn-ghost { background: var(--white); color: var(--text2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 7px 13px; font-size: 13px; text-decoration: none; cursor: pointer; transition: background .2s, border-color .2s, color .2s; }
+.rp-btn-ghost:hover { background: var(--cream2); border-color: var(--brown3); color: var(--text); }
 .rp-btn-add { background: var(--fire); color: var(--white); border: none; border-radius: var(--radius-sm); padding: 8px 18px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background .2s; }
-.rp-btn-add:hover { background: #c96a1a; }
+.rp-btn-add:hover { background: #92400e; }
 
 /* ── 레이아웃 ── */
 .rp-layout { display: grid; grid-template-columns: 280px 1fr; min-height: calc(100vh - 64px); max-width: 1600px; margin: 0 auto; }
@@ -75,7 +75,7 @@ code { background: var(--cream2); padding: 1px 5px; border-radius: 4px; font-siz
 .rp-welcome p { color: var(--text2); font-size: 14px; line-height: 1.8; }
 
 .rp-btn-primary { background: var(--fire); color: var(--white); border: none; border-radius: var(--radius-sm); padding: 10px 22px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background .2s; }
-.rp-btn-primary:hover { background: #c96a1a; }
+.rp-btn-primary:hover { background: #92400e; }
 .rp-btn-primary:disabled { background: var(--tan); cursor: not-allowed; opacity: .7; }
 .rp-btn-lg { padding: 13px 30px; font-size: 15px; }
 .rp-btn-cancel { background: var(--cream2); color: var(--text2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 20px; font-size: 14px; cursor: pointer; transition: background .2s; }
@@ -110,7 +110,7 @@ code { background: var(--cream2); padding: 1px 5px; border-radius: 4px; font-siz
 
 /* ── 파일 드롭 ── */
 .rp-file-drop { border: 2px dashed var(--tan); border-radius: var(--radius); padding: 36px 20px; text-align: center; cursor: pointer; transition: all .2s; color: var(--text2); }
-.rp-file-drop:hover, .rp-file-drop.drag-over { border-color: var(--fire); background: rgba(224,123,42,.05); }
+.rp-file-drop:hover, .rp-file-drop.drag-over { border-color: var(--fire); background: rgba(245,158,11,.06); }
 .rp-file-drop-icon { font-size: 34px; margin-bottom: 8px; }
 .rp-file-drop p { font-size: 14px; line-height: 1.6; }
 .rp-file-sub { font-size: 12px; color: var(--text3); margin-top: 4px; }
@@ -307,7 +307,7 @@ code { background: var(--cream2); padding: 1px 5px; border-radius: 4px; font-siz
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: linear-gradient(135deg, var(--fire) 0%, #f97316 100%);
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -315,7 +315,7 @@ code { background: var(--cream2); padding: 1px 5px; border-radius: 4px; font-siz
   font-weight: 600;
   cursor: pointer;
   transition: opacity .15s, transform .1s;
-  box-shadow: 0 2px 8px rgba(224,123,42,.35);
+  box-shadow: 0 2px 8px rgba(180,83,9,.30);
 }
 .rp-btn-ai:hover { opacity: .9; transform: translateY(-1px); }
 .rp-btn-ai:disabled { opacity: .55; cursor: not-allowed; transform: none; }

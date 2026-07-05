@@ -477,6 +477,7 @@ body {
 /* ── 반응형 ── */
 @media (max-width: 600px) {
   .rb-form-row { grid-template-columns: 1fr; }
-  .rb-header-inner { height: auto; padding: 14px 0; }
+  .rb-header-inner { flex-direction: column; align-items: stretch; height: auto; gap: 12px; padding: 14px 0; }
+  .rb-header-inner > div:last-child { flex-wrap: wrap; }
   .rb-grid { grid-template-columns: 1fr; }
 }

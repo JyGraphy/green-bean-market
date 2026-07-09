@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-07-08T22:11:04Z",
+  "checked_at": "2026-07-09T23:00:16Z",
   "total": 1276,
   "removed": [],
   "held_stores": [],
@@ -14,13 +14,18 @@
       "dead": 0,
       "ambiguous": 0
     },
+    "코빈즈커피": {
+      "ok": 0,
+      "dead": 0,
+      "ambiguous": 81
+    },
     "모모스커피": {
-      "ok": 119,
+      "ok": 112,
       "dead": 0,
       "ambiguous": 0
     },
     "블레스빈": {
-      "ok": 85,
+      "ok": 87,
       "dead": 0,
       "ambiguous": 0
     },
@@ -30,7 +35,7 @@
       "ambiguous": 0
     },
     "엠아이커피": {
-      "ok": 91,
+      "ok": 97,
       "dead": 0,
       "ambiguous": 0
     },
@@ -69,13 +74,8 @@
       "dead": 0,
       "ambiguous": 0
     },
-    "코빈즈커피": {
-      "ok": 81,
-      "dead": 0,
-      "ambiguous": 0
-    },
     "팔콘커피": {
-      "ok": 30,
+      "ok": 29,
       "dead": 0,
       "ambiguous": 0
     }

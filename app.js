@@ -427,7 +427,7 @@ function renderTableMobile(items, ctr) {
       ${notes}
       <div class="mob-row-bot">
         <span class="sp ${sc}">${p.store}</span>
-        <a href="${p.url}" target="_blank" rel="noopener noreferrer" class="buy-lnk">구매</a>
+        ${p.isSoldout ? '<span class="soldout-lnk">품절</span>' : `<a href="${p.url}" target="_blank" rel="noopener noreferrer" class="buy-lnk">구매</a>`}
       </div>
     </div>`;
   }).join('');

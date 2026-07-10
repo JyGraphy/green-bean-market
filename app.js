@@ -8,22 +8,41 @@ const PAGE_SZ = 50;
 // ── Data init ─────────────────────────────────────────────
 async function initDB() {
   showLoading(true);
-  // 캐시 버스팅: 날짜 기준 쿼리로 옛 데이터(상대경로 등) 캐시 방지. 데이터는 매일 06시 갱신.
-  const v = new Date().toISOString().slice(0, 10);
-  const res = await fetch(`data/products_web.json?v=${v}`, { cache: 'no-cache' });
-  PRODUCTS = await res.json();
-  dbReady = true;
-  showLoading(false);
-  init();
-  loadUpdateLog();
+  try {
+    // 캐시 버스팅: 날짜 기준 쿼리로 옛 데이터(상대경로 등) 캐시 방지. 데이터는 매일 06시 갱신.
+    const v = new Date().toISOString().slice(0, 10);
+    const res = await fetch(`data/products_web.json?v=${v}`, { cache: 'no-cache' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    PRODUCTS = await res.json();
+    dbReady = true;
+    showLoading(false);
+    init();
+    loadUpdateLog();
+  } catch (e) {
+    showLoadError();
+  }
 }
 
 function showLoading(on) {
   document.getElementById('loadingOverlay').style.display = on ? 'flex' : 'none';
 }
 
+function showLoadError() {
+  const overlay = document.getElementById('loadingOverlay');
+  overlay.style.display = 'flex';
+  overlay.querySelector('.loading-box').innerHTML = `
+    <div class="loading-text">데이터를 불러오지 못했습니다.<br>네트워크 상태를 확인한 뒤 다시 시도해주세요.</div>
+    <button class="reset-btn" style="margin-top:14px" onclick="location.reload()">다시 시도</button>`;
+}
+
 function queryAll() {
   return PRODUCTS || [];
+}
+
+// 스크래핑 데이터(상품명·노트 등)를 innerHTML에 넣기 전 이스케이프
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
 // ── Init ──────────────────────────────────────────────────
@@ -88,7 +107,7 @@ function buildStatBars(products) {
   const maxO = topO[0]?.[1]||1;
   document.getElementById('originStats').innerHTML = topO.map(([o,c])=>`
     <div class="stat-bar-item">
-      <div class="stat-bar-lbl"><span>${o}</span><span>${c}</span></div>
+      <div class="stat-bar-lbl"><span>${esc(o)}</span><span>${c}</span></div>
       <div class="stat-bar-track"><div class="stat-bar-fill" style="width:${c/maxO*100}%"></div></div>
     </div>`).join('');
 
@@ -98,7 +117,7 @@ function buildStatBars(products) {
   const maxP = topP[0]?.[1]||1;
   document.getElementById('processStats').innerHTML = topP.map(([proc,c])=>`
     <div class="stat-bar-item">
-      <div class="stat-bar-lbl"><span>${proc}</span><span>${c}</span></div>
+      <div class="stat-bar-lbl"><span>${esc(proc)}</span><span>${c}</span></div>
       <div class="stat-bar-track"><div class="stat-bar-fill" style="width:${c/maxP*100}%;background:${PROC_COLORS[proc]||'#5c3317'}"></div></div>
     </div>`).join('');
 }
@@ -266,18 +285,18 @@ function renderTable(items, ctr) {
         p.isDecaf   ? `<span class="bsm bsm-decaf">디카페인</span>` : '',
         p.isSpecial ? `<span class="bsm bsm-special">스페셜티</span>` : '',
       ].filter(Boolean).join(' ');
-      const notes = p.notes ? `<div class="name-notes">${p.notes}</div>` : '';
+      const notes = p.notes ? `<div class="name-notes">${esc(p.notes)}</div>` : '';
       return `<tr>
-        <td><div class="origin-cell"><span class="oname">${p.origin}</span></div></td>
+        <td><div class="origin-cell"><span class="oname">${esc(p.origin)}</span></div></td>
         <td class="name-wrap">
-          <div class="name-main">${p.name}</div>
+          <div class="name-main">${esc(p.name)}</div>
           ${notes}
           ${bdgs ? `<div class="name-badges">${bdgs}</div>` : ''}
         </td>
-        <td><span class="proc-badge ${pc}">${p.process}</span></td>
+        <td><span class="proc-badge ${pc}">${esc(p.process)}</span></td>
         <td class="td-price"><span class="price-val">₩${p.price.toLocaleString()}</span><span class="price-kg">/kg</span></td>
-        <td><span class="sp ${sc}">${p.store}</span></td>
-        <td>${p.isSoldout ? '<span class="soldout-lnk">품절</span>' : `<a href="${p.url}" target="_blank" rel="noopener noreferrer" class="buy-lnk">구매</a>`}</td>
+        <td><span class="sp ${sc}">${esc(p.store)}</span></td>
+        <td>${p.isSoldout ? '<span class="soldout-lnk">품절</span>' : `<a href="${esc(p.url)}" target="_blank" rel="noopener noreferrer" class="buy-lnk">구매</a>`}</td>
       </tr>`;
     }).join('')}</tbody>
   </table></div>`;
@@ -293,18 +312,18 @@ function renderCards(items, ctr) {
       p.isDecaf   ? `<span class="bsm bsm-decaf">디카페인</span>` : '',
       p.isSpecial ? `<span class="bsm bsm-special">스페셜티</span>` : '',
     ].filter(Boolean).join('');
-    const notes = p.notes ? `<div class="c-notes">${p.notes}</div>` : '';
+    const notes = p.notes ? `<div class="c-notes">${esc(p.notes)}</div>` : '';
     return `<div class="c-card">
-      <div class="c-top"><div class="c-badges">${bdgs}</div><span class="sp ${sc}">${p.store}</span></div>
+      <div class="c-top"><div class="c-badges">${bdgs}</div><span class="sp ${sc}">${esc(p.store)}</span></div>
       <div class="c-mid">
-        <div class="c-title">${p.name}</div>
-        <div class="c-origin">${p.origin} · ${p.region}</div>
-        <span class="proc-badge ${pc}" style="margin-top:4px;display:inline-block">${p.process}</span>
+        <div class="c-title">${esc(p.name)}</div>
+        <div class="c-origin">${esc(p.origin)} · ${esc(p.region)}</div>
+        <span class="proc-badge ${pc}" style="margin-top:4px;display:inline-block">${esc(p.process)}</span>
         ${notes}
       </div>
       <div class="c-bot">
         <div><div class="c-price">₩${p.price.toLocaleString()}</div><div class="c-price-unit">1kg 기준</div></div>
-        ${p.isSoldout ? '<span class="soldout-lnk">품절</span>' : `<a href="${p.url}" target="_blank" rel="noopener noreferrer" class="buy-lnk">구매</a>`}
+        ${p.isSoldout ? '<span class="soldout-lnk">품절</span>' : `<a href="${esc(p.url)}" target="_blank" rel="noopener noreferrer" class="buy-lnk">구매</a>`}
       </div>
     </div>`;
   }).join('')}</div>`;
@@ -414,20 +433,20 @@ function renderTableMobile(items, ctr) {
       p.isDecaf   ? `<span class="bsm bsm-decaf">디카페인</span>` : '',
       p.isSpecial ? `<span class="bsm bsm-special">스페셜티</span>` : '',
     ].filter(Boolean).join(' ');
-    const notes = p.notes ? `<div class="mob-row-notes">${p.notes}</div>` : '';
+    const notes = p.notes ? `<div class="mob-row-notes">${esc(p.notes)}</div>` : '';
     return `<div class="mob-row-card">
       <div class="mob-row-top">
-        <div class="mob-row-name">${p.name}${bdgs ? ` <span style="display:inline-flex;gap:3px;vertical-align:middle">${bdgs}</span>` : ''}</div>
+        <div class="mob-row-name">${esc(p.name)}${bdgs ? ` <span style="display:inline-flex;gap:3px;vertical-align:middle">${bdgs}</span>` : ''}</div>
         <div class="mob-row-price">₩${p.price.toLocaleString()}<span style="font-size:0.62rem;font-weight:500;color:var(--text-muted);display:block;text-align:right">/kg</span></div>
       </div>
       <div class="mob-row-meta">
-        <span class="mob-row-origin">${p.origin}</span>
-        <span class="proc-badge ${pc}">${p.process}</span>
+        <span class="mob-row-origin">${esc(p.origin)}</span>
+        <span class="proc-badge ${pc}">${esc(p.process)}</span>
       </div>
       ${notes}
       <div class="mob-row-bot">
-        <span class="sp ${sc}">${p.store}</span>
-        <a href="${p.url}" target="_blank" rel="noopener noreferrer" class="buy-lnk">구매</a>
+        <span class="sp ${sc}">${esc(p.store)}</span>
+        ${p.isSoldout ? '<span class="soldout-lnk">품절</span>' : `<a href="${esc(p.url)}" target="_blank" rel="noopener noreferrer" class="buy-lnk">구매</a>`}
       </div>
     </div>`;
   }).join('');

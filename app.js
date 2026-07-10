@@ -8,18 +8,31 @@ const PAGE_SZ = 50;
 // ── Data init ─────────────────────────────────────────────
 async function initDB() {
   showLoading(true);
-  // 캐시 버스팅: 날짜 기준 쿼리로 옛 데이터(상대경로 등) 캐시 방지. 데이터는 매일 06시 갱신.
-  const v = new Date().toISOString().slice(0, 10);
-  const res = await fetch(`data/products_web.json?v=${v}`, { cache: 'no-cache' });
-  PRODUCTS = await res.json();
-  dbReady = true;
-  showLoading(false);
-  init();
-  loadUpdateLog();
+  try {
+    // 캐시 버스팅: 날짜 기준 쿼리로 옛 데이터(상대경로 등) 캐시 방지. 데이터는 매일 06시 갱신.
+    const v = new Date().toISOString().slice(0, 10);
+    const res = await fetch(`data/products_web.json?v=${v}`, { cache: 'no-cache' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    PRODUCTS = await res.json();
+    dbReady = true;
+    showLoading(false);
+    init();
+    loadUpdateLog();
+  } catch (e) {
+    showLoadError();
+  }
 }
 
 function showLoading(on) {
   document.getElementById('loadingOverlay').style.display = on ? 'flex' : 'none';
+}
+
+function showLoadError() {
+  const overlay = document.getElementById('loadingOverlay');
+  overlay.style.display = 'flex';
+  overlay.querySelector('.loading-box').innerHTML = `
+    <div class="loading-text">데이터를 불러오지 못했습니다.<br>네트워크 상태를 확인한 뒤 다시 시도해주세요.</div>
+    <button class="reset-btn" style="margin-top:14px" onclick="location.reload()">다시 시도</button>`;
 }
 
 function queryAll() {

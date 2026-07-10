@@ -1,6 +1,6 @@
 {
-  "checked_at": "2026-07-09T23:00:16Z",
-  "total": 1276,
+  "checked_at": "2026-07-10T22:05:30Z",
+  "total": 1284,
   "removed": [],
   "held_stores": [],
   "per_store": {
@@ -14,13 +14,8 @@
       "dead": 0,
       "ambiguous": 0
     },
-    "코빈즈커피": {
-      "ok": 0,
-      "dead": 0,
-      "ambiguous": 81
-    },
     "모모스커피": {
-      "ok": 112,
+      "ok": 115,
       "dead": 0,
       "ambiguous": 0
     },
@@ -50,12 +45,12 @@
       "ambiguous": 0
     },
     "지에스씨(GSC)": {
-      "ok": 138,
+      "ok": 140,
       "dead": 0,
       "ambiguous": 0
     },
     "커만사": {
-      "ok": 425,
+      "ok": 427,
       "dead": 0,
       "ambiguous": 0
     },
@@ -71,6 +66,11 @@
     },
     "커피플랜트": {
       "ok": 48,
+      "dead": 0,
+      "ambiguous": 0
+    },
+    "코빈즈커피": {
+      "ok": 82,
       "dead": 0,
       "ambiguous": 0
     },

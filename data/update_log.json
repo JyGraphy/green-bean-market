@@ -1,5 +1,10 @@
 {
-  "updated_at": "2026-07-12T21:56:00Z",
-  "stores": [],
-  "total_new": 0
+  "updated_at": "2026-07-13T22:00:42Z",
+  "stores": [
+    {
+      "name": "코빈즈커피",
+      "new_count": 1
+    }
+  ],
+  "total_new": 1
 }

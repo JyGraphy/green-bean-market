@@ -26,8 +26,12 @@ SCRAPERS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 SCRAPERS = [
     # 가나다 순 (더블유빈 제외 — 클라이언트렌더링/차단)
+    # 스마트스토어(루베르로스터리·아마티보)는 네이버가 데이터센터 IP를 차단하면
+    # 스크래퍼가 스스로 스킵(정상 종료)하고 기존 데이터를 보존한다.
+    ('scraper_ruber.py',       '루베르로스터리'),
     ('scraper_momos.py',       '모모스커피'),
     ('scraper_blessbean.py',   '블레스빈'),
+    ('scraper_amativo.py',     '아마티보'),
     ('scraper_ayantu.py',      '아얀투'),
     ('scraper_micoffee.py',    '엠아이커피'),
     ('scraper_oromia.py',      '오로미아코리아'),

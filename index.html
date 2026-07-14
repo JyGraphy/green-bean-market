@@ -29,11 +29,6 @@
     <p>한국 주요 생두 쇼핑몰 · 가격·원산지·가공방식 통합 비교</p>
   </div>
   <nav class="region-nav">
-    <button class="region-btn active" data-region="all" onclick="setRegion(this,'all')">전체</button>
-    <button class="region-btn" data-region="아프리카" onclick="setRegion(this,'아프리카')">아프리카</button>
-    <button class="region-btn" data-region="중남미" onclick="setRegion(this,'중남미')">중남미</button>
-    <button class="region-btn" data-region="아시아" onclick="setRegion(this,'아시아')">아시아</button>
-    <button class="region-btn" data-region="기타" onclick="setRegion(this,'기타')">기타</button>
     <a href="brewing.html" class="region-btn" style="text-decoration:none">브루잉 가이드</a>
     <a href="roastery.html" class="region-btn" style="text-decoration:none">원두 컬렉션</a>
     <a href="roasting.html" class="region-btn" style="text-decoration:none">로스팅 프로파일</a>
@@ -190,6 +185,15 @@
         <span class="mob-filter-badge" id="filterCount" style="display:none">0</span>
       </button>
       <div class="result-info" style="margin-left:auto">총 <strong id="showingCountMob">0</strong>개</div>
+    </div>
+
+    <!-- 지역(대륙) 필터 -->
+    <div class="region-filter-bar" id="regionFilter">
+      <button class="region-btn active" data-region="all" onclick="setRegion(this,'all')">전체</button>
+      <button class="region-btn" data-region="아프리카" onclick="setRegion(this,'아프리카')">아프리카</button>
+      <button class="region-btn" data-region="중남미" onclick="setRegion(this,'중남미')">중남미</button>
+      <button class="region-btn" data-region="아시아" onclick="setRegion(this,'아시아')">아시아</button>
+      <button class="region-btn" data-region="기타" onclick="setRegion(this,'기타')">기타</button>
     </div>
 
     <div class="content-hdr">

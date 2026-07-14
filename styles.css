@@ -196,6 +196,27 @@ header {
 .region-btn:hover { border-color: var(--accent); color: var(--accent-strong); }
 .region-btn.active { background: var(--ink); color: #fff; border-color: var(--ink); }
 
+/* 지역(대륙) 필터 바 — 콘텐츠 상단 */
+.region-filter-bar {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.region-filter-bar .region-btn { background: var(--surface); }
+.region-filter-bar .region-btn.active { background: var(--ink); }
+@media (max-width: 920px) {
+  .region-filter-bar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .region-filter-bar::-webkit-scrollbar { display: none; }
+  .region-filter-bar .region-btn { flex-shrink: 0; }
+}
+
 /* HOME LINK + AUTH */
 .brand-home { color: inherit; text-decoration: none; }
 .brand-home:hover { color: var(--accent-strong); }

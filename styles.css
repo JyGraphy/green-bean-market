@@ -180,7 +180,8 @@ header {
 .hstat { text-align: center; }
 .hstat-num { font-size: 1.3rem; font-weight: 800; color: var(--accent-strong); line-height: 1; }
 .hstat-label { font-size: 0.66rem; color: var(--text-muted); margin-top: 4px; }
-.region-nav { display: flex; gap: 6px; flex-shrink: 0; }
+.region-nav { display: flex; gap: 16px; flex-shrink: 0; }
+.region-nav .region-btn { padding: 8px 20px; }
 .region-btn {
   background: transparent;
   border: 1px solid var(--border);
@@ -799,7 +800,7 @@ header {
   .region-nav {
     order: 3;
     width: 100%;
-    gap: 6px;
+    gap: 10px;
     overflow-x: auto;
     scrollbar-width: none;
     padding-bottom: 2px;

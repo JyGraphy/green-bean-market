@@ -134,7 +134,7 @@ coffeebeanweb/
 | cafe24 / godomall | 서버 렌더링 → `web_fetch` 또는 curl로 직접 스크래핑 가능 |
 | Sixshop | 클라이언트 렌더링 → Chrome MCP `javascript_tool` 필요 |
 | aram (블레스빈) | 서버 렌더링 → `web_fetch` 가능 |
-| 네이버 스마트스토어 (아마티보, 루베르로스터리) | **데이터센터 IP 차단 잦음** — requests는 429, 실브라우저(Playwright)도 로그인 월로 리다이렉트 (GH Actions에서 실측 확인). run_all.py(매일 06시)에 포함되어 있으나 차단 감지 시 스크래퍼가 스스로 스킵(정상 종료)하고 기존 데이터를 보존한다. 초기 수집·보강은 가정용 IP 로컬 PC에서 `python scrapers/scraper_amativo.py` / `scraper_ruber.py` 수동 실행 후 커밋. 내부 API 문서는 `scrapers/naver_smartstore.py` 참고 |
+| 네이버 스마트스토어 (아마티보, 루베르로스터리) | **데이터센터 IP 차단 잦음** — requests는 429, 실브라우저(Playwright)도 로그인 월로 리다이렉트 (GH Actions에서 실측 확인). CI 자동화는 3단 구조: ① 직접 접근 시도 → ② 차단 시 **공식 오픈API 폴백**(`scrapers/naver_openapi.py`, 리포 시크릿 `NAVER_CLIENT_ID`/`NAVER_CLIENT_SECRET` 필요) → ③ 키 미설정이면 스킵(기존 데이터 보존, 잡은 초록 유지). 가정용 IP에서는 직접 접근이 되므로 로컬 수동 실행(`scripts/update_smartstore_local.py`)으로 정밀 수집 가능. 내부 API 문서는 `scrapers/naver_smartstore.py` 참고 |
 
 - 콤파스커피 Sixshop store ID: `224244`
 

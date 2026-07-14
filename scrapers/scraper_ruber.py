@@ -15,11 +15,15 @@
 import sys
 
 sys.path.insert(0, __file__.rsplit('/', 1)[0])
-from naver_smartstore import NaverBlocked, fetch_products, save
+import naver_openapi
+from naver_smartstore import NaverBlocked, fetch_products, normalize_price_1kg, save
 
 STORE = '루베르로스터리'
 STORE_ID = 'ruberroastery'
 ID_START = 950
+
+# 네이버쇼핑 판매처 표기 후보 (공백 무시 비교 — 첫 매칭 사용)
+MALL_NAMES = ['루베르로스터리', '루베르 로스터리']
 
 # 생두 진열 카테고리 후보 (사용자 제공 링크에서 확보한 두 ID — 첫 번째부터 시도)
 CATEGORY_CANDIDATES = [
@@ -36,15 +40,24 @@ if __name__ == '__main__':
             try:
                 items = fetch_products(STORE_ID, category=cat)
             except NaverBlocked:
-                raise  # 차단은 카테고리 문제가 아님 — 즉시 스킵 처리로
+                raise  # 차단은 카테고리 문제가 아님 — 즉시 폴백/스킵 처리로
             except Exception as e:
                 print(f'  실패: {e}')
                 items = []
             if items:
                 break
     except NaverBlocked as e:
-        print(f'⏭️  {STORE}: {e}')
-        print(f'⏭️  {STORE}: 기존 데이터 보존, 이번 갱신은 스킵')
-        sys.exit(0)
+        print(f'⚠️  {STORE}: 직접 접근 차단됨 — {e}')
+        if not naver_openapi.have_keys():
+            print(f'⏭️  {STORE}: NAVER_CLIENT_ID/SECRET 미설정 → 기존 데이터 보존, 스킵')
+            sys.exit(0)
+        # 원두·드립백 등 로스팅 제품 판매몰이므로 상품명에 '생두'가 있는 것만 수집
+        print(f'[{STORE}] 공식 오픈API로 폴백 (생두 상품만)...')
+        for mall in MALL_NAMES:
+            items = naver_openapi.fetch_store_products(mall, require_keyword='생두')
+            if items:
+                break
+        for it in items:
+            it['price'] = normalize_price_1kg(it['name'], it['price'])
     print(f'[{STORE}] 총 {len(items)}개')
     save(STORE, items, ID_START)

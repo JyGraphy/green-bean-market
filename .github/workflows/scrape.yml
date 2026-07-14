@@ -30,6 +30,10 @@ jobs:
       - name: 스크래퍼 실행
         id: scrape
         continue-on-error: true
+        env:
+          # 네이버 공식 오픈API (스마트스토어 폴백용) — 미설정 시 해당 store는 스킵
+          NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+          NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
         run: python scrapers/run_all.py
 
       # 최종 방어선: 워킹트리를 직전 커밋(HEAD)과 비교해 무결성 검증.

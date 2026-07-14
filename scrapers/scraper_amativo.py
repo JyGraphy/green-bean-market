@@ -32,6 +32,9 @@ if __name__ == '__main__':
             sys.exit(0)
         print(f'[{STORE}] 공식 오픈API로 폴백...')
         items = naver_openapi.fetch_store_products(MALL_NAME)
+        if not items:
+            print(f'⏭️  {STORE}: 오픈API에서 0개 — 기존 데이터 보존, 스킵')
+            sys.exit(0)
         for it in items:
             it['price'] = normalize_price_1kg(it['name'], it['price'])
     print(f'[{STORE}] 총 {len(items)}개')

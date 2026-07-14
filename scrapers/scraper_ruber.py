@@ -23,7 +23,8 @@ STORE_ID = 'ruberroastery'
 ID_START = 950
 
 # 네이버쇼핑 판매처 표기 후보 (공백 무시 비교 — 첫 매칭 사용)
-MALL_NAMES = ['루베르로스터리', '루베르 로스터리']
+# 실측: 네이버쇼핑 표기는 '루베르 로스터리 하우스'
+MALL_NAMES = ['루베르 로스터리 하우스', '루베르로스터리', '루베르 로스터리']
 
 # 생두 진열 카테고리 후보 (사용자 제공 링크에서 확보한 두 ID — 첫 번째부터 시도)
 CATEGORY_CANDIDATES = [
@@ -51,12 +52,14 @@ if __name__ == '__main__':
         if not naver_openapi.have_keys():
             print(f'⏭️  {STORE}: NAVER_CLIENT_ID/SECRET 미설정 → 기존 데이터 보존, 스킵')
             sys.exit(0)
-        # 원두·드립백 등 로스팅 제품 판매몰이므로 상품명에 '생두'가 있는 것만 수집
+        # 원두·드립백 등 로스팅 제품 판매몰이므로 상품명에 '생두'가 있는 것만 수집.
+        # 실측(2026-07): 생두 카테고리 상품이 네이버쇼핑 검색에 미노출 → 0개면 스킵.
+        # 이 store의 정밀 수집은 가정용 IP에서 scripts/update_smartstore_local.py 사용.
         print(f'[{STORE}] 공식 오픈API로 폴백 (생두 상품만)...')
-        for mall in MALL_NAMES:
-            items = naver_openapi.fetch_store_products(mall, require_keyword='생두')
-            if items:
-                break
+        items = naver_openapi.fetch_store_products(MALL_NAMES, require_keyword='생두')
+        if not items:
+            print(f'⏭️  {STORE}: 오픈API에서 생두 상품 0개 (검색 미노출) — 기존 데이터 보존, 스킵')
+            sys.exit(0)
         for it in items:
             it['price'] = normalize_price_1kg(it['name'], it['price'])
     print(f'[{STORE}] 총 {len(items)}개')

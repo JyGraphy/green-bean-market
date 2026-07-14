@@ -60,15 +60,21 @@ def _search(query, start, display=100):
     return r.json()
 
 
-def fetch_store_products(mall_name, require_keyword=None, max_pages=10, delay=0.15):
-    """쇼핑 검색 결과에서 mall_name 상품만 추출 → [{'name','price','url','is_soldout'}].
+def fetch_store_products(mall_names, require_keyword=None, queries=None, max_pages=10, delay=0.15):
+    """쇼핑 검색 결과에서 판매처가 mall_names에 해당하는 상품만 추출.
 
-    mall_name: 공백 무시 비교 (예: '루베르 로스터리' == '루베르로스터리')
+    mall_names: 판매처명 문자열 또는 표기 후보 리스트 — 공백 무시 비교로
+                한 번의 검색 패스에서 모든 후보를 동시에 매칭한다.
     require_keyword: 지정 시 상품명에 이 키워드가 있어야 수집 (예: '생두' — 원두 제외용)
+    queries: 검색어 목록. 기본값은 판매처명들 + 생두 일반 검색어 —
+             상품명에 '생두'가 없는 몰(예: 아마티보)은 판매처명 검색으로 잡는다.
+    반환: [{'name','price','url','is_soldout'}]
     """
-    target = _norm(mall_name)
+    names = [mall_names] if isinstance(mall_names, str) else list(mall_names)
+    targets = {_norm(n) for n in names}
     found = {}
-    for q in QUERIES:
+    qlist = queries if queries is not None else list(dict.fromkeys(names + QUERIES))
+    for q in qlist:
         for page in range(max_pages):
             start = 1 + page * 100
             if start > 1000:  # API 최대 offset
@@ -80,7 +86,7 @@ def fetch_store_products(mall_name, require_keyword=None, max_pages=10, delay=0.
                 break
             items = data.get('items', [])
             for it in items:
-                if _norm(it.get('mallName')) != target:
+                if _norm(it.get('mallName')) not in targets:
                     continue
                 name = html.unescape(_TAG.sub('', it.get('title') or '')).strip()
                 if not name:

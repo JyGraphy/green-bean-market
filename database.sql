@@ -1,4 +1,4 @@
--- 자동 생성: 2026-07-14T17:50:05Z
+-- 자동 생성: 2026-07-14T18:14:26Z
 CREATE TABLE IF NOT EXISTS products (
   id INTEGER PRIMARY KEY,
   store TEXT NOT NULL,
@@ -1303,4 +1303,19 @@ INSERT INTO products (id,store,name,price,origin,region,process,notes,url,isNew,
   (851,'팔콘커피','Mbohang Lot 2395, Tuang, Indonesia |  Anaerobic Honey FSK-0050',25450,'인도네시아','아시아/태평양','무산소발효','','https://korea.falcon-micro.com/products/mbohang-lot-2395-tuang-indonesia-anaerobic-honey-fsk-0050',0,0,0,0,NULL),
   (852,'팔콘커피','Mbohang Lot 282, Tuang, Indonesia |  Thermal Fermentation FSK-0048',32020,'인도네시아','아시아/태평양','무산소발효','','https://korea.falcon-micro.com/products/mbohang-lot-282-tuang-indonesia-thermal-fermentation-fsk-0048',0,0,0,0,NULL),
   (853,'팔콘커피','Efrain Carhuallocllo Gesha Lot 2, El Cerro, Peru |  Washed FSK-0057',53360,'페루','중남미','워시드','','https://korea.falcon-micro.com/products/efrain-carhuallocllo-gesha-lot-2-el-cerro-peru-washed-fsk-0057',0,0,1,0,NULL),
-  (857,'팔콘커피','Ijen Highlands, Kavenka, Indonesia |  Washed FSK-0043',20230,'인도네시아','아시아/태평양','워시드','','https://korea.falcon-micro.com/products/ijen-highlands-kavenka-indonesia-washed-fsk-0043',0,0,0,0,NULL);
+  (857,'팔콘커피','Ijen Highlands, Kavenka, Indonesia |  Washed FSK-0043',20230,'인도네시아','아시아/태평양','워시드','','https://korea.falcon-micro.com/products/ijen-highlands-kavenka-indonesia-washed-fsk-0043',0,0,0,0,NULL),
+  (900,'아마티보','2026 MOB 대회 6kg 세트',26170,'알수없음','기타','알수없음','','https://smartstore.naver.com/main/products/13653797274',1,0,0,0,'2026-07-14'),
+  (907,'아마티보','콜롬비아 푸에르토 알투로 게이샤 허니 (Puerto Arturo Geisha Honey)',49000,'콜롬비아','중남미','허니','','https://smartstore.naver.com/main/products/10866139436',0,0,1,0,'2026-07-14'),
+  (943,'아마티보','2026 MOB / Bukisu E.F Washed 부기수 E.F 워시드 (우간다) 1kg',25000,'우간다','아프리카','워시드','','https://smartstore.naver.com/main/products/13659910935',1,0,0,0,'2026-07-14'),
+  (945,'아마티보','2026 IKRC 대회 2kg 세트 (파나마 Volcan Washed / 콜롬비아 La Frontera Natural Lot 2)',28000,'콜롬비아','중남미','내추럴','','https://smartstore.naver.com/main/products/13653728029',1,0,0,0,'2026-07-14'),
+  (946,'아마티보','2026 MOC/KTCC 대회 10kg 세트',24200,'알수없음','기타','알수없음','','https://smartstore.naver.com/main/products/13659952712',1,0,0,0,'2026-07-14'),
+  (947,'아마티보','2026 MOB / La Luisa Natural 라 루이사 내추럴 (콜롬비아) 1kg',24000,'콜롬비아','중남미','내추럴','','https://smartstore.naver.com/main/products/13659902779',1,0,0,0,'2026-07-14'),
+  (948,'아마티보','2026 MOB / Mbale Anaerobic Natural 음발레 무산소 내추럴 (우간다) 1kg',29000,'우간다','아프리카','무산소발효','','https://smartstore.naver.com/main/products/13659909647',1,0,0,0,'2026-07-14'),
+  (949,'아마티보','2026 MOB / La Riviera Premium Microlot 라 리비에라 프리미엄 (콜롬비아) 1kg',27000,'콜롬비아','중남미','알수없음','','https://smartstore.naver.com/main/products/13659905217',1,0,0,0,'2026-07-14'),
+  (950,'아마티보','2026 MOB / Chiriqui Regional Washed 치리퀴 워시드 (파나마) 1kg',23000,'파나마','중남미','워시드','','https://smartstore.naver.com/main/products/13659906665',1,0,0,0,'2026-07-14'),
+  (951,'아마티보','2026 MOB / La Frontera Natural MOB 라 프론테라 내추럴 (콜롬비아) 1kg',29000,'콜롬비아','중남미','내추럴','','https://smartstore.naver.com/main/products/13659903745',1,0,0,0,'2026-07-14'),
+  (952,'아마티보','2026 아마티보 ’파나마’ 그란 델 바르 게이샤 허니 (Gran Del Val Geisha Honey) 1kg',129000,'파나마','중남미','허니','','https://smartstore.naver.com/main/products/13199426017',1,0,1,0,'2026-07-14'),
+  (953,'아마티보','2026 아마티보 ’파나마’ 테시 티피카 내추럴(Tessie Typica Natural) 1kg',88000,'파나마','중남미','내추럴','','https://smartstore.naver.com/main/products/13365770199',1,0,1,0,'2026-07-14'),
+  (954,'아마티보','2026 아마티보 ’파나마’ 그란 델 바르 게이샤 허니 (Gran Del Val Geisha Honey) 500g',135000,'파나마','중남미','허니','','https://smartstore.naver.com/main/products/13199479541',1,0,1,0,'2026-07-14'),
+  (955,'아마티보','2026 아마티보 ’파나마’ 그란 델 바르 게이샤 워시드(Gran Del Val Geisha Washed) 1kg',140000,'파나마','중남미','워시드','','https://smartstore.naver.com/main/products/13223763000',1,0,1,0,'2026-07-14'),
+  (956,'아마티보','2026 아마티보 ’파나마’ 그란 델 바르 게이샤 워시드(Gran Del Val Geisha Washed) 500g',144000,'파나마','중남미','워시드','','https://smartstore.naver.com/main/products/13223758792',1,0,1,0,'2026-07-14');

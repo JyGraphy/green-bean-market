@@ -1,5 +1,10 @@
 {
-  "updated_at": "2026-07-14T17:50:05Z",
-  "stores": [],
-  "total_new": 0
+  "updated_at": "2026-07-14T18:14:26Z",
+  "stores": [
+    {
+      "name": "아마티보",
+      "new_count": 15
+    }
+  ],
+  "total_new": 15
 }

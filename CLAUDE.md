@@ -134,6 +134,7 @@ coffeebeanweb/
 | cafe24 / godomall | 서버 렌더링 → `web_fetch` 또는 curl로 직접 스크래핑 가능 |
 | Sixshop | 클라이언트 렌더링 → Chrome MCP `javascript_tool` 필요 |
 | aram (블레스빈) | 서버 렌더링 → `web_fetch` 가능 |
+| 네이버 스마트스토어 (아마티보, 루베르로스터리) | **데이터센터 IP 전면 차단** — requests는 429, 실브라우저(Playwright)도 로그인 월로 리다이렉트 (GH Actions에서 실측 확인). CI(run_all.py)에 넣지 말 것. 가정용 IP 로컬 PC에서 `python scrapers/scraper_amativo.py` / `scraper_ruber.py` 수동 실행 후 커밋. 내부 API 문서는 `scrapers/naver_smartstore.py` 참고 |
 
 - 콤파스커피 Sixshop store ID: `224244`
 

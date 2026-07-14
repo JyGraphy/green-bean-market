@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>생두 가격 비교 - 한국 생두 쇼핑몰 통합 비교</title>
-<meta name="description" content="커피리브레, 모모스커피, 블레스빈 등 한국 주요 생두 쇼핑몰 15곳의 상품을 한 페이지에서 가격·원산지·가공방식으로 비교하세요. 매일 자동 업데이트.">
+<meta name="description" content="커피리브레, 모모스커피, 블레스빈 등 한국 주요 생두 쇼핑몰 17곳의 상품을 한 페이지에서 가격·원산지·가공방식으로 비교하세요. 매일 자동 업데이트.">
 <link rel="canonical" href="https://green-bean-market.vercel.app/">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <meta property="og:type" content="website">
 <meta property="og:title" content="생두 가격 비교 - 한국 생두 쇼핑몰 통합 비교">
-<meta property="og:description" content="한국 주요 생두 쇼핑몰 15곳의 상품을 가격·원산지·가공방식으로 한눈에 비교. 매일 자동 업데이트.">
+<meta property="og:description" content="한국 주요 생두 쇼핑몰 17곳의 상품을 가격·원산지·가공방식으로 한눈에 비교. 매일 자동 업데이트.">
 <meta property="og:url" content="https://green-bean-market.vercel.app/">
 <meta property="og:locale" content="ko_KR">
 <meta name="twitter:card" content="summary">
@@ -36,7 +36,7 @@
   <div class="header-right">
     <div class="header-stats">
       <div class="hstat"><div class="hstat-num" id="totalCount">0</div><div class="hstat-label">총 상품</div></div>
-      <div class="hstat"><div class="hstat-num">15</div><div class="hstat-label">쇼핑몰</div></div>
+      <div class="hstat"><div class="hstat-num">17</div><div class="hstat-label">쇼핑몰</div></div>
       <div class="hstat"><div class="hstat-num" id="originCount">0</div><div class="hstat-label">산지</div></div>
     </div>
     <div class="auth-area" id="authArea"></div>
@@ -95,6 +95,8 @@
       <button class="tag-btn" data-store="팔콘커피" onclick="setStoreMob(this,'팔콘커피')">팔콘커피</button>
       <button class="tag-btn" data-store="더블유빈" onclick="setStoreMob(this,'더블유빈')">더블유빈</button>
       <button class="tag-btn" data-store="커만사" onclick="setStoreMob(this,'커만사')">커만사</button>
+      <button class="tag-btn" data-store="아마티보" onclick="setStoreMob(this,'아마티보')">아마티보</button>
+      <button class="tag-btn" data-store="루베르로스터리" onclick="setStoreMob(this,'루베르로스터리')">루베르로스터리</button>
     </div>
   </div>
 
@@ -139,6 +141,8 @@
         <button class="tag-btn" data-store="팔콘커피" onclick="setStore(this,'팔콘커피')">팔콘커피</button>
         <button class="tag-btn" data-store="더블유빈" onclick="setStore(this,'더블유빈')">더블유빈</button>
         <button class="tag-btn" data-store="커만사" onclick="setStore(this,'커만사')">커만사</button>
+        <button class="tag-btn" data-store="아마티보" onclick="setStore(this,'아마티보')">아마티보</button>
+        <button class="tag-btn" data-store="루베르로스터리" onclick="setStore(this,'루베르로스터리')">루베르로스터리</button>
       </div>
     </div>
 
@@ -172,6 +176,8 @@
         <span class="legend-item"><span class="legend-dot" style="background:#ea580c"></span>팔콘커피</span>
         <span class="legend-item"><span class="legend-dot" style="background:#7c2d12"></span>더블유빈</span>
         <span class="legend-item"><span class="legend-dot" style="background:#166534"></span>커만사</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#a21caf"></span>아마티보</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#881337"></span>루베르로스터리</span>
       </div>
     </div>
   </aside>

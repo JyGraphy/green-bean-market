@@ -3,6 +3,11 @@ name: probe-naver
 
 on:
   workflow_dispatch:
+  push:
+    branches: [claude/site-launch-improvements-xs5923]
+    paths:
+      - scripts/probe_naver.py
+      - .github/workflows/probe-naver.yml
 
 jobs:
   probe:

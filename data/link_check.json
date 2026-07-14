@@ -1,6 +1,6 @@
 {
-  "checked_at": "2026-07-14T17:48:30Z",
-  "total": 1287,
+  "checked_at": "2026-07-14T22:02:52Z",
+  "total": 1302,
   "removed": [],
   "held_stores": [],
   "per_store": {
@@ -23,6 +23,11 @@
       "ok": 87,
       "dead": 0,
       "ambiguous": 0
+    },
+    "아마티보": {
+      "ok": 0,
+      "dead": 0,
+      "ambiguous": 15
     },
     "아얀투": {
       "ok": 13,

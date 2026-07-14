@@ -11,7 +11,7 @@ const STORE_CLS = {
   '커피플랜트':'sp-cp','커피창고':'sp-cg','엠아이커피':'sp-mi','모모스커피':'sp-momos','코빈즈커피':'sp-cobeans',
   '아얀투':'sp-ayantu','오로미아코리아':'sp-oromia','지에스씨(GSC)':'sp-gsc','오월의숲':'sp-mayforest',
   '커피리브레':'sp-cl','블레스빈':'sp-bb','콤파스커피':'sp-compass','팔콘커피':'sp-falcon',
-  '더블유빈':'sp-wbean','커만사':'sp-comansa'
+  '더블유빈':'sp-wbean','커만사':'sp-comansa','아마티보':'sp-amativo','루베르로스터리':'sp-ruber'
 };
 
 const PROC_CLS = {

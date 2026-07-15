@@ -1,5 +1,10 @@
 {
-  "updated_at": "2026-07-14T22:04:23Z",
-  "stores": [],
-  "total_new": 0
+  "updated_at": "2026-07-15T22:08:14Z",
+  "stores": [
+    {
+      "name": "블레스빈",
+      "new_count": 2
+    }
+  ],
+  "total_new": 2
 }

@@ -486,6 +486,10 @@ function parseRows(rows, filename) {
   }
   const cols = rows[hdr].map(c => String(c).trim().replace(/^"|"$/g, '').toLowerCase());
 
+  // IKAWA 열풍식 로스터 CSV 감지 (구형: 'exaust temp'(원문 오타) / 신형: 'temp above')
+  if (cols.includes('exaust temp') || cols.includes('temp above'))
+    return parseIkawaRows(rows, hdr, cols, filename);
+
   // 온도 컬럼은 RoR·히터·비율 컬럼과 혼동되면 안 됨 → 제외 패턴
   const isRate = c => /ror|rate|히터|heater|비율|출력|파워|power|%/.test(c);
   const findCol = (...patterns) => cols.findIndex(c => patterns.some(p => p.test(c)));
@@ -560,6 +564,69 @@ function parseRows(rows, filename) {
   };
 }
 
+/* ── IKAWA 열풍식 로스터 CSV 전용 파서 ──
+   Artisan ikawa.py와 동일한 규칙:
+   - BT 대용 = 배기온도('exaust temp' 구형 / 'temp above' 신형), ET = 유입('inlet temp'/'temp below')
+   - time 컬럼 무시, 1행 = 1초 (행 인덱스가 시간)
+   - state: 'doser open' → 투입(CHARGE), 'cooling' → 배출(DROP)
+   - adfc_timestamp: 1차 크랙 자동감지 시각(투입 후 초)
+   - 팬 %('fan set (%)'/'fan set')를 0–10 스케일로 변환해 교반 슬롯에 표시 */
+function parseIkawaRows(rows, hdr, cols, filename) {
+  const idx = n => cols.indexOf(n);
+  const btIdx  = idx('exaust temp') !== -1 ? idx('exaust temp') : idx('temp above');
+  const etIdx  = idx('inlet temp')  !== -1 ? idx('inlet temp')  : idx('temp below');
+  const fanIdx = idx('fan set (%)') !== -1 ? idx('fan set (%)') : idx('fan set');
+  const stateIdx = idx('state');
+  const adfcIdx  = cols.findIndex(c => c.includes('adfc'));
+
+  let chargeSec = null, dropSec = null, adfc = null;
+  const raw = [];
+  for (let i = hdr + 1; i < rows.length; i++) {
+    const vals = rows[i].map(v => String(v).trim().replace(/^"|"$/g, ''));
+    const sec = i - hdr - 1;                       // 1행 = 1초
+    const st = stateIdx !== -1 ? (vals[stateIdx] || '').toLowerCase() : '';
+    if (chargeSec == null && st.includes('doser open')) chargeSec = sec;
+    if (dropSec == null && st.includes('cooling')) dropSec = sec;
+    raw.push({
+      sec,
+      bt:  btIdx  !== -1 ? parseFloat(vals[btIdx])  : NaN,
+      et:  etIdx  !== -1 ? parseFloat(vals[etIdx])  : NaN,
+      fan: fanIdx !== -1 ? parseFloat(vals[fanIdx]) : NaN,
+    });
+    if (adfcIdx !== -1 && vals[adfcIdx] && parseFloat(vals[adfcIdx]) > 0) adfc = parseFloat(vals[adfcIdx]);
+  }
+
+  const t0 = chargeSec != null ? chargeSec : 0;
+  const tEnd = dropSec != null ? dropSec : (raw.length ? raw[raw.length - 1].sec : 0);
+  const dropT = tEnd - t0;
+  if (dropT <= 0) throw new Error('IKAWA CSV에서 투입~배출 구간을 찾지 못했습니다.');
+
+  const btPts = [], etPts = [], fanRaw = [];
+  raw.forEach(r => {
+    const t = r.sec - t0;
+    if (t < 0 || r.sec > tEnd) return;
+    if (!isNaN(r.bt) && r.bt > 0) btPts.push({ t, bt: r.bt });
+    if (!isNaN(r.et) && r.et > 0) etPts.push({ t, bt: r.et });
+    if (!isNaN(r.fan)) fanRaw.push({ t, v: +(r.fan / 10).toFixed(1) }); // 팬% → 0–10
+  });
+  if (btPts.length < 2) throw new Error('IKAWA CSV에서 배기 온도 데이터를 찾지 못했습니다.');
+
+  const evTimes = { charge: 0, drop: dropT };
+  if (adfc != null && adfc > 0 && adfc < dropT) evTimes.fcs = adfc;
+
+  // 팬 변화 지점만 step 포인트로 압축
+  const agitSorted = [];
+  fanRaw.forEach(p => {
+    if (!agitSorted.length || agitSorted[agitSorted.length - 1].v !== p.v) agitSorted.push(p);
+  });
+
+  return {
+    btPts, etPts, evTimes, dropT, agitSorted: agitSorted.length ? agitSorted : null,
+    title: filename.replace(/\.[^.]+$/, ''), ambient_temp: null, ambient_humidity: null,
+    machine: 'IKAWA', fluidBed: true,
+  };
+}
+
 /* 파싱 결과(btPts/etPts/evTimes/dropT)로 wizardData 객체 생성.
    extra.agitSorted: 교반 step 포인트([{t,v}]) — AI 또는 데이터파일 출처
    extra.chargeTemp/dropTemp: 명시 온도(없으면 BT 곡선에서 보간) */
@@ -616,6 +683,7 @@ function buildWizardFromParse(parse, extra) {
     time_series: times, bt_series: bts, et_series: ets, agitation_series: agits, ror, et_ror: etRor,
     et_drop_temp: etDropTemp, charge_weight: chargeWeight, drop_weight: dropWeight, weight_loss: weightLoss,
     events: evTimes,
+    fluid_bed: !!parse.fluidBed, machine: parse.machine || null,
   };
 }
 
@@ -1024,7 +1092,9 @@ function analyzeCurrentPoint(dropTemp, dtr) {
 function renderMetrics(el, d) {
   const cards = [
     { label:'총 시간', value: fmtTime(d.total_time), unit:'',
-      cls: d.total_time<420?'warn':d.total_time>1200?'warn':'good' },
+      cls: d.fluid_bed
+        ? (d.total_time<150?'warn':d.total_time>720?'warn':'good')
+        : (d.total_time<420?'warn':d.total_time>1200?'warn':'good') },
     { label:'DTR', value: d.dtr!=null? d.dtr.toFixed(1):'—', unit:'%',
       cls: d.dtr==null?'':d.dtr<15?'bad':d.dtr>30?'warn':'good' },
     { label:'투입온도', value: d.charge_temp ?? '—', unit:'°C', cls:'' },
@@ -1293,11 +1363,20 @@ function comprehensiveAnalysis(d) {
       text:'크래시·플릭 패턴이 감지되지 않았습니다. ROR이 비교적 매끄럽게 감소하고 있습니다.'});
   }
 
-  // 총 시간
-  if (total_time<420) items.push({type:'bad',icon:'',title:`총 ${fmtTime(total_time)} — 매우 짧음`,
-    text:'급속 로스팅으로 겉은 타고 속은 덜 익는 불균등 로스팅 위험이 있습니다.'});
-  else if (total_time>1200) items.push({type:'warn',icon:'',title:`총 ${fmtTime(total_time)} — 김`,
-    text:'장시간 저온 로스팅은 베이킹·평탄화 결함으로 이어질 수 있습니다.'});
+  // 총 시간 (열풍식은 3~10분이 정상 범위 → 드럼 기준 경고 미적용)
+  if (d.fluid_bed) {
+    items.push({type:'info', icon:'', title:`열풍식(${d.machine || 'fluid-bed'}) 프로파일`,
+      text:'드럼 없이 열풍 대류로 로스팅하는 방식입니다. BT는 배기(exhaust) 공기 온도의 대리값이며, 교반 축에는 팬 속도(%÷10)가 표시됩니다. 드럼 로스터의 온도·시간 기준과 직접 비교하지 마세요.'});
+    if (total_time < 150) items.push({type:'warn',icon:'',title:`총 ${fmtTime(total_time)} — 열풍식 기준으로도 짧음`,
+      text:'3분 미만 로스팅은 발달 부족 위험이 있습니다. 프로파일 시간을 늘려보세요.'});
+    else if (total_time > 720) items.push({type:'warn',icon:'',title:`총 ${fmtTime(total_time)} — 열풍식 기준 김`,
+      text:'열풍식에서 12분 초과는 드문 편입니다. 베이킹·평탄화에 유의하세요.'});
+  } else {
+    if (total_time<420) items.push({type:'bad',icon:'',title:`총 ${fmtTime(total_time)} — 매우 짧음`,
+      text:'급속 로스팅으로 겉은 타고 속은 덜 익는 불균등 로스팅 위험이 있습니다.'});
+    else if (total_time>1200) items.push({type:'warn',icon:'',title:`총 ${fmtTime(total_time)} — 김`,
+      text:'장시간 저온 로스팅은 베이킹·평탄화 결함으로 이어질 수 있습니다.'});
+  }
 
   // 환경(온습도) 반영
   if (ambient_humidity!=null) {

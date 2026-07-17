@@ -61,6 +61,17 @@ Identify the app, then map each curve using the legend you read in PHASE 0.
        to "low" and say so in "notes" rather than guessing.
   The thin noisy line in the bottom chart is ROR — ignore it here.
 
+▶ IKAWA (Pro app / Home app; clean minimal UI, light or dark):
+  FLUID-BED air roaster — there is NO bean-temperature probe. The graph shows:
+    • Temperature curves: setpoint (target) vs actual AIR temperature
+      (inlet and/or exhaust). If both shown, treat EXHAUST as BT and INLET as ET.
+      If only one temperature line, output it as BT.
+    • Fan speed curve (%): a separate line/axis, usually 60–95%.
+      Report its step changes in "agitation" as percent÷10 (e.g. 80% → 8).
+  Roasts are SHORT: total time 3–10 minutes — do not stretch the time axis to
+  drum-roaster lengths. First crack may be marked by the app (ADFC) — read it if shown.
+  Note "IKAWA fluid-bed" in the notes field so the client can apply air-roast rules.
+
 ▶ Artisan (light or dark background): read its legend too.
   Commonly BT = orange/red thick curve, ET = blue curve, but CONFIRM via legend.
   Events: vertical lines labeled CHARGE, DRY END, FC START, FC END, DROP/SCO

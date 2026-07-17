@@ -1,6 +1,6 @@
 {
-  "checked_at": "2026-07-16T22:42:06Z",
-  "total": 1287,
+  "checked_at": "2026-07-17T22:01:15Z",
+  "total": 1294,
   "removed": [],
   "held_stores": [],
   "per_store": {
@@ -13,11 +13,6 @@
       "ok": 49,
       "dead": 0,
       "ambiguous": 0
-    },
-    "코빈즈커피": {
-      "ok": 0,
-      "dead": 0,
-      "ambiguous": 76
     },
     "모모스커피": {
       "ok": 115,
@@ -76,6 +71,11 @@
     },
     "커피플랜트": {
       "ok": 48,
+      "dead": 0,
+      "ambiguous": 0
+    },
+    "코빈즈커피": {
+      "ok": 83,
       "dead": 0,
       "ambiguous": 0
     },

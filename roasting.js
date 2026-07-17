@@ -576,6 +576,7 @@ function parseIkawaRows(rows, hdr, cols, filename) {
   const btIdx  = idx('exaust temp') !== -1 ? idx('exaust temp') : idx('temp above');
   const etIdx  = idx('inlet temp')  !== -1 ? idx('inlet temp')  : idx('temp below');
   const fanIdx = idx('fan set (%)') !== -1 ? idx('fan set (%)') : idx('fan set');
+  const spIdx  = idx('temp set') !== -1 ? idx('temp set') : idx('setpoint');  // 목표(setpoint) 온도
   const stateIdx = idx('state');
   const adfcIdx  = cols.findIndex(c => c.includes('adfc'));
 
@@ -593,6 +594,7 @@ function parseIkawaRows(rows, hdr, cols, filename) {
       bt:  btIdx  !== -1 ? parseFloat(vals[btIdx])  : NaN,
       et:  etIdx  !== -1 ? parseFloat(vals[etIdx])  : NaN,
       fan: fanIdx !== -1 ? parseFloat(vals[fanIdx]) : NaN,
+      sp:  spIdx  !== -1 ? parseFloat(vals[spIdx])  : NaN,
     };
     raw.push(rec);
     if (chargeRow == null && st.includes('doser open')) chargeRow = rec.row;
@@ -612,7 +614,7 @@ function parseIkawaRows(rows, hdr, cols, filename) {
   const tOf = r => timeValid ? r.time - t0 : r.row - chargeRow;
   const dropT = tOf(raw[dropRow]);
 
-  const btPts = [], etPts = [], fanRaw = [];
+  const btPts = [], etPts = [], fanRaw = [], targetPts = [];
   raw.forEach(r => {
     if (r.row < chargeRow || r.row > dropRow) return;   // 예열·냉각 구간 제외
     const t = tOf(r);
@@ -620,6 +622,7 @@ function parseIkawaRows(rows, hdr, cols, filename) {
     if (!isNaN(r.bt) && r.bt > 0) btPts.push({ t, bt: r.bt });
     if (!isNaN(r.et) && r.et > 0) etPts.push({ t, bt: r.et });
     if (!isNaN(r.fan)) fanRaw.push({ t, v: +(r.fan / 10).toFixed(1) }); // 팬% → 0–10
+    if (!isNaN(r.sp) && r.sp > 0) targetPts.push({ t, bt: r.sp });      // 목표(setpoint) 곡선
   });
   if (btPts.length < 2) throw new Error('IKAWA CSV에서 배기 온도 데이터를 찾지 못했습니다.');
 
@@ -634,6 +637,7 @@ function parseIkawaRows(rows, hdr, cols, filename) {
 
   return {
     btPts, etPts, evTimes, dropT, agitSorted: agitSorted.length ? agitSorted : null,
+    targetPts: targetPts.length >= 2 ? targetPts : null,
     title: filename.replace(/\.[^.]+$/, ''), ambient_temp: null, ambient_humidity: null,
     machine: 'IKAWA', fluidBed: true,
   };
@@ -654,6 +658,11 @@ function buildWizardFromParse(parse, extra) {
   const ets   = etPts.length >= 2 ? resample(etPts, 5, dropT).map(s => s.bt) : [];
   const etRor = etPts.length >= 2 ? computeRoR(times, ets, 30) : [];
   const etDropTemp = etPts.length >= 2 ? +interp(etPts, dropT).toFixed(1) : null;
+
+  // 목표(setpoint) 곡선: CSV의 setpoint 컬럼 우선, 없으면 사진에서 읽은 프로파일(extra)
+  const targetSrc = (parse.targetPts && parse.targetPts.length >= 2) ? parse.targetPts
+    : (extra.targetPts && extra.targetPts.length >= 2 ? extra.targetPts : null);
+  const targets = targetSrc ? resample(targetSrc, 5, dropT).map(s => s.bt) : [];
 
   // 교반: 데이터 파일의 교반 컬럼(초 단위 정확값)을 최우선, 없을 때만 AI(사진) 보강값 사용
   const agitSrc = (parse.agitSorted && parse.agitSorted.length) ? parse.agitSorted
@@ -696,6 +705,7 @@ function buildWizardFromParse(parse, extra) {
     et_drop_temp: etDropTemp, charge_weight: chargeWeight, drop_weight: dropWeight, weight_loss: weightLoss,
     events: evTimes,
     fluid_bed: !!parse.fluidBed, machine: parse.machine || null,
+    target_series: targets,
   };
 }
 
@@ -705,7 +715,7 @@ function showWizardResult() {
   chartInstance = buildChart('roastChart',
     wizardData.time_series, wizardData.bt_series, wizardData.et_series || [],
     wizardData.agitation_series || [], wizardData.ror || [], wizardData.et_ror || [],
-    wizardData.events, chartInstance);
+    wizardData.events, chartInstance, wizardData.target_series || []);
   $('chartTitle').textContent = wizardData.bean_name;
   selectedTarget = null;
   const renderTargets = () => renderTargetButtons($('targetBtns'), wizardData, key => {
@@ -822,6 +832,12 @@ async function autoScan() {
     // 교반: AI step 포인트
     const agitSorted = rawAgit.sort((a, b) => a.t - b.t);
 
+    // 목표 프로파일(로스팅 전 계획, Edit Points 화면 등)
+    const targetPts = ((result.target_profile && result.target_profile.temp_points) || [])
+      .map(p => ({ t: +p[0], bt: +p[1] }))
+      .filter(p => !isNaN(p.t) && !isNaN(p.bt) && p.bt > 0)
+      .sort((a, b) => a.t - b.t);
+
     if (hasData) {
       // ── 통합: 데이터 파일(온도·시간) 권위 + 사진(교반·누락 이벤트) 보강 ──
       const dp = digi.dataParsed;
@@ -833,7 +849,11 @@ async function autoScan() {
       });
       const mergedParse = Object.assign({}, dp, { evTimes: mergedEvents });
       // 교반: 데이터파일 교반 컬럼(정확)을 최우선, 없을 때만 사진값 (buildWizardFromParse가 처리)
-      wizardData = buildWizardFromParse(mergedParse, agitSorted.length ? { agitSorted } : {});
+      // 목표 곡선: CSV setpoint 우선, 없으면 사진의 프로파일 포인트
+      const extra = {};
+      if (agitSorted.length) extra.agitSorted = agitSorted;
+      if (targetPts.length >= 2) extra.targetPts = targetPts;
+      wizardData = buildWizardFromParse(mergedParse, extra);
 
       const conf = result.confidence || 'medium';
       const confTxt = conf === 'high' ? '높음' : conf === 'medium' ? '보통' : '낮음';
@@ -847,7 +867,7 @@ async function autoScan() {
       const dropTemp   = result.drop_temp   != null ? +result.drop_temp   : +interp(curve, dropT).toFixed(1);
       wizardData = buildWizardFromParse(
         { btPts: curve, etPts: etCurve, evTimes, dropT, title: '', ambient_temp: null, ambient_humidity: null },
-        { agitSorted, chargeTemp, dropTemp }
+        { agitSorted, chargeTemp, dropTemp, targetPts: targetPts.length >= 2 ? targetPts : undefined }
       );
 
       const conf = result.confidence || 'medium';
@@ -1127,7 +1147,7 @@ function renderMetrics(el, d) {
 }
 
 /* ════════ 차트 ════════ */
-function buildChart(canvasId, times, bts, ets, agits, btRor, etRor, events, prev) {
+function buildChart(canvasId, times, bts, ets, agits, btRor, etRor, events, prev, targets) {
   if (prev) prev.destroy();
   const labels = times.map(t => fmtTime(t));
 
@@ -1142,6 +1162,11 @@ function buildChart(canvasId, times, bts, ets, agits, btRor, etRor, events, prev
   });
 
   const datasets = [];
+
+  // 목표(setpoint) 곡선 — 회색 점선, 있을 때만
+  if (targets && targets.length > 0)
+    datasets.push({ label:'목표 (°C)', data:targets, borderColor:'#9ca3af',
+      borderWidth:1.6, pointRadius:0, tension:.2, yAxisID:'yT', borderDash:[7,4], order:0 });
 
   // BT
   datasets.push({ label:'BT (°C)', data:bts, borderColor:'#e07b2a', backgroundColor:'rgba(224,123,42,.07)',
@@ -1373,6 +1398,31 @@ function comprehensiveAnalysis(d) {
       text:'발달 후반 ROR이 다시 상승하는 패턴입니다. 1차 크랙 중·후 가스를 올리면 탄 향이 날 수 있으니 화력을 낮추세요.'});
     if (!crash && !flick) items.push({type:'good',icon:'',title:'ROR 곡선 양호',
       text:'크래시·플릭 패턴이 감지되지 않았습니다. ROR이 비교적 매끄럽게 감소하고 있습니다.'});
+  }
+
+  // 계획(목표 setpoint) vs 실측 이탈 분석
+  if (d.target_series && d.target_series.length > 2 && bts && bts.length === d.target_series.length) {
+    let sumDev = 0, maxDev = 0, maxIdx = 0, n = 0;
+    for (let i = 0; i < bts.length; i++) {
+      if (bts[i] == null || d.target_series[i] == null) continue;
+      if (times[i] < 60) continue;  // 투입 직후 터닝포인트 하강(정상 현상)은 이탈에서 제외
+      const dev = bts[i] - d.target_series[i];
+      sumDev += Math.abs(dev); n++;
+      if (Math.abs(dev) > Math.abs(maxDev)) { maxDev = dev; maxIdx = i; }
+    }
+    if (n > 0) {
+      const meanDev = sumDev / n;
+      const maxT = times[maxIdx];
+      if (meanDev <= 2)
+        items.push({type:'good', icon:'', title:`목표 프로파일 추종 우수 (평균 편차 ${meanDev.toFixed(1)}°C)`,
+          text:`실측이 목표(setpoint) 곡선을 잘 따라갔습니다. 최대 편차 ${maxDev>0?'+':''}${maxDev.toFixed(1)}°C(${fmtTime(maxT)}). 재현성이 높은 로스팅입니다.`});
+      else if (meanDev <= 5)
+        items.push({type:'info', icon:'', title:`목표 대비 평균 편차 ${meanDev.toFixed(1)}°C`,
+          text:`최대 편차 ${maxDev>0?'+':''}${maxDev.toFixed(1)}°C(${fmtTime(maxT)}). ${maxDev>0?'실측이 목표보다 높았던':'실측이 목표에 못 미친'} 구간이 있습니다. 투입량·예열 상태를 점검하세요.`});
+      else
+        items.push({type:'warn', icon:'', title:`목표 대비 이탈 큼 (평균 ${meanDev.toFixed(1)}°C)`,
+          text:`최대 편차 ${maxDev>0?'+':''}${maxDev.toFixed(1)}°C(${fmtTime(maxT)}). 히터 출력 한계, 투입량 과다, 예열 부족 등이 원인일 수 있습니다. 같은 프로파일 재사용 시 결과가 달라질 수 있으니 원인을 확인하세요.`});
+    }
   }
 
   // 총 시간 (열풍식은 3~10분이 정상 범위 → 드럼 기준 경고 미적용)

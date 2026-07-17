@@ -181,6 +181,18 @@ When MULTIPLE images are given (e.g. one chart + one stat screen), merge: curves
 from the chart image, events/temps from the stat screen. Values printed as text
 are ground truth — prefer them over pixel estimates when they conflict.
 
+▶ PROFILE EDITOR SCREENS (pre-roast plan — e.g. IKAWA "Edit Points"):
+Tables titled 온도 포인트 (time + Exhaust온도) and 팬 포인트 (time + 팬 %).
+These are the PLANNED setpoints, NOT the actual roast. Do NOT put them into
+bt_curve/events. Instead output them as an extra top-level field:
+  "target_profile": {
+    "name": "<profile name if shown>",
+    "temp_points": [[time_sec, temp_celsius], ...],
+    "fan_points":  [[time_sec, fan_percent], ...]
+  }
+Convert MM:SS → seconds. Ignore the 냉각(cooling) section. If the roast's actual
+data comes from another image or file, target_profile simply rides along.
+
 CRITICAL RULES:
 - drop is REQUIRED (from the chart or from a stat screen's 배출 시간)
 - bt_curve and et_curve must each have 25–60 points, sorted by time, spanning

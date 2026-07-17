@@ -161,9 +161,30 @@ OUTPUT — return ONLY this JSON, no markdown, no explanation:
   "notes": "<note any close-overlap situations and how you resolved them>"
 }
 
+════════════════════════════════════════
+TEXT / SUMMARY SCREENS (no chart visible)
+════════════════════════════════════════
+Some uploaded images are STAT/LOG screens with labeled text values instead of a
+chart — e.g. the IKAWA app roast log (dark screen listing 예열 온도, 배출 온도,
+배출 시간, 처음부터 시간, 터닝포인트, 컬러변환시점, 1차 크랙, DTR), or similar
+summary pages from other apps. For such images DO NOT invent curves. Instead:
+- Read every labeled value and convert times (MM:SS → seconds):
+    터닝포인트 / turning point       → events.tp
+    컬러변환시점 / color change      → events.dry
+    1차 크랙 / first crack           → events.fcs   (e.g. "4:57 (202°C)" → 297)
+    배출 시간 / drop time            → events.drop
+    예열/투입 온도                    → charge_temp
+    배출 온도                        → drop_temp
+- Leave bt_curve / et_curve / agitation as [] if no chart is shown.
+- Put "text summary screen" in notes.
+When MULTIPLE images are given (e.g. one chart + one stat screen), merge: curves
+from the chart image, events/temps from the stat screen. Values printed as text
+are ground truth — prefer them over pixel estimates when they conflict.
+
 CRITICAL RULES:
-- drop is REQUIRED
-- bt_curve and et_curve must each have 25–60 points, sorted by time, spanning 0 → drop
+- drop is REQUIRED (from the chart or from a stat screen's 배출 시간)
+- bt_curve and et_curve must each have 25–60 points, sorted by time, spanning
+  0 → drop — EXCEPT when the only image(s) are text summary screens (then [] is allowed)
 - bt_curve must always be >= et_curve at corresponding times after the first 2 minutes
 - agitation: use [] only if bottom chart is completely absent from the image
 - agitation MUST be traced from the line matching the 교반 swatch color — NEVER the

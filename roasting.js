@@ -579,32 +579,44 @@ function parseIkawaRows(rows, hdr, cols, filename) {
   const stateIdx = idx('state');
   const adfcIdx  = cols.findIndex(c => c.includes('adfc'));
 
-  let chargeSec = null, dropSec = null, adfc = null;
+  const timeIdx = idx('time');
+
+  // 행 파싱: state로 투입/배출 '행 인덱스'를 잡는다 (예열 구간 제외용)
+  let chargeRow = null, dropRow = null, adfc = null;
   const raw = [];
   for (let i = hdr + 1; i < rows.length; i++) {
     const vals = rows[i].map(v => String(v).trim().replace(/^"|"$/g, ''));
-    const sec = i - hdr - 1;                       // 1행 = 1초
     const st = stateIdx !== -1 ? (vals[stateIdx] || '').toLowerCase() : '';
-    if (chargeSec == null && st.includes('doser open')) chargeSec = sec;
-    if (dropSec == null && st.includes('cooling')) dropSec = sec;
-    raw.push({
-      sec,
+    const rec = {
+      row: raw.length,
+      time: timeIdx !== -1 ? parseFloat(vals[timeIdx]) : NaN,
       bt:  btIdx  !== -1 ? parseFloat(vals[btIdx])  : NaN,
       et:  etIdx  !== -1 ? parseFloat(vals[etIdx])  : NaN,
       fan: fanIdx !== -1 ? parseFloat(vals[fanIdx]) : NaN,
-    });
+    };
+    raw.push(rec);
+    if (chargeRow == null && st.includes('doser open')) chargeRow = rec.row;
+    if (dropRow == null && st.includes('cooling')) dropRow = rec.row;
     if (adfcIdx !== -1 && vals[adfcIdx] && parseFloat(vals[adfcIdx]) > 0) adfc = parseFloat(vals[adfcIdx]);
   }
+  if (chargeRow == null) chargeRow = 0;
+  if (dropRow == null) dropRow = raw.length - 1;
+  if (dropRow <= chargeRow) throw new Error('IKAWA CSV에서 투입~배출 구간을 찾지 못했습니다.');
 
-  const t0 = chargeSec != null ? chargeSec : 0;
-  const tEnd = dropSec != null ? dropSec : (raw.length ? raw[raw.length - 1].sec : 0);
-  const dropT = tEnd - t0;
-  if (dropT <= 0) throw new Error('IKAWA CSV에서 투입~배출 구간을 찾지 못했습니다.');
+  // 시간축: time 컬럼이 유효하면 그대로 사용(신형은 샘플링 간격이 1초가 아님),
+  // 없거나 증가하지 않으면 1행=1초 규칙(구형)으로 폴백
+  const timeValid = timeIdx !== -1
+    && !isNaN(raw[chargeRow].time) && !isNaN(raw[dropRow].time)
+    && raw[dropRow].time > raw[chargeRow].time + 1;
+  const t0 = timeValid ? raw[chargeRow].time : chargeRow;
+  const tOf = r => timeValid ? r.time - t0 : r.row - chargeRow;
+  const dropT = tOf(raw[dropRow]);
 
   const btPts = [], etPts = [], fanRaw = [];
   raw.forEach(r => {
-    const t = r.sec - t0;
-    if (t < 0 || r.sec > tEnd) return;
+    if (r.row < chargeRow || r.row > dropRow) return;   // 예열·냉각 구간 제외
+    const t = tOf(r);
+    if (isNaN(t) || t < 0 || t > dropT) return;
     if (!isNaN(r.bt) && r.bt > 0) btPts.push({ t, bt: r.bt });
     if (!isNaN(r.et) && r.et > 0) etPts.push({ t, bt: r.et });
     if (!isNaN(r.fan)) fanRaw.push({ t, v: +(r.fan / 10).toFixed(1) }); // 팬% → 0–10

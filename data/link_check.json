@@ -1,6 +1,6 @@
 {
-  "checked_at": "2026-07-17T22:01:15Z",
-  "total": 1294,
+  "checked_at": "2026-07-18T21:53:57Z",
+  "total": 1285,
   "removed": [],
   "held_stores": [],
   "per_store": {
@@ -14,20 +14,20 @@
       "dead": 0,
       "ambiguous": 0
     },
+    "블레스빈": {
+      "ok": 0,
+      "dead": 0,
+      "ambiguous": 89
+    },
     "모모스커피": {
       "ok": 115,
-      "dead": 0,
-      "ambiguous": 0
-    },
-    "블레스빈": {
-      "ok": 89,
       "dead": 0,
       "ambiguous": 0
     },
     "아마티보": {
       "ok": 0,
       "dead": 0,
-      "ambiguous": 16
+      "ambiguous": 15
     },
     "아얀투": {
       "ok": 13,
@@ -50,12 +50,12 @@
       "ambiguous": 0
     },
     "지에스씨(GSC)": {
-      "ok": 140,
+      "ok": 134,
       "dead": 0,
       "ambiguous": 0
     },
     "커만사": {
-      "ok": 427,
+      "ok": 425,
       "dead": 0,
       "ambiguous": 0
     },

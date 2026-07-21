@@ -1,6 +1,6 @@
 {
-  "checked_at": "2026-07-20T22:14:02Z",
-  "total": 1270,
+  "checked_at": "2026-07-21T22:10:22Z",
+  "total": 1285,
   "removed": [],
   "held_stores": [],
   "per_store": {
@@ -14,15 +14,10 @@
       "dead": 0,
       "ambiguous": 0
     },
-    "오월의숲": {
-      "ok": 19,
-      "dead": 0,
-      "ambiguous": 18
-    },
     "모모스커피": {
-      "ok": 52,
+      "ok": 115,
       "dead": 0,
-      "ambiguous": 63
+      "ambiguous": 0
     },
     "블레스빈": {
       "ok": 89,
@@ -49,8 +44,13 @@
       "dead": 0,
       "ambiguous": 0
     },
+    "오월의숲": {
+      "ok": 37,
+      "dead": 0,
+      "ambiguous": 0
+    },
     "지에스씨(GSC)": {
-      "ok": 110,
+      "ok": 113,
       "dead": 0,
       "ambiguous": 0
     },
@@ -60,7 +60,7 @@
       "ambiguous": 0
     },
     "커피리브레": {
-      "ok": 85,
+      "ok": 84,
       "dead": 0,
       "ambiguous": 0
     },
@@ -70,7 +70,7 @@
       "ambiguous": 0
     },
     "커피플랜트": {
-      "ok": 57,
+      "ok": 71,
       "dead": 0,
       "ambiguous": 0
     },
@@ -80,7 +80,7 @@
       "ambiguous": 0
     },
     "팔콘커피": {
-      "ok": 30,
+      "ok": 29,
       "dead": 0,
       "ambiguous": 0
     }

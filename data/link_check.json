@@ -1,6 +1,6 @@
 {
-  "checked_at": "2026-07-21T22:10:22Z",
-  "total": 1285,
+  "checked_at": "2026-07-22T22:16:17Z",
+  "total": 1295,
   "removed": [],
   "held_stores": [],
   "per_store": {
@@ -27,7 +27,7 @@
     "아마티보": {
       "ok": 0,
       "dead": 0,
-      "ambiguous": 15
+      "ambiguous": 21
     },
     "아얀투": {
       "ok": 13,
@@ -55,12 +55,12 @@
       "ambiguous": 0
     },
     "커만사": {
-      "ok": 425,
+      "ok": 426,
       "dead": 0,
       "ambiguous": 0
     },
     "커피리브레": {
-      "ok": 84,
+      "ok": 83,
       "dead": 0,
       "ambiguous": 0
     },
@@ -70,17 +70,17 @@
       "ambiguous": 0
     },
     "커피플랜트": {
-      "ok": 71,
+      "ok": 73,
       "dead": 0,
       "ambiguous": 0
     },
     "코빈즈커피": {
-      "ok": 87,
+      "ok": 88,
       "dead": 0,
       "ambiguous": 0
     },
     "팔콘커피": {
-      "ok": 29,
+      "ok": 30,
       "dead": 0,
       "ambiguous": 0
     }

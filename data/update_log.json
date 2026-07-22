@@ -1,10 +1,18 @@
 {
-  "updated_at": "2026-07-21T22:11:55Z",
+  "updated_at": "2026-07-22T22:18:06Z",
   "stores": [
     {
+      "name": "아마티보",
+      "new_count": 5
+    },
+    {
       "name": "커피플랜트",
-      "new_count": 12
+      "new_count": 2
+    },
+    {
+      "name": "코빈즈커피",
+      "new_count": 1
     }
   ],
-  "total_new": 12
+  "total_new": 8
 }

@@ -1,6 +1,6 @@
 {
-  "checked_at": "2026-07-23T22:11:58Z",
-  "total": 1300,
+  "checked_at": "2026-07-24T22:12:54Z",
+  "total": 1305,
   "removed": [],
   "held_stores": [],
   "per_store": {
@@ -35,7 +35,7 @@
       "ambiguous": 0
     },
     "엠아이커피": {
-      "ok": 95,
+      "ok": 97,
       "dead": 0,
       "ambiguous": 0
     },
@@ -55,7 +55,7 @@
       "ambiguous": 0
     },
     "커만사": {
-      "ok": 426,
+      "ok": 428,
       "dead": 0,
       "ambiguous": 0
     },
@@ -75,7 +75,7 @@
       "ambiguous": 0
     },
     "코빈즈커피": {
-      "ok": 89,
+      "ok": 90,
       "dead": 0,
       "ambiguous": 0
     },

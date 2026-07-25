@@ -1,14 +1,5 @@
 {
-  "updated_at": "2026-07-24T22:14:26Z",
-  "stores": [
-    {
-      "name": "엠아이커피",
-      "new_count": 2
-    },
-    {
-      "name": "코빈즈커피",
-      "new_count": 1
-    }
-  ],
-  "total_new": 3
+  "updated_at": "2026-07-25T22:05:16Z",
+  "stores": [],
+  "total_new": 0
 }

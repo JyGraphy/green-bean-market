@@ -1,6 +1,6 @@
 {
-  "checked_at": "2026-07-25T22:03:23Z",
-  "total": 1294,
+  "checked_at": "2026-07-26T22:07:31Z",
+  "total": 1289,
   "removed": [],
   "held_stores": [],
   "per_store": {
@@ -55,7 +55,7 @@
       "ambiguous": 0
     },
     "커만사": {
-      "ok": 420,
+      "ok": 415,
       "dead": 0,
       "ambiguous": 0
     },

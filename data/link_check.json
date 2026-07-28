@@ -1,8 +1,10 @@
 {
-  "checked_at": "2026-07-27T22:12:48Z",
-  "total": 1277,
+  "checked_at": "2026-07-28T22:10:05Z",
+  "total": 1273,
   "removed": [],
-  "held_stores": [],
+  "held_stores": [
+    "모모스커피: dead 115/115 (100%) — URL 구조 변경 의심, 제거 보류"
+  ],
   "per_store": {
     "더블유빈": {
       "ok": 42,
@@ -15,12 +17,12 @@
       "ambiguous": 0
     },
     "모모스커피": {
-      "ok": 115,
-      "dead": 0,
+      "ok": 0,
+      "dead": 115,
       "ambiguous": 0
     },
     "블레스빈": {
-      "ok": 89,
+      "ok": 90,
       "dead": 0,
       "ambiguous": 0
     },
@@ -35,7 +37,7 @@
       "ambiguous": 0
     },
     "엠아이커피": {
-      "ok": 92,
+      "ok": 91,
       "dead": 0,
       "ambiguous": 0
     },
@@ -50,17 +52,17 @@
       "ambiguous": 0
     },
     "지에스씨(GSC)": {
-      "ok": 114,
+      "ok": 113,
       "dead": 0,
       "ambiguous": 0
     },
     "커만사": {
-      "ok": 414,
+      "ok": 413,
       "dead": 0,
       "ambiguous": 0
     },
     "커피리브레": {
-      "ok": 81,
+      "ok": 80,
       "dead": 0,
       "ambiguous": 0
     },
@@ -80,7 +82,7 @@
       "ambiguous": 0
     },
     "팔콘커피": {
-      "ok": 30,
+      "ok": 29,
       "dead": 0,
       "ambiguous": 0
     }

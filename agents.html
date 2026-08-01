@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AGENT HQ — AI 직원 현황판 | 생두 가격 비교</title>
+<meta name="description" content="생두 가격 비교 사이트를 운영하는 Claude Code 서브에이전트(AI 직원) 조직 현황판.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="agents.css">
+</head>
+<body>
+
+<!-- ===== 상단 관제 바 ===== -->
+<header class="hq-topbar">
+  <div class="hq-logo">
+    <span class="hq-logo-dot"></span>
+    <div class="hq-logo-text">
+      <div class="hq-title">AGENT&nbsp;HQ <span class="hq-uptime" id="hqUptime">00:00:00</span></div>
+      <div class="hq-sub"><span id="hqAgentTotal">0</span> 에이전트 · <span id="hqDeptTotal">0</span> 부서 <span class="hq-badge">생두마켓 캠퍼스</span></div>
+    </div>
+  </div>
+
+  <div class="hq-pills" id="hqPills"><!-- JS 렌더 --></div>
+
+  <div class="hq-clock">
+    <div class="hq-time" id="hqTime">--:--:--</div>
+    <div class="hq-date" id="hqDate">--</div>
+  </div>
+</header>
+
+<!-- ===== 조직 커맨드 바 ===== -->
+<div class="cmd-bar">
+  <div class="cmd-left">
+    <span class="cmd-title">ORGANIZATION&nbsp;COMMAND</span>
+    <span class="cmd-status"><span class="cmd-status-dot"></span>CONTROL LINK STABLE</span>
+  </div>
+  <div class="cmd-right">
+    <span class="cmd-note" id="cmdNote">-</span>
+    <a class="cmd-link" href="index.html">← 생두 비교 사이트</a>
+  </div>
+</div>
+
+<main class="hq-main">
+
+  <!-- ===== 부서 카드 ===== -->
+  <section class="dept-grid" id="deptGrid"><!-- JS 렌더 --></section>
+
+  <!-- ===== 플로어 뷰 ===== -->
+  <section class="floor-sec">
+    <div class="sec-head">
+      <span class="sec-title">FLOOR&nbsp;VIEW</span>
+      <span class="sec-sub">캠퍼스 전체 · 데스크 실시간</span>
+    </div>
+    <div class="floor-grid" id="floorGrid"><!-- JS 렌더 --></div>
+  </section>
+
+  <!-- ===== 업무 로그 ===== -->
+  <section class="log-sec">
+    <div class="sec-head">
+      <span class="sec-title">ACTIVITY&nbsp;LOG</span>
+      <span class="sec-sub">최근 산출물 · 업무 기록</span>
+    </div>
+    <ul class="log-list" id="logList"><!-- JS 렌더 --></ul>
+  </section>
+
+  <p class="hq-footnote">
+    이 현황판의 직원들은 <code>.claude/agents/</code>에 정의된 Claude Code 서브에이전트입니다.
+    세션에서 이름을 불러 호출하면 근무가 시작되고, 산출물은 <code>docs/</code>·<code>research/</code>에 쌓입니다.
+    상태·로그는 에이전트가 일할 때마다 <code>agents.js</code>의 명부를 갱신해 반영됩니다.
+  </p>
+
+</main>
+
+<script src="agents.js"></script>
+</body>
+</html>

@@ -41,6 +41,25 @@
 > 근본 해결: 환경의 네트워크 정책을 열면(허용 도메인 추가) WebFetch가 살아나고 리서치 품질이 크게 올라간다.
 > 정책은 환경 생성 시 선택한 값이며 소유자만 변경할 수 있다.
 
+## 💰 모델 배치 (토큰 비용 최적화)
+
+작업 성격에 맞는 모델을 각 정의 파일의 `model:` 프런트매터로 지정한다.
+
+| 모델 | 담당 | 이유 |
+|------|------|------|
+| **haiku** (저비용) | store-scout, roast-profile-collector, data-validator, frontend-reviewer | 검색·목록화·기계적 검사 — 판단보다 수집이 핵심 |
+| **sonnet** (중간) | coe-auction-reporter, coffee-research-translator, scraper-checker, new-store-onboarder | 교차 검증·번역 품질·코드 판단이 필요 |
+| **opus** | (기본 미배정) | 사장님이 직접 지시하는 설계·의사결정 세션에서만 |
+
+**수집과 정리를 분리하면 비용이 크게 준다** — haiku가 원자료를 `research/raw/`에 모으고,
+sonnet이 그걸 읽어 보고서로 정리하는 2단 구조가 기본이다.
+
+## 📄 보고서 규격
+
+모든 보고서는 **`.claude/agents/REPORT-FORMAT.md`** 규격을 따른다.
+핵심: 결론 3줄 → 사장님 결정 필요 항목 → 표 중심 본문 → 출처(신뢰등급 표기).
+본문 4,000자 상한, 원자료는 보고서에 붙이지 말고 `research/raw/`에 두고 링크만.
+
 ## 운영 원칙
 
 - 발굴(scout)과 추가(onboarder)는 분리되어 있다. **scout 보고 → 사용자 컨펌 → onboarder 실행** 순서를 지킨다.

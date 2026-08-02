@@ -47,6 +47,11 @@ const LOGS = [
   { date: '2026-08-01', dept: 'qa',  agent: 'system', text: 'AI 직원 8명 채용 완료 — 검수·실무·리서치 3개 부서 편성' },
 ];
 
+/* 보고서함 — `hq/build-artifact.py`가 docs/·research/의 .md를 읽어
+ * window.__REPORTS__ = [{ id, title, agent, dept, date, desc, body }] 형태로 주입한다.
+ * 주입이 없으면(로컬에서 그냥 열었을 때) 보고서함은 안내 문구를 보여준다. */
+const REPORTS = window.__REPORTS__ || [];
+
 /* ===== 이하 렌더링 (데이터 수정 불필요) ===== */
 const STATUS_KO = { active: '업무 중', standby: '대기', idle: '휴식', offline: '오프라인' };
 const $ = (id) => document.getElementById(id);
@@ -139,6 +144,138 @@ function render() {
     </li>`).join('');
 }
 
+/* ===== 마크다운 → HTML (보고서 렌더용 최소 구현) ===== */
+function esc(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function inlineMd(s) {
+  return s
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+}
+function cells(row) {
+  return row.replace(/^\||\|$/g, '').split('|').map((c) => c.trim());
+}
+function mdToHtml(md) {
+  const L = esc(md).split('\n');
+  const out = [];
+  let i = 0;
+  const isBlockStart = (s) =>
+    /^(#{1,6}\s|\||```|&gt;|\s*[-*]\s|\s*\d+\.\s)/.test(s) || /^---+$/.test(s.trim());
+
+  while (i < L.length) {
+    const ln = L[i];
+
+    if (/^```/.test(ln)) {                                   // 코드 블록
+      const buf = [];
+      i++;
+      while (i < L.length && !/^```/.test(L[i])) buf.push(L[i++]);
+      i++;
+      out.push('<pre><code>' + buf.join('\n') + '</code></pre>');
+      continue;
+    }
+    if (/^\|/.test(ln) && i + 1 < L.length && /^\|[\s:|-]+\|?\s*$/.test(L[i + 1])) { // 표
+      const head = cells(ln);
+      i += 2;
+      const rows = [];
+      while (i < L.length && /^\|/.test(L[i])) rows.push(cells(L[i++]));
+      out.push(
+        '<div class="tw"><table><thead><tr>' +
+          head.map((c) => '<th>' + inlineMd(c) + '</th>').join('') +
+          '</tr></thead><tbody>' +
+          rows.map((r) => '<tr>' + r.map((c) => '<td>' + inlineMd(c) + '</td>').join('') + '</tr>').join('') +
+          '</tbody></table></div>'
+      );
+      continue;
+    }
+    const h = ln.match(/^(#{1,6})\s+(.*)$/);                 // 제목
+    if (h) { out.push(`<h${h[1].length}>${inlineMd(h[2])}</h${h[1].length}>`); i++; continue; }
+
+    if (/^---+$/.test(ln.trim())) { out.push('<hr>'); i++; continue; }
+
+    if (/^&gt;\s?/.test(ln)) {                               // 인용
+      const buf = [];
+      while (i < L.length && /^&gt;/.test(L[i])) buf.push(L[i++].replace(/^&gt;\s?/, ''));
+      out.push('<blockquote>' + buf.map(inlineMd).join('<br>') + '</blockquote>');
+      continue;
+    }
+    const ordered = /^\s*\d+\.\s+/.test(ln);
+    if (ordered || /^\s*[-*]\s+/.test(ln)) {                 // 목록
+      const mark = ordered ? /^\s*\d+\.\s+/ : /^\s*[-*]\s+/;
+      const buf = [];
+      while (i < L.length && (mark.test(L[i]) || (buf.length && /^\s{2,}\S/.test(L[i])))) {
+        if (mark.test(L[i])) buf.push(L[i].replace(mark, ''));
+        else buf[buf.length - 1] += ' ' + L[i].trim();
+        i++;
+      }
+      const tag = ordered ? 'ol' : 'ul';
+      out.push(`<${tag}>` + buf.map((x) => '<li>' + inlineMd(x) + '</li>').join('') + `</${tag}>`);
+      continue;
+    }
+    if (!ln.trim()) { i++; continue; }
+
+    const buf = [];                                          // 문단
+    while (i < L.length && L[i].trim() && !isBlockStart(L[i])) buf.push(L[i++]);
+    out.push('<p>' + inlineMd(buf.join(' ')) + '</p>');
+  }
+  return out.join('\n');
+}
+
+/* ===== 보고서함 + 리더 ===== */
+function renderReports() {
+  const grid = $('repGrid');
+  if (!grid) return;
+  if (!REPORTS.length) {
+    grid.innerHTML =
+      '<div class="rep-empty">아직 제출된 보고서가 없습니다.<br>' +
+      '직원이 근무하면 여기에 쌓입니다.</div>';
+    return;
+  }
+  const deptOf = (id) => HQ.departments.find((d) => d.id === id);
+  grid.innerHTML = REPORTS.map((r, n) => {
+    const d = deptOf(r.dept);
+    const emoji = (d ? d.agents.find((a) => a.id === r.agent) : null)?.emoji || '📄';
+    return `
+    <button class="rep-card" data-idx="${n}" style="--accent:${d ? d.accent : 'var(--dim)'}">
+      <div class="rep-top">
+        <span class="rep-icon">${emoji}</span>
+        <span class="rep-agent">${r.agent}</span>
+        <span class="rep-date">${r.date}</span>
+      </div>
+      <div class="rep-title">${r.title}</div>
+      <div class="rep-desc">${r.desc || ''}</div>
+      <div class="rep-open"><span>보고서 열기 →</span><span>${r.words}자</span></div>
+    </button>`;
+  }).join('');
+
+  grid.querySelectorAll('.rep-card').forEach((el) => {
+    el.addEventListener('click', () => openReader(REPORTS[+el.dataset.idx]));
+  });
+}
+
+let lastFocused = null;
+function openReader(r) {
+  lastFocused = document.activeElement;
+  $('readerTitle').textContent = r.title;
+  $('readerMeta').textContent = `${r.agent} · ${r.date} · ${r.path}`;
+  $('readerBody').innerHTML = mdToHtml(r.body);
+  $('readerBody').scrollTop = 0;
+  $('reader').hidden = false;
+  document.body.style.overflow = 'hidden';
+  $('readerClose').focus();
+}
+function closeReader() {
+  $('reader').hidden = true;
+  document.body.style.overflow = '';
+  lastFocused?.focus();
+}
+if ($('reader')) {
+  $('readerClose').addEventListener('click', closeReader);
+  $('reader').addEventListener('click', (e) => { if (e.target === $('reader')) closeReader(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('reader').hidden) closeReader(); });
+}
+
 /* 시계 + 세션 가동 시간 */
 const bootAt = Date.now();
 function tick() {
@@ -151,5 +288,6 @@ function tick() {
 }
 
 render();
+renderReports();
 tick();
 setInterval(tick, 1000);

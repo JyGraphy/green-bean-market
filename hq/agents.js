@@ -37,7 +37,12 @@ const HQ = {
 
 /* 업무 로그 — 최신이 위. 에이전트가 산출물을 만들면 여기에 추가 (report: 링크는 선택) */
 const LOGS = [
-  { date: '2026-08-02', dept: 'res', agent: 'coe-auction-reporter', text: 'COE 2026 옥션 일정 리포트 제출 — 태국 옥션 D-2(8/4) 임박 알림 · 랏 상세는 접근 차단으로 미확인' },
+  { date: '2026-08-02', dept: 'qa',  agent: 'data-validator', text: '데이터 전수 검증 — 위험 1건(모모스커피 링크 115개 전량 dead) · 주의 9건 · 중복ID/상대경로URL 0건', report: '../docs/daily/2026-08-02-데이터검증.md' },
+  { date: '2026-08-02', dept: 'qa',  agent: 'scraper-checker', text: '스크래퍼 15종 전수 점검 — 규칙 위반 0건 · 주의 6건 · CLAUDE.md 문서 드리프트 발견(12→16개사, 500→1286개)', report: '../docs/daily/2026-08-02-스크래퍼점검.md' },
+  { date: '2026-08-02', dept: 'ops', agent: 'store-scout', text: '신규 생두사 후보 15곳 발굴 — 1군 4곳(커피시스·캅카와·맥널티·나무사이로) ⏳ 승인 대기', report: '../docs/store-scout-report-2026-08-02.md' },
+  { date: '2026-08-02', dept: 'res', agent: 'roast-profile-collector', text: '프로파일 출처 카탈로그 22곳 구축 — 곡선 수집 0건(본문 접근 차단, 날조 대신 보류)', report: '../research/roast-profiles/SOURCES.md' },
+  { date: '2026-08-02', dept: 'res', agent: 'coffee-research-translator', text: '커피 논문 2편 한글 정리 (로스팅 색도 곡선 · 적정산도)', report: '../docs/research/' },
+  { date: '2026-08-02', dept: 'res', agent: 'coe-auction-reporter', text: 'COE 2026 옥션 일정 리포트 제출 — 태국 옥션 D-2(8/4) 임박 알림 · 랏 상세는 접근 차단으로 미확인', report: '../docs/coe-report-2026-08-02.md' },
   { date: '2026-08-02', dept: 'qa',  agent: 'system', text: '환경 네트워크 실측: WebFetch·curl 전면 403 차단, WebSearch 정상 → 리서치팀 전원에 대체 프로토콜 배포' },
   { date: '2026-08-01', dept: 'qa',  agent: 'system', text: 'AI 직원 8명 채용 완료 — 검수·실무·리서치 3개 부서 편성' },
 ];

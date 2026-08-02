@@ -26,7 +26,7 @@ const HQ = {
       id: 'res', name: '리서치부서', unit: 'UNIT RES', icon: '📡', accent: 'var(--res)',
       desc: 'COE 옥션 · 로스팅 프로파일 데이터 · 논문 번역',
       agents: [
-        { id: 'coe-auction-reporter',     emoji: '🏆', role: 'COE 옥션 리포트',     status: 'standby', lastWork: null },
+        { id: 'coe-auction-reporter',     emoji: '🏆', role: 'COE 옥션 리포트',     status: 'standby', lastWork: 'COE 2026 일정 리포트 제출' },
         { id: 'roast-profile-collector',  emoji: '🔥', role: '프로파일 데이터 수집', status: 'standby', lastWork: null },
         { id: 'coffee-research-translator',emoji: '📚', role: '논문 번역·정리',      status: 'standby', lastWork: null },
       ],
@@ -37,6 +37,8 @@ const HQ = {
 
 /* 업무 로그 — 최신이 위. 에이전트가 산출물을 만들면 여기에 추가 (report: 링크는 선택) */
 const LOGS = [
+  { date: '2026-08-02', dept: 'res', agent: 'coe-auction-reporter', text: 'COE 2026 옥션 일정 리포트 제출 — 태국 옥션 D-2(8/4) 임박 알림 · 랏 상세는 접근 차단으로 미확인' },
+  { date: '2026-08-02', dept: 'qa',  agent: 'system', text: '환경 네트워크 실측: WebFetch·curl 전면 403 차단, WebSearch 정상 → 리서치팀 전원에 대체 프로토콜 배포' },
   { date: '2026-08-01', dept: 'qa',  agent: 'system', text: 'AI 직원 8명 채용 완료 — 검수·실무·리서치 3개 부서 편성' },
 ];
 

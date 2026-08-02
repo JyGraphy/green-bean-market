@@ -22,7 +22,7 @@ from collections import Counter, defaultdict
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DATA = ROOT / 'data' / 'products.json'
-DAILY = ROOT / 'docs' / 'daily'
+DAILY = ROOT / 'vault' / 'raw' / 'qa'
 
 PROC_CLS = {
     '펄프드내추럴', '무산소발효', '허니', '웻훌드', '내추럴', '워시드', '디카페인', '알수없음',

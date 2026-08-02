@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-08-01T21:55:40Z",
+  "checked_at": "2026-08-02T21:57:22Z",
   "total": 1286,
   "removed": [],
   "held_stores": [
@@ -27,9 +27,9 @@
       "ambiguous": 21
     },
     "블레스빈": {
-      "ok": 90,
+      "ok": 91,
       "dead": 0,
-      "ambiguous": 1
+      "ambiguous": 0
     },
     "아얀투": {
       "ok": 20,
@@ -37,7 +37,7 @@
       "ambiguous": 0
     },
     "엠아이커피": {
-      "ok": 89,
+      "ok": 90,
       "dead": 0,
       "ambiguous": 0
     },
@@ -57,7 +57,7 @@
       "ambiguous": 0
     },
     "커만사": {
-      "ok": 417,
+      "ok": 416,
       "dead": 0,
       "ambiguous": 0
     },

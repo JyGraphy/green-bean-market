@@ -37,6 +37,14 @@ vault/
 
 > `vault/raw/coe/2026-08-04-*` 읽고 `wiki/coe-옥션.md` 갱신해.
 
+## COE 자동 수집 (GitHub Actions)
+
+Claude Code 세션은 allianceforcoffeeexcellence.org 접근이 차단돼(네트워크 허용목록 정책)
+WebFetch로 랏 단위 결과를 못 읽는다. 대신 `.github/workflows/coe.yml`이 매주 월요일과
+수동 실행 시 GitHub Actions 러너(완전한 인터넷 접근)에서 `scripts/coe_fetch.py`를 돌려
+`vault/raw/coe/YYYY-MM-DD-옥션결과-자동수집.md`를 커밋한다. 표를 찾으면 그대로, 못 찾으면
+본문 텍스트를 보존한다 — 정리(wiki 반영)는 이후 AI가 이 raw를 읽고 수행한다.
+
 ## 목차 갱신 (토큰 0)
 
 ```bash

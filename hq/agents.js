@@ -37,12 +37,12 @@ const HQ = {
 
 /* 업무 로그 — 최신이 위. 에이전트가 산출물을 만들면 여기에 추가 (report: 링크는 선택) */
 const LOGS = [
-  { date: '2026-08-02', dept: 'qa',  agent: 'data-validator', text: '데이터 전수 검증 — 위험 1건(모모스커피 링크 115개 전량 dead) · 주의 9건 · 중복ID/상대경로URL 0건', report: '../docs/daily/2026-08-02-데이터검증.md' },
-  { date: '2026-08-02', dept: 'qa',  agent: 'scraper-checker', text: '스크래퍼 15종 전수 점검 — 규칙 위반 0건 · 주의 6건 · CLAUDE.md 문서 드리프트 발견(12→16개사, 500→1286개)', report: '../docs/daily/2026-08-02-스크래퍼점검.md' },
-  { date: '2026-08-02', dept: 'ops', agent: 'store-scout', text: '신규 생두사 후보 15곳 발굴 — 1군 4곳(커피시스·캅카와·맥널티·나무사이로) ⏳ 승인 대기', report: '../docs/store-scout-report-2026-08-02.md' },
-  { date: '2026-08-02', dept: 'res', agent: 'roast-profile-collector', text: '프로파일 출처 카탈로그 22곳 구축 — 곡선 수집 0건(본문 접근 차단, 날조 대신 보류)', report: '../research/roast-profiles/SOURCES.md' },
-  { date: '2026-08-02', dept: 'res', agent: 'coffee-research-translator', text: '커피 논문 2편 한글 정리 (로스팅 색도 곡선 · 적정산도)', report: '../docs/research/' },
-  { date: '2026-08-02', dept: 'res', agent: 'coe-auction-reporter', text: 'COE 2026 옥션 일정 리포트 제출 — 태국 옥션 D-2(8/4) 임박 알림 · 랏 상세는 접근 차단으로 미확인', report: '../docs/coe-report-2026-08-02.md' },
+  { date: '2026-08-02', dept: 'qa',  agent: 'data-validator', text: '데이터 전수 검증 — 위험 1건(모모스커피 링크 115개 전량 dead) · 주의 9건 · 중복ID/상대경로URL 0건' },
+  { date: '2026-08-02', dept: 'qa',  agent: 'scraper-checker', text: '스크래퍼 15종 전수 점검 — 규칙 위반 0건 · 주의 6건 · CLAUDE.md 문서 드리프트 발견(12→16개사, 500→1286개)' },
+  { date: '2026-08-02', dept: 'ops', agent: 'store-scout', text: '신규 생두사 후보 15곳 발굴 — 1군 4곳(커피시스·캅카와·맥널티·나무사이로) ⏳ 승인 대기' },
+  { date: '2026-08-02', dept: 'res', agent: 'roast-profile-collector', text: '프로파일 출처 카탈로그 22곳 구축 — 곡선 수집 0건(본문 접근 차단, 날조 대신 보류)' },
+  { date: '2026-08-02', dept: 'res', agent: 'coffee-research-translator', text: '커피 논문 2편 한글 정리 (로스팅 색도 곡선 · 적정산도)' },
+  { date: '2026-08-02', dept: 'res', agent: 'coe-auction-reporter', text: 'COE 2026 옥션 일정 리포트 제출 — 태국 옥션 D-2(8/4) 임박 알림 · 랏 상세는 접근 차단으로 미확인' },
   { date: '2026-08-02', dept: 'qa',  agent: 'system', text: '환경 네트워크 실측: WebFetch·curl 전면 403 차단, WebSearch 정상 → 리서치팀 전원에 대체 프로토콜 배포' },
   { date: '2026-08-01', dept: 'qa',  agent: 'system', text: 'AI 직원 8명 채용 완료 — 검수·실무·리서치 3개 부서 편성' },
 ];
@@ -51,6 +51,9 @@ const LOGS = [
  * window.__REPORTS__ = [{ id, title, agent, dept, date, desc, body }] 형태로 주입한다.
  * 주입이 없으면(로컬에서 그냥 열었을 때) 보고서함은 안내 문구를 보여준다. */
 const REPORTS = window.__REPORTS__ || [];
+
+/* 지시함 — build-artifact.py 가 scripts/orders.py 결과를 주입한다 */
+const ORDERS = window.__ORDERS__ || [];
 
 /* ===== 이하 렌더링 (데이터 수정 불필요) ===== */
 const STATUS_KO = { active: '업무 중', standby: '대기', idle: '휴식', offline: '오프라인' };
@@ -222,6 +225,31 @@ function mdToHtml(md) {
   return out.join('\n');
 }
 
+/* ===== 지시함 ===== */
+function renderOrders() {
+  const box = $('ordBox');
+  if (!box) return;
+  const deptOf = (agent) => HQ.departments.find((d) => d.agents.some((a) => a.id === agent));
+  const hint =
+    '<div class="ord-hint">옵시디언에서 <code>vault/지시함.md</code>에 ' +
+    '<code>- [ ] @태그 지시내용</code> 한 줄을 적고, ' +
+    '저에게 <strong>"지시함 확인해줘"</strong>라고 하면 담당 직원이 처리합니다.</div>';
+  if (!ORDERS.length) {
+    box.innerHTML = '<div class="ord-empty">대기 중인 지시가 없습니다.</div>' + hint;
+    return;
+  }
+  box.innerHTML = ORDERS.map((o) => {
+    const d = deptOf(o.agent);
+    return `
+    <div class="ord-item${o.urgent ? ' urgent' : ''}" style="--accent:${d ? d.accent : 'var(--dim)'}">
+      <span class="ord-tag">@${o.tag}</span>
+      <span class="ord-text">${o.text}</span>
+      ${o.urgent ? '<span class="ord-urgent">🔥 급함</span>' : ''}
+      <span class="ord-to">→ ${o.agent} · ${o.model}</span>
+    </div>`;
+  }).join('') + hint;
+}
+
 /* ===== 보고서함 + 리더 ===== */
 function renderReports() {
   const grid = $('repGrid');
@@ -288,6 +316,7 @@ function tick() {
 }
 
 render();
+renderOrders();
 renderReports();
 tick();
 setInterval(tick, 1000);

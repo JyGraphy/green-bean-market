@@ -82,6 +82,14 @@ def build(out_path):
     # 아티팩트에서는 상대경로 링크가 동작하지 않으므로 라이브 사이트로 교체
     body = body.replace('href="../index.html"', f'href="{LIVE_SITE}" target="_blank" rel="noopener"')
 
+    sys.path.insert(0, str(ROOT / 'scripts'))
+    try:
+        import orders as _orders
+        pending = [{'tag': o['tag'], 'text': o['text'], 'urgent': o['urgent'],
+                    'agent': o['agent'], 'model': o['model']} for o in _orders.parse()]
+    except Exception:
+        pending = []
+
     reports = collect_reports()
     payload = json.dumps(reports, ensure_ascii=False)
     # </script> 가 문자열 안에 있으면 조기 종료되므로 이스케이프
@@ -91,11 +99,12 @@ def build(out_path):
         '<title>AGENT HQ — AI 직원 현황판</title>\n'
         f'<style>\n{css}\n</style>\n'
         f'{body}\n'
-        f'<script>window.__REPORTS__ = {payload};</script>\n'
+        f'<script>window.__ORDERS__ = {json.dumps(pending, ensure_ascii=False)};'
+        f'window.__REPORTS__ = {payload};</script>\n'
         f'<script>\n{js}\n</script>\n'
     )
     out_path.write_text(out, encoding='utf-8')
-    print(f'✓ {out_path}  ({len(out)/1024:.0f} KB, 보고서 {len(reports)}건)')
+    print(f'✓ {out_path}  ({len(out)/1024:.0f} KB, 보고서 {len(reports)}건, 대기 지시 {len(pending)}건)')
     for r in reports:
         print(f'   · [{r["date"]}] {r["agent"]:<26} {r["title"][:44]}')
 

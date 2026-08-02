@@ -120,18 +120,18 @@ REPORT-FORMAT 규격의 마크다운까지 써낸다. **AI 토큰 0.**
 | **sonnet** (중간) | coe-auction-reporter, coffee-research-translator, scraper-checker, new-store-onboarder | 교차 검증·번역 품질·코드 판단이 필요 |
 | **opus** | (기본 미배정) | 사장님이 직접 지시하는 설계·의사결정 세션에서만 |
 
-**수집과 정리를 분리하면 비용이 크게 준다** — haiku가 원자료를 `research/raw/`에 모으고,
+**수집과 정리를 분리하면 비용이 크게 준다** — haiku가 원자료를 `vault/raw/`에 모으고,
 sonnet이 그걸 읽어 보고서로 정리하는 2단 구조가 기본이다.
 
 ## 📄 보고서 규격
 
 모든 보고서는 **`.claude/agents/REPORT-FORMAT.md`** 규격을 따른다.
 핵심: 결론 3줄 → 사장님 결정 필요 항목 → 표 중심 본문 → 출처(신뢰등급 표기).
-본문 4,000자 상한, 원자료는 보고서에 붙이지 말고 `research/raw/`에 두고 링크만.
+본문 4,000자 상한, 원자료는 보고서에 붙이지 말고 `vault/raw/`에 두고 링크만.
 
 ## 운영 원칙
 
 - 발굴(scout)과 추가(onboarder)는 분리되어 있다. **scout 보고 → 사용자 컨펌 → onboarder 실행** 순서를 지킨다.
-- 리서치 산출물은 `docs/`, 수집 데이터는 `research/`에 쌓인다.
+- 모든 산출물은 `vault/raw/`에 쌓이고, 정리본만 `vault/wiki/`에 남는다 (세컨드 브레인 절 참조).
 - **현황판 갱신**: 에이전트가 산출물을 만들면 `agents.js`(AGENT HQ 현황판 명부)의 `LOGS` 맨 위에 기록을 한 줄 추가하고, 해당 에이전트의 `lastWork`를 갱신한다. 쓰기 도구가 없는 검수팀의 보고는 메인 세션이 대신 기록한다. 현황판은 `hq/agents.js` 명부 기반의 `hq/agents.html` — **운영자 내부 전용**으로 `.vercelignore`에 의해 유저 사이트에는 배포되지 않으며, 명부가 바뀌면 아티팩트로 재게시해 사용자에게 보여준다.
 - 에이전트는 세션에서 호출될 때 실행된다. 정기 자동 보고(예: 매주 COE 체크)를 원하면 Claude Code의 스케줄 기능(Routine)에 연결할 수 있다.

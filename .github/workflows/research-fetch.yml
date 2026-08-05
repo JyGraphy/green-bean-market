@@ -1,0 +1,91 @@
+name: 리서치 자료 수집 (옥션 · 논문 전문)
+
+# Claude Code 세션은 네트워크 허용목록 정책 때문에 외부 사이트가 403으로 막힌다.
+# GitHub Actions 러너는 인터넷이 열려 있으므로 여기서 원본을 받아 커밋한다.
+# 이후 AI가 vault/raw/ 의 원본을 읽고 번역·정리한다.
+
+on:
+  schedule:
+    # 매주 월요일 오전 8시 (KST = UTC+9, 즉 UTC 전날 23:00)
+    - cron: '0 23 * * 0'
+  workflow_dispatch:
+    inputs:
+      auction_source:
+        description: '옥션 소스 (coe / bop / 비우면 전체)'
+        required: false
+        default: ''
+      paper_query:
+        description: '논문 검색어 (비우면 대기열만 처리)'
+        required: false
+        default: ''
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: 저장소 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Python 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 의존성 설치
+        run: pip install requests beautifulsoup4 lxml
+
+      # 사이트 하나가 막혀도 나머지 수집은 계속되도록 격리.
+      - name: 옥션 결과 수집 (COE · BOP)
+        id: auction
+        continue-on-error: true
+        run: |
+          if [ -n "${{ github.event.inputs.auction_source }}" ]; then
+            python scripts/auction_fetch.py --source ${{ github.event.inputs.auction_source }}
+          else
+            python scripts/auction_fetch.py
+          fi
+
+      - name: 논문 전문 수집 (오픈액세스)
+        id: papers
+        continue-on-error: true
+        run: |
+          if [ -n "${{ github.event.inputs.paper_query }}" ]; then
+            python scripts/paper_fetch.py --search "${{ github.event.inputs.paper_query }}"
+          fi
+          python scripts/paper_fetch.py --queue
+
+      - name: 세컨드 브레인 목차 갱신
+        if: always()
+        run: python scripts/build_wiki_index.py
+
+      - name: 변경사항 확인
+        id: check_changes
+        if: always()
+        run: |
+          git add vault/raw/ vault/wiki/index.md
+          git diff --cached --quiet || echo "changed=true" >> $GITHUB_OUTPUT
+
+      - name: 변경사항 커밋 & 푸시
+        if: always() && steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config user.name "GreenBeanBot"
+          git config user.email "bot@green-bean-market"
+          git commit -m "리서치 자료 자동 수집: $(date '+%Y-%m-%d')"
+          git push
+
+      # 두 수집이 모두 실패하면 잡을 빨간 X로 표시해 사람이 알아채게 한다.
+      - name: 수집 결과 표면화
+        if: always()
+        run: |
+          A="${{ steps.auction.outcome }}"
+          P="${{ steps.papers.outcome }}"
+          echo "옥션: $A / 논문: $P"
+          if [ "$A" != "success" ] && [ "$P" != "success" ]; then
+            echo "::error::옥션·논문 수집이 모두 실패했습니다 — vault/raw/ 최신 보고서를 확인하세요."
+            exit 1
+          fi
+          if [ "$A" != "success" ]; then echo "::warning::옥션 수집 실패"; fi
+          if [ "$P" != "success" ]; then echo "::warning::논문 수집 실패(대기열이 비어 있으면 정상)"; fi

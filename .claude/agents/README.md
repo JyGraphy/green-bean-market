@@ -21,9 +21,9 @@
 
 | 직원 | 역할 | 호출 예시 |
 |------|------|-----------|
-| `coe-auction-reporter` | 각국 COE 옥션 일정·결과를 표로 정리 보고 | "COE 리포트 만들어줘" |
-| `roast-profile-collector` | 로스터기 프로파일 학습 데이터 수집(출처·라이선스 검증 필수) | "IKAWA 프로파일 데이터 수집해줘" |
-| `coffee-research-translator` | 커피 논문을 찾아 한글로 번역·정리 | "로스팅 관련 최신 논문 번역해줘" |
+| `auction-reporter` | COE·BOP 등 각국 옥션의 **전체 랏 결과**(낙찰자·낙찰가 포함) | "옥션 리포트 만들어줘" |
+| `roast-profile-collector` | 기기별 지식 수집 → **로스팅 AI 프롬프트에 주입(학습)** → 검증 보고 | "프로파일 AI 학습시켜줘" |
+| `coffee-research-translator` | 논문 **전문**을 한글로 완역(요약 아님) | "논문 전문 번역해줘" |
 
 ## ⚠️ 이 환경의 네트워크 제약 (2026-08-02 실측)
 
@@ -34,12 +34,22 @@
 | `curl` / 직접 outbound | ❌ 403 | `CONNECT tunnel failed` — 환경 네트워크 정책 |
 | GitHub (git push/pull) | ✅ 정상 | 전용 프록시 경유 |
 
-**따라서 리서치팀은 WebSearch를 주력으로 쓴다.** 각 에이전트 정의의 "네트워크 제약 프로토콜"을 따를 것:
-본문을 못 읽어 확인 불가한 값은 **"미확인(본문 접근 차단)"**으로 표기하고, **절대 지어내지 않는다.**
-그래도 만들 수 있는 산출물(일정표, 후보 목록, 출처 카탈로그)은 반드시 만들어 낸다 — 빈손 퇴근은 실패다.
+### ✅ 해결책 — GitHub Actions로 원본을 받아온다 (2026-08-05 도입)
 
-> 근본 해결: 환경의 네트워크 정책을 열면(허용 도메인 추가) WebFetch가 살아나고 리서치 품질이 크게 올라간다.
-> 정책은 환경 생성 시 선택한 값이며 소유자만 변경할 수 있다.
+세션은 막혀 있지만 **GitHub Actions 러너는 인터넷이 열려 있다.** 실제로 검증됐다
+(COE 13/13 페이지 수신 성공). 따라서 "본문을 못 읽어 초록만 정리"는 더 이상 변명이 안 된다.
+
+| 수집기 | 받는 것 | 저장 위치 |
+|---|---|---|
+| `scripts/auction_fetch.py` | COE·BOP 등 **전체 랏 표**(낙찰자·낙찰가 포함) | `vault/raw/auctions/` |
+| `scripts/paper_fetch.py` | 오픈액세스 논문 **전문 + 표 + 그림** | `vault/raw/papers/fulltext/` |
+
+워크플로: `.github/workflows/research-fetch.yml` (매주 월 08:00 KST + 수동 실행).
+논문은 `vault/raw/papers/_수집대기.md` 에 PMCID를 넣으면 다음 실행 때 받아진다.
+
+**리서치팀은 먼저 `vault/raw/` 에 받아둔 원본이 있는지 확인하고 그것을 근거로 쓴다.**
+없으면 대기열에 등록하거나 워크플로 수동 실행을 요청한다. WebSearch는 보조 수단이다.
+확인 못 한 값은 **"미확인"**으로 표기하고 **절대 지어내지 않는다.**
 
 ## 🧠 세컨드 브레인 (vault/) — 산출물이 쌓이는 곳
 
@@ -50,7 +60,7 @@
 | `vault/raw/` | **IN** — 수집한 원본 | 수정 금지. 에이전트는 여기에만 쓴다 |
 | `vault/wiki/` | **OUT** — 정리된 지식 | 주제당 파일 하나. 새 정보가 오면 **갱신** |
 
-에이전트별 저장 위치: `raw/coe/` · `raw/stores/` · `raw/qa/` · `raw/papers/` · `raw/roast-profiles/`
+에이전트별 저장 위치: `raw/auctions/` · `raw/stores/` · `raw/qa/` · `raw/papers/`(+`fulltext/`, `번역/`) · `raw/roast-profiles/`(+`machines/`)
 
 정리 규칙은 **`vault/CLAUDE.md`** 에 있다. 목차는 스크립트가 만든다:
 
@@ -67,7 +77,7 @@ python3 scripts/build_wiki_index.py   # vault/wiki/index.md 재생성 — 토큰
 
 ```markdown
 - [ ] @발굴 부산 지역 생두 매장 찾아봐
-- [ ] @coe 태국 옥션 결과 정리해줘 !급함
+- [ ] @옥션 BOP 결과 전체 랏 정리해줘 !급함
 ```
 
 사장님이 **"지시함 확인해줘"** 라고 할 때 처리한다. **자동 확인 루틴은 현재 없다**
@@ -117,8 +127,8 @@ REPORT-FORMAT 규격의 마크다운까지 써낸다. **AI 토큰 0.**
 
 | 모델 | 담당 | 이유 |
 |------|------|------|
-| **haiku** (저비용) | store-scout, roast-profile-collector, data-validator, frontend-reviewer | 검색·목록화·기계적 검사 — 판단보다 수집이 핵심 |
-| **sonnet** (중간) | coe-auction-reporter, coffee-research-translator, scraper-checker, new-store-onboarder | 교차 검증·번역 품질·코드 판단이 필요 |
+| **haiku** (저비용) | store-scout, data-validator, frontend-reviewer | 검색·목록화·기계적 검사 — 판단보다 수집이 핵심 |
+| **sonnet** (중간) | auction-reporter, coffee-research-translator, roast-profile-collector, scraper-checker, new-store-onboarder | 교차 검증·번역 품질·코드 판단이 필요 |
 | **opus** | (기본 미배정) | 사장님이 직접 지시하는 설계·의사결정 세션에서만 |
 
 **수집과 정리를 분리하면 비용이 크게 준다** — haiku가 원자료를 `vault/raw/`에 모으고,
@@ -130,9 +140,15 @@ sonnet이 그걸 읽어 보고서로 정리하는 2단 구조가 기본이다.
 핵심: 결론 3줄 → 사장님 결정 필요 항목 → 표 중심 본문 → 출처(신뢰등급 표기).
 본문 4,000자 상한, 원자료는 보고서에 붙이지 말고 `vault/raw/`에 두고 링크만.
 
+**예외 — 상한이 적용되지 않는 것** (사장님 피드백 2026-08-03: "요약만 주니 얻어가는 게 없다"):
+- 논문 **완역본** — 원문만큼 길어도 된다. 표·그림 캡션까지 전부 옮긴다.
+- 옥션 **전체 랏 표** — 1위만 발췌 금지. 낙찰자·낙찰가까지 전량 보존.
+
 ## 운영 원칙
 
 - 발굴(scout)과 추가(onboarder)는 분리되어 있다. **scout 보고 → 사용자 컨펌 → onboarder 실행** 순서를 지킨다.
 - 모든 산출물은 `vault/raw/`에 쌓이고, 정리본만 `vault/wiki/`에 남는다 (세컨드 브레인 절 참조).
 - **현황판 갱신**: 에이전트가 산출물을 만들면 `agents.js`(AGENT HQ 현황판 명부)의 `LOGS` 맨 위에 기록을 한 줄 추가하고, 해당 에이전트의 `lastWork`를 갱신한다. 쓰기 도구가 없는 검수팀의 보고는 메인 세션이 대신 기록한다. 현황판은 `hq/agents.js` 명부 기반의 `hq/agents.html` — **운영자 내부 전용**으로 `.vercelignore`에 의해 유저 사이트에는 배포되지 않으며, 명부가 바뀌면 아티팩트로 재게시해 사용자에게 보여준다.
-- 에이전트는 세션에서 호출될 때 실행된다. 정기 자동 보고(예: 매주 COE 체크)를 원하면 Claude Code의 스케줄 기능(Routine)에 연결할 수 있다.
+- 에이전트는 세션에서 호출될 때 실행된다. 원본 수집만은 GitHub Actions가 자동으로 돌린다.
+- **로스팅 AI 학습**: `roast-profile-collector`는 수집으로 끝내지 않고 `build_roast_knowledge.py`로
+  기기 지식을 실제 AI 프롬프트(`analyze-roast/index.ts`)에 주입해야 업무 완료다. 배포는 사장님 몫.

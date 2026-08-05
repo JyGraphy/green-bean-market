@@ -80,6 +80,59 @@ Identify the app, then map each curve using the legend you read in PHASE 0.
   BT = boldest colored curve; confirm names against the legend.
   Events marked by vertical dashed lines with text.
 
+// <<<MACHINE_KNOWLEDGE_START>>>
+// 자동 생성 — 직접 수정 금지. 원본: vault/raw/roast-profiles/machines/*.md
+// 생성일 2026-08-05 · 등록 기기 2대
+
+════════════════════════════════════════
+PHASE 1-B — MACHINE-SPECIFIC READING RULES (verified knowledge base)
+════════════════════════════════════════
+The user may specify which roaster produced the chart. Heat-transfer method differs
+per machine (drum conduction / fluid-bed convection / halogen radiation), so the curve
+shapes, typical temperature ranges and total roast times differ too. Use the matching
+entry below to calibrate your reading; if the machine is unknown, infer it from the
+chart app and total roast time, then apply that entry.
+
+| Machine | Heat source | Temp probe | Typical total | Chart app |
+|---|---|---|---|---|
+| IKAWA Pro (50g / 100g) | 열풍(대류) — fluid-bed | 배기온도만 (원두 프로브 없음) | 3–10분 | IKAWA Pro app |
+| Stronghold (Roastware / Boost) | 하이브리드 — 열풍 + 할로겐(복사) + 드럼히터(전도) | BT+ET (원두 표면 / 내부) | 10–16분 | Roastware / Boost web app (dark UI, Korean labels) |
+
+▶ IKAWA Pro (50g / 100g)
+  - FLUID-BED air roaster — there is NO bean-temperature probe. Never invent a BT probe reading.
+  - Temperature curves are setpoint (target) vs actual AIR temperature. If both inlet and exhaust
+    are shown, treat EXHAUST as BT and INLET as ET. If only one line, output it as BT.
+  - Fan speed curve (%) has its own axis, usually 60–95%. Report step changes in "agitation"
+    as percent ÷ 10 (e.g. 80% → 8).
+  - Roasts are SHORT (3–10 min). Do NOT stretch the time axis to drum-roaster lengths —
+    this is the single most common error when the machine is misidentified.
+  - First crack may be marked by the app (ADFC) — read it if shown.
+  - Note "IKAWA fluid-bed" in the notes field so the client applies air-roast rules.
+  - CSV export exists: 구형 헤더는 'exaust temp'(원문 오타), 신형은 'temp above'.
+    roasting.js 의 IKAWA CSV 파서가 이 두 형태를 모두 인식한다.
+
+▶ Stronghold (Roastware / Boost)
+  - TOP CHART legend reads "■ 원두 표면  ■ 내부":
+    BT = 원두 표면 (bean surface), ET = 내부 (internal drum). Match legend swatch colors.
+    Sanity check only: BT usually finishes HIGHER than ET at drop.
+  - BOTTOM CHART (labeled 열원값) has up to four control STEP curves:
+    열풍 (hot air) / 할로겐 (halogen) / 드럼 히터 (drum heater) / 교반 (agitation, 0–10).
+  - ⚠️ 할로겐(purple) and 교반(green) are the most commonly CONFUSED pair.
+    Trace ONLY the step line whose color matches the 교반 swatch pixel-for-pixel.
+    BEHAVIOR CUE: 할로겐 usually DECREASES and may step DOWN to 0 near the end;
+    교반 commonly HOLDS a mid value then STEPS UP in the last 1–2 minutes (7→8→9→10).
+    If the traced "교반" is flat throughout or drops to 0, you likely traced 할로겐.
+  - Read the ENTIRE 교반 line to DROP — late step-ups are frequently missed.
+  - Because this machine mixes three heat sources, ROR behaviour differs from pure drum
+    roasters: halogen changes cause faster BT response than a drum-only roaster would show.
+
+CRITICAL: report the detected machine in the output "notes" field, e.g.
+"machine: IKAWA Pro (fluid-bed)". If the observed values contradict the machine's
+typical range above by a wide margin, lower "confidence" and say so in notes rather
+than forcing the numbers to fit.
+
+// <<<MACHINE_KNOWLEDGE_END>>>
+
 ════════════════════════════════════════
 PHASE 2 — DISAMBIGUATE OVERLAPPING LABELS
 ════════════════════════════════════════

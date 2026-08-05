@@ -24,7 +24,9 @@ INBOX = ROOT / 'vault' / '지시함.md'
 
 # 태그 → (담당, 모델, 산출물 경로, 스크립트 선처리 여부)
 ROUTES = {
-    'coe':      ('coe-auction-reporter',      'sonnet', 'vault/raw/coe/',            None),
+    '옥션':      ('auction-reporter',          'sonnet', 'vault/raw/auctions/',       None),
+    'coe':      ('auction-reporter',          'sonnet', 'vault/raw/auctions/',       None),
+    'bop':      ('auction-reporter',          'sonnet', 'vault/raw/auctions/',       None),
     '발굴':      ('store-scout',               'haiku',  'vault/raw/stores/',         None),
     '온보딩':    ('new-store-onboarder',       'sonnet', '(코드 수정)',                None),
     '논문':      ('coffee-research-translator','sonnet', 'vault/raw/papers/',         None),
@@ -35,7 +37,8 @@ ROUTES = {
     '정리':      ('(메인 세션)',                '-',      'vault/wiki/',               'python3 scripts/build_wiki_index.py'),
 }
 ALIAS = {'scout': '발굴', 'store': '발굴', 'paper': '논문', 'profile': '프로파일',
-         'data': '데이터', 'scraper': '스크래퍼', 'front': '프론트', 'wiki': '정리'}
+         'data': '데이터', 'scraper': '스크래퍼', 'front': '프론트', 'wiki': '정리',
+         'auction': '옥션', '경매': '옥션'}
 
 PENDING_RE = re.compile(r'^-\s*\[ \]\s*@(\S+)\s+(.*)$')
 

@@ -26,9 +26,9 @@ const HQ = {
       id: 'res', name: '리서치부서', unit: 'UNIT RES', icon: '📡', accent: 'var(--res)',
       desc: 'COE 옥션 · 로스팅 프로파일 데이터 · 논문 번역',
       agents: [
-        { id: 'coe-auction-reporter',     emoji: '🏆', role: 'COE 옥션 리포트',     status: 'standby', lastWork: 'COE 2026 일정 리포트 제출' },
-        { id: 'roast-profile-collector',  emoji: '🔥', role: '프로파일 데이터 수집', status: 'standby', lastWork: null },
-        { id: 'coffee-research-translator',emoji: '📚', role: '논문 번역·정리',      status: 'standby', lastWork: null },
+        { id: 'auction-reporter',         emoji: '🏆', role: '옥션 전체 랏 리포트',  status: 'standby', lastWork: 'COE 랏 단위 순위표 확보' },
+        { id: 'roast-profile-collector',  emoji: '🔥', role: '로스팅 AI 학습',      status: 'standby', lastWork: '기기 지식 2대 프롬프트 주입' },
+        { id: 'coffee-research-translator',emoji: '📚', role: '논문 전문 완역',      status: 'standby', lastWork: null },
       ],
     },
   ],
@@ -37,6 +37,8 @@ const HQ = {
 
 /* 업무 로그 — 최신이 위. 에이전트가 산출물을 만들면 여기에 추가 (report: 링크는 선택) */
 const LOGS = [
+  { date: '2026-08-05', dept: 'res', agent: 'system', text: '리서치팀 전면 개편 — 논문 전문 수집기·옥션 전체 랏 수집기(COE+BOP) 신설, 로스팅 AI 학습 파이프라인 구축' },
+  { date: '2026-08-05', dept: 'res', agent: 'roast-profile-collector', text: '로스팅 AI에 기기 지식 2대(IKAWA·Stronghold) 프롬프트 주입 — 열원별 판독 규칙 반영' },
   { date: '2026-08-02', dept: 'qa',  agent: 'data-validator', text: '데이터 전수 검증 — 위험 1건(모모스커피 링크 115개 전량 dead) · 주의 9건 · 중복ID/상대경로URL 0건' },
   { date: '2026-08-02', dept: 'qa',  agent: 'scraper-checker', text: '스크래퍼 15종 전수 점검 — 규칙 위반 0건 · 주의 6건 · CLAUDE.md 문서 드리프트 발견(12→16개사, 500→1286개)' },
   { date: '2026-08-02', dept: 'ops', agent: 'store-scout', text: '신규 생두사 후보 15곳 발굴 — 1군 4곳(커피시스·캅카와·맥널티·나무사이로) ⏳ 승인 대기' },

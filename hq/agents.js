@@ -27,8 +27,8 @@ const HQ = {
       desc: 'COE 옥션 · 로스팅 프로파일 데이터 · 논문 번역',
       agents: [
         { id: 'auction-reporter',         emoji: '🏆', role: '옥션 전체 랏 리포트',  status: 'standby', lastWork: 'COE 랏 단위 순위표 확보' },
-        { id: 'roast-profile-collector',  emoji: '🔥', role: '로스팅 AI 학습',      status: 'standby', lastWork: '기기 지식 2대 프롬프트 주입' },
-        { id: 'coffee-research-translator',emoji: '📚', role: '논문 전문 완역',      status: 'standby', lastWork: null },
+        { id: 'roast-profile-collector',  emoji: '🔥', role: '로스팅 AI 학습',      status: 'standby', lastWork: '로스터기 8대 학습·배포 완료' },
+        { id: 'coffee-research-translator',emoji: '📚', role: '논문 전문 완역',      status: 'standby', lastWork: '기초지식 정리 + 전문 6편 확보' },
       ],
     },
   ],
@@ -37,6 +37,8 @@ const HQ = {
 
 /* 업무 로그 — 최신이 위. 에이전트가 산출물을 만들면 여기에 추가 (report: 링크는 선택) */
 const LOGS = [
+  { date: '2026-08-05', dept: 'res', agent: 'coffee-research-translator', text: '생두·로스팅 기초지식 종합 정리 — 화학조성·가공방식·로스팅 3단계·크랙 원인·DTR 논쟁 · 전문 6편(29만자·그림32) 확보' },
+  { date: '2026-08-05', dept: 'res', agent: 'roast-profile-collector', text: '로스터기 6대 추가 학습(Probat·Loring·후지로얄·Aillio·Giesen·태환) — 총 8대, 자동 배포로 실서비스 반영 완료' },
   { date: '2026-08-05', dept: 'res', agent: 'system', text: '리서치팀 전면 개편 — 논문 전문 수집기·옥션 전체 랏 수집기(COE+BOP) 신설, 로스팅 AI 학습 파이프라인 구축' },
   { date: '2026-08-05', dept: 'res', agent: 'roast-profile-collector', text: '로스팅 AI에 기기 지식 2대(IKAWA·Stronghold) 프롬프트 주입 — 열원별 판독 규칙 반영' },
   { date: '2026-08-02', dept: 'qa',  agent: 'data-validator', text: '데이터 전수 검증 — 위험 1건(모모스커피 링크 115개 전량 dead) · 주의 9건 · 중복ID/상대경로URL 0건' },

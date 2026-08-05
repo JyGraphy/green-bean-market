@@ -56,13 +56,17 @@ def coe_pages(year: int) -> dict[str, str]:
 
 
 def bop_pages(year: int) -> dict[str, str]:
-    """Best of Panama — 게이샤 최고가 경신이 자주 나오는 옥션."""
+    """Best of Panama — 게이샤 최고가 경신이 자주 나오는 옥션.
+
+    주의: 옥션 도메인은 bestofpanama.org 가 아니라 **bestofpanama.auction** 이다
+    (2026-08-05 실측으로 확인 — .org 하위의 /results/ 는 404).
+    옥션 운영은 M-Cultivo 플랫폼에서 이뤄진다.
+    """
     return {
         'BOP 공식': 'https://bestofpanama.org/',
-        'BOP 결과': 'https://bestofpanama.org/results/',
-        f'BOP {year} 결과': f'https://bestofpanama.org/{year}-results/',
-        'BOP 옥션 플랫폼': 'https://auction.bestofpanama.org/',
-        'SCAP(파나마 스페셜티커피협회)': 'https://scap.com.pa/',
+        'BOP 옥션 (현행)': 'https://bestofpanama.auction/',
+        'BOP 옥션 앱': 'https://app.bestofpanama.auction/',
+        'M-Cultivo BOP': 'https://mcultivo.com/customer-stories/best-of-panama',
     }
 
 

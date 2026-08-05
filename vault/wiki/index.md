@@ -13,15 +13,15 @@ _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0
 | [[데이터-파이프라인]] — 데이터 파이프라인 | 2026-08-02 | 2건 |
 | [[로스팅-프로파일]] — 로스팅 프로파일 | 2026-08-05 | 7건 |
 | [[생두-공급사]] — 생두 공급사 | 2026-08-03 | 3건 |
-| [[옥션]] — 세계 커피 옥션 (COE · BOP 등) | 2026-08-03 | 2건 |
+| [[옥션]] — 세계 커피 옥션 (COE · BOP 등) | 2026-08-05 | 4건 |
 | [[커피-논문]] — 커피 논문 | 2026-08-03 | 8건 |
 
 ## 📥 원본 (raw — 수정 금지)
 
 ### 📄 auctions `raw/auctions/`
 
-- [[2026-08-05-bop-전체랏]] — BOP (Best of Panama) 옥션 결과 — 전체 랏 수집  ⚠️ _wiki에서 참조되지 않음_
-- [[2026-08-05-coe-전체랏]] — COE (Cup of Excellence) 옥션 결과 — 전체 랏 수집  ⚠️ _wiki에서 참조되지 않음_
+- [[2026-08-05-bop-전체랏]] — BOP (Best of Panama) 옥션 결과 — 전체 랏 수집
+- [[2026-08-05-coe-전체랏]] — COE (Cup of Excellence) 옥션 결과 — 전체 랏 수집
 
 ### 🏆 COE 옥션 `raw/coe/`
 
@@ -59,13 +59,11 @@ _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0
 
 ## ⚠️ 정리 대기
 
-아래 5건은 아직 wiki에 반영되지 않았습니다.
+아래 3건은 아직 wiki에 반영되지 않았습니다.
 정리하려면 Claude에게 다음처럼 지시하세요:
 
 ```
 vault/raw의 아래 문서를 읽고 vault/CLAUDE.md 규칙대로 wiki로 정리해:
-  - raw/auctions/2026-08-05-bop-전체랏.md
-  - raw/auctions/2026-08-05-coe-전체랏.md
   - raw/papers/_수집대기.md
   - raw/papers/fulltext/PMC11500665-Contrasted-agronomical-and-physiological-responses-of-five-C.md
   - raw/papers/fulltext/PMC6818232-Starmaya-The-First-Arabica-F1-Coffee-Hybrid-Produced-Using-G.md

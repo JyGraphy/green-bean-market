@@ -138,7 +138,8 @@ def write_report(machines: list[dict], changed: bool):
         '',
         '## ⏳ 사장님 결정 필요',
         '',
-        ('- [ ] Supabase Edge Function 재배포 (`supabase functions deploy analyze-roast`)'
+        ('- [ ] 배포 확인 — main 푸시 시 `deploy-functions.yml` 이 자동 배포합니다. '
+         '저장소 시크릿 `SUPABASE_ACCESS_TOKEN` 이 없으면 건너뛰므로 등록 여부를 확인하세요.'
          if changed else '- 없음'),
         '',
         '## 등록된 기기 지식',
@@ -201,8 +202,11 @@ def main():
         out = write_report(machines, changed)
         print(f'✓ {out.relative_to(ROOT)} 생성')
     if changed:
-        print('\n⚠️ 실제 서비스 반영에는 배포가 필요합니다:')
-        print('   supabase functions deploy analyze-roast')
+        print('\n⚠️ 실제 서비스 반영에는 배포가 필요합니다.')
+        print('   · 자동: 이 변경을 main에 푸시하면 deploy-functions.yml 이 배포합니다')
+        print('     (저장소 시크릿 SUPABASE_ACCESS_TOKEN 필요)')
+        print('   · 수동: supabase functions deploy analyze-roast '
+              '--project-ref txnpbzukavajwbmggpfk')
 
 
 if __name__ == '__main__':

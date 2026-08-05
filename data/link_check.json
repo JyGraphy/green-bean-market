@@ -1,6 +1,6 @@
 {
-  "checked_at": "2026-08-04T22:15:07Z",
-  "total": 1282,
+  "checked_at": "2026-08-05T22:18:51Z",
+  "total": 1293,
   "removed": [],
   "held_stores": [
     "모모스커피: dead 115/115 (100%) — URL 구조 변경 의심, 제거 보류"
@@ -27,7 +27,7 @@
       "ambiguous": 21
     },
     "블레스빈": {
-      "ok": 93,
+      "ok": 94,
       "dead": 0,
       "ambiguous": 0
     },
@@ -37,7 +37,7 @@
       "ambiguous": 0
     },
     "엠아이커피": {
-      "ok": 88,
+      "ok": 96,
       "dead": 0,
       "ambiguous": 0
     },
@@ -57,12 +57,12 @@
       "ambiguous": 0
     },
     "커만사": {
-      "ok": 415,
+      "ok": 414,
       "dead": 0,
       "ambiguous": 0
     },
     "커피리브레": {
-      "ok": 77,
+      "ok": 76,
       "dead": 0,
       "ambiguous": 0
     },
@@ -72,7 +72,7 @@
       "ambiguous": 0
     },
     "커피플랜트": {
-      "ok": 66,
+      "ok": 67,
       "dead": 0,
       "ambiguous": 0
     },
@@ -82,7 +82,7 @@
       "ambiguous": 0
     },
     "팔콘커피": {
-      "ok": 28,
+      "ok": 31,
       "dead": 0,
       "ambiguous": 0
     }

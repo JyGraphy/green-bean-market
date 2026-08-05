@@ -2,7 +2,7 @@
 
 _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0) · 2026-08-05_
 
-정리된 주제 **5개** · 원본 문서 **31건**
+정리된 주제 **5개** · 원본 문서 **35건**
 
 ---
 
@@ -60,13 +60,17 @@ _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0
 
 ## ⚠️ 정리 대기
 
-아래 3건은 아직 wiki에 반영되지 않았습니다.
+아래 7건은 아직 wiki에 반영되지 않았습니다.
 정리하려면 Claude에게 다음처럼 지시하세요:
 
 ```
 vault/raw의 아래 문서를 읽고 vault/CLAUDE.md 규칙대로 wiki로 정리해:
   - raw/papers/_수집대기.md
+  - raw/papers/fulltext/PMC10305520-Chemical-and-Biological-Characterization-of-Green-and-Proces.md
+  - raw/papers/fulltext/PMC11002029-The-effect-of-roast-profiles-on-the-dynamics-of-titratable-a.md
   - raw/papers/fulltext/PMC11500665-Contrasted-agronomical-and-physiological-responses-of-five-C.md
+  - raw/papers/fulltext/PMC12234775-A-universal-color-curve-for-roasted-arabica-coffee.md
   - raw/papers/fulltext/PMC6818232-Starmaya-The-First-Arabica-F1-Coffee-Hybrid-Produced-Using-G.md
+  - raw/papers/fulltext/PMC8854711-Comparison-of-chemical-compounds-and-their-influence-on-the.md
 ```
 

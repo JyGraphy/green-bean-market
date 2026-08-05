@@ -82,7 +82,7 @@ Identify the app, then map each curve using the legend you read in PHASE 0.
 
 // <<<MACHINE_KNOWLEDGE_START>>>
 // 자동 생성 — 직접 수정 금지. 원본: vault/raw/roast-profiles/machines/*.md
-// 생성일 2026-08-05 · 등록 기기 2대
+// 생성일 2026-08-05 · 등록 기기 8대
 
 ════════════════════════════════════════
 PHASE 1-B — MACHINE-SPECIFIC READING RULES (verified knowledge base)
@@ -95,8 +95,69 @@ chart app and total roast time, then apply that entry.
 
 | Machine | Heat source | Temp probe | Typical total | Chart app |
 |---|---|---|---|---|
+| Aillio Bullet R1 (v2 / R2 Pro) | 하이브리드 — 드럼 + 유도가열(IH), 가스/화염 아님 | BT+ET + 선택형 IBTS(적외선 표면센서, 열지연 없음) | 8–12분 (배치 약 400g–1.2kg) | RoasTime (Aillio 자체 앱) |
+| 후지로얄 Fuji Royal (R-101 / R-105 등 소형 드럼) | 드럼(전도) — 반직화식(semi-direct fire) 가스 드럼 | 내장 프로브 없음 (국내는 후장착 서모커플+Artisan 조합) | 10–15분 (드럼을 약 200℃로 예열 후 150℃ 부근으로 낮춰 투입) | Artisan (자체 차트 앱 없음 — 후장착 프로브+Artisan 조합이 일반적) |
+| Giesen (W6 / W15 / W30 시리즈) | 드럼(전도) — 가스버너 + 간접 드럼 가열(indirect-drum) 재킷 | BT+ET 옵션 (PT100 이중 프로브) | 약 12–13분 (실측 예: 브라질 옐로우 부르봉, 최종 BT 200℃ 기준 4회 평균 12:50) | Artisan / Cropster / Giesen Profiler (자체 소프트웨어, 2.0부터 색상 커스터마이징 가능) |
 | IKAWA Pro (50g / 100g) | 열풍(대류) — fluid-bed | 배기온도만 (원두 프로브 없음) | 3–10분 | IKAWA Pro app |
+| Loring (S15 Falcon / S35 Kestrel / S70 Peregrine) | 열풍(대류) — single burner heats inlet air, not the drum (smokeless afterburner) | BT(빠른 ~1.5mm 프로브)+ET(배기) | 10–16분 (예: S15 배치 15kg). 대형기(S35/S70)도 배치만 커질 뿐 시간대는 유사 | Cropster (Roasting Intelligence) / Loring 자체 제어 소프트웨어 ("Roast Architect") |
+| Probat (Probatone / P Series) | 드럼(전도) — gas burner + drum/air thermocouples | BT+ET (P series 표준, 구형 Probatone 2 base는 BT만) | 10–20분 (상업용 배치 5–60kg) | Artisan / Cropster (자체 차트 앱 없음, 외부 소프트웨어 연동) |
 | Stronghold (Roastware / Boost) | 하이브리드 — 열풍 + 할로겐(복사) + 드럼히터(전도) | BT+ET (원두 표면 / 내부) | 10–16분 | Roastware / Boost web app (dark UI, Korean labels) |
+| 태환 Proaster (Taehwan Automation) | 드럼(전도) — 드럼 하부 열원(가스 또는 전기, 모델별 상이) | 미확인 (모델별 상이, 표준 BT/ET 구성 확인 안 됨) | 5–20분 (모델별 편차 큼 — 예: THCR-01A 500g–1.5kg 배치, 5–20분) | 미확인 — 자체 데이터로깅/차트 소프트웨어 존재를 검색으로 확인하지 못함 |
+
+▶ Aillio Bullet R1 (v2 / R2 Pro)
+  - Induction heating gives fast, precise power response — ROR reacts to power-level changes
+    noticeably QUICKER than a gas-fired drum (Probat/Giesen/Fuji Royal), though still slower than
+    IKAWA's fluid-bed.
+  - If an IBTS (Infrared Bean Temperature Sensor) curve is present, it reads bean SURFACE
+    temperature with NO thermometric lag: it typically shows NO dip/turning-point after charge,
+    and reads roughly 15–17°C (~30°F) HIGHER than the traditional contact bean probe at the same
+    moment. Do NOT force an IBTS curve to show a turning point just because a classic BT curve
+    normally has one — its absence is expected and CORRECT for IBTS, not a reading error.
+  - If BOTH a contact bean-probe curve and an IBTS curve are shown, they are NOT interchangeable —
+    check the legend to see which is which. The contact-probe curve has the classic post-charge
+    dip; the IBTS curve does not.
+  - RoasTime is Aillio's own app; no fixed color convention (e.g. Artisan's red=BT) is confirmed
+    to carry over. Always read the on-image legend rather than assuming colors from memory.
+  - Batch size is small (400g–1.2kg) with a wide preheat range (160–310°C) — total roast time is
+    typically 8–12 min; do not stretch it toward Probat-length 15–20 min ranges.
+  - Controls include 9 power levels, 12 fan speeds, 9 drum speeds. If a bottom control chart shows
+    stepped lines, expect discrete integer levels (not smooth curves) — conceptually similar to
+    Stronghold's step controls, but the channel names differ (power/fan/drum, not
+    열풍/할로겐/드럼히터/교반) — do not reuse Stronghold's Korean labels for this machine.
+
+▶ 후지로얄 Fuji Royal (R-101 / R-105 등 소형 드럼)
+  - This is an older-style small semi-direct-fire drum roaster with NO built-in data port or
+    proprietary charting software. In Korea it is almost always paired with an aftermarket
+    thermocouple + Artisan (occasionally Cropster) — so a chart labeled "Fuji Royal" actually
+    follows ARTISAN's chart conventions (legend, default colors), not a machine-specific skin.
+    Apply the Artisan legend-reading rules to it.
+  - Some very small/older units expose only ONE temperature reading (drum wall or a single bean
+    probe) with no separate ET line. If only one curve is present, treat it as BT and do not
+    invent an ET curve.
+  - Small batch sizes are common in Korea (R-101 = 1kg, R-105 = 5kg), but total roast time
+    (10–15 min) is typical for a small GAS DRUM roaster regardless — do NOT apply the IKAWA
+    fluid-bed rule ("short roasts, 3–10 min") just because the batch is small; that rule is
+    exclusive to fluid-bed/air roasters, not small drum roasters.
+  - Typical operating pattern: drum preheated to ~200℃, then reduced to ~150℃ before charging
+    beans — a high preheat/drum-wall reading at the very start of a log is expected and is NOT
+    the bean charge temperature; do not confuse the two.
+  - No confirmed proprietary Fuji Royal charting app exists in available sources — if a chart
+    claims to be a "native Fuji Royal app," treat that claim with caution and default to
+    Artisan-style legend reading unless the image clearly shows otherwise.
+
+▶ Giesen (W6 / W15 / W30 시리즈)
+  - Standard gas-fired DRUM roaster with an added "indirect-drum heating" jacket meant to spread
+    heat more evenly and reduce scorching. Expect a generally SMOOTHER BT curve with fewer sharp
+    local spikes than a plain direct-drum design, but the overall S-curve shape and ROR behavior
+    is similar to other classic gas drum roasters (Probat, Fuji Royal) rather than to convection
+    (Loring) or fluid-bed (IKAWA) machines.
+  - Batch sizes scale from 6kg (W6) to 15kg (W15) up to 30–60kg (W30/W60) — total roast time
+    (~12–13 min typical) does not scale up much with batch size within this commercial range.
+  - Giesen Profiler 2.0 lets users CUSTOMIZE curve colors and line widths — there is NO fixed
+    default color scheme confirmed. Never assume a fixed BT/ET color for Giesen; always read the
+    on-image legend (this machine is a strong case for the "read the legend first" rule).
+  - If a chart is exported via Artisan or Cropster instead of the native Giesen Profiler, follow
+    that app's own legend/color conventions instead of assuming a Giesen-specific scheme.
 
 ▶ IKAWA Pro (50g / 100g)
   - FLUID-BED air roaster — there is NO bean-temperature probe. Never invent a BT probe reading.
@@ -110,6 +171,43 @@ chart app and total roast time, then apply that entry.
   - Note "IKAWA fluid-bed" in the notes field so the client applies air-roast rules.
   - CSV export exists: 구형 헤더는 'exaust temp'(원문 오타), 신형은 'temp above'.
     roasting.js 의 IKAWA CSV 파서가 이 두 형태를 모두 인식한다.
+
+▶ Loring (S15 Falcon / S35 Kestrel / S70 Peregrine)
+  - Even though beans tumble in a rotating DRUM, the flame does NOT sit under the drum — it heats
+    the inlet air, so heat transfer is closer to convection than a Probat/Giesen-style gas drum.
+    Expect ROR to respond FASTER to burner changes than a pure conduction drum, though still
+    slower than IKAWA (fluid-bed) or Aillio (induction).
+  - Built-in afterburner recirculates and combusts exhaust smoke ("smokeless roasting") — do not
+    expect a visible smoke/exhaust spike near first crack the way some drum-roaster software
+    annotates; the exhaust curve reflects recirculated air temperature, not raw smoke output.
+  - A "Roast Profile" in Loring's own software (Roast Architect) is a BT curve defined by
+    time/temperature ANCHOR POINTS set before roasting. If a chart shows a smooth planned line
+    alongside a jagged actual line, treat the planned line as a target/plan (similar to the
+    PROFILE EDITOR handling for IKAWA) — do not merge it into the actual bt_curve.
+  - Batch sizes are LARGE commercial scale (S15=15kg, S35=35kg, S70=70kg) yet total roast time is
+    still 10–16 min thanks to strong airflow — do not assume a bigger batch means a much longer
+    roast the way it would on a plain conduction drum.
+  - No fixed native color scheme is confirmed — charts are frequently exported through Cropster
+    (which has its own conventions), not a Loring-branded skin. Always read the on-image legend.
+
+▶ Probat (Probatone / P Series)
+  - This is the classic reference gas-fired DRUM roaster: burner heats the drum and the air that
+    flows through it; thermocouples read product (BT) and exhaust (ET) temperature.
+  - Older base Probatone 2 units ship with a BT probe ONLY; the ET probe is an aftermarket addition
+    fitted to the exhaust. If only ONE temperature curve is shown, treat it as BT — do not invent
+    an ET line.
+  - Probat has NO proprietary chart skin — charts are almost always exported via Artisan or
+    Cropster, so legend colors follow THAT app's convention, not a Probat-specific one. Always
+    read the on-image legend (do not assume fixed colors for "Probat").
+  - Commercial batch scale is 5–60kg (Probatone 5/12, P12–P60); total roast time is typically
+    10–20 min. Do not shrink the time axis toward small sample-roaster durations.
+  - Expect the classic BT S-curve: a dip/turning-point shortly after charge, then a steady rise
+    through Maillard to drop. ET typically tracks below BT after the turning point but the exact
+    offset varies by probe placement — confirm relative position with the anchor/consistency
+    rules rather than assuming a fixed gap.
+  - Because heat transfer is drum conduction plus burner-heated air (not induction or fluid-bed),
+    ROR responds more SLOWLY to burner (gas) changes than IKAWA (fluid-bed) or Aillio (induction) —
+    do not expect fast, step-like ROR jumps right after a burner adjustment.
 
 ▶ Stronghold (Roastware / Boost)
   - TOP CHART legend reads "■ 원두 표면  ■ 내부":
@@ -125,6 +223,24 @@ chart app and total roast time, then apply that entry.
   - Read the ENTIRE 교반 line to DROP — late step-ups are frequently missed.
   - Because this machine mixes three heat sources, ROR behaviour differs from pure drum
     roasters: halogen changes cause faster BT response than a drum-only roaster would show.
+
+▶ 태환 Proaster (Taehwan Automation)
+  - Korean-market drum roaster with the heat source located below/under the drum (conduction),
+    spanning a WIDE range of models from small (200g sample roasters) to large industrial
+    (30kg+) capacity. Do NOT apply one fixed time/batch assumption — if the model or batch
+    capacity is stated by the user, scale expectations accordingly: small sample models can roast
+    in well under 10 min, larger industrial batches typically need longer.
+  - No confirmed proprietary charting app or default color legend was found for Proaster in
+    available sources. If a Proaster chart is provided, do NOT assume Artisan-style default
+    colors — read the on-image legend, and if no legend is visible, lower "confidence" to "low"
+    rather than guessing which curve is BT/ET.
+  - Gas vs electric heater variants exist (e.g. THCR-01A: gas ~3900kcal or 3.3kW electric option).
+    Heater type may plausibly affect burner-response speed for ROR, but no verified data on the
+    magnitude of that difference was found — do not invent a specific ROR-lag figure for this.
+  - Treat this entry as PARTIAL/LOW-CONFIDENCE knowledge: the batch/time range above is sourced
+    from ONE specific small model's public spec listing, not confirmed across the full Proaster
+    lineup actually used in Korean roasteries. Prefer asking the user for the exact model over
+    guessing machine-specific behavior beyond what is stated here.
 
 CRITICAL: report the detected machine in the output "notes" field, e.g.
 "machine: IKAWA Pro (fluid-bed)". If the observed values contradict the machine's

@@ -1,8 +1,8 @@
 # 📚 생두마켓 세컨드 브레인
 
-_이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0) · 2026-08-05_
+_이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0) · 2026-08-09_
 
-정리된 주제 **5개** · 원본 문서 **35건**
+정리된 주제 **5개** · 원본 문서 **37건**
 
 ---
 
@@ -22,6 +22,8 @@ _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0
 
 - [[2026-08-05-bop-전체랏]] — BOP (Best of Panama) 옥션 결과 — 전체 랏 수집
 - [[2026-08-05-coe-전체랏]] — COE (Cup of Excellence) 옥션 결과 — 전체 랏 수집
+- [[2026-08-09-bop-전체랏]] — BOP (Best of Panama) 옥션 결과 — 전체 랏 수집  ⚠️ _wiki에서 참조되지 않음_
+- [[2026-08-09-coe-전체랏]] — COE (Cup of Excellence) 옥션 결과 — 전체 랏 수집  ⚠️ _wiki에서 참조되지 않음_
 
 ### 🏆 COE 옥션 `raw/coe/`
 
@@ -60,11 +62,13 @@ _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0
 
 ## ⚠️ 정리 대기
 
-아래 7건은 아직 wiki에 반영되지 않았습니다.
+아래 9건은 아직 wiki에 반영되지 않았습니다.
 정리하려면 Claude에게 다음처럼 지시하세요:
 
 ```
 vault/raw의 아래 문서를 읽고 vault/CLAUDE.md 규칙대로 wiki로 정리해:
+  - raw/auctions/2026-08-09-bop-전체랏.md
+  - raw/auctions/2026-08-09-coe-전체랏.md
   - raw/papers/_수집대기.md
   - raw/papers/fulltext/PMC10305520-Chemical-and-Biological-Characterization-of-Green-and-Proces.md
   - raw/papers/fulltext/PMC11002029-The-effect-of-roast-profiles-on-the-dynamics-of-titratable-a.md

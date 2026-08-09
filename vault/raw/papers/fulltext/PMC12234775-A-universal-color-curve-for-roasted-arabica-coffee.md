@@ -12,7 +12,7 @@
 | 저자 | Anokye-Bempah Laudia, Styczynski Timothy, Ristenpart William D, Donis-González Irwin R |
 | 본문 그림 | 6개 |
 | 본문 표 | 4개 |
-| 수집 | 2026-08-05 · scripts/paper_fetch.py (GitHub Actions) |
+| 수집 | 2026-08-09 · scripts/paper_fetch.py (GitHub Actions) |
 
 출처: https://europepmc.org/article/PMC/PMC12234775
 

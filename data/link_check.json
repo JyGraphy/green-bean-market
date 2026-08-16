@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-08-15T21:22:26Z",
+  "checked_at": "2026-08-16T21:20:54Z",
   "total": 1270,
   "removed": [],
   "held_stores": [
@@ -27,9 +27,9 @@
       "ambiguous": 21
     },
     "블레스빈": {
-      "ok": 92,
+      "ok": 0,
       "dead": 0,
-      "ambiguous": 0
+      "ambiguous": 92
     },
     "아얀투": {
       "ok": 19,

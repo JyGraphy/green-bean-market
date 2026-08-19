@@ -12,6 +12,11 @@
      (커만사/지에스씨류 '클릭 시 우리 도메인 403' 재발의 결정적 신호)
   4. 기대 store가 모두 존재 (store 소멸 감지)
   5. (경고) store별 상품 링크 표본을 실제로 찔러봐 404면 경고 (403/타임아웃은 무시)
+  6. **Supabase 백엔드 생존 확인** — 로그인·원두 컬렉션·로스팅 프로파일이 전부 여기에 의존한다.
+     무료 플랜은 일정 기간 요청이 없으면 프로젝트를 자동 일시정지(pause)하는데,
+     그러면 정적 페이지는 멀쩡해 보이지만 위 기능들이 통째로 죽는다.
+     2026-08-19에 실제로 이 일이 있었고, 정적 사이트만 보던 헬스체크는 초록불이었다.
+     그래서 백엔드 점검을 여기에 추가한다.
 
 사용법: python scripts/healthcheck.py <BASE_URL>
   예) python scripts/healthcheck.py https://green-bean-market.vercel.app
@@ -30,8 +35,39 @@ EXPECTED_STORES = {
 }
 
 
+SUPABASE_URL = 'https://txnpbzukavajwbmggpfk.supabase.co'
+SUPABASE_ANON = 'sb_publishable_KeqUfylPUoX8YSCbKGjqEQ_pQCzFFBF'
+
+
 def fail(msg, errs):
     errs.append(msg)
+
+
+def check_supabase(errs, warns):
+    """Supabase 프로젝트가 살아 있는지 확인한다.
+
+    무료 플랜은 요청이 없으면 프로젝트를 일시정지하고, 그 상태에서는 로그인·
+    원두 컬렉션·로스팅 프로파일이 전부 동작하지 않는다. 정적 페이지만 보는
+    기존 검사로는 이걸 못 잡아서 별도 항목으로 둔다.
+
+    부수 효과로 매일 1회 요청이 발생해 '무활동' 판정도 늦춰진다.
+    """
+    url = f'{SUPABASE_URL}/rest/v1/'
+    try:
+        r = requests.get(url, headers={**UA, 'apikey': SUPABASE_ANON}, timeout=15)
+    except requests.RequestException as e:
+        fail(f'Supabase 백엔드 연결 실패 ({type(e).__name__}) — '
+             f'로그인/원두컬렉션/로스팅 프로파일이 동작하지 않습니다', errs)
+        return
+    # 일시정지된 프로젝트는 보통 503/540 또는 게이트웨이 오류를 돌려준다.
+    if r.status_code in (503, 540) or 'paused' in r.text.lower():
+        fail(f'Supabase 프로젝트가 일시정지(paused)로 보입니다 (HTTP {r.status_code}) — '
+             f'대시보드에서 Resume 필요. 로그인/원두컬렉션/로스팅 프로파일 전부 중단 상태', errs)
+    elif r.status_code >= 500:
+        fail(f'Supabase 백엔드 오류 HTTP {r.status_code}', errs)
+    elif r.status_code >= 400:
+        # 401/404 등은 REST 루트 특성상 정상 응답일 수 있으나 기록은 남긴다.
+        warns.append(f'Supabase 응답 HTTP {r.status_code} — 서버는 살아 있으나 확인 권장')
 
 
 def main(base):
@@ -105,6 +141,8 @@ def main(base):
 
     # 결과
     print("=" * 55)
+    check_supabase(errs, warns)
+
     print(f"🩺 라이브 헬스체크: {base}")
     if products is not None:
         print(f"   상품 {len(products)}개")

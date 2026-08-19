@@ -1,0 +1,75 @@
+name: 공급사 링크 진단
+
+# check_links.py 가 "dead 비율 30% 초과 — 제거 보류" 로 잡아둔 store를 실제로 조사한다.
+# Claude Code 세션은 쇼핑몰 접근이 403으로 막히므로 여기(인터넷 열림)에서 실행한다.
+#
+# 결과는 로그로만 남는다(데이터를 건드리지 않는 읽기 전용 진단).
+
+on:
+  workflow_dispatch:
+    inputs:
+      store:
+        description: '진단할 공급사명 (예: 모모스커피)'
+        required: true
+        default: '모모스커피'
+      sample:
+        description: '확인할 URL 개수'
+        required: false
+        default: '6'
+      rescrape:
+        description: '진단 후 해당 스크래퍼를 다시 돌려 링크를 교체할지 (true/false)'
+        required: false
+        default: 'false'
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: 저장소 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Python 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 의존성 설치
+        run: pip install requests beautifulsoup4 lxml
+
+      - name: 링크 진단
+        run: |
+          python scripts/diagnose_store.py \
+            --store "${{ github.event.inputs.store }}" \
+            --sample "${{ github.event.inputs.sample }}"
+
+      # 진단만으로 끝내지 않고 바로 고칠 수 있게, 선택 시 해당 스크래퍼를 재실행한다.
+      # common.guard_store_replacement 가 급감을 막아주므로 안전하다.
+      - name: 스크래퍼 재실행 (선택)
+        if: github.event.inputs.rescrape == 'true'
+        run: |
+          set -e
+          case "${{ github.event.inputs.store }}" in
+            "모모스커피") S=scrapers/scraper_momos.py ;;
+            "커피리브레") S=scrapers/scraper_coffeelibre.py ;;
+            *) echo "::error::재실행 대상 스크래퍼가 매핑돼 있지 않습니다"; exit 1 ;;
+          esac
+          echo "재실행: $S"
+          python "$S"
+
+      - name: 데이터 검증
+        if: github.event.inputs.rescrape == 'true'
+        run: python scripts/validate_data.py
+
+      - name: 변경사항 커밋 & 푸시
+        if: github.event.inputs.rescrape == 'true'
+        run: |
+          git config user.name "GreenBeanBot"
+          git config user.email "bot@green-bean-market"
+          git add data/ database.sql
+          git diff --cached --quiet || {
+            git commit -m "${{ github.event.inputs.store }} 링크 재수집 (죽은 링크 교체)"
+            git push
+          }

@@ -13,20 +13,20 @@ _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0
 | [[데이터-파이프라인]] — 데이터 파이프라인 | 2026-08-02 | 2건 |
 | [[로스팅-프로파일]] — 로스팅 프로파일 | 2026-08-05 | 13건 |
 | [[생두-공급사]] — 생두 공급사 | 2026-08-03 | 3건 |
-| [[옥션]] — 세계 커피 옥션 (COE · BOP 등) | 2026-08-05 | 4건 |
+| [[옥션]] — 세계 커피 옥션 (COE · BOP 등) | — | 4건 |
 | [[커피-논문]] — 커피 논문 | 2026-08-05 | 9건 |
 
 ## 📥 원본 (raw — 수정 금지)
 
 ### 📄 auctions `raw/auctions/`
 
-- [[2026-08-05-bop-전체랏]] — BOP (Best of Panama) 옥션 결과 — 전체 랏 수집
+- [[2026-08-05-bop-전체랏]] — BOP (Best of Panama) 옥션 결과 — 전체 랏 수집  ⚠️ _wiki에서 참조되지 않음_
 - [[2026-08-05-coe-전체랏]] — COE (Cup of Excellence) 옥션 결과 — 전체 랏 수집
 - [[2026-08-09-bop-전체랏]] — BOP (Best of Panama) 옥션 결과 — 전체 랏 수집  ⚠️ _wiki에서 참조되지 않음_
 - [[2026-08-09-coe-전체랏]] — COE (Cup of Excellence) 옥션 결과 — 전체 랏 수집  ⚠️ _wiki에서 참조되지 않음_
 - [[2026-08-16-bop-전체랏]] — BOP (Best of Panama) 옥션 결과 — 전체 랏 수집  ⚠️ _wiki에서 참조되지 않음_
 - [[2026-08-16-coe-전체랏]] — COE (Cup of Excellence) 옥션 결과 — 전체 랏 수집  ⚠️ _wiki에서 참조되지 않음_
-- [[2026-08-19-bop-전체랏]] — BOP (Best of Panama) 옥션 결과 — 전체 랏 수집  ⚠️ _wiki에서 참조되지 않음_
+- [[2026-08-19-bop-전체랏]] — BOP (Best of Panama) 옥션 결과 — 전체 랏 수집
 
 ### 🏆 COE 옥션 `raw/coe/`
 
@@ -70,11 +70,11 @@ _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0
 
 ```
 vault/raw의 아래 문서를 읽고 vault/CLAUDE.md 규칙대로 wiki로 정리해:
+  - raw/auctions/2026-08-05-bop-전체랏.md
   - raw/auctions/2026-08-09-bop-전체랏.md
   - raw/auctions/2026-08-09-coe-전체랏.md
   - raw/auctions/2026-08-16-bop-전체랏.md
   - raw/auctions/2026-08-16-coe-전체랏.md
-  - raw/auctions/2026-08-19-bop-전체랏.md
   - raw/papers/_수집대기.md
   - raw/papers/fulltext/PMC10305520-Chemical-and-Biological-Characterization-of-Green-and-Proces.md
   - raw/papers/fulltext/PMC11002029-The-effect-of-roast-profiles-on-the-dynamics-of-titratable-a.md

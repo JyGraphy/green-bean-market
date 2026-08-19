@@ -12,7 +12,7 @@
 | 저자 | Georget Frédéric, Marie Lison, Alpizar Edgardo, Courtel Philippe, Bordeaux Mélanie, Hidalgo Jose Martin, Marraccini Pierre, Breitler Jean-christophe, Déchamp Eveline, Poncon Clément, Etienne Hervé, Bertrand Benoit |
 | 본문 그림 | 6개 |
 | 본문 표 | 10개 |
-| 수집 | 2026-08-16 · scripts/paper_fetch.py (GitHub Actions) |
+| 수집 | 2026-08-19 · scripts/paper_fetch.py (GitHub Actions) |
 
 출처: https://europepmc.org/article/PMC/PMC6818232
 

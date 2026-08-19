@@ -1,16 +1,24 @@
 #!/usr/bin/env python3
-"""모모스커피 신규 플랫폼(아임웹) 상품 카드 구조 확인 — 스크래퍼 재작성 마지막 조사.
+"""모모스커피(아임웹) 생두 상품이 실제로 몇 개이고 어디에 흩어져 있는지 확인.
 
-밝혀진 것 (2026-08-19, GitHub Actions 실측):
+여기까지 확정된 사실 (2026-08-19, GitHub Actions 실측):
  - momos.co.kr 이 cafe24 → **아임웹(imweb)** 으로 이전. 옛 URL 은 전부 404.
- - 생두 목록 페이지: `/Product_GreenBean`
- - **상품 링크는 서버 HTML 에 들어 있다**: `/Product_GreenBean/?idx=<숫자>`
-   (아임웹은 shop_view 페이지의 슬러그를 바꿀 수 있어서, 앞서 `shop_view?idx=` 로만
-    찾았을 때 0개로 보였던 것이다. 자바스크립트 렌더링이 아니었다.)
- - `/api/public/*` 는 실재하지 않는다 — 아임웹이 미지 경로에 SPA HTML 을 그대로 준다
-   (응답 크기가 전부 1,875,630바이트로 동일한 것이 증거).
+ - 상품 링크는 **서버 HTML 에 있다**: `/Product_GreenBean/?idx=<숫자>`
+ - 카드 구조:
+     div.shop-item._shop_item
+       └ div.item-wrap
+           └ a._fade_link.shop-item-thumb[href="/Product_GreenBean/?idx=7374"]
+               └ div.item-overlay > div.item-pay > div
+                   ├ h2               ← 상품명 ("[생두] …")
+                   ├ p.pay            ← 가격 ("58,000원", 품절이면 "0원")
+                   └ div.prod_icon.sold_out ← 품절 배지 (SOLDOUT)
 
-남은 질문: **상품 카드에서 이름·가격·품절을 어느 태그에서 읽는가**, 그리고 **페이지네이션**.
+**남은 문제**: `/Product_GreenBean` 에 고유 상품이 28개뿐인데 우리가 저장한 건 115개다.
+`?page=2` 는 1페이지와 같은 결과를 준다. 둘 중 하나다.
+  (가) 페이지네이션 방식이 달라서 나머지를 못 보고 있다
+  (나) 생두가 여러 카테고리(B2B 등)로 흩어졌다 — 옛 cate_no=64 가 통합 카테고리였다
+이 스크립트가 그 둘을 가른다. 28개로 그냥 교체하면 급감 가드에 걸리고,
+가드를 우회해 밀어넣으면 상품 87개가 사라진다. 그래서 반드시 먼저 확인한다.
 """
 from __future__ import annotations
 
@@ -21,7 +29,6 @@ import requests
 from bs4 import BeautifulSoup
 
 BASE = 'https://momos.co.kr'
-LIST_PATH = '/Product_GreenBean'
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 '
                   '(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
@@ -30,83 +37,119 @@ HEADERS = {
 }
 IDX_RE = re.compile(r'[?&]idx=(\d+)')
 
+# 생두가 있을 만한 페이지 — 사이트 자체 JS 주석에 나열된 쇼핑 슬러그에서 추렸다
+PAGES = [
+    '/Product_GreenBean',
+    '/greenbean',
+    '/ForBusiness_Shop',
+    '/ForBusiness',
+    '/b2b',
+    '/ProductArchive',
+    '/shop',
+]
 
-def get(path):
-    r = requests.get(BASE + path, headers=HEADERS, timeout=30)
-    return r
+
+def idx_of(soup):
+    return {IDX_RE.search(a['href']).group(1)
+            for a in soup.find_all('a', href=True) if IDX_RE.search(a['href'])}
+
+
+def bean_cards(soup):
+    """[생두] 로 시작하는 상품만 센다 — 원두/굿즈가 섞인 페이지 구분용."""
+    out = []
+    for item in soup.select('div.shop-item, div._shop_item'):
+        a = item.find('a', href=IDX_RE.search)
+        h = item.find(['h2', 'h3'])
+        if not a or not h:
+            continue
+        name = h.get_text(' ', strip=True)
+        out.append((name, a['href']))
+    return out
 
 
 def main():
     print('=' * 60)
-    print(f'=== {BASE}{LIST_PATH} 상품 카드 구조 ===')
-    r = get(LIST_PATH)
-    print(f'HTTP {r.status_code} · {len(r.text):,}바이트')
+    print('=== 생두가 어느 페이지에 몇 개 있는가 ===')
+    total = {}
+    for path in PAGES:
+        try:
+            r = requests.get(BASE + path, headers=HEADERS, timeout=30)
+        except requests.RequestException as e:
+            print(f'{path:22} 오류 {type(e).__name__}')
+            continue
+        if r.status_code != 200:
+            print(f'{path:22} HTTP {r.status_code}')
+            continue
+        soup = BeautifulSoup(r.text, 'lxml')
+        ids = idx_of(soup)
+        cards = bean_cards(soup)
+        beans = [c for c in cards if '[생두]' in c[0]]
+        print(f'{path:22} HTTP 200 · idx {len(ids):3}개 · 카드 {len(cards):3}개 · [생두] {len(beans):3}개')
+        total[path] = ids
+        for n, h in beans[:3]:
+            print(f'{"":24}예) {n[:55]}  {h}')
+
+    allids = set().union(*total.values()) if total else set()
+    print(f'\n→ 모든 페이지 합계 고유 idx: {len(allids)}개')
+
+    # ── 페이지네이션 방식 찾기 ──────────────────────────────────────────
+    print('\n' + '=' * 60)
+    print('=== /Product_GreenBean 페이지네이션 조사 ===')
+    r = requests.get(BASE + '/Product_GreenBean', headers=HEADERS, timeout=30)
     soup = BeautifulSoup(r.text, 'lxml')
 
-    links = [a for a in soup.find_all('a', href=True) if IDX_RE.search(a['href'])]
-    idxs = sorted({IDX_RE.search(a['href']).group(1) for a in links})
-    print(f'idx 링크 {len(links)}개 · 고유 상품 {len(idxs)}개')
-    print(f'idx 범위: {idxs[:5]} … {idxs[-5:]}' if idxs else 'idx 없음')
+    # 총 개수 표기 ("총 28개" 등)
+    for m in re.finditer(r'(총\s*[\d,]+\s*개|[\d,]+\s*개의\s*상품|total[^<]{0,20}\d+)', r.text):
+        print(f'   개수 표기: {m.group(0)[:60]}')
 
-    if not links:
-        print('✗ idx 링크가 없다 — 페이지 구조가 또 달라졌다.')
-        return
-
-    # 상품 카드 컨테이너 찾기 — 링크에서 위로 올라가며 클래스가 붙은 첫 조상
-    a0 = links[0]
-    print('\n--- 첫 링크의 조상 체인 (클래스) ---')
-    node, chain = a0, []
-    for _ in range(8):
-        node = node.parent
-        if node is None or node.name == '[document]':
+    # 페이징 UI
+    for sel in ('.pagination', '._pagination', '.paging', '._paging', '[class*=page]'):
+        els = soup.select(sel)
+        if els:
+            print(f'\n   {sel} → {len(els)}개')
+            print('   ' + els[0].prettify()[:900].replace('\n', '\n   '))
             break
-        chain.append(f'{node.name}.{".".join(node.get("class") or []) or "(무클래스)"}')
-    print('   ' + ' ← '.join(chain))
+    else:
+        print('   페이징 UI 없음 → 무한스크롤이거나 전량 표시')
 
-    # 카드 전체 HTML 을 보여준다 — 이름/가격/품절이 어느 태그에 있는지 눈으로 확인
-    card = a0
-    for _ in range(6):
-        if card.parent is None:
-            break
-        card = card.parent
-        cls = ' '.join(card.get('class') or [])
-        if any(k in cls for k in ('item', 'goods', 'prod', 'list')):
-            break
-    print('\n--- 카드 HTML (앞 2500자) ---')
-    print(card.prettify()[:2500])
-
-    print('\n--- 카드 텍스트 ---')
-    print(re.sub(r'\n\s*\n+', '\n', card.get_text('\n', strip=True))[:600])
-
-    # 페이지네이션 — 전체 상품 수를 확인해야 급감 가드에 걸리지 않는다
-    print('\n' + '=' * 60)
-    print('=== 페이지네이션 확인 ===')
-    seen_first = set(idxs)
-    for page in (2, 3):
-        rr = get(f'{LIST_PATH}?page={page}')
-        s2 = BeautifulSoup(rr.text, 'lxml')
-        ix = sorted({IDX_RE.search(a['href']).group(1)
-                     for a in s2.find_all('a', href=True) if IDX_RE.search(a['href'])})
-        new = set(ix) - seen_first
-        print(f'?page={page}: HTTP {rr.status_code} · 고유 {len(ix)}개 · 1페이지에 없던 것 {len(new)}개')
-        seen_first |= set(ix)
-    print(f'→ page 파라미터로 늘어난 총 고유 상품: {len(seen_first)}개')
-    print('   (1페이지와 동일하면 페이지네이션이 없거나 다른 방식이다)')
-
-    # 상세 페이지 한 건 — 가격·품절 표기 확인용
-    print('\n' + '=' * 60)
-    print(f'=== 상세 페이지 확인: {LIST_PATH}/?idx={idxs[0]} ===')
-    rd = get(f'{LIST_PATH}/?idx={idxs[0]}')
-    sd = BeautifulSoup(rd.text, 'lxml')
-    print(f'HTTP {rd.status_code} · {len(rd.text):,}바이트')
-    print(f'title: {sd.title.get_text(strip=True) if sd.title else "-"}')
-    og = sd.find('meta', property='og:title')
-    print(f'og:title: {og.get("content") if og else "-"}')
-    for sel in ('.item-price', '.item_price', '.price', '.shop-item-price', '[class*=price]'):
-        el = sd.select(sel)
+    # 위젯 데이터 — 아임웹은 목록 AJAX 를 부를 때 이 값들을 쓴다
+    print('\n   위젯 요소 속성:')
+    for sel in ('div._widget_data', 'div.shop-content.widget', 'div.shop-grid'):
+        el = soup.select_one(sel)
         if el:
-            print(f'   {sel} → {[e.get_text(" ", strip=True)[:60] for e in el[:3]]}')
-            break
+            attrs = {k: (str(v)[:80]) for k, v in el.attrs.items()}
+            print(f'      {sel}: {attrs}')
+
+    # 페이지 안에서 목록 AJAX 호출에 쓰이는 파라미터 이름 찾기
+    print('\n   get_shop_list_view 호출 문맥:')
+    for m in re.finditer(r'.{250}get_shop_list_view.{350}', r.text, re.S):
+        print('      …' + re.sub(r'\s+', ' ', m.group(0))[:560] + '…')
+        break
+
+    # ── 목록 AJAX 를 파라미터와 함께 실제로 호출 ────────────────────────
+    print('\n' + '=' * 60)
+    print('=== 목록 AJAX 파라미터 시도 ===')
+    url = BASE + '/ajax/get_shop_list_view.cm'
+    trials = [
+        {'page': 2},
+        {'page': 2, 'category': 'Product_GreenBean'},
+        {'page': 2, 'unit_code': 'Product_GreenBean'},
+        {'page': 2, 'code': 'Product_GreenBean'},
+        {'page': 2, 'limit': 100},
+        {'page': 1, 'limit': 200},
+    ]
+    for params in trials:
+        try:
+            rr = requests.post(url, headers={**HEADERS, 'X-Requested-With': 'XMLHttpRequest',
+                                             'Referer': BASE + '/Product_GreenBean'},
+                               data=params, timeout=30)
+        except requests.RequestException as e:
+            print(f'   {params} → 오류 {e}')
+            continue
+        ids = set(re.findall(r'[?&]idx=(\d+)', rr.text))
+        print(f'   {params} → HTTP {rr.status_code} · {len(rr.content):,}바이트 · idx {len(ids)}개')
+        if ids:
+            print(f'      샘플: {sorted(ids)[:10]}')
 
 
 if __name__ == '__main__':

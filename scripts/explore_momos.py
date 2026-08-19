@@ -1,27 +1,28 @@
 #!/usr/bin/env python3
-"""모모스커피 신규 플랫폼 구조 탐색 — 스크래퍼 재작성을 위한 1회성 조사 도구.
+"""모모스커피 신규 플랫폼 구조 탐색 — 스크래퍼 재작성용 조사 도구.
 
-배경: momos.co.kr 이 cafe24(`/product/<슬러그>/<id>/category/...`)에서
-다른 솔루션(`/shop_view?idx=<숫자>`)으로 이전했다. 그 결과
- - 저장된 상품 URL 115개가 전부 404
- - 스크래퍼는 상품을 0개 추출 → guard_store_replacement 가 교체를 막아
-   죽은 데이터가 그대로 보존됨 (안전장치는 정상 작동)
+지금까지 밝혀진 것 (2026-08-19, GitHub Actions 실측):
+ - momos.co.kr 이 cafe24 → 다른 솔루션으로 이전
+ - 옛 URL `/product/<슬러그>/<id>/category/64/...` 는 전부 404
+ - 새 상품 URL 형식: `/shop_view/?idx=<숫자>`
+ - 생두 카테고리: `/greenbean`, `/Product_GreenBean`
+ - 그런데 카테고리 페이지(1.3MB)에 <a> 기반 상품 링크가 0개
+   → 상품 목록을 자바스크립트로 그리는 것으로 보인다
 
-이 스크립트는 새 구조에서 스크래퍼를 쓰는 데 필요한 것만 뽑아 출력한다:
-카테고리 목록, 상품 목록 페이지, 상품 카드의 실제 마크업, 페이지네이션 방식.
-
-GitHub Actions 에서 실행한다(세션은 쇼핑몰 접근이 403).
+이 스크립트는 그 다음 질문에 답한다:
+ "상품 데이터가 HTML 안에 (JSON 등으로) 들어 있는가, 아니면 별도 API를 호출하는가?"
+전자면 requests 만으로 계속 긁을 수 있고, 후자면 그 API를 직접 호출하면 된다.
 """
 from __future__ import annotations
 
+import json
 import re
 import sys
-from urllib.parse import urljoin
 
 import requests
-from bs4 import BeautifulSoup
 
 BASE = 'https://momos.co.kr'
+CATS = ['/greenbean', '/Product_GreenBean']
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 '
                   '(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
@@ -29,98 +30,74 @@ HEADERS = {
 }
 
 
-def get(url):
-    r = requests.get(url, headers=HEADERS, timeout=20)
-    return r.status_code, r.text, r.url
-
-
 def main():
-    print(f'=== ① 첫 화면 구조: {BASE} ===')
-    code, html, final = get(BASE)
-    print(f'HTTP {code} · 최종 {final} · {len(html):,}바이트')
-    soup = BeautifulSoup(html, 'lxml')
-    print(f'제목: {soup.title.get_text(strip=True) if soup.title else "-"}')
+    for cat in CATS:
+        url = BASE + cat
+        print(f'\n{"=" * 60}\n=== {url} ===')
+        r = requests.get(url, headers=HEADERS, timeout=25)
+        html = r.text
+        print(f'HTTP {r.status_code} · {len(html):,}바이트')
 
-    # 내비게이션 링크 — 생두 카테고리를 찾는다
-    print('\n내비게이션/카테고리 후보 (텍스트 → 링크):')
-    seen = set()
-    for a in soup.find_all('a'):
-        txt = a.get_text(' ', strip=True)
-        h = a.get('href', '')
-        if not h or h.startswith(('#', 'javascript:')):
-            continue
-        if not txt or len(txt) > 30:
-            continue
-        key = (txt, h)
-        if key in seen:
-            continue
-        seen.add(key)
-        if any(k in txt for k in ('생두', 'Green', 'GREEN', 'Coffee', 'COFFEE', '원두')) \
-           or re.search(r'(Ethiopia|Colombia|Columbia|CostaRica|Brazil|Kenya)', h, re.I):
-            print(f'   {txt[:28]:<28} → {h}')
+        # ① 원문에 shop_view 가 몇 번 나오는가 (a 태그가 아니어도)
+        hits = re.findall(r'shop_view/?\?idx=(\d+)', html)
+        print(f'\n① 원문 내 shop_view idx 등장: {len(hits)}회 · 고유 {len(set(hits))}개')
+        if hits:
+            print(f'   샘플 idx: {sorted(set(hits))[:12]}')
+            # 그 주변 문맥을 보면 어떤 구조에 들어 있는지 알 수 있다
+            m = re.search(r'.{220}shop_view/?\?idx=\d+.{220}', html, re.S)
+            if m:
+                ctx = re.sub(r'\s+', ' ', m.group(0))
+                print(f'   문맥: …{ctx}…')
 
-    # ② 생두로 보이는 카테고리 페이지 조사
-    print('\n=== ② 상품 목록 페이지 조사 ===')
-    candidates = []
-    for a in soup.find_all('a'):
-        h = a.get('href', '')
-        txt = a.get_text(' ', strip=True)
-        if h and ('생두' in txt or 'green' in h.lower()):
-            candidates.append(urljoin(BASE, h))
-    # 후보가 없으면 국가 카테고리라도 본다
-    if not candidates:
-        for a in soup.find_all('a'):
-            h = a.get('href', '')
-            if re.fullmatch(r'/(Ethiopia|Columbia|Colombia|CostaRica|Brazil|Kenya)', h or ''):
-                candidates.append(urljoin(BASE, h))
-    candidates = list(dict.fromkeys(candidates))[:3]
-    print(f'조사할 후보: {candidates}')
+        # ② 상품명으로 보이는 문자열이 원문에 있는가
+        for kw in ('생두', 'Ethiopia', 'Colombia', '원'):
+            print(f'   "{kw}" 등장 {html.count(kw)}회')
 
-    for cat in candidates:
-        print(f'\n--- {cat} ---')
-        c, h2, _ = get(cat)
-        if c != 200:
-            print(f'   HTTP {c} — 건너뜀')
-            continue
-        s2 = BeautifulSoup(h2, 'lxml')
-        views = [a.get('href') for a in s2.select('a[href*="shop_view"]')]
-        views = list(dict.fromkeys(v for v in views if v))
-        print(f'   HTTP 200 · {len(h2):,}바이트 · shop_view 링크 {len(views)}개')
-        for v in views[:3]:
-            print(f'      {v}')
-        # 상품 카드 마크업 샘플 — 이름/가격 셀렉터를 정하기 위해 필요
-        if views:
-            a0 = s2.select_one('a[href*="shop_view"]')
-            card = a0
-            for _ in range(4):           # 카드 컨테이너까지 거슬러 올라간다
-                if card.parent and card.parent.name not in ('body', 'html', '[document]'):
-                    card = card.parent
-            sample = re.sub(r'\s+', ' ', card.prettify())[:1400]
-            print(f'\n   [상품 카드 마크업 샘플]\n   {sample}\n')
-        # 페이지네이션 단서
-        pg = [a.get('href') for a in s2.find_all('a')
-              if a.get('href') and re.search(r'page|pageNum|p=', a.get('href'))]
-        if pg:
-            print(f'   페이지네이션 후보: {list(dict.fromkeys(pg))[:5]}')
+        # ③ 인라인 JSON 후보 — 상품 배열이 통째로 박혀 있는 경우
+        print('\n② 인라인 JSON 후보')
+        found_json = False
+        for m in re.finditer(r'(?:var|let|const)\s+(\w+)\s*=\s*(\[\{.{200,}?\}\])\s*[;\n]', html, re.S):
+            name, blob = m.group(1), m.group(2)
+            try:
+                data = json.loads(blob)
+            except Exception:
+                continue
+            if isinstance(data, list) and data and isinstance(data[0], dict):
+                print(f'   ✓ {name} — {len(data)}건, 키: {list(data[0])[:12]}')
+                found_json = True
+        # __NUXT__ / __NEXT_DATA__ 같은 프레임워크 상태
+        for key in ('__NUXT__', '__NEXT_DATA__', 'window.__INITIAL_STATE__'):
+            if key in html:
+                print(f'   ✓ {key} 발견 — 프레임워크 상태에 상품이 들어 있을 수 있음')
+                found_json = True
+        if not found_json:
+            print('   (없음)')
 
-    # ③ 상품 상세 페이지 한 건
-    print('\n=== ③ 상품 상세 페이지 확인 ===')
-    for cat in candidates:
-        c, h2, _ = get(cat)
-        if c != 200:
-            continue
-        s2 = BeautifulSoup(h2, 'lxml')
-        a0 = s2.select_one('a[href*="shop_view"]')
-        if not a0:
-            continue
-        url = urljoin(BASE, a0.get('href'))
-        c3, h3, _ = get(url)
-        s3 = BeautifulSoup(h3, 'lxml')
-        print(f'   {url}')
-        print(f'   HTTP {c3} · 제목: {s3.title.get_text(strip=True) if s3.title else "-"}')
-        prices = re.findall(r'[\d,]{4,}\s*원', h3)[:5]
-        print(f'   페이지에서 발견한 가격 형태: {prices}')
-        break
+        # ④ JS가 호출할 만한 API 엔드포인트
+        print('\n③ API 엔드포인트 후보')
+        apis = set()
+        for m in re.finditer(r'["\'](/[\w/\-.]*(?:api|ajax|list|product|goods|shop)[\w/\-.]*)["\']',
+                             html, re.I):
+            p = m.group(1)
+            if len(p) > 6 and not p.endswith(('.css', '.js', '.png', '.jpg', '.svg', '.gif', '.webp')):
+                apis.add(p)
+        for p in sorted(apis)[:25]:
+            print(f'   {p}')
+        if not apis:
+            print('   (없음)')
+
+        # ⑤ 페이지네이션 파라미터 흔적
+        pgs = set(re.findall(r'[?&](page|pageNum|p|offset|start)=\d+', html))
+        print(f'\n④ 페이지네이션 파라미터 흔적: {sorted(pgs) or "(없음)"}')
+
+    # ⑥ 상품 상세가 서버 렌더링인지 확인 — 여기만 되면 상세 수집은 가능
+    print(f'\n{"=" * 60}\n=== 상품 상세 페이지 확인 ===')
+    r = requests.get(f'{BASE}/shop_view/?idx=2486', headers=HEADERS, timeout=25)
+    h = r.text
+    print(f'HTTP {r.status_code} · {len(h):,}바이트')
+    t = re.search(r'<title[^>]*>(.*?)</title>', h, re.S)
+    print(f'제목: {t.group(1).strip() if t else "-"}')
+    print(f'가격 형태 샘플: {re.findall(r"[\\d,]{4,}\\s*원", h)[:6]}')
 
 
 if __name__ == '__main__':

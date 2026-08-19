@@ -97,7 +97,31 @@ def main():
     print(f'HTTP {r.status_code} · {len(h):,}바이트')
     t = re.search(r'<title[^>]*>(.*?)</title>', h, re.S)
     print(f'제목: {t.group(1).strip() if t else "-"}')
-    print(f'가격 형태 샘플: {re.findall(r"[\\d,]{4,}\\s*원", h)[:6]}')
+    prices = re.findall(r'[\d,]{4,}\s*원', h)
+    print(f'가격 형태 샘플: {prices[:6]}')
+
+    # ⑦ 홈페이지에는 shop_view 링크가 34개 서버렌더링돼 있었다(진단 로그 확인).
+    #    즉 "사이트 전체가 SPA"가 아니라 **카테고리 목록만** 비동기다.
+    #    imweb 계열은 목록을 페이지 파라미터로 다시 받아오는 경우가 많으므로 그걸 확인한다.
+    print(f'\n{"=" * 60}\n=== 목록 파라미터/플랫폼 지문 ===')
+    for probe in ('/', '/greenbean?page=1', '/greenbean?page=2'):
+        try:
+            rr = requests.get(BASE + probe, headers=HEADERS, timeout=25)
+        except requests.RequestException as e:
+            print(f'{probe}: 오류 {e}')
+            continue
+        idxs = sorted(set(re.findall(r'shop_view/?\?idx=(\d+)', rr.text)))
+        print(f'{probe}: HTTP {rr.status_code} · {len(rr.text):,}바이트 · idx {len(idxs)}개 {idxs[:10]}')
+
+    # 플랫폼 판별 — 어떤 솔루션인지 알면 목록 API 규격을 특정할 수 있다
+    r0 = requests.get(BASE + '/', headers=HEADERS, timeout=25)
+    for marker in ('imweb', 'IMWEB', 'sixshop', 'cafe24', 'godomall', 'shopby', 'NHN'):
+        if marker in r0.text:
+            print(f'플랫폼 지문: "{marker}" 발견')
+    srcs = re.findall(r'<script[^>]+src=["\']([^"\']+)["\']', r0.text)
+    print('스크립트 src 샘플:')
+    for s in srcs[:15]:
+        print(f'   {s}')
 
 
 if __name__ == '__main__':

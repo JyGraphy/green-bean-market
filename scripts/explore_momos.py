@@ -1,156 +1,117 @@
 #!/usr/bin/env python3
-"""모모스커피 신규 플랫폼 구조 탐색 — 스크래퍼 재작성용 조사 도구.
+"""모모스커피 신규 플랫폼(아임웹) 상품 카드 구조 확인 — 스크래퍼 재작성 마지막 조사.
 
-지금까지 밝혀진 것 (2026-08-19, GitHub Actions 실측):
- - momos.co.kr 이 cafe24 → **아임웹(imweb)** 으로 이전
- - 옛 URL `/product/<슬러그>/<id>/category/64/...` 는 전부 404
- - 생두는 imweb 기본 쇼핑이 아니라 **자체 앱**(momos-dev.twomos.com)으로 운영
- - 생두 페이지 `/greenbean`, `/Product_GreenBean` 은 자바스크립트로 목록을 그린다
- - 그 목록이 쓰는 **공개 API**가 HTML 안에 노출돼 있다:
-     /api/public/green-beans   /api/public/products
-     /api/public/origins       /api/public/filters
-   (imweb 기본 목록 AJAX `/ajax/get_shop_list_view.cm` 도 존재)
+밝혀진 것 (2026-08-19, GitHub Actions 실측):
+ - momos.co.kr 이 cafe24 → **아임웹(imweb)** 으로 이전. 옛 URL 은 전부 404.
+ - 생두 목록 페이지: `/Product_GreenBean`
+ - **상품 링크는 서버 HTML 에 들어 있다**: `/Product_GreenBean/?idx=<숫자>`
+   (아임웹은 shop_view 페이지의 슬러그를 바꿀 수 있어서, 앞서 `shop_view?idx=` 로만
+    찾았을 때 0개로 보였던 것이다. 자바스크립트 렌더링이 아니었다.)
+ - `/api/public/*` 는 실재하지 않는다 — 아임웹이 미지 경로에 SPA HTML 을 그대로 준다
+   (응답 크기가 전부 1,875,630바이트로 동일한 것이 증거).
 
-이 스크립트는 그 API들의 **응답 형태**를 확인한다 — 어떤 필드에 상품명·가격·
-원산지·상세링크가 들어 있는지 알아야 스크래퍼를 쓸 수 있다.
+남은 질문: **상품 카드에서 이름·가격·품절을 어느 태그에서 읽는가**, 그리고 **페이지네이션**.
 """
 from __future__ import annotations
 
-import json
 import re
 import sys
 
 import requests
+from bs4 import BeautifulSoup
 
 BASE = 'https://momos.co.kr'
+LIST_PATH = '/Product_GreenBean'
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 '
                   '(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    'Accept': 'application/json, text/plain, */*',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
     'Accept-Language': 'ko-KR,ko;q=0.9',
-    'Referer': BASE + '/Product_GreenBean',
 }
-
-# 목록 API 후보. 페이지네이션 파라미터가 필요할 수 있어 몇 가지 변형을 함께 시도한다.
-CANDIDATES = [
-    '/api/public/green-beans',
-    '/api/public/green-beans?page=1&size=100',
-    '/api/public/green-beans?page=1&limit=100',
-    '/api/public/products',
-    '/api/public/products?page=1&size=100',
-    '/api/public/origins',
-    '/api/public/filters',
-]
+IDX_RE = re.compile(r'[?&]idx=(\d+)')
 
 
-def brief(obj, depth=0, max_depth=3):
-    """JSON 구조를 짧게 요약해 출력한다 (전체를 쏟아내면 로그가 못 쓴다)."""
-    pad = '  ' * depth
-    if isinstance(obj, dict):
-        for k, v in list(obj.items())[:25]:
-            if isinstance(v, (dict, list)) and depth < max_depth:
-                kind = 'dict' if isinstance(v, dict) else f'list[{len(v)}]'
-                print(f'{pad}{k}: {kind}')
-                brief(v, depth + 1, max_depth)
-            else:
-                s = str(v)
-                print(f'{pad}{k}: {s[:90]}')
-    elif isinstance(obj, list):
-        if not obj:
-            print(f'{pad}(빈 배열)')
-            return
-        print(f'{pad}[0]:')
-        brief(obj[0], depth + 1, max_depth)
+def get(path):
+    r = requests.get(BASE + path, headers=HEADERS, timeout=30)
+    return r
 
 
-def probe_api():
+def main():
     print('=' * 60)
-    print('=== 공개 API 응답 확인 ===')
-    for path in CANDIDATES:
-        url = BASE + path
-        print(f'\n--- {url} ---')
-        try:
-            r = requests.get(url, headers=HEADERS, timeout=25)
-        except requests.RequestException as e:
-            print(f'   오류: {type(e).__name__}: {e}')
-            continue
-        ctype = r.headers.get('content-type', '')
-        print(f'   HTTP {r.status_code} · {ctype} · {len(r.content):,}바이트')
-        if r.status_code != 200:
-            print(f'   본문 앞부분: {r.text[:200]!r}')
-            continue
-        if 'json' not in ctype.lower():
-            print(f'   JSON 아님. 앞부분: {r.text[:200]!r}')
-            continue
-        try:
-            data = r.json()
-        except Exception as e:
-            print(f'   JSON 파싱 실패: {e}')
-            continue
-        brief(data)
-        # 상품 배열을 찾으면 첫 항목 전체를 그대로 보여준다 (필드명을 정확히 알아야 한다)
-        arr = None
-        if isinstance(data, list):
-            arr = data
-        elif isinstance(data, dict):
-            for key in ('data', 'items', 'list', 'results', 'content', 'products', 'greenBeans'):
-                v = data.get(key)
-                if isinstance(v, list) and v:
-                    arr = v
-                    break
-                if isinstance(v, dict):
-                    for k2 in ('items', 'list', 'content', 'results'):
-                        if isinstance(v.get(k2), list) and v[k2]:
-                            arr = v[k2]
-                            break
-                if arr:
-                    break
-        if arr:
-            print(f'\n   ▶ 상품 배열 {len(arr)}건 · 첫 항목 원본:')
-            print('   ' + json.dumps(arr[0], ensure_ascii=False, indent=2)[:2500].replace('\n', '\n   '))
+    print(f'=== {BASE}{LIST_PATH} 상품 카드 구조 ===')
+    r = get(LIST_PATH)
+    print(f'HTTP {r.status_code} · {len(r.text):,}바이트')
+    soup = BeautifulSoup(r.text, 'lxml')
 
+    links = [a for a in soup.find_all('a', href=True) if IDX_RE.search(a['href'])]
+    idxs = sorted({IDX_RE.search(a['href']).group(1) for a in links})
+    print(f'idx 링크 {len(links)}개 · 고유 상품 {len(idxs)}개')
+    print(f'idx 범위: {idxs[:5]} … {idxs[-5:]}' if idxs else 'idx 없음')
 
-def probe_imweb_ajax():
-    """imweb 기본 목록 AJAX — 생두가 여기 있을 수도 있어 함께 확인한다."""
+    if not links:
+        print('✗ idx 링크가 없다 — 페이지 구조가 또 달라졌다.')
+        return
+
+    # 상품 카드 컨테이너 찾기 — 링크에서 위로 올라가며 클래스가 붙은 첫 조상
+    a0 = links[0]
+    print('\n--- 첫 링크의 조상 체인 (클래스) ---')
+    node, chain = a0, []
+    for _ in range(8):
+        node = node.parent
+        if node is None or node.name == '[document]':
+            break
+        chain.append(f'{node.name}.{".".join(node.get("class") or []) or "(무클래스)"}')
+    print('   ' + ' ← '.join(chain))
+
+    # 카드 전체 HTML 을 보여준다 — 이름/가격/품절이 어느 태그에 있는지 눈으로 확인
+    card = a0
+    for _ in range(6):
+        if card.parent is None:
+            break
+        card = card.parent
+        cls = ' '.join(card.get('class') or [])
+        if any(k in cls for k in ('item', 'goods', 'prod', 'list')):
+            break
+    print('\n--- 카드 HTML (앞 2500자) ---')
+    print(card.prettify()[:2500])
+
+    print('\n--- 카드 텍스트 ---')
+    print(re.sub(r'\n\s*\n+', '\n', card.get_text('\n', strip=True))[:600])
+
+    # 페이지네이션 — 전체 상품 수를 확인해야 급감 가드에 걸리지 않는다
     print('\n' + '=' * 60)
-    print('=== imweb 목록 AJAX 확인 ===')
-    url = BASE + '/ajax/get_shop_list_view.cm'
-    for method in ('get', 'post'):
-        try:
-            fn = requests.get if method == 'get' else requests.post
-            r = fn(url, headers=HEADERS, timeout=25,
-                   **({'params': {'page': 1}} if method == 'get' else {'data': {'page': 1}}))
-        except requests.RequestException as e:
-            print(f'   {method.upper()} 오류: {e}')
-            continue
-        print(f'   {method.upper()} HTTP {r.status_code} · {len(r.content):,}바이트')
-        idxs = sorted(set(re.findall(r'shop_view/?\?idx=(\d+)', r.text)))
-        print(f'      shop_view idx {len(idxs)}개 {idxs[:10]}')
-        print(f'      앞부분: {r.text[:200]!r}')
+    print('=== 페이지네이션 확인 ===')
+    seen_first = set(idxs)
+    for page in (2, 3):
+        rr = get(f'{LIST_PATH}?page={page}')
+        s2 = BeautifulSoup(rr.text, 'lxml')
+        ix = sorted({IDX_RE.search(a['href']).group(1)
+                     for a in s2.find_all('a', href=True) if IDX_RE.search(a['href'])})
+        new = set(ix) - seen_first
+        print(f'?page={page}: HTTP {rr.status_code} · 고유 {len(ix)}개 · 1페이지에 없던 것 {len(new)}개')
+        seen_first |= set(ix)
+    print(f'→ page 파라미터로 늘어난 총 고유 상품: {len(seen_first)}개')
+    print('   (1페이지와 동일하면 페이지네이션이 없거나 다른 방식이다)')
 
-
-def probe_detail_link():
-    """상품 상세 링크 형식 확인 — 우리가 저장할 url 이 이것이다."""
+    # 상세 페이지 한 건 — 가격·품절 표기 확인용
     print('\n' + '=' * 60)
-    print('=== 생두 페이지 원문에서 상세 링크 힌트 찾기 ===')
-    r = requests.get(BASE + '/Product_GreenBean',
-                     headers={**HEADERS, 'Accept': 'text/html'}, timeout=25)
-    h = r.text
-    for pat, label in [
-        (r'["\'](/[Pp]roduct_?[Gg]reen[Bb]ean[^"\']*)["\']', '생두 경로'),
-        (r'["\']([^"\']*green-?beans?/[^"\']*)["\']', 'green-bean 경로'),
-        (r'["\']([^"\']*detail[^"\']*)["\']', 'detail 경로'),
-        (r'\{\{[^}]{0,60}\}\}', '템플릿 자리표시자'),
-    ]:
-        found = sorted(set(re.findall(pat, h)))[:12]
-        print(f'   {label}: {found}')
+    print(f'=== 상세 페이지 확인: {LIST_PATH}/?idx={idxs[0]} ===')
+    rd = get(f'{LIST_PATH}/?idx={idxs[0]}')
+    sd = BeautifulSoup(rd.text, 'lxml')
+    print(f'HTTP {rd.status_code} · {len(rd.text):,}바이트')
+    print(f'title: {sd.title.get_text(strip=True) if sd.title else "-"}')
+    og = sd.find('meta', property='og:title')
+    print(f'og:title: {og.get("content") if og else "-"}')
+    for sel in ('.item-price', '.item_price', '.price', '.shop-item-price', '[class*=price]'):
+        el = sd.select(sel)
+        if el:
+            print(f'   {sel} → {[e.get_text(" ", strip=True)[:60] for e in el[:3]]}')
+            break
 
 
 if __name__ == '__main__':
     try:
-        probe_api()
-        probe_imweb_ajax()
-        probe_detail_link()
+        main()
     except requests.RequestException as e:
         print(f'✗ 네트워크 오류: {e}')
         sys.exit(1)

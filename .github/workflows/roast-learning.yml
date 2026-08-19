@@ -1,0 +1,91 @@
+name: 로스팅 AI 자동 학습
+
+# 사이트에 업로드된 실제 로스팅 프로파일에서 "AI 판독 vs 사용자 수정" 차이를 집계해
+# 기기별 판독 규칙을 갱신하고, 그 규칙을 analyze-roast 프롬프트에 주입한다.
+# 프롬프트가 바뀌면 deploy-functions.yml 이 이어받아 실서비스에 자동 배포한다.
+#
+# 즉 **로스터가 사이트를 쓸수록 AI가 정확해지는 루프**의 자동 실행 지점이다.
+#
+# ⚠️ 사전 준비 (한 번만): 저장소 Settings → Secrets and variables → Actions 에
+#    SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY 등록.
+#    없으면 집계를 건너뛰고 조용히 종료한다(안전).
+
+on:
+  schedule:
+    # 매주 화요일 오전 9시 KST (= UTC 월 00:00)
+    - cron: '0 0 * * 2'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: '집계만 하고 파일은 수정하지 않음 (true/false)'
+        required: false
+        default: 'false'
+
+jobs:
+  learn:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: 저장소 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Python 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # 실사용 피드백 집계 — 자격증명이 없거나 업로드가 없으면 조용히 통과한다.
+      - name: 실사용 피드백 집계 → 기기 규칙 갱신
+        id: feedback
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            python scripts/roast_feedback.py --dry-run
+          else
+            python scripts/roast_feedback.py
+          fi
+
+      # 갱신된 기기 규칙을 AI 프롬프트에 주입 ← 여기가 '학습'
+      - name: AI 프롬프트에 주입
+        if: github.event.inputs.dry_run != 'true'
+        run: python scripts/build_roast_knowledge.py --report
+
+      - name: 세컨드 브레인 목차 갱신
+        if: always()
+        run: python scripts/build_wiki_index.py
+
+      - name: 변경사항 확인
+        id: check_changes
+        if: always()
+        run: |
+          git add vault/ supabase/
+          git diff --cached --quiet || echo "changed=true" >> $GITHUB_OUTPUT
+
+      # 커밋이 supabase/functions/ 를 건드리면 deploy-functions.yml 이 이어받아 배포한다.
+      - name: 변경사항 커밋 & 푸시
+        if: always() && steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config user.name "GreenBeanBot"
+          git config user.email "bot@green-bean-market"
+          git commit -m "로스팅 AI 자동 학습: $(date '+%Y-%m-%d') 실사용 피드백 반영"
+          git push
+
+      - name: 결과 요약
+        if: always()
+        run: |
+          if [ -z "${{ secrets.SUPABASE_URL }}" ] || [ -z "${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" ]; then
+            echo "### ⏭️ 자동 학습 건너뜀 — Supabase 자격증명 미설정" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "저장소 Settings → Secrets and variables → Actions 에 아래 두 개를 등록하세요." >> $GITHUB_STEP_SUMMARY
+            echo "- \`SUPABASE_URL\` — 예: https://txnpbzukavajwbmggpfk.supabase.co" >> $GITHUB_STEP_SUMMARY
+            echo "- \`SUPABASE_SERVICE_ROLE_KEY\` — Supabase 대시보드 → Project Settings → API → service_role" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.check_changes.outputs.changed }}" = "true" ]; then
+            echo "### ✅ 학습 반영됨 — 프롬프트 갱신 후 자동 배포가 이어집니다" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ✅ 실행 완료 — 반영할 새 패턴 없음" >> $GITHUB_STEP_SUMMARY
+          fi

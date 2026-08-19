@@ -164,6 +164,11 @@ async function saveProfile() {
     drop_weight: wizardData.drop_weight ?? null,
     weight_loss: wizardData.weight_loss ?? null,
     et_ror_series: wizardData.et_ror?.length ? wizardData.et_ror : null,
+    // AI 자동 학습 신호 (roasting-migration-ai-feedback.sql 로 추가한 컬럼)
+    ai_raw: wizardData.ai_raw ?? null,
+    ai_confidence: wizardData.ai_confidence ?? null,
+    ai_machine: wizardData.ai_machine ?? null,
+    ai_input_kind: wizardData.ai_input_kind ?? null,
   };
   const { error } = await sb.from('roasting_profiles').insert(payload);
   if (error) { alert('저장 실패: ' + error.message); return; }
@@ -763,6 +768,21 @@ function setAiStatus(state, msg) {
   }
 }
 
+/* ── AI 자동 학습용 판독 흔적 보존 ──────────────────────────────
+ * analyze-roast 가 읽어낸 원본은 마법사에서 사용자가 고치면 사라진다.
+ * 하지만 "AI가 뭐라 읽었나" vs "사용자가 뭘 고쳤나" 의 차이가 곧 학습 신호다.
+ * 여기서 wizardData 에 붙여두면 saveProfile() 이 DB에 함께 저장하고,
+ * scripts/roast_feedback.py 가 기기별 오차 패턴을 뽑아 판독 규칙으로 되먹인다. */
+function attachAiTrace(result, inputKind) {
+  if (!wizardData || !result) return;
+  wizardData.ai_raw = result;
+  wizardData.ai_confidence = result.confidence || null;
+  wizardData.ai_input_kind = inputKind;
+  // 프롬프트가 notes 에 'machine: XXX' 형태로 판독 기기를 적도록 되어 있다.
+  const m = /machine\s*:\s*([^.,;\n]+)/i.exec(result.notes || '');
+  wizardData.ai_machine = m ? m[1].trim() : null;
+}
+
 async function autoScan() {
   if (!digi.images.length) { alert('이미지를 먼저 업로드해 주세요.'); return; }
   $('btnAutoScan').disabled = true;
@@ -855,6 +875,10 @@ async function autoScan() {
       if (targetPts.length >= 2) extra.targetPts = targetPts;
       wizardData = buildWizardFromParse(mergedParse, extra);
 
+      // AI 자동 학습용: 사용자가 마법사에서 고치기 **전**의 AI 원본 판독을 보존한다.
+      // 이 값과 최종 저장값의 차이가 유일한 학습 신호다 (scripts/roast_feedback.py 가 분석).
+      attachAiTrace(result, 'photo+datafile');
+
       const conf = result.confidence || 'medium';
       const confTxt = conf === 'high' ? '높음' : conf === 'medium' ? '보통' : '낮음';
       const agitFromData = dp.agitSorted && dp.agitSorted.length;
@@ -869,6 +893,8 @@ async function autoScan() {
         { btPts: curve, etPts: etCurve, evTimes, dropT, title: '', ambient_temp: null, ambient_humidity: null },
         { agitSorted, chargeTemp, dropTemp, targetPts: targetPts.length >= 2 ? targetPts : undefined }
       );
+
+      attachAiTrace(result, 'photo');
 
       const conf = result.confidence || 'medium';
       const confTxt = conf === 'high' ? '높음' : conf === 'medium' ? '보통' : '낮음';

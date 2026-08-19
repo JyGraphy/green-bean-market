@@ -2,16 +2,17 @@
 """모모스커피 신규 플랫폼 구조 탐색 — 스크래퍼 재작성용 조사 도구.
 
 지금까지 밝혀진 것 (2026-08-19, GitHub Actions 실측):
- - momos.co.kr 이 cafe24 → 다른 솔루션으로 이전
+ - momos.co.kr 이 cafe24 → **아임웹(imweb)** 으로 이전
  - 옛 URL `/product/<슬러그>/<id>/category/64/...` 는 전부 404
- - 새 상품 URL 형식: `/shop_view/?idx=<숫자>`
- - 생두 카테고리: `/greenbean`, `/Product_GreenBean`
- - 그런데 카테고리 페이지(1.3MB)에 <a> 기반 상품 링크가 0개
-   → 상품 목록을 자바스크립트로 그리는 것으로 보인다
+ - 생두는 imweb 기본 쇼핑이 아니라 **자체 앱**(momos-dev.twomos.com)으로 운영
+ - 생두 페이지 `/greenbean`, `/Product_GreenBean` 은 자바스크립트로 목록을 그린다
+ - 그 목록이 쓰는 **공개 API**가 HTML 안에 노출돼 있다:
+     /api/public/green-beans   /api/public/products
+     /api/public/origins       /api/public/filters
+   (imweb 기본 목록 AJAX `/ajax/get_shop_list_view.cm` 도 존재)
 
-이 스크립트는 그 다음 질문에 답한다:
- "상품 데이터가 HTML 안에 (JSON 등으로) 들어 있는가, 아니면 별도 API를 호출하는가?"
-전자면 requests 만으로 계속 긁을 수 있고, 후자면 그 API를 직접 호출하면 된다.
+이 스크립트는 그 API들의 **응답 형태**를 확인한다 — 어떤 필드에 상품명·가격·
+원산지·상세링크가 들어 있는지 알아야 스크래퍼를 쓸 수 있다.
 """
 from __future__ import annotations
 
@@ -22,111 +23,134 @@ import sys
 import requests
 
 BASE = 'https://momos.co.kr'
-CATS = ['/greenbean', '/Product_GreenBean']
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 '
                   '(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    'Accept': 'application/json, text/plain, */*',
     'Accept-Language': 'ko-KR,ko;q=0.9',
+    'Referer': BASE + '/Product_GreenBean',
 }
 
+# 목록 API 후보. 페이지네이션 파라미터가 필요할 수 있어 몇 가지 변형을 함께 시도한다.
+CANDIDATES = [
+    '/api/public/green-beans',
+    '/api/public/green-beans?page=1&size=100',
+    '/api/public/green-beans?page=1&limit=100',
+    '/api/public/products',
+    '/api/public/products?page=1&size=100',
+    '/api/public/origins',
+    '/api/public/filters',
+]
 
-def main():
-    for cat in CATS:
-        url = BASE + cat
-        print(f'\n{"=" * 60}\n=== {url} ===')
-        r = requests.get(url, headers=HEADERS, timeout=25)
-        html = r.text
-        print(f'HTTP {r.status_code} · {len(html):,}바이트')
 
-        # ① 원문에 shop_view 가 몇 번 나오는가 (a 태그가 아니어도)
-        hits = re.findall(r'shop_view/?\?idx=(\d+)', html)
-        print(f'\n① 원문 내 shop_view idx 등장: {len(hits)}회 · 고유 {len(set(hits))}개')
-        if hits:
-            print(f'   샘플 idx: {sorted(set(hits))[:12]}')
-            # 그 주변 문맥을 보면 어떤 구조에 들어 있는지 알 수 있다
-            m = re.search(r'.{220}shop_view/?\?idx=\d+.{220}', html, re.S)
-            if m:
-                ctx = re.sub(r'\s+', ' ', m.group(0))
-                print(f'   문맥: …{ctx}…')
+def brief(obj, depth=0, max_depth=3):
+    """JSON 구조를 짧게 요약해 출력한다 (전체를 쏟아내면 로그가 못 쓴다)."""
+    pad = '  ' * depth
+    if isinstance(obj, dict):
+        for k, v in list(obj.items())[:25]:
+            if isinstance(v, (dict, list)) and depth < max_depth:
+                kind = 'dict' if isinstance(v, dict) else f'list[{len(v)}]'
+                print(f'{pad}{k}: {kind}')
+                brief(v, depth + 1, max_depth)
+            else:
+                s = str(v)
+                print(f'{pad}{k}: {s[:90]}')
+    elif isinstance(obj, list):
+        if not obj:
+            print(f'{pad}(빈 배열)')
+            return
+        print(f'{pad}[0]:')
+        brief(obj[0], depth + 1, max_depth)
 
-        # ② 상품명으로 보이는 문자열이 원문에 있는가
-        for kw in ('생두', 'Ethiopia', 'Colombia', '원'):
-            print(f'   "{kw}" 등장 {html.count(kw)}회')
 
-        # ③ 인라인 JSON 후보 — 상품 배열이 통째로 박혀 있는 경우
-        print('\n② 인라인 JSON 후보')
-        found_json = False
-        for m in re.finditer(r'(?:var|let|const)\s+(\w+)\s*=\s*(\[\{.{200,}?\}\])\s*[;\n]', html, re.S):
-            name, blob = m.group(1), m.group(2)
-            try:
-                data = json.loads(blob)
-            except Exception:
-                continue
-            if isinstance(data, list) and data and isinstance(data[0], dict):
-                print(f'   ✓ {name} — {len(data)}건, 키: {list(data[0])[:12]}')
-                found_json = True
-        # __NUXT__ / __NEXT_DATA__ 같은 프레임워크 상태
-        for key in ('__NUXT__', '__NEXT_DATA__', 'window.__INITIAL_STATE__'):
-            if key in html:
-                print(f'   ✓ {key} 발견 — 프레임워크 상태에 상품이 들어 있을 수 있음')
-                found_json = True
-        if not found_json:
-            print('   (없음)')
-
-        # ④ JS가 호출할 만한 API 엔드포인트
-        print('\n③ API 엔드포인트 후보')
-        apis = set()
-        for m in re.finditer(r'["\'](/[\w/\-.]*(?:api|ajax|list|product|goods|shop)[\w/\-.]*)["\']',
-                             html, re.I):
-            p = m.group(1)
-            if len(p) > 6 and not p.endswith(('.css', '.js', '.png', '.jpg', '.svg', '.gif', '.webp')):
-                apis.add(p)
-        for p in sorted(apis)[:25]:
-            print(f'   {p}')
-        if not apis:
-            print('   (없음)')
-
-        # ⑤ 페이지네이션 파라미터 흔적
-        pgs = set(re.findall(r'[?&](page|pageNum|p|offset|start)=\d+', html))
-        print(f'\n④ 페이지네이션 파라미터 흔적: {sorted(pgs) or "(없음)"}')
-
-    # ⑥ 상품 상세가 서버 렌더링인지 확인 — 여기만 되면 상세 수집은 가능
-    print(f'\n{"=" * 60}\n=== 상품 상세 페이지 확인 ===')
-    r = requests.get(f'{BASE}/shop_view/?idx=2486', headers=HEADERS, timeout=25)
-    h = r.text
-    print(f'HTTP {r.status_code} · {len(h):,}바이트')
-    t = re.search(r'<title[^>]*>(.*?)</title>', h, re.S)
-    print(f'제목: {t.group(1).strip() if t else "-"}')
-    prices = re.findall(r'[\d,]{4,}\s*원', h)
-    print(f'가격 형태 샘플: {prices[:6]}')
-
-    # ⑦ 홈페이지에는 shop_view 링크가 34개 서버렌더링돼 있었다(진단 로그 확인).
-    #    즉 "사이트 전체가 SPA"가 아니라 **카테고리 목록만** 비동기다.
-    #    imweb 계열은 목록을 페이지 파라미터로 다시 받아오는 경우가 많으므로 그걸 확인한다.
-    print(f'\n{"=" * 60}\n=== 목록 파라미터/플랫폼 지문 ===')
-    for probe in ('/', '/greenbean?page=1', '/greenbean?page=2'):
+def probe_api():
+    print('=' * 60)
+    print('=== 공개 API 응답 확인 ===')
+    for path in CANDIDATES:
+        url = BASE + path
+        print(f'\n--- {url} ---')
         try:
-            rr = requests.get(BASE + probe, headers=HEADERS, timeout=25)
+            r = requests.get(url, headers=HEADERS, timeout=25)
         except requests.RequestException as e:
-            print(f'{probe}: 오류 {e}')
+            print(f'   오류: {type(e).__name__}: {e}')
             continue
-        idxs = sorted(set(re.findall(r'shop_view/?\?idx=(\d+)', rr.text)))
-        print(f'{probe}: HTTP {rr.status_code} · {len(rr.text):,}바이트 · idx {len(idxs)}개 {idxs[:10]}')
+        ctype = r.headers.get('content-type', '')
+        print(f'   HTTP {r.status_code} · {ctype} · {len(r.content):,}바이트')
+        if r.status_code != 200:
+            print(f'   본문 앞부분: {r.text[:200]!r}')
+            continue
+        if 'json' not in ctype.lower():
+            print(f'   JSON 아님. 앞부분: {r.text[:200]!r}')
+            continue
+        try:
+            data = r.json()
+        except Exception as e:
+            print(f'   JSON 파싱 실패: {e}')
+            continue
+        brief(data)
+        # 상품 배열을 찾으면 첫 항목 전체를 그대로 보여준다 (필드명을 정확히 알아야 한다)
+        arr = None
+        if isinstance(data, list):
+            arr = data
+        elif isinstance(data, dict):
+            for key in ('data', 'items', 'list', 'results', 'content', 'products', 'greenBeans'):
+                v = data.get(key)
+                if isinstance(v, list) and v:
+                    arr = v
+                    break
+                if isinstance(v, dict):
+                    for k2 in ('items', 'list', 'content', 'results'):
+                        if isinstance(v.get(k2), list) and v[k2]:
+                            arr = v[k2]
+                            break
+                if arr:
+                    break
+        if arr:
+            print(f'\n   ▶ 상품 배열 {len(arr)}건 · 첫 항목 원본:')
+            print('   ' + json.dumps(arr[0], ensure_ascii=False, indent=2)[:2500].replace('\n', '\n   '))
 
-    # 플랫폼 판별 — 어떤 솔루션인지 알면 목록 API 규격을 특정할 수 있다
-    r0 = requests.get(BASE + '/', headers=HEADERS, timeout=25)
-    for marker in ('imweb', 'IMWEB', 'sixshop', 'cafe24', 'godomall', 'shopby', 'NHN'):
-        if marker in r0.text:
-            print(f'플랫폼 지문: "{marker}" 발견')
-    srcs = re.findall(r'<script[^>]+src=["\']([^"\']+)["\']', r0.text)
-    print('스크립트 src 샘플:')
-    for s in srcs[:15]:
-        print(f'   {s}')
+
+def probe_imweb_ajax():
+    """imweb 기본 목록 AJAX — 생두가 여기 있을 수도 있어 함께 확인한다."""
+    print('\n' + '=' * 60)
+    print('=== imweb 목록 AJAX 확인 ===')
+    url = BASE + '/ajax/get_shop_list_view.cm'
+    for method in ('get', 'post'):
+        try:
+            fn = requests.get if method == 'get' else requests.post
+            r = fn(url, headers=HEADERS, timeout=25,
+                   **({'params': {'page': 1}} if method == 'get' else {'data': {'page': 1}}))
+        except requests.RequestException as e:
+            print(f'   {method.upper()} 오류: {e}')
+            continue
+        print(f'   {method.upper()} HTTP {r.status_code} · {len(r.content):,}바이트')
+        idxs = sorted(set(re.findall(r'shop_view/?\?idx=(\d+)', r.text)))
+        print(f'      shop_view idx {len(idxs)}개 {idxs[:10]}')
+        print(f'      앞부분: {r.text[:200]!r}')
+
+
+def probe_detail_link():
+    """상품 상세 링크 형식 확인 — 우리가 저장할 url 이 이것이다."""
+    print('\n' + '=' * 60)
+    print('=== 생두 페이지 원문에서 상세 링크 힌트 찾기 ===')
+    r = requests.get(BASE + '/Product_GreenBean',
+                     headers={**HEADERS, 'Accept': 'text/html'}, timeout=25)
+    h = r.text
+    for pat, label in [
+        (r'["\'](/[Pp]roduct_?[Gg]reen[Bb]ean[^"\']*)["\']', '생두 경로'),
+        (r'["\']([^"\']*green-?beans?/[^"\']*)["\']', 'green-bean 경로'),
+        (r'["\']([^"\']*detail[^"\']*)["\']', 'detail 경로'),
+        (r'\{\{[^}]{0,60}\}\}', '템플릿 자리표시자'),
+    ]:
+        found = sorted(set(re.findall(pat, h)))[:12]
+        print(f'   {label}: {found}')
 
 
 if __name__ == '__main__':
     try:
-        main()
+        probe_api()
+        probe_imweb_ajax()
+        probe_detail_link()
     except requests.RequestException as e:
         print(f'✗ 네트워크 오류: {e}')
         sys.exit(1)

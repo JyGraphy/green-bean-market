@@ -107,12 +107,28 @@ def main():
         print(f'② 목록 페이지 주소가 등록돼 있지 않습니다 (LISTING 에 추가 필요) — 여기까지.')
         return
     print(f'② 목록 페이지에서 현재 링크 확인: {listing}')
-    code, _ = probe(listing)
+    code, final = probe(listing)
     if code != 200:
         print(f'   ✗ 목록 페이지 자체가 HTTP {code} — 쇼핑몰 구조가 크게 바뀌었거나 차단됨')
         return
+    if final != listing:
+        print(f'   ↪ 리다이렉트됨: {final}')
     r = requests.get(listing, headers=HEADERS, timeout=20)
     soup = BeautifulSoup(r.text, 'lxml')
+
+    # 페이지가 실제로 무엇을 주는지 먼저 확인한다 (셀렉터 문제 vs 구조 변경 구분)
+    title = (soup.title.get_text(strip=True) if soup.title else '(제목 없음)')
+    all_a = soup.find_all('a')
+    scripts = soup.find_all('script')
+    print(f'   페이지 제목: {title}')
+    print(f'   HTML {len(r.text):,}바이트 · <a> {len(all_a)}개 · <script> {len(scripts)}개')
+    if '생두' in r.text:
+        print('   본문에 "생두" 문자열 있음')
+    else:
+        print('   ⚠️ 본문에 "생두" 문자열이 없음 — 이 카테고리가 더 이상 생두가 아닐 수 있음')
+    if len(all_a) < 5 and len(scripts) > 3:
+        print('   ⚠️ 링크가 거의 없고 스크립트가 많음 — 클라이언트 렌더링(SPA) 전환 의심')
+
     hrefs = []
     for a_tag in soup.select('a[href*="/product/"]'):
         h = a_tag.get('href', '')
@@ -120,8 +136,25 @@ def main():
             hrefs.append(h)
     hrefs = list(dict.fromkeys(hrefs))
     print(f'   현재 목록에서 상품 링크 {len(hrefs)}개 추출')
+
     if not hrefs:
-        print('   ✗ 상품 링크를 못 찾음 — 목록 페이지 마크업이 바뀌었을 가능성 (셀렉터 수정 필요)')
+        print('   ✗ /product/ 링크를 못 찾음. 페이지에 실제로 있는 링크 형태를 조사합니다:')
+        pats = {}
+        for a_tag in all_a:
+            h = a_tag.get('href', '')
+            if not h or h.startswith(('#', 'javascript:', 'mailto:')):
+                continue
+            key = shape(h if h.startswith('http') else 'https://x' + (h if h.startswith('/') else '/' + h))
+            pats[key] = pats.get(key, 0) + 1
+        for k, c in sorted(pats.items(), key=lambda kv: -kv[1])[:12]:
+            print(f'      {c:>4}개  {k}')
+        if not pats:
+            print('      (링크가 하나도 없음 — 서버가 빈 껍데기 HTML을 주는 상태)')
+        # 카테고리 번호가 바뀌었는지 단서 찾기
+        cats = sorted(set(re.findall(r'cate_no=(\d+)', r.text)))
+        if cats:
+            print(f'   페이지에 등장하는 cate_no 값: {cats[:20]}')
+            print('   → 생두 카테고리 번호가 바뀌었을 수 있습니다(현재 스크래퍼는 64 사용).')
         return
 
     from urllib.parse import urljoin

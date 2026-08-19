@@ -65,9 +65,13 @@ def check_supabase(errs, warns):
              f'대시보드에서 Resume 필요. 로그인/원두컬렉션/로스팅 프로파일 전부 중단 상태', errs)
     elif r.status_code >= 500:
         fail(f'Supabase 백엔드 오류 HTTP {r.status_code}', errs)
+    elif r.status_code in (401, 403, 404):
+        # REST 루트에 Authorization 없이 apikey만 보내면 401이 정상 응답이다.
+        # 즉 401/403/404 는 "서버가 살아서 인증 검사를 하고 있다"는 확실한 생존 신호이므로
+        # 경고로 올리지 않는다 (매일 뜨는 노이즈가 되어 진짜 경고를 묻는다).
+        pass
     elif r.status_code >= 400:
-        # 401/404 등은 REST 루트 특성상 정상 응답일 수 있으나 기록은 남긴다.
-        warns.append(f'Supabase 응답 HTTP {r.status_code} — 서버는 살아 있으나 확인 권장')
+        warns.append(f'Supabase 응답 HTTP {r.status_code} — 예상 밖 응답, 확인 권장')
 
 
 def main(base):

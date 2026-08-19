@@ -134,9 +134,19 @@ coffeebeanweb/
 | cafe24 / godomall | 서버 렌더링 → `web_fetch` 또는 curl로 직접 스크래핑 가능 |
 | Sixshop | 클라이언트 렌더링 → Chrome MCP `javascript_tool` 필요 |
 | aram (블레스빈) | 서버 렌더링 → `web_fetch` 가능 |
+| 아임웹 imweb (모모스) | 서버 렌더링. 목록 더보기는 `/ajax/get_shop_list_view.cm` (JSON `{msg,html}`). 호출 파라미터(`category`·`widget_code`·`pagesize`)는 **목록 페이지 인라인 스크립트에서 매번 추출**한다 — 위젯을 다시 만들면 값이 바뀌어, 박아두면 그날부터 조용히 0개가 된다. **품절 배지 `.prod_icon.sold_out` 은 전 상품에 렌더되는 숨은 템플릿이라 신뢰 불가** |
 | 네이버 스마트스토어 (아마티보, 루베르로스터리) | **데이터센터 IP 차단 잦음** — requests는 429, 실브라우저(Playwright)도 로그인 월로 리다이렉트 (GH Actions에서 실측 확인). CI 자동화는 3단 구조: ① 직접 접근 시도 → ② 차단 시 **공식 오픈API 폴백**(`scrapers/naver_openapi.py`, 리포 시크릿 `NAVER_CLIENT_ID`/`NAVER_CLIENT_SECRET` 필요) → ③ 키 미설정이면 스킵(기존 데이터 보존, 잡은 초록 유지). 가정용 IP에서는 직접 접근이 되므로 로컬 수동 실행(`scripts/update_smartstore_local.py`)으로 정밀 수집 가능. 내부 API 문서는 `scrapers/naver_smartstore.py` 참고 |
 
 - 콤파스커피 Sixshop store ID: `224244`
+- 모모스커피는 2026년 cafe24 → 아임웹으로 이전했다. 옛 URL
+  `/product/<슬러그>/<id>/category/64/...` 는 전부 404이고, 현재는
+  목록 `/Product_GreenBean`, 상품 `/Product_GreenBean/?idx=<숫자>` 다.
+
+**쇼핑몰이 플랫폼을 갈아탔을 때** — 안전장치가 데이터를 지켜주지만(스크래퍼가 0개를
+수집하면 가드가 덮어쓰기를 막고, check_links 는 dead 비율 30% 초과 시 제거를 보류한다)
+그 상태로 두면 죽은 링크가 사용자에게 계속 노출된다. `공급사 링크 진단`
+워크플로(`store-diagnose.yml`)로 조사·재수집한다. 취급 품목이 실제로 줄어
+급감 가드에 걸리면, **감소가 사실임을 확인한 뒤에만** `force=true` 로 우회한다.
 
 ## 향후 추가 가능 공급사
 

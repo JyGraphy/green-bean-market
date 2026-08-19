@@ -49,6 +49,12 @@ ID_START = 101          # 모모스 ID 구간 시작 (alloc_ids 가 충돌은 �
 MAX_PAGES = 30          # 폭주 방지
 IDX_RE = re.compile(r'[?&]idx=(\d+)')
 
+# 페이지 인라인 스크립트가 알려주는 pagesize 는 98이다. 그대로 쓰면 상품이 그보다
+# 적을 때 페이징이 한 번도 실행되지 않아서, "한 번에 다 받았다"와 "서버가 page 를
+# 무시했다"를 구분할 수 없다. 실측(pagesize=6)에서 페이징이 정상 동작함을 확인했으므로
+# 일부러 작은 값을 써서 매 실행이 페이징을 거치게 한다.
+PAGE_SIZE = 24
+
 
 def fetch_html(session, path, **kw):
     r = session.get(BASE + path, timeout=25, **kw)
@@ -82,14 +88,16 @@ def parse_cards(html):
             if m:
                 price = int(m.group(1).replace(',', ''))
 
-        # 품절 — 품절 상품에만 렌더되는 배지. 클래스 템플릿 오탐이 없는지 실측 확인함.
-        soldout = card.select_one('.prod_icon.sold_out, .prod_icon.soldout') is not None
-
+        # 품절은 감지하지 않는다 — 아임웹의 .prod_icon.sold_out 은 **모든 카드에**
+        # 렌더되는 숨은 템플릿이다(2026-08-19 실측: 28/28 카드, 카드당 2개, style 없음.
+        # 상세페이지의 btn-soldout 계열도 표본 3건 전부 존재). 이걸 믿으면 전 상품이
+        # 품절로 표시된다 — cafe24 btnSoldout, godomall div.soldout 과 같은 함정이다.
+        # 신뢰할 신호를 찾기 전까지는 '모름'으로 두고 거짓 표시를 하지 않는다.
         items.append({
             'name': name,
             'price': price,
             'url': abs_url(BASE, a['href']),
-            'is_soldout': soldout,
+            'is_soldout': False,
         })
     return items
 
@@ -128,39 +136,50 @@ def scrape():
     session.headers.update(HEADERS)
 
     html = fetch_html(session, LIST_PATH)
-    items = parse_cards(html)
-    print(f'  1페이지: {len(items)}개')
-
     params = extract_ajax_params(html)
-    if not params:
-        # 파라미터를 못 찾아도 1페이지 분은 살린다. 급감이면 가드가 막는다.
-        print('  ⚠️ 목록 AJAX 파라미터를 못 찾았습니다 — 1페이지만 수집합니다.')
-    else:
-        print(f'  목록 AJAX 파라미터: category={params["category"]} '
-              f'widget_code={params["widget_code"]} pagesize={params["pagesize"]}')
-        seen = {it['url'] for it in items}
-        for page in range(2, MAX_PAGES + 1):
-            q = dict(params, page=page)
-            try:
-                r = session.get(BASE + AJAX_PATH, params=q, timeout=25,
-                                headers={'X-Requested-With': 'XMLHttpRequest',
-                                         'Referer': BASE + LIST_PATH})
-                data = r.json()
-            except Exception as e:
-                print(f'  페이지 {page} 실패: {type(e).__name__}: {e}')
-                break
-            if data.get('msg') != 'SUCCESS':
-                print(f'  페이지 {page}: msg={data.get("msg")} — 종료')
-                break
-            page_items = parse_cards(data.get('html') or '')
-            fresh = [it for it in page_items if it['url'] not in seen]
-            print(f'  페이지 {page}: {len(page_items)}개 (신규 {len(fresh)}개)')
-            if not fresh:
-                break
-            seen.update(it['url'] for it in fresh)
-            items.extend(fresh)
-            time.sleep(0.5)
 
+    if not params:
+        # 파라미터를 못 찾으면 목록 페이지에 그려진 첫 화면 분량만 건진다.
+        # 그것도 급감이면 가드가 교체를 막아 기존 데이터가 보존된다.
+        items = parse_cards(html)
+        print(f'  ⚠️ 목록 AJAX 파라미터를 못 찾았습니다 — 목록 페이지 분 {len(items)}개만 수집')
+        return finalize(items)
+
+    print(f'  목록 AJAX 파라미터: category={params["category"]} '
+          f'widget_code={params["widget_code"]} (사이트 pagesize={params["pagesize"]}, '
+          f'수집은 {PAGE_SIZE})')
+
+    # 1페이지부터 AJAX 로 받는다. 목록 페이지 HTML 과 섞으면 pagesize 가 달라져
+    # 오프셋이 어긋난다 — 예를 들어 HTML(98개) + AJAX page2(pagesize 24 → 25~48번)를
+    # 합치면 전부 중복이라 '더 없음'으로 판단해 99번째 이후를 통째로 놓친다.
+    items, seen = [], set()
+    for page in range(1, MAX_PAGES + 1):
+        q = dict(params, page=page, pagesize=PAGE_SIZE)
+        try:
+            r = session.get(BASE + AJAX_PATH, params=q, timeout=25,
+                            headers={'X-Requested-With': 'XMLHttpRequest',
+                                     'Referer': BASE + LIST_PATH})
+            data = r.json()
+        except Exception as e:
+            print(f'  페이지 {page} 실패: {type(e).__name__}: {e}')
+            break
+        if data.get('msg') != 'SUCCESS':
+            print(f'  페이지 {page}: msg={data.get("msg")} — 종료')
+            break
+        page_items = parse_cards(data.get('html') or '')
+        fresh = [it for it in page_items if it['url'] not in seen]
+        print(f'  페이지 {page}: {len(page_items)}개 (신규 {len(fresh)}개)')
+        if not fresh:
+            break
+        seen.update(it['url'] for it in fresh)
+        items.extend(fresh)
+        time.sleep(0.5)
+
+    return finalize(items)
+
+
+def finalize(items):
+    """수집 결과를 생두만 남기고 정리한다."""
     # 생두만 남긴다 — 목록에 원두/굿즈가 섞여 와도 [생두] 표기로 가른다.
     beans = [it for it in items if '[생두]' in it['name']]
     print(f'  전체 {len(items)}개 중 [생두] {len(beans)}개')
@@ -173,11 +192,16 @@ def scrape():
     for it in beans:
         it['name'] = re.sub(r'\[\s*생두\s*\]\s*', '', it['name']).strip()
 
-    # 가격도 없고 품절도 아니면 카드가 덜 그려진 것 → 제외
-    beans = [it for it in beans if it['price'] > 0 or it['is_soldout']]
+    # 가격 없는 항목 제외 — 우리 사이트는 가격 비교가 목적이라 0원은 비교 대상이
+    # 아니다(전체 데이터에 0원 상품은 한 건도 없다). 실제로 걸리는 건 커핑 행사
+    # 같은 비판매 항목이다.
+    dropped = [it for it in beans if it['price'] <= 0]
+    beans = [it for it in beans if it['price'] > 0]
+    if dropped:
+        print(f'  가격 없는 항목 {len(dropped)}개 제외: '
+              f'{[it["name"][:30] for it in dropped[:3]]}')
 
-    soldout = sum(1 for it in beans if it['is_soldout'])
-    print(f'[{STORE}] 총 {len(beans)}개 수집 (품절 {soldout}개)')
+    print(f'[{STORE}] 총 {len(beans)}개 수집')
     return beans
 
 

@@ -235,13 +235,23 @@ def guard_store_replacement(store, old_count, new_count):
     스크래퍼)는 반드시 이 함수를 거쳐야 한다.
     """
     # 1) 결과가 비었는데 기존 데이터가 있으면 = 스크래핑 실패로 간주 → 보존
+    #    이건 어떤 경우에도 우회하지 않는다. 0개는 정상적인 결과가 아니다.
     if new_count == 0 and old_count > 0:
         print(f"⚠️  {store}: 0개 수집됨 — 스크래핑 실패로 판단, 기존 {old_count}개 보존 (덮어쓰기 생략)")
         raise SystemExit(1)
     # 2) 기존이 충분히 많았는데 절반 미만으로 급감 = 부분 실패 의심 → 보존
     if old_count >= SUSPICIOUS_MIN_BASELINE and new_count < old_count * SUSPICIOUS_DROP_RATIO:
-        print(f"⚠️  {store}: {old_count}개 → {new_count}개로 급감 — 부분 실패 의심, 기존 데이터 보존 (덮어쓰기 생략)")
-        raise SystemExit(1)
+        # 급감이 '진짜'인 경우도 있다 — 쇼핑몰이 플랫폼을 갈아타며 취급 품목을 줄이면
+        # 스크래퍼가 정상인데도 영영 막힌다(모모스 115→28, 2026-08-19).
+        # 그래서 사람이 확인한 뒤 여는 명시적 통로를 둔다. validate_data.py 와 같은
+        # 플래그를 쓰고, 우회했다는 사실을 로그에 크게 남긴다.
+        if os.environ.get('FORCE_DATA_UPDATE') == '1':
+            print(f"🔓 {store}: {old_count}개 → {new_count}개 급감이지만 "
+                  f"FORCE_DATA_UPDATE=1 이라 진행합니다 (사람이 확인한 의도적 변경).")
+        else:
+            print(f"⚠️  {store}: {old_count}개 → {new_count}개로 급감 — 부분 실패 의심, 기존 데이터 보존 (덮어쓰기 생략)")
+            print("    실제로 상품이 줄어든 것이 확인됐다면 FORCE_DATA_UPDATE=1 로 다시 실행하세요.")
+            raise SystemExit(1)
 
 
 def update_json(store, new_products):

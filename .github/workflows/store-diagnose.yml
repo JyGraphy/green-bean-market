@@ -21,7 +21,7 @@ on:
         required: false
         default: 'false'
       explore:
-        description: '모모스 신규 플랫폼 구조 탐색 (true/false)'
+        description: '모모스 드라이런 — 저장 없이 수집 결과만 확인 (true/false)'
         required: false
         default: 'false'
       force:
@@ -55,8 +55,8 @@ jobs:
 
       # 진단만으로 끝내지 않고 바로 고칠 수 있게, 선택 시 해당 스크래퍼를 재실행한다.
       # common.guard_store_replacement 가 급감을 막아주므로 안전하다.
-      # 모모스 플랫폼 이전 조사용 1회성 탐색 (store가 모모스커피일 때만)
-      - name: 신규 플랫폼 구조 탐색
+      # 저장하기 전에 몇 개가 잡히는지 먼저 본다 (모모스 전용)
+      - name: 모모스 드라이런 (저장 없음)
         if: github.event.inputs.explore == 'true'
         run: python scripts/explore_momos.py
 

@@ -74,24 +74,63 @@ def check_url(session, url):
 
 
 def check_all(products):
-    """products → {id: (code, verdict)}. 도메인별 순차 + 도메인 간 병렬."""
+    """products → (results{id:(code,verdict)}, meta).
+
+    HEAD/GET 낭비 제거: process=='알수없음' 상품은 여기서 건너뛴다. 그 URL은
+    enrich_process 가 어차피 GET 으로 상세페이지를 받으므로(가공방식 추출),
+    거기서 연결성(404/410)까지 함께 판정한다 → 같은 URL 이중 조회 방지.
+
+    측정: 도메인별 요청 수·소요시간을 함께 반환한다(병목 파악용).
+    """
+    checked = [p for p in products if p.get('process') != '알수없음']
+    skipped = len(products) - len(checked)
+
     by_domain = defaultdict(list)
-    for p in products:
+    for p in checked:
         dom = urlparse(p.get('url', '')).netloc or '_invalid'
         by_domain[dom].append(p)
 
     results = {}
+    dom_time = {}   # 도메인 → 소요초
+    dom_cnt = {}    # 도메인 → 요청수
 
-    def run_domain(items):
+    def run_domain(item):
+        dom, items = item
+        t0 = time.monotonic()
         s = requests.Session()
         s.headers.update(HEADERS)
         for p in items:
             results[p['id']] = check_url(s, p.get('url', ''))
             time.sleep(PER_DOMAIN_DELAY)
+        dom_time[dom] = time.monotonic() - t0
+        dom_cnt[dom] = len(items)
 
+    t0 = time.monotonic()
     with ThreadPoolExecutor(max_workers=min(16, len(by_domain) or 1)) as ex:
-        list(ex.map(run_domain, by_domain.values()))
-    return results
+        list(ex.map(run_domain, by_domain.items()))
+    meta = {
+        'elapsed': time.monotonic() - t0,
+        'checked': len(checked),
+        'skipped_unknown': skipped,
+        'requests': sum(dom_cnt.values()),
+        'dom_time': dom_time,
+        'dom_cnt': dom_cnt,
+    }
+    return results, meta
+
+
+def _print_domain_timing(meta):
+    """도메인별 소요시간을 오래 걸린 순으로 (병목 파악)."""
+    dt = meta['dom_time']
+    if not dt:
+        return
+    print(f"⏱️  요청 {meta['requests']}건 / {meta['elapsed']:.0f}초 "
+          f"(스킵 {meta['skipped_unknown']}건은 enrich가 처리)")
+    print("   도메인별 소요(오래 걸린 순):")
+    for dom, sec in sorted(dt.items(), key=lambda x: -x[1])[:8]:
+        n = meta['dom_cnt'].get(dom, 0)
+        avg = sec / n if n else 0
+        print(f"     {sec:6.0f}초  {n:4d}건  평균{avg:4.1f}s  {dom}")
 
 
 def main():
@@ -100,12 +139,15 @@ def main():
     products = data['products']
     print(f"🔗 상품 링크 검증 시작 — {len(products)}개")
 
-    results = check_all(products)
+    results, meta = check_all(products)
+    _print_domain_timing(meta)
 
-    # store별 집계
+    # store별 집계 (검사한 상품만 — '알수없음'은 enrich가 담당)
     per_store = defaultdict(lambda: {'ok': 0, 'dead': 0, 'ambiguous': 0, 'dead_ids': []})
     for p in products:
-        code, verdict = results.get(p['id'], (None, 'ambiguous'))
+        if p['id'] not in results:
+            continue
+        code, verdict = results[p['id']]
         st = per_store[p['store']]
         st[verdict] += 1
         if verdict == 'dead':
@@ -155,6 +197,15 @@ def main():
         'total': len(products),
         'removed': sorted(to_remove),
         'held_stores': held,
+        'timing': {
+            'elapsed_sec': round(meta['elapsed'], 1),
+            'requests': meta['requests'],
+            'skipped_unknown': meta['skipped_unknown'],
+            'slowest_domains': sorted(
+                ({'domain': d, 'sec': round(s, 1), 'count': meta['dom_cnt'].get(d, 0)}
+                 for d, s in meta['dom_time'].items()),
+                key=lambda x: -x['sec'])[:8],
+        },
         'per_store': {s: {k: v for k, v in st.items() if k != 'dead_ids'}
                       for s, st in per_store.items()},
     }

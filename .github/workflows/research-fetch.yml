@@ -21,6 +21,14 @@ on:
         description: '논문 검색어 (비우면 대기열만 처리)'
         required: false
         default: ''
+      machine:
+        description: '로스터기 키 (machines/<키>.md 와 동일). machine_url 과 함께 쓴다'
+        required: false
+        default: ''
+      machine_url:
+        description: '받아올 로스터기 자료 주소'
+        required: false
+        default: ''
 
 jobs:
   fetch:
@@ -60,6 +68,26 @@ jobs:
           fi
           python scripts/paper_fetch.py --queue
 
+      # 프로파일 리서치와 같은 자리에서 로스터기 자료도 함께 받는다.
+      # 로스팅 AI 학습은 '기기별 판독 규칙'이 핵심이라, 논문만 모아서는 나아지지 않는다.
+      - name: 로스터기 자료 수집
+        id: machines
+        continue-on-error: true
+        run: |
+          if [ -n "${{ github.event.inputs.machine }}" ] && [ -n "${{ github.event.inputs.machine_url }}" ]; then
+            python scripts/roast_machine_fetch.py \
+              --machine "${{ github.event.inputs.machine }}" \
+              --url "${{ github.event.inputs.machine_url }}"
+          fi
+          python scripts/roast_machine_fetch.py --queue
+
+      # 수집만으로는 AI가 똑똑해지지 않는다 — 기기 규칙을 프롬프트에 주입해야 학습이다.
+      # 여기서 supabase/functions/ 가 바뀌면 deploy-functions.yml 이 이어받아 배포한다.
+      - name: 로스팅 AI 학습 주입
+        id: learn
+        continue-on-error: true
+        run: python scripts/build_roast_knowledge.py --report
+
       - name: 세컨드 브레인 목차 갱신
         if: always()
         run: python scripts/build_wiki_index.py
@@ -68,7 +96,7 @@ jobs:
         id: check_changes
         if: always()
         run: |
-          git add vault/raw/ vault/wiki/index.md
+          git add vault/raw/ vault/wiki/index.md supabase/
           git diff --cached --quiet || echo "changed=true" >> $GITHUB_OUTPUT
 
       - name: 변경사항 커밋 & 푸시
@@ -85,10 +113,18 @@ jobs:
         run: |
           A="${{ steps.auction.outcome }}"
           P="${{ steps.papers.outcome }}"
-          echo "옥션: $A / 논문: $P"
-          if [ "$A" != "success" ] && [ "$P" != "success" ]; then
-            echo "::error::옥션·논문 수집이 모두 실패했습니다 — vault/raw/ 최신 보고서를 확인하세요."
+          M="${{ steps.machines.outcome }}"
+          L="${{ steps.learn.outcome }}"
+          echo "옥션: $A / 논문: $P / 로스터기: $M / 학습주입: $L"
+          if [ "$A" != "success" ] && [ "$P" != "success" ] && [ "$M" != "success" ]; then
+            echo "::error::옥션·논문·로스터기 수집이 모두 실패했습니다 — vault/raw/ 최신 보고서를 확인하세요."
             exit 1
           fi
           if [ "$A" != "success" ]; then echo "::warning::옥션 수집 실패"; fi
           if [ "$P" != "success" ]; then echo "::warning::논문 수집 실패(대기열이 비어 있으면 정상)"; fi
+          if [ "$M" != "success" ]; then echo "::warning::로스터기 자료 수집 실패"; fi
+          # 학습 주입 실패는 조용히 넘기지 않는다 — 여기가 막히면 아무리 모아도 AI는 그대로다.
+          if [ "$L" != "success" ]; then
+            echo "::error::로스팅 AI 학습 주입 실패 — 기기 규칙이 프롬프트에 반영되지 않았습니다."
+            exit 1
+          fi

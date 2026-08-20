@@ -71,7 +71,10 @@ def build_block(machines: list[dict]) -> str:
     lines = [
         START,
         '// 자동 생성 — 직접 수정 금지. 원본: vault/raw/roast-profiles/machines/*.md',
-        f'// 생성일 {datetime.date.today().isoformat()} · 등록 기기 {len(machines)}대',
+        # 생성일을 넣지 않는다. 넣으면 규칙이 하나도 안 바뀐 날에도 이 줄 때문에 파일이
+        # 달라져서, 매주 리서치 실행마다 의미 없는 커밋과 재배포가 일어난다.
+        # "언제 만들었나"는 git 이력이 더 정확하게 답한다.
+        f'// 등록 기기 {len(machines)}대',
         '',
         '════════════════════════════════════════',
         'PHASE 1-B — MACHINE-SPECIFIC READING RULES (verified knowledge base)',

@@ -26,13 +26,39 @@ Claude 비전 모델 + **판독 규칙 프롬프트** 구조이므로, 이 AI의
 따라서 프로파일을 모으기만 하면 AI는 하나도 똑똑해지지 않는다.
 **모은 지식을 기기별 판독 규칙으로 바꿔 프롬프트에 주입해야** 비로소 학습이다.
 
+## 리서치 주기에 올라타 있다 (2026-08-20~)
+
+너는 리서치 부서의 일원이고, **논문·옥션 수집과 같은 주기에 함께 돈다.**
+`research-fetch.yml`(매주 월요일)이 논문을 받는 그 실행에서 로스터기 자료도 같이 받고,
+학습 주입까지 자동으로 굴린다:
+
+```
+논문 수집 · 옥션 수집 · 로스터기 자료 수집   ← 같은 실행
+   → build_roast_knowledge.py 자동 주입      ← 학습
+   → deploy-functions.yml 자동 배포
+```
+
+그래서 **네가 프로파일을 조사하다 기기 자료를 발견하면, 직접 받으려 애쓰지 말고
+`vault/raw/roast-profiles/_수집대기.md` 에 한 줄 적어라.** 다음 실행이 받아온다.
+
+```
+- [ ] giesen https://…/w6a-specs  W6A 프로브 사양표
+```
+
+받아진 원본은 `vault/raw/roast-profiles/sources/` 에 쌓인다(raw이므로 수정 금지).
+네 일은 그 원본을 읽고 `machines/<기기>.md` 의 판독 규칙으로 옮기는 것이다.
+
 ## 작업 루프 (매번 이 순서로)
 
 1. **수집** — 신뢰 가능한 출처에서 기기별 특성을 조사한다.
    - 출처 우선순위: ① 제조사 공식(IKAWA·Aillio·Stronghold·Probat·Loring) ② 오픈소스
      (Artisan 문서·샘플 로그) ③ 학술 논문 ④ 로스터 공개 자료(수치가 화면으로 검증 가능할 때만)
+   - 먼저 `vault/raw/roast-profiles/sources/` 에 이미 받아진 원본이 있는지 확인한다.
    - 세션에서 WebFetch가 403이면 WebSearch로 하고, 본문이 꼭 필요하면
-     `vault/raw/papers/_수집대기.md` 에 등록해 GitHub Actions가 받아오게 한다.
+     기기 자료는 `vault/raw/roast-profiles/_수집대기.md`,
+     논문은 `vault/raw/papers/_수집대기.md` 에 등록해 GitHub Actions가 받아오게 한다.
+   - **URL을 추측해서 적지 마라.** 실재를 확인하지 않은 주소는 다음 실행에서 404가 나고,
+     그만큼 학습이 한 주 밀린다.
 2. **기기 지식 작성** — `vault/raw/roast-profiles/machines/<기기>.md`
    (`_템플릿.md` 형식을 지킬 것. `- heat_source:` 등 키가 정확해야 스크립트가 읽는다.)
    - `## 판독 규칙` 섹션이 **그대로 AI 프롬프트에 들어간다.** 영어로 쓸 것.

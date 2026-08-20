@@ -1,8 +1,8 @@
 # 📚 생두마켓 세컨드 브레인
 
-_이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0) · 2026-08-19_
+_이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0) · 2026-08-20_
 
-정리된 주제 **5개** · 원본 문서 **40건**
+정리된 주제 **5개** · 원본 문서 **42건**
 
 ---
 
@@ -54,6 +54,8 @@ _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0
 ### 🔥 로스팅 프로파일 `raw/roast-profiles/`
 
 - [[2026-08-05-AI학습현황]] — 로스팅 AI 학습 현황
+- [[2026-08-19-AI학습현황]] — 로스팅 AI 학습 현황  ⚠️ _wiki에서 참조되지 않음_
+- [[_수집대기]] — 📥 로스터기 자료 수집 대기열  ⚠️ _wiki에서 참조되지 않음_
 - [[_출처카탈로그]] — 로스팅 프로파일 출처 카탈로그 (SOURCES.md)
 
 ### 🔎 공급사 발굴 `raw/stores/`
@@ -65,7 +67,7 @@ _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0
 
 ## ⚠️ 정리 대기
 
-아래 12건은 아직 wiki에 반영되지 않았습니다.
+아래 14건은 아직 wiki에 반영되지 않았습니다.
 정리하려면 Claude에게 다음처럼 지시하세요:
 
 ```
@@ -82,5 +84,7 @@ vault/raw의 아래 문서를 읽고 vault/CLAUDE.md 규칙대로 wiki로 정리
   - raw/papers/fulltext/PMC12234775-A-universal-color-curve-for-roasted-arabica-coffee.md
   - raw/papers/fulltext/PMC6818232-Starmaya-The-First-Arabica-F1-Coffee-Hybrid-Produced-Using-G.md
   - raw/papers/fulltext/PMC8854711-Comparison-of-chemical-compounds-and-their-influence-on-the.md
+  - raw/roast-profiles/2026-08-19-AI학습현황.md
+  - raw/roast-profiles/_수집대기.md
 ```
 

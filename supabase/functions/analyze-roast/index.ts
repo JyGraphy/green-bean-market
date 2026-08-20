@@ -82,7 +82,7 @@ Identify the app, then map each curve using the legend you read in PHASE 0.
 
 // <<<MACHINE_KNOWLEDGE_START>>>
 // 자동 생성 — 직접 수정 금지. 원본: vault/raw/roast-profiles/machines/*.md
-// 생성일 2026-08-05 · 등록 기기 8대
+// 등록 기기 8대
 
 ════════════════════════════════════════
 PHASE 1-B — MACHINE-SPECIFIC READING RULES (verified knowledge base)

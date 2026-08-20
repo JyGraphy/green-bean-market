@@ -9,6 +9,10 @@ on:
 jobs:
   scrape:
     runs-on: ubuntu-latest
+    # run_all.py 안의 단계별 타임아웃이 1차 방어선이고, 이건 최후의 상한이다.
+    # 기본값은 360분이라 파이프라인이 멈춰도 반나절을 붙잡고 있는다.
+    # 평소 전체 실행이 16분이므로 60분이면 넉넉하다.
+    timeout-minutes: 60
     permissions:
       contents: write  # 커밋 푸시 권한
 

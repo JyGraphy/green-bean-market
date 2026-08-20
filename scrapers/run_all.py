@@ -24,6 +24,32 @@ import subprocess, sys, os
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCRAPERS_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# ── 타임아웃 (초) ──────────────────────────────────────────────────
+# **왜 필요한가** — 예전엔 어디에도 타임아웃이 없어서, 쇼핑몰 한 곳이 응답을 안 주면
+# 매일 06시 파이프라인이 통째로 매달렸다. GitHub 잡 상한이 6시간이라 그때까지 붙잡혀
+# 있을 수 있고, 그 사이 정상 수집된 store 도 커밋되지 못한다.
+# (2026-08-20 실측: 평소 16분 걸리던 수집이 40분을 넘겨도 안 끝났다.)
+#
+# 값은 '평소보다 넉넉하되 하루를 잡아먹지는 않는' 선으로 잡았다.
+# 시간이 초과되면 그 단계만 실패로 처리하고 다음으로 넘어간다 — 가드가 있으므로
+# 덜 긁힌 데이터가 기존 데이터를 덮어쓰지는 않는다.
+SCRAPER_TIMEOUT = 600      # store 1곳 (평소 수십 초~2분)
+LINKCHECK_TIMEOUT = 1800   # 전 상품 링크 확인 (1,000건 이상 × HTTP 요청)
+ENRICH_TIMEOUT = 1200      # '알수없음' 상품만 상세페이지 조회
+SQL_TIMEOUT = 300          # 로컬 파일 생성 (네트워크 없음)
+
+
+def run_step(argv, label, timeout):
+    """하위 프로세스를 타임아웃과 함께 실행한다. (성공여부, 사유) 반환."""
+    try:
+        r = subprocess.run(argv, capture_output=False, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        print(f"⏱️  {label} 타임아웃 ({timeout}초 초과) — 중단하고 다음으로 넘어갑니다")
+        return False, 'timeout'
+    if r.returncode != 0:
+        return False, f'종료코드 {r.returncode}'
+    return True, ''
+
 SCRAPERS = [
     # 가나다 순 (더블유빈 제외 — 클라이언트렌더링/차단)
     # 스마트스토어(루베르로스터리·아마티보)는 네이버가 데이터센터 IP를 차단하면
@@ -53,40 +79,34 @@ for filename, name in SCRAPERS:
     print(f"\n{'='*50}")
     print(f"▶ {name} 스크래핑 중...")
     print(f"{'='*50}")
-    result = subprocess.run([sys.executable, path], capture_output=False)
-    if result.returncode != 0:
-        print(f"❌ {name} 실패 (종료코드 {result.returncode})")
-        errors.append(name)
-    else:
+    ok, why = run_step([sys.executable, path], name, SCRAPER_TIMEOUT)
+    if ok:
         print(f"✅ {name} 완료")
+    else:
+        print(f"❌ {name} 실패 ({why})")
+        errors.append(f'{name}({why})' if why == 'timeout' else name)
 
 print(f"\n{'='*50}")
 print("▶ 상품 링크 연결성 검증 중...")
 # 죽은 링크(404/410)만 제거. 체커 자체 오류는 비치명적(데이터 보존).
-result = subprocess.run(
-    [sys.executable, os.path.join(ROOT, 'scripts', 'check_links.py')],
-    capture_output=False
-)
-if result.returncode != 0:
-    print("⚠️  링크 검증 비정상 종료 — 데이터는 보존됨(계속 진행)")
+ok, why = run_step([sys.executable, os.path.join(ROOT, 'scripts', 'check_links.py')],
+                   '링크 검증', LINKCHECK_TIMEOUT)
+if not ok:
+    print(f"⚠️  링크 검증 비정상 종료({why}) — 데이터는 보존됨(계속 진행)")
 
 print(f"\n{'='*50}")
 print("▶ 가공방식 보강 중 (상세페이지)...")
 # 상품명으로 못 잡은 '알수없음'만 상세페이지에서 추출. 오류는 비치명적.
-result = subprocess.run(
-    [sys.executable, os.path.join(ROOT, 'scripts', 'enrich_process.py')],
-    capture_output=False
-)
-if result.returncode != 0:
-    print("⚠️  가공방식 보강 비정상 종료 — 데이터는 보존됨(계속 진행)")
+ok, why = run_step([sys.executable, os.path.join(ROOT, 'scripts', 'enrich_process.py')],
+                   '가공방식 보강', ENRICH_TIMEOUT)
+if not ok:
+    print(f"⚠️  가공방식 보강 비정상 종료({why}) — 데이터는 보존됨(계속 진행)")
 
 print(f"\n{'='*50}")
 print("▶ database.sql 재생성 중...")
-result = subprocess.run(
-    [sys.executable, os.path.join(ROOT, 'scripts', 'generate_sql.py')],
-    capture_output=False
-)
-if result.returncode != 0:
+ok, why = run_step([sys.executable, os.path.join(ROOT, 'scripts', 'generate_sql.py')],
+                   'database.sql 재생성', SQL_TIMEOUT)
+if not ok:
     print("❌ database.sql 재생성 실패")
     errors.append('generate_sql')
 

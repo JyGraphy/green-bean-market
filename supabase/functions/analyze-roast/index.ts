@@ -102,17 +102,21 @@ chart app and total roast time, then apply that entry.
 | Loring (S15 Falcon / S35 Kestrel / S70 Peregrine) | 열풍(대류) — single burner heats inlet air, not the drum (smokeless afterburner) | BT(빠른 ~1.5mm 프로브)+ET(배기) | 10–16분 (예: S15 배치 15kg). 대형기(S35/S70)도 배치만 커질 뿐 시간대는 유사 | Cropster (Roasting Intelligence) / Loring 자체 제어 소프트웨어 ("Roast Architect") |
 | Probat (Probatone / P Series) | 드럼(전도) — gas burner + drum/air thermocouples | BT+ET (P series 표준, 구형 Probatone 2 base는 BT만) | 10–20분 (상업용 배치 5–60kg) | Artisan / Cropster (자체 차트 앱 없음, 외부 소프트웨어 연동) |
 | Stronghold (Roastware / Boost) | 하이브리드 — 열풍 + 할로겐(복사) + 드럼히터(전도) | BT+ET (원두 표면 / 내부) | 10–16분 | Roastware / Boost web app (dark UI, Korean labels) |
-| 태환 Proaster (Taehwan Automation) | 드럼(전도) — 드럼 하부 열원(가스 또는 전기, 모델별 상이) | 미확인 (모델별 상이, 표준 BT/ET 구성 확인 안 됨) | 5–20분 (모델별 편차 큼 — 예: THCR-01A 500g–1.5kg 배치, 5–20분) | 미확인 — 자체 데이터로깅/차트 소프트웨어 존재를 검색으로 확인하지 못함 |
+| 태환 Proaster (Taehwan Automation) | 드럼(전도) — 드럼 하부 열원(가스 또는 전기, 모델별 상이) | 모델별 상이 — Artisan 연동은 THCR-01/01A/03/06/12/25 공식 지원 확인, 일부 모델 "3 TEMP" 가이드 존재(채널 구성은 미확인) | 5–20분 (모델별 편차 큼) — 확인 지점: THCR-01A 500g–1.5kg/5–20분, THCR-06 2–10kg/약10–15분 | 모델별 Artisan 연동 지원(공식 설치 매뉴얼 확인) + 자체 로깅 프로그램 "DAQ MASTER"(상세 기능 미확인) |
 
 ▶ Aillio Bullet R1 (v2 / R2 Pro)
   - Induction heating gives fast, precise power response — ROR reacts to power-level changes
     noticeably QUICKER than a gas-fired drum (Probat/Giesen/Fuji Royal), though still slower than
     IKAWA's fluid-bed.
   - If an IBTS (Infrared Bean Temperature Sensor) curve is present, it reads bean SURFACE
-    temperature with NO thermometric lag: it typically shows NO dip/turning-point after charge,
-    and reads roughly 15–17°C (~30°F) HIGHER than the traditional contact bean probe at the same
-    moment. Do NOT force an IBTS curve to show a turning point just because a classic BT curve
-    normally has one — its absence is expected and CORRECT for IBTS, not a reading error.
+    temperature with NO thermometric lag: it typically shows NO dip/turning-point after charge.
+    Do NOT force an IBTS curve to show a turning point just because a classic BT curve normally
+    has one — its absence is expected and CORRECT for IBTS, not a reading error.
+  - The IBTS-vs-contact-probe OFFSET IS NOT A FIXED NUMBER — do not hard-code "IBTS reads ~15–17°C
+    higher." User reports (Roast World community) show the gap is LARGEST on small batches and
+    SHRINKS as batch size increases; on larger batches (~1.2kg) some roasters report IBTS reading
+    LOWER than the contact BT probe well before first crack, i.e. the sign of the offset can
+    reverse. Treat any specific IBTS-BT gap as machine/batch-dependent, not a universal constant.
   - If BOTH a contact bean-probe curve and an IBTS curve are shown, they are NOT interchangeable —
     check the legend to see which is which. The contact-probe curve has the classic post-charge
     dip; the IBTS curve does not.
@@ -158,6 +162,13 @@ chart app and total roast time, then apply that entry.
     on-image legend (this machine is a strong case for the "read the legend first" rule).
   - If a chart is exported via Artisan or Cropster instead of the native Giesen Profiler, follow
     that app's own legend/color conventions instead of assuming a Giesen-specific scheme.
+  - Giesen sells MULTIPLE PT100 probe variants (confirmed via Giesen's own parts store): a straight
+    AIR/exhaust probe (100mm long, 6mm diameter) and several angled BEAN probes (55mm long in 3mm
+    or 6mm diameter, 35mm long 3mm diameter, or 25mm long 3mm diameter), plus a "double read-out"
+    option. Probe length/diameter affects thermal lag (shorter/thinner probes respond faster), and
+    it is user-selectable per machine — do NOT assume one fixed BT thermal-lag profile for
+    "Giesen" as a brand; if the roast looks unusually fast/slow to respond around the turning
+    point, this is a plausible explanation rather than a reading error.
 
 ▶ IKAWA Pro (50g / 100g)
   - FLUID-BED air roaster — there is NO bean-temperature probe. Never invent a BT probe reading.
@@ -189,6 +200,15 @@ chart app and total roast time, then apply that entry.
     roast the way it would on a plain conduction drum.
   - No fixed native color scheme is confirmed — charts are frequently exported through Cropster
     (which has its own conventions), not a Loring-branded skin. Always read the on-image legend.
+  - Loring's own bean probe is confirmed to be a very thin ~1.5mm thermocouple (vs. ~3mm on many
+    classic drum roasters, e.g. Diedrich), per Loring's own thermocouple parts listing. Roasters
+    comparing machines report this fast probe produces a noticeably TALLER/SHARPER RoR peak right
+    at the turning point, a FLATTER-looking RoR through the middle-to-end of the roast, and a
+    HIGHER absolute end-of-roast BT reading for the same visual roast color than a slower probe
+    would show (one documented comparison: ~415°F on Loring vs ~399–401°F on a Diedrich for a
+    similar color). When judging "how developed" a Loring BT curve looks near the end, do not
+    assume the same BT-to-color mapping as a classic drum roaster — a higher absolute BT number can
+    still be a comparable roast level, not necessarily a hotter/more-developed roast.
 
 ▶ Probat (Probatone / P Series)
   - This is the classic reference gas-fired DRUM roaster: burner heats the drum and the air that
@@ -226,21 +246,28 @@ chart app and total roast time, then apply that entry.
 
 ▶ 태환 Proaster (Taehwan Automation)
   - Korean-market drum roaster with the heat source located below/under the drum (conduction),
-    spanning a WIDE range of models from small (200g sample roasters) to large industrial
-    (30kg+) capacity. Do NOT apply one fixed time/batch assumption — if the model or batch
-    capacity is stated by the user, scale expectations accordingly: small sample models can roast
-    in well under 10 min, larger industrial batches typically need longer.
-  - No confirmed proprietary charting app or default color legend was found for Proaster in
-    available sources. If a Proaster chart is provided, do NOT assume Artisan-style default
-    colors — read the on-image legend, and if no legend is visible, lower "confidence" to "low"
-    rather than guessing which curve is BT/ET.
-  - Gas vs electric heater variants exist (e.g. THCR-01A: gas ~3900kcal or 3.3kW electric option).
-    Heater type may plausibly affect burner-response speed for ROR, but no verified data on the
-    magnitude of that difference was found — do not invent a specific ROR-lag figure for this.
-  - Treat this entry as PARTIAL/LOW-CONFIDENCE knowledge: the batch/time range above is sourced
-    from ONE specific small model's public spec listing, not confirmed across the full Proaster
-    lineup actually used in Korean roasteries. Prefer asking the user for the exact model over
-    guessing machine-specific behavior beyond what is stated here.
+    spanning a WIDE range of models from small (200g–1.5kg sample models like THCR-01/01A) to
+    mid-size (THCR-06: 2–10kg, ~10–15 min) to large industrial (THCR-12/THCR-25, 30kg+) capacity.
+    Do NOT apply one fixed time/batch assumption — if the model or batch capacity is stated by the
+    user, scale expectations accordingly: small sample models can roast in well under 10 min,
+    larger industrial batches typically need longer even though total time does not scale linearly
+    with batch size (THCR-01A and THCR-06 overlap in the 10–15 min range despite very different
+    batch sizes).
+  - Proaster models are OFFICIALLY compatible with Artisan (confirmed via Taehwan's own install-
+    manual download page, covering THCR-01/01A/03/06/12/25) as well as Taehwan's own logging
+    software "DAQ MASTER." If a Proaster chart is provided, do NOT assume Artisan-style default
+    colors purely because Artisan is supported — still read the on-image legend, and if no legend
+    is visible, lower "confidence" to "low" rather than guessing which curve is BT/ET.
+  - Gas vs electric heater variants exist (e.g. THCR-01A: gas ~3900kcal/hr or 3.3kW electric
+    option; THCR-06: gas ~18,000kcal/hr natural gas or ~1.5kg/hr LPG, single-phase 220–240V,
+    ~2.0kW/hr power draw). Heater type may plausibly affect burner-response speed for ROR, but no
+    verified data on the magnitude of that difference was found — do not invent a specific ROR-lag
+    figure for this.
+  - Treat probe COUNT/PLACEMENT as still LOW-CONFIDENCE: a "3 TEMP Artisan connection guide" is
+    confirmed to exist for at least one model, implying 3-channel temperature logging is possible,
+    but which channels (BT/ET/drum-wall/preheat) are not confirmed from search alone — do not
+    assume a specific 3-probe layout without the primary manual. Prefer asking the user for the
+    exact model over guessing machine-specific behavior beyond what is stated here.
 
 CRITICAL: report the detected machine in the output "notes" field, e.g.
 "machine: IKAWA Pro (fluid-bed)". If the observed values contradict the machine's

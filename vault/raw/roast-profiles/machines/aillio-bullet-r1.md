@@ -12,10 +12,14 @@
   noticeably QUICKER than a gas-fired drum (Probat/Giesen/Fuji Royal), though still slower than
   IKAWA's fluid-bed.
 - If an IBTS (Infrared Bean Temperature Sensor) curve is present, it reads bean SURFACE
-  temperature with NO thermometric lag: it typically shows NO dip/turning-point after charge,
-  and reads roughly 15–17°C (~30°F) HIGHER than the traditional contact bean probe at the same
-  moment. Do NOT force an IBTS curve to show a turning point just because a classic BT curve
-  normally has one — its absence is expected and CORRECT for IBTS, not a reading error.
+  temperature with NO thermometric lag: it typically shows NO dip/turning-point after charge.
+  Do NOT force an IBTS curve to show a turning point just because a classic BT curve normally
+  has one — its absence is expected and CORRECT for IBTS, not a reading error.
+- The IBTS-vs-contact-probe OFFSET IS NOT A FIXED NUMBER — do not hard-code "IBTS reads ~15–17°C
+  higher." User reports (Roast World community) show the gap is LARGEST on small batches and
+  SHRINKS as batch size increases; on larger batches (~1.2kg) some roasters report IBTS reading
+  LOWER than the contact BT probe well before first crack, i.e. the sign of the offset can
+  reverse. Treat any specific IBTS-BT gap as machine/batch-dependent, not a universal constant.
 - If BOTH a contact bean-probe curve and an IBTS curve are shown, they are NOT interchangeable —
   check the legend to see which is which. The contact-probe curve has the classic post-charge
   dip; the IBTS curve does not.
@@ -36,4 +40,5 @@
 - [The Start of Something…. Our New Infrared Bean Temperature… - Aillio Medium](https://aillio.medium.com/the-start-of-something-39aa01d08fa9)
 - [IBTS vs Bean Probe Temp discrepancies - Roast World Community](https://community.roast.world/t/ibts-vs-bean-probe-temp-discrepancies/9710)
 - [Roasting Glossary - docs.aillio.com](https://docs.aillio.com/glossary/)
+- [R2 Pro: IBTS reading lower than BT well before first crack on 1200g batches - Roast World Community](https://community.roast.world/t/r2-pro-ibts-reading-lower-than-bt-well-before-first-crack-on-1200g-batches-normal-behaviour-or-sensor-issue/21143)
 - 검증 대기 — 실제 RoasTime 차트 이미지로 아직 테스트하지 못함

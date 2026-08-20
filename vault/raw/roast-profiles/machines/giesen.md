@@ -20,6 +20,13 @@
   on-image legend (this machine is a strong case for the "read the legend first" rule).
 - If a chart is exported via Artisan or Cropster instead of the native Giesen Profiler, follow
   that app's own legend/color conventions instead of assuming a Giesen-specific scheme.
+- Giesen sells MULTIPLE PT100 probe variants (confirmed via Giesen's own parts store): a straight
+  AIR/exhaust probe (100mm long, 6mm diameter) and several angled BEAN probes (55mm long in 3mm
+  or 6mm diameter, 35mm long 3mm diameter, or 25mm long 3mm diameter), plus a "double read-out"
+  option. Probe length/diameter affects thermal lag (shorter/thinner probes respond faster), and
+  it is user-selectable per machine — do NOT assume one fixed BT thermal-lag profile for
+  "Giesen" as a brand; if the roast looks unusually fast/slow to respond around the turning
+  point, this is a plausible explanation rather than a reading error.
 
 ## 근거
 
@@ -30,4 +37,5 @@
 - [artisan blog: Giesen Roaster Connected](https://artisan-roasterscope.blogspot.com/2017/02/giesen-roaster-connected.html)
 - [Giesen Launches Updated Coffee Roasting Software, Giesen Profiler 2.0 - Sprudge](https://sprudge.com/giesen-launches-updated-coffee-roasting-software-giesen-profiler-2-0-232387.html)
 - [Giesen Profiler 2.0 is here! - giesen.com](https://www.giesen.com/giesen-profiler-2-0-is-here/)
+- [PT100 Temperature sensor – Giesen Roasting Solutions (검색 요약, 세션 WebFetch 403 — 원문은 대기열 등록)](https://giesen.store/products/pt100-temperature-sensor)
 - 검증 대기 — 실제 Giesen Profiler/Artisan 차트 이미지로 아직 테스트하지 못함

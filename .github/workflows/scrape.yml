@@ -73,7 +73,22 @@ jobs:
           git config user.email "bot@green-bean-market"
           git add data/products.json database.sql data/product_dates.json data/update_log.json data/products_web.json data/link_check.json data/process_enrich.json vault/raw/qa/
           git commit -m "자동 갱신: $(date '+%Y-%m-%d') 생두 데이터 업데이트"
-          git push
+
+          # 수집에 15분 남짓 걸리는 동안 다른 작업이 main 을 앞서 나가면 push 가
+          # (fetch first) 로 거부되고, 그날 갱신분이 통째로 버려진다.
+          # 실제로 2026-08-20 에 이 일이 났다 — 커밋은 만들어졌는데 푸시가 거부됐다.
+          # 그래서 rebase 후 재시도한다. 우리 커밋은 데이터 파일만 건드리므로
+          # 남의 커밋 위에 얹어도 안전하다.
+          for i in 1 2 3; do
+            if git pull --rebase origin main && git push; then
+              echo "✅ 푸시 완료 (시도 $i회)"
+              exit 0
+            fi
+            echo "⚠️ 푸시 실패 — 재시도 ($i/3)"
+            sleep $((i * 5))
+          done
+          echo "::error::rebase 후에도 푸시에 실패했습니다 — 갱신분이 반영되지 않았습니다."
+          exit 1
 
       - name: 변경 없음
         if: always() && steps.validate.outcome == 'success' && steps.check_changes.outputs.changed != 'true'

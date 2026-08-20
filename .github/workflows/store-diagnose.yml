@@ -94,7 +94,18 @@ jobs:
           git config user.name "GreenBeanBot"
           git config user.email "bot@green-bean-market"
           git add data/ database.sql
-          git diff --cached --quiet || {
+          if ! git diff --cached --quiet; then
             git commit -m "${{ github.event.inputs.store }} 링크 재수집 (죽은 링크 교체)"
-            git push
-          }
+            # main 이 앞서 나갔을 때 push 가 거부돼 작업분이 버려지는 것을 막는다
+            # (2026-08-20 갱신 잡에서 실제 발생). rebase 후 최대 3회 재시도.
+            for i in 1 2 3; do
+              if git pull --rebase origin main && git push; then
+                echo "✅ 푸시 완료 (시도 $i회)"
+                exit 0
+              fi
+              echo "⚠️ 푸시 실패 — 재시도 ($i/3)"
+              sleep $((i * 5))
+            done
+            echo "::error::rebase 후에도 푸시에 실패했습니다."
+            exit 1
+          fi

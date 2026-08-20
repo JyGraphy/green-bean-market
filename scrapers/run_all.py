@@ -19,7 +19,7 @@ GitHub Actions에서 호출됨
 - 콤파스커피   🔜 (Sixshop, JS 필요)
 - 팔콘커피     🔜
 """
-import subprocess, sys, os
+import subprocess, sys, os, time
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCRAPERS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -43,16 +43,36 @@ ENRICH_TIMEOUT = 1200      # '알수없음' 상품만 상세페이지 조회
 SQL_TIMEOUT = 300          # 로컬 파일 생성 (네트워크 없음)
 
 
+# 단계별 소요시간 기록 — [(라벨, 초, 성공여부), ...]
+# **왜 재는가**: "어디가 오래 걸리나"를 짐작으로 답하면 엉뚱한 곳을 고치게 된다.
+# 공급사가 늘수록 이 숫자가 판단 근거가 되어야 하므로 매 실행마다 남긴다.
+TIMINGS = []
+
+
 def run_step(argv, label, timeout):
     """하위 프로세스를 타임아웃과 함께 실행한다. (성공여부, 사유) 반환."""
+    t0 = time.monotonic()
     try:
         r = subprocess.run(argv, capture_output=False, timeout=timeout)
+        ok, why = (r.returncode == 0), ('' if r.returncode == 0 else f'종료코드 {r.returncode}')
     except subprocess.TimeoutExpired:
         print(f"⏱️  {label} 타임아웃 ({timeout}초 초과) — 중단하고 다음으로 넘어갑니다")
-        return False, 'timeout'
-    if r.returncode != 0:
-        return False, f'종료코드 {r.returncode}'
-    return True, ''
+        ok, why = False, 'timeout'
+    TIMINGS.append((label, time.monotonic() - t0, ok))
+    return ok, why
+
+
+def print_timings():
+    """소요시간을 오래 걸린 순으로 출력한다."""
+    if not TIMINGS:
+        return
+    total = sum(sec for _, sec, _ in TIMINGS)
+    print(f"\n{'='*50}")
+    print(f"⏱️  단계별 소요시간 (합계 {total/60:.1f}분)")
+    for label, sec, ok in sorted(TIMINGS, key=lambda x: -x[1]):
+        share = sec / total * 100 if total else 0
+        mark = ' ' if ok else '✗'
+        print(f"   {mark} {label:22} {sec:6.1f}초  {share:4.1f}%")
 
 SCRAPERS = [
     # 가나다 순 (더블유빈 제외 — 클라이언트렌더링/차단)
@@ -113,6 +133,8 @@ ok, why = run_step([sys.executable, os.path.join(ROOT, 'scripts', 'generate_sql.
 if not ok:
     print("❌ database.sql 재생성 실패")
     errors.append('generate_sql')
+
+print_timings()
 
 print(f"\n{'='*50}")
 if errors:

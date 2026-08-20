@@ -57,9 +57,18 @@ def check_url(session, url):
             if code in (405, 501) and method == 'head':
                 continue  # HEAD 미지원 → GET 재시도
             return code, 'ambiguous'  # 403/429/5xx 등
+        except requests.Timeout:
+            # 타임아웃이면 GET으로 다시 시도해봐야 거의 또 타임아웃이다.
+            # 그런데 그 재시도 비용이 TIMEOUT만큼(15초) 더 든다 — 느린 URL 하나가
+            # 30초를 먹는다. 도메인 안은 순차 처리라 이 낭비가 전체 소요시간에
+            # 그대로 쌓인다. 그래서 타임아웃은 즉시 포기한다.
+            # 판정은 'ambiguous'라 링크를 지우지 않으므로 오삭제 위험은 없다.
+            return None, 'ambiguous'
         except requests.RequestException:
+            # 연결 리셋 등은 다르다 — HEAD만 거부하는 서버가 실제로 있어서
+            # GET으로 넘어가면 정상 응답을 받는 경우가 있다. 이건 재시도할 값어치가 있다.
             if method == 'get':
-                return None, 'ambiguous'  # 타임아웃/연결오류 → 보존
+                return None, 'ambiguous'
             continue
     return None, 'ambiguous'
 

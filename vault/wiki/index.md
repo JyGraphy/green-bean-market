@@ -2,7 +2,7 @@
 
 _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0) · 2026-08-20_
 
-정리된 주제 **5개** · 원본 문서 **42건**
+정리된 주제 **5개** · 원본 문서 **43건**
 
 ---
 
@@ -10,8 +10,8 @@ _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0
 
 | 주제 | 최종 갱신 | 근거 문서 |
 |---|---|---|
-| [[데이터-파이프라인]] — 데이터 파이프라인 | 2026-08-02 | 2건 |
-| [[로스팅-프로파일]] — 로스팅 프로파일 | 2026-08-19 | 13건 |
+| [[데이터-파이프라인]] — 데이터 파이프라인 | 2026-08-20 | 3건 |
+| [[로스팅-프로파일]] — 로스팅 프로파일 | 2026-08-20 | 13건 |
 | [[생두-공급사]] — 생두 공급사 | 2026-08-03 | 3건 |
 | [[옥션]] — 세계 커피 옥션 (COE · BOP 등) | — | 4건 |
 | [[커피-논문]] — 커피 논문 | 2026-08-05 | 9건 |
@@ -53,8 +53,9 @@ _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0
 
 ### 🔥 로스팅 프로파일 `raw/roast-profiles/`
 
-- [[2026-08-05-AI학습현황]] — 로스팅 AI 학습 현황
+- [[2026-08-05-AI학습현황]] — 로스팅 AI 학습 현황  ⚠️ _wiki에서 참조되지 않음_
 - [[2026-08-19-AI학습현황]] — 로스팅 AI 학습 현황  ⚠️ _wiki에서 참조되지 않음_
+- [[2026-08-20-AI학습현황]] — 로스팅 AI 학습 현황
 - [[_수집대기]] — 📥 로스터기 자료 수집 대기열  ⚠️ _wiki에서 참조되지 않음_
 - [[_출처카탈로그]] — 로스팅 프로파일 출처 카탈로그 (SOURCES.md)
 
@@ -67,7 +68,7 @@ _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0
 
 ## ⚠️ 정리 대기
 
-아래 14건은 아직 wiki에 반영되지 않았습니다.
+아래 15건은 아직 wiki에 반영되지 않았습니다.
 정리하려면 Claude에게 다음처럼 지시하세요:
 
 ```
@@ -84,6 +85,7 @@ vault/raw의 아래 문서를 읽고 vault/CLAUDE.md 규칙대로 wiki로 정리
   - raw/papers/fulltext/PMC12234775-A-universal-color-curve-for-roasted-arabica-coffee.md
   - raw/papers/fulltext/PMC6818232-Starmaya-The-First-Arabica-F1-Coffee-Hybrid-Produced-Using-G.md
   - raw/papers/fulltext/PMC8854711-Comparison-of-chemical-compounds-and-their-influence-on-the.md
+  - raw/roast-profiles/2026-08-05-AI학습현황.md
   - raw/roast-profiles/2026-08-19-AI학습현황.md
   - raw/roast-profiles/_수집대기.md
 ```

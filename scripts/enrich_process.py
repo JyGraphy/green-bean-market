@@ -27,10 +27,13 @@ from common import HEADERS, guess_process
 
 ROOT       = os.path.join(os.path.dirname(__file__), '..')
 JSON_FILE  = os.path.join(ROOT, 'data', 'products.json')
+DATES_FILE = os.path.join(ROOT, 'data', 'product_dates.json')
 REPORT     = os.path.join(ROOT, 'data', 'process_enrich.json')
 
 TIMEOUT          = 15
 PER_DOMAIN_DELAY = 0.4
+STORE_DEAD_GUARD = 0.30   # store 미상 중 dead 비율이 이 값 초과면 제거 보류(URL 스킴 변경 의심)
+DEAD_CODES       = {404, 410}
 LABEL_RE = re.compile(r'(가공\s*방식|가공|프로세스|process(?:ing)?)\s*[:：\-]?\s*(.{0,40})', re.I)
 
 
@@ -50,19 +53,25 @@ def extract_process(html):
     return guess_process(text)
 
 
-def enrich_domain(session_items, results):
-    session, items = session_items
+def enrich_domain(dom, items, results, dead, dom_time, dom_cnt):
+    """도메인 하나를 순차 조회. GET 한 번으로 (a) 가공방식 추출 (b) 죽은 링크 판정."""
+    t0 = time.monotonic()
+    session = requests.Session(); session.headers.update(HEADERS)
     for p in items:
         url = p.get('url', '')
         try:
             r = session.get(url, timeout=TIMEOUT, allow_redirects=True)
-            if r.status_code < 400 and r.text:
+            if r.status_code in DEAD_CODES:
+                dead.add(p['id'])              # 404/410 → 죽은 링크 (check_links 대신 여기서 판정)
+            elif r.status_code < 400 and r.text:
                 proc = extract_process(r.text)
                 if proc != '알수없음':
                     results[p['id']] = proc
         except requests.RequestException:
             pass
         time.sleep(PER_DOMAIN_DELAY)
+    dom_time[dom] = time.monotonic() - t0
+    dom_cnt[dom] = len(items)
 
 
 def main():
@@ -78,32 +87,72 @@ def main():
     for p in targets:
         by_domain[urlparse(p.get('url', '')).netloc or '_x'].append(p)
 
-    results = {}
+    results = {}       # id → 추출된 process
+    dead = set()       # id → 죽은 링크(404/410)
+    dom_time, dom_cnt = {}, {}
 
-    def make(items):
-        s = requests.Session(); s.headers.update(HEADERS)
-        return (s, items)
-
+    t0 = time.monotonic()
     with ThreadPoolExecutor(max_workers=min(16, len(by_domain) or 1)) as ex:
-        list(ex.map(lambda items: enrich_domain(make(items), results), by_domain.values()))
+        list(ex.map(lambda kv: enrich_domain(kv[0], kv[1], results, dead, dom_time, dom_cnt),
+                    by_domain.items()))
+    elapsed = time.monotonic() - t0
 
-    # 적용
+    # 가공방식 적용
     filled_by = Counter()
     for p in data['products']:
         if p['id'] in results:
             p['process'] = results[p['id']]
             filled_by[p['process']] += 1
 
-    if results:
+    # 죽은 링크 제거 (check_links가 '알수없음'을 스킵하므로 여기서 담당) — store 가드 유지
+    by_store_dead = defaultdict(list)
+    by_store_total = Counter(p['store'] for p in targets)
+    for p in targets:
+        if p['id'] in dead:
+            by_store_dead[p['store']].append(p['id'])
+    to_remove, held = set(), []
+    for store, ids in by_store_dead.items():
+        ratio = len(ids) / by_store_total[store] if by_store_total[store] else 0
+        if ratio > STORE_DEAD_GUARD:
+            held.append(f"{store}: 미상 중 dead {len(ids)}/{by_store_total[store]} ({ratio:.0%}) — 제거 보류")
+        else:
+            to_remove.update(ids)
+
+    if to_remove:
+        data['products'] = [p for p in data['products'] if p['id'] not in to_remove]
+        if os.path.exists(DATES_FILE):
+            with open(DATES_FILE, encoding='utf-8') as f:
+                dates = json.load(f)
+            for rid in to_remove:
+                dates.pop(str(rid), None)
+            with open(DATES_FILE, 'w', encoding='utf-8') as f:
+                json.dump(dates, f, ensure_ascii=False)
+
+    if results or to_remove:
         with open(JSON_FILE, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
-    print(f"✅ {len(results)}개 가공방식 보강 완료: {dict(filled_by)}  (잔여 미상 {len(targets)-len(results)}개)")
+
+    # 측정 출력
+    print(f"⏱️  GET {len(targets)}건 / {elapsed:.0f}초  (도메인 오래 걸린 순):")
+    for dom, sec in sorted(dom_time.items(), key=lambda x: -x[1])[:8]:
+        n = dom_cnt.get(dom, 0)
+        print(f"     {sec:6.0f}초  {n:4d}건  평균{sec/n if n else 0:4.1f}s  {dom}")
+    print(f"✅ 가공방식 {len(results)}개 보강: {dict(filled_by)}  |  죽은 링크 {len(to_remove)}개 제거"
+          f"  |  잔여 미상 {len(targets)-len(results)-len(to_remove)}개")
+    if held:
+        print("⚠️  제거 보류:", "; ".join(held))
 
     with open(REPORT, 'w', encoding='utf-8') as f:
         json.dump({
             'checked_at': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
-            'targets': len(targets), 'filled': len(results),
-            'filled_by': dict(filled_by),
+            'targets': len(targets), 'filled': len(results), 'removed_dead': len(to_remove),
+            'filled_by': dict(filled_by), 'held_stores': held,
+            'timing': {
+                'elapsed_sec': round(elapsed, 1), 'requests': len(targets),
+                'slowest_domains': sorted(
+                    ({'domain': d, 'sec': round(s, 1), 'count': dom_cnt.get(d, 0)}
+                     for d, s in dom_time.items()), key=lambda x: -x['sec'])[:8],
+            },
         }, f, ensure_ascii=False, indent=2)
 
 

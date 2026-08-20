@@ -41,24 +41,40 @@ coffeebeanweb/
 - 가격이 50,000원/kg 이상인 고가 상품
 - 상품명이나 노트에 "게이샤", "파카마라", "에스메랄다" 등 포함
 
-## 12개 공급사 현황
+## 공급사 현황 (17곳 등록)
 
-| 공급사 | CSS 클래스 | 색상 | 상품 수 | URL |
-|--------|-----------|------|---------|-----|
-| 커피플랜트 | sp-cp | #dc2626 | 53 | coffeeplant.co.kr |
-| 커피창고 | sp-cg | #16a34a | 16 | thecoffeehouse.co.kr |
-| 엠아이커피 | sp-mi | #1d4ed8 | 33 | micoffee.co.kr |
-| 모모스커피 | sp-momos | #c2410c | 55 | momos.co.kr |
-| 코빈즈커피 | sp-cobeans | #0284c7 | 69 | cobeans.com |
-| 아얀투 | sp-ayantu | #7c3aed | 13 | ayantu.co.kr |
-| 오로미아코리아 | sp-oromia | #b45309 | 9 | oromiakorea.com |
-| 지에스씨(GSC) | sp-gsc | #0d9488 | 6 | gsc.coffee |
+> **상품 수는 매일 바뀐다.** 아래 숫자는 2026-08-20 기준 스냅샷이며, 정확한 현재값은
+> `data/products.json` 이 유일한 진실이다. 이 표는 **공급사·CSS 클래스·도메인 대응표**로 쓴다.
+> ```bash
+> python3 -c "import json,collections;print(collections.Counter(p['store'] for p in json.load(open('data/products.json'))['products']).most_common())"
+> ```
+
+| 공급사 | CSS 클래스 | 색상 | 상품 수 | 도메인 |
+|--------|-----------|------|---------|--------|
+| 커만사 | sp-comansa | #166534 | 375 | comansa.kr |
+| 지에스씨(GSC) | sp-gsc | #0d9488 | 115 | gsc.coffee |
+| 엠아이커피 | sp-mi | #1d4ed8 | 100 | micoffee.co.kr |
+| 코빈즈커피 | sp-cobeans | #0284c7 | 100 | cobeans.com |
+| 블레스빈 | sp-bb | #0e7490 | 92 | blessbean.co.kr |
+| 커피리브레 | sp-cl | #d97706 | 70 | coffeelibre.kr |
+| 커피플랜트 | sp-cp | #dc2626 | 70 | coffeeplant.co.kr |
+| 콤파스커피 | sp-compass | #be185d | 49 | compasscoffee.kr |
+| 더블유빈 | sp-wbean | #7c2d12 | 42 | wbeans.com |
 | 오월의숲 | sp-mayforest | #15803d | 37 | mayforest.kr |
-| 커피리브레 | sp-cl | #d97706 | 77 | coffeelibre.kr |
-| 블레스빈 | sp-bb | #0e7490 | 84 | blessbean.co.kr |
-| 콤파스커피 | sp-compass | #be185d | 48 | compasscoffee.kr |
+| 팔콘커피 | sp-falcon | #ea580c | 32 | korea.falcon-micro.com |
+| 모모스커피 | sp-momos | #c2410c | 27 | momos.co.kr |
+| 아마티보 | sp-amativo | #a21caf | 21 | smartstore.naver.com |
+| 아얀투 | sp-ayantu | #7c3aed | 19 | ayantu.co.kr |
+| 커피창고 | sp-cg | #16a34a | 16 | coffeecg.com |
+| 오로미아코리아 | sp-oromia | #b45309 | 7 | oromia.kr |
+| 루베르로스터리 | sp-ruber | #881337 | 0 | smartstore.naver.com |
 
-**총 500개 상품, ID 범위 1~845**
+**총 1,172개 상품, ID 범위 1~1375** (2026-08-20)
+
+- **루베르로스터리는 상품 0개다.** 네이버 스마트스토어가 데이터센터 IP를 차단해 CI에서
+  수집이 안 된다(아래 '스크래핑 플랫폼 메모' 참고). 등록만 돼 있고 필터에도 뜬다.
+- **모모스커피 27개**는 아임웹 이전 후 실제로 취급 품목이 줄어든 결과다(115 → 27,
+  2026-08-19 실측 확인). 스크래퍼 문제가 아니다.
 
 ## 가공방식 자동 추출
 
@@ -151,5 +167,7 @@ coffeebeanweb/
 ## 향후 추가 가능 공급사
 
 조사가 필요한 생두 전문 쇼핑몰 목록 (아직 미추가):
-- wbeans.com (접근 불가 확인됨 — 클라이언트 렌더링/차단)
+- ~~wbeans.com~~ → **더블유빈으로 추가 완료** (42개)
+- 커피시스 cgbeans.com — 조사 완료(47개, 1kg/20kg, 7,400~38,000원/kg, cafe24).
+  **사장님 컨펌 대기 중.** 승인 전까지 추가하지 않는다.
 - 추가 조사 필요 업체들은 별도 확인 후 추가

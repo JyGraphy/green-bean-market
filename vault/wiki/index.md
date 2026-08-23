@@ -1,8 +1,8 @@
 # 📚 생두마켓 세컨드 브레인
 
-_이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0) · 2026-08-20_
+_이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0) · 2026-08-23_
 
-정리된 주제 **5개** · 원본 문서 **43건**
+정리된 주제 **5개** · 원본 문서 **60건**
 
 ---
 
@@ -27,6 +27,8 @@ _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0
 - [[2026-08-16-bop-전체랏]] — BOP (Best of Panama) 옥션 결과 — 전체 랏 수집  ⚠️ _wiki에서 참조되지 않음_
 - [[2026-08-16-coe-전체랏]] — COE (Cup of Excellence) 옥션 결과 — 전체 랏 수집  ⚠️ _wiki에서 참조되지 않음_
 - [[2026-08-19-bop-전체랏]] — BOP (Best of Panama) 옥션 결과 — 전체 랏 수집
+- [[2026-08-23-bop-전체랏]] — BOP (Best of Panama) 옥션 결과 — 전체 랏 수집  ⚠️ _wiki에서 참조되지 않음_
+- [[2026-08-23-coe-전체랏]] — COE (Cup of Excellence) 옥션 결과 — 전체 랏 수집  ⚠️ _wiki에서 참조되지 않음_
 
 ### 🏆 COE 옥션 `raw/coe/`
 
@@ -50,12 +52,18 @@ _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0
 
 - [[2026-08-02-데이터검증]] — 생두 데이터 검증 리포트
 - [[2026-08-02-스크래퍼점검]] — 스크래퍼 안전장치 점검
+- [[2026-08-20-사이트점검]] — 사이트 자가 점검 — 2026-08-20
+- [[2026-08-21-사이트점검]] — 사이트 자가 점검 — 2026-08-21  ⚠️ _wiki에서 참조되지 않음_
+- [[2026-08-22-사이트점검]] — 사이트 자가 점검 — 2026-08-22  ⚠️ _wiki에서 참조되지 않음_
+- [[2026-08-23-사이트점검]] — 사이트 자가 점검 — 2026-08-23  ⚠️ _wiki에서 참조되지 않음_
+- [[2026-08-24-사이트점검]] — 사이트 자가 점검 — 2026-08-24  ⚠️ _wiki에서 참조되지 않음_
 
 ### 🔥 로스팅 프로파일 `raw/roast-profiles/`
 
 - [[2026-08-05-AI학습현황]] — 로스팅 AI 학습 현황  ⚠️ _wiki에서 참조되지 않음_
 - [[2026-08-19-AI학습현황]] — 로스팅 AI 학습 현황  ⚠️ _wiki에서 참조되지 않음_
 - [[2026-08-20-AI학습현황]] — 로스팅 AI 학습 현황
+- [[2026-08-23-AI학습현황]] — 로스팅 AI 학습 현황  ⚠️ _wiki에서 참조되지 않음_
 - [[_수집대기]] — 📥 로스터기 자료 수집 대기열  ⚠️ _wiki에서 참조되지 않음_
 - [[_출처카탈로그]] — 로스팅 프로파일 출처 카탈로그 (SOURCES.md)
 
@@ -68,7 +76,7 @@ _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0
 
 ## ⚠️ 정리 대기
 
-아래 15건은 아직 wiki에 반영되지 않았습니다.
+아래 31건은 아직 wiki에 반영되지 않았습니다.
 정리하려면 Claude에게 다음처럼 지시하세요:
 
 ```
@@ -78,6 +86,8 @@ vault/raw의 아래 문서를 읽고 vault/CLAUDE.md 규칙대로 wiki로 정리
   - raw/auctions/2026-08-09-coe-전체랏.md
   - raw/auctions/2026-08-16-bop-전체랏.md
   - raw/auctions/2026-08-16-coe-전체랏.md
+  - raw/auctions/2026-08-23-bop-전체랏.md
+  - raw/auctions/2026-08-23-coe-전체랏.md
   - raw/papers/_수집대기.md
   - raw/papers/fulltext/PMC10305520-Chemical-and-Biological-Characterization-of-Green-and-Proces.md
   - raw/papers/fulltext/PMC11002029-The-effect-of-roast-profiles-on-the-dynamics-of-titratable-a.md
@@ -85,8 +95,22 @@ vault/raw의 아래 문서를 읽고 vault/CLAUDE.md 규칙대로 wiki로 정리
   - raw/papers/fulltext/PMC12234775-A-universal-color-curve-for-roasted-arabica-coffee.md
   - raw/papers/fulltext/PMC6818232-Starmaya-The-First-Arabica-F1-Coffee-Hybrid-Produced-Using-G.md
   - raw/papers/fulltext/PMC8854711-Comparison-of-chemical-compounds-and-their-influence-on-the.md
+  - raw/qa/2026-08-21-사이트점검.md
+  - raw/qa/2026-08-22-사이트점검.md
+  - raw/qa/2026-08-23-사이트점검.md
+  - raw/qa/2026-08-24-사이트점검.md
   - raw/roast-profiles/2026-08-05-AI학습현황.md
   - raw/roast-profiles/2026-08-19-AI학습현황.md
+  - raw/roast-profiles/2026-08-23-AI학습현황.md
   - raw/roast-profiles/_수집대기.md
+  - raw/roast-profiles/sources/aillio-bullet-r1-aillio-medium-com-the-start-of-something-39aa01d08fa9.md
+  - raw/roast-profiles/sources/aillio-bullet-r1-community-roast-world-t-r2-pro-ibts-reading-lower-than-bt-well-before-.md
+  - raw/roast-profiles/sources/fuji-royal-kostverlorenvaart-blogspot-com-2014-01-fuji-pxg4-setup-for-coffee-roas.md
+  - raw/roast-profiles/sources/fuji-royal-www-coulton-com-res-impxwa-pdf.md
+  - raw/roast-profiles/sources/giesen-giesen-store-products-pt100-temperature-sensor.md
+  - raw/roast-profiles/sources/loring-shop-loring-com-collections-thermocouple.md
+  - raw/roast-profiles/sources/probat-artisan-scope-org-machines-probat.md
+  - raw/roast-profiles/sources/taehwan-proaster-taehwan-co-kr-bbs-board-php-bo-table-coffee-roaster-wr-id-30.md
+  - raw/roast-profiles/sources/taehwan-proaster-taehwan-co-kr-en-bbs-board-php-bo-table-down-wr-id-1.md
 ```
 

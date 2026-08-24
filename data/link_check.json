@@ -1,51 +1,51 @@
 {
-  "checked_at": "2026-08-23T21:22:48Z",
-  "total": 1183,
+  "checked_at": "2026-08-24T21:31:01Z",
+  "total": 1184,
   "removed": [],
   "held_stores": [],
   "timing": {
-    "elapsed_sec": 463.6,
-    "requests": 958,
+    "elapsed_sec": 518.5,
+    "requests": 959,
     "skipped_unknown": 225,
     "slowest_domains": [
       {
         "domain": "comansa.kr",
-        "sec": 463.6,
+        "sec": 518.5,
         "count": 333
       },
       {
         "domain": "www.gsc.coffee",
-        "sec": 134.7,
-        "count": 79
+        "sec": 139.5,
+        "count": 78
       },
       {
         "domain": "www.blessbean.co.kr",
-        "sec": 87.5,
+        "sec": 89.4,
         "count": 88
       },
       {
         "domain": "www.micoffee.co.kr",
-        "sec": 83.5,
-        "count": 72
+        "sec": 88.1,
+        "count": 71
       },
       {
         "domain": "wbeans.com",
-        "sec": 70.1,
+        "sec": 75.3,
         "count": 42
       },
       {
         "domain": "www.cobeans.com",
-        "sec": 68.4,
-        "count": 84
+        "sec": 72.3,
+        "count": 86
       },
       {
         "domain": "coffeeplant.co.kr",
-        "sec": 59.9,
+        "sec": 61.0,
         "count": 51
       },
       {
         "domain": "compasscoffee.kr",
-        "sec": 44.5,
+        "sec": 45.3,
         "count": 48
       }
     ]
@@ -67,7 +67,7 @@
       "ambiguous": 18
     },
     "모모스커피": {
-      "ok": 27,
+      "ok": 28,
       "dead": 0,
       "ambiguous": 0
     },
@@ -82,7 +82,7 @@
       "ambiguous": 0
     },
     "엠아이커피": {
-      "ok": 72,
+      "ok": 71,
       "dead": 0,
       "ambiguous": 0
     },
@@ -97,7 +97,7 @@
       "ambiguous": 0
     },
     "지에스씨(GSC)": {
-      "ok": 79,
+      "ok": 78,
       "dead": 0,
       "ambiguous": 0
     },
@@ -122,14 +122,14 @@
       "ambiguous": 0
     },
     "코빈즈커피": {
-      "ok": 84,
+      "ok": 86,
       "dead": 0,
       "ambiguous": 0
     },
     "팔콘커피": {
-      "ok": 29,
+      "ok": 32,
       "dead": 0,
-      "ambiguous": 3
+      "ambiguous": 0
     }
   }
 }

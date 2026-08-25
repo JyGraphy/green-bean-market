@@ -7,62 +7,18 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
+      - name: 체크아웃
+        uses: actions/checkout@v4
       - name: 의존성
-        run: pip install requests beautifulsoup4
-      - name: 모모스 soldout 권위 신호 탐색
+        run: pip install requests beautifulsoup4 lxml
+      - name: 모모스 스크래퍼 실측 (수집 + 품절 감지)
         run: |
-          python3 - <<'PY'
-          import re, json, requests
-          from bs4 import BeautifulSoup
-          UA={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36','Accept-Language':'ko-KR,ko;q=0.9'}
-          BASE='https://momos.co.kr'; s=requests.Session(); s.headers.update(UA)
-
-          # ── A) 리스트 전 카드: prod_icon sold_out 유무 ──────────────
-          html=s.get(BASE+'/Product_GreenBean', timeout=30).text
-          soup=BeautifulSoup(html,'html.parser')
-          cards=soup.select('div.shop-item._shop_item')
-          have=sum(1 for c in cards if c.select_one('.prod_icon.sold_out'))
-          print(f"A) 리스트 카드 {len(cards)}개 중 sold_out 마커 보유: {have}개")
-          # data-product-properties 에 재고/품절 필드가 있나?
-          dp=cards[0].get('data-product-properties','')
-          print("   data-product-properties keys:", list(json.loads(dp).keys()) if dp else None)
-
-          # ── B) AJAX 목록 원본에 soldout 필드가 있나 ────────────────
-          m=re.search(r"category['\"]?\s*[:=]\s*['\"]([^'\"]+)", html)
-          cat=m.group(1) if m else ''
-          wm=re.search(r"widget_code['\"]?\s*[:=]\s*['\"]([^'\"]+)", html)
-          wc=wm.group(1) if wm else ''
-          print(f"B) category={cat} widget_code={wc}")
-          try:
-              aj=s.get(BASE+'/ajax/get_shop_list_view.cm',
-                       params={'page':1,'pagesize':5,'category':cat,'sort':'recent',
-                               'menu_url':'/Product_GreenBean/','widget_code':wc},
-                       headers={'X-Requested-With':'XMLHttpRequest','Referer':BASE+'/Product_GreenBean'},
-                       timeout=30).json()
-              print("   AJAX msg:", aj.get('msg'), "| keys:", list(aj.keys()))
-              # html 외에 product 데이터 배열이 오나
-              for k,v in aj.items():
-                  if k!='html': print(f"   AJAX[{k}]=", str(v)[:200])
-          except Exception as e:
-              print("   AJAX 실패:", e)
-
-          # ── C) 상세페이지에서 soldout 불리언 출처 ──────────────────
-          idx=re.search(r'idx=(\d+)', html).group(1)
-          d=s.get(BASE+f'/Product_GreenBean/?idx={idx}', timeout=30).text
-          print(f"\nC) 상세 idx={idx} — soldout 값이 담긴 JSON/변수 탐색")
-          # soldout : true/false, "soldout":..., soldout_yn, sold_out_yn, is_soldout, stock_...
-          for pat in [r'"?soldout"?\s*[:=]\s*(true|false|"[YN]"|[YN])',
-                      r'"?is_soldout"?\s*[:=]\s*(true|false|\d)',
-                      r'"?soldout_yn"?\s*[:=]\s*"?([YN])',
-                      r'"?stock"?\w*\s*[:=]\s*(-?\d+)',
-                      r'"?sold_?out"?\s*[:=]\s*(true|false)']:
-              for mm in re.finditer(pat, d)[:1] if False else list(re.finditer(pat, d))[:4]:
-                  ctx=re.sub(r'\s+',' ',d[max(0,mm.start()-50):mm.end()+20])
-                  print(f"   [{pat[:22]}] …{ctx}…")
-          # product json blob 이 있으면 idx 근처 통째로
-          for mm in list(re.finditer(r'\{[^{}]*"idx"\s*:\s*'+idx+r'[^{}]*\}', d))[:2]:
-              print("   idx blob:", mm.group(0)[:400])
-          # p.soldout 렌더 함수 주변
-          for mm in list(re.finditer(r'.{80}p\.soldout.{80}', d))[:2]:
-              print("   p.soldout 문맥:", re.sub(r'\s+',' ',mm.group(0)))
-          PY
+          python3 -c "
+          import sys; sys.path.insert(0,'scrapers')
+          import scraper_momos as m
+          beans=m.scrape()
+          sold=sum(1 for b in beans if b['is_soldout'])
+          print(f'\n=== 결과: 수집 {len(beans)}개 / 품절 {sold}개 ===')
+          for b in beans[:8]:
+              print(('품절' if b['is_soldout'] else '판매'), '|', b['name'][:42], '|', b['price'], '|', b['url'])
+          "

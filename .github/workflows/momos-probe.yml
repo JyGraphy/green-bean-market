@@ -7,59 +7,29 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/green-bean-update-check-b88h4b
       - name: 의존성
         run: pip install requests beautifulsoup4
-      - name: 빈 category 전체 조회 + category 코드 전수 탐색
+      - name: momos 스크래퍼 드라이런 (커밋 없음)
         run: |
           python3 - <<'PY'
-          import re, json, requests
-          from bs4 import BeautifulSoup
-          UA={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36','Accept-Language':'ko-KR,ko;q=0.9'}
-          BASE='https://momos.co.kr'; s=requests.Session(); s.headers.update(UA)
-
-          def fetch_cat(cat, label):
-              allp={}
-              for page in range(1,20):
-                  r=s.get(BASE+'/ajax/get_shop_list_view.cm',
-                          params={'category':cat,'page':page,'pagesize':100,'sort':'recent'},
-                          headers={'Accept':'application/json','Referer':BASE+'/greenbean'}, timeout=30)
-                  try: j=r.json()
-                  except: break
-                  doc=BeautifulSoup(j.get('html',''),'html.parser')
-                  nodes=doc.select('._shop_item')
-                  new=0
-                  for n in nodes:
-                      raw=n.get('data-product-properties')
-                      if not raw: continue
-                      try: p=json.loads(raw)
-                      except: continue
-                      c=p.get('code') or p.get('idx')
-                      if c and c not in allp: allp[c]=p; new+=1
-                  if not nodes or new==0: break
-              print(f"[{label}] cat={cat!r} → 고유 {len(allp)}개")
-              return allp
-
-          # 1) /greenbean 페이지에서 category 코드 전수 추출
-          pg=s.get(BASE+'/greenbean', timeout=30).text
-          cats=sorted(set(re.findall(r's20\d{6}[0-9a-f]{6,}', pg)))
-          print("페이지에서 발견한 category 코드:", cats)
-
-          # 2) 빈 category = 전체 카탈로그 가정
-          allp = fetch_cat('', '빈category')
-
-          # 3) 발견한 각 코드도 조회 (합집합)
-          for c in cats:
-              got = fetch_cat(c, 'code')
-              for k,v in got.items(): allp.setdefault(k,v)
-
-          print(f"\n=== 합집합 총 고유 상품: {len(allp)}개 ===")
-          beans=[p for p in allp.values() if '생두' in p.get('name','')]
-          print(f"이름에 '생두' 포함: {len(beans)}개")
-          print("\n생두 표본 (최대 40):")
-          for p in beans[:40]:
-              print(f"   idx={p.get('idx')} code={p.get('code')} {p.get('price')}원 {p.get('name','')[:55]}")
-          bo=[p for p in allp.values() if 'bolivia' in p.get('name','').lower() or '볼리비아' in p.get('name','')]
-          print(f"\n볼리비아 관련: {len(bo)}개")
-          for p in bo:
-              print(f"   idx={p.get('idx')} {p.get('name','')[:60]}")
+          import sys
+          sys.path.insert(0, 'scrapers')
+          import scraper_momos as m
+          beans = m.scrape()
+          print("\n=== 드라이런 결과 ===")
+          print("생두 총:", len(beans))
+          sold = sum(1 for b in beans if b.get('is_soldout'))
+          print(f"품절 {sold} / 재고 {len(beans)-sold}")
+          bo = [b for b in beans if 'bolivia' in b['name'].lower() or '볼리비아' in b['name']]
+          print(f"볼리비아 {len(bo)}개:")
+          for b in bo:
+              tag = '품절' if b.get('is_soldout') else '재고'
+              print(f"   [{tag}] {b['price']}원 {b['name'][:50]}  {b['url']}")
+          print("\n표본 12개:")
+          for b in beans[:12]:
+              tag = '품절' if b.get('is_soldout') else '재고'
+              print(f"   [{tag}] {b['price']}원 {b['name'][:45]}")
           PY

@@ -38,7 +38,7 @@ import requests
 from bs4 import BeautifulSoup
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from common import HEADERS, abs_url, to_products, update_json
+from common import HEADERS, to_products, update_json
 
 STORE = '모모스커피'
 BASE = 'https://momos.co.kr'
@@ -105,10 +105,6 @@ def parse_cards(html):
             except (ValueError, TypeError):
                 pass
 
-        # 상세 링크 — 아임웹이 실제로 링크하는 URL 우선
-        a = card.find('a', href=lambda h: h and IDX_RE.search(h))
-        href = a['href'] if a else None
-
         # data-product-properties 가 없으면 마크업에서 보강
         if not name:
             h = card.find(['h2', 'h3'])
@@ -121,14 +117,20 @@ def parse_cards(html):
                 m = re.search(r'([\d,]+)\s*원', pay.get_text(' ', strip=True))
                 if m:
                     price = int(m.group(1).replace(',', ''))
+        if idx is None:
+            a = card.find('a', href=lambda h: h and IDX_RE.search(h))
+            if a:
+                mi = IDX_RE.search(a['href'])
+                idx = mi.group(1) if mi else None
 
-        # URL 확정: href 우선, 없으면 idx 로 구성(idx 는 아임웹 전역 상품 id)
-        if href:
-            url = abs_url(BASE, href)
-        elif idx:
-            url = f'{BASE}{LIST_PATH}/?idx={idx}'
-        else:
+        # URL 확정: idx 로 /Product_GreenBean/?idx= 형식으로 구성한다.
+        # 전체 카탈로그 AJAX 카드의 a[href] 는 경로 없는 '?idx=' 라서 그대로 쓰면
+        # 'momos.co.kr?idx=' 가 되어 상세페이지로 안 간다(품절 판독·사용자 링크 모두
+        # 깨진다). idx 는 아임웹 전역 상품 id 라 이 경로로 항상 상세페이지가 열린다
+        # (2026-08-25 실측, "is_soldout" 도 이 URL 에서 읽힌다).
+        if idx is None:
             continue
+        url = f'{BASE}{LIST_PATH}/?idx={idx}'
 
         items.append({
             'name': name,

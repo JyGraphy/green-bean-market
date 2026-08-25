@@ -1,7 +1,5 @@
 name: 모모스 구조 진단
 
-# 모모스 생두 페이지(/greenbean 등)의 실제 HTML 구조를 GitHub 러너에서 덤프한다.
-# 스크래퍼 수정을 위한 일회성 조사용(workflow_dispatch).
 on:
   workflow_dispatch:
 
@@ -11,67 +9,50 @@ jobs:
     steps:
       - name: 의존성
         run: pip install requests beautifulsoup4
-      - name: 모모스 페이지 구조 덤프
+      - name: 모모스 품절 신호 덤프
         run: |
           python3 - <<'PY'
           import re, requests
           from bs4 import BeautifulSoup
-          UA={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36',
-              'Accept-Language':'ko-KR,ko;q=0.9'}
+          UA={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36','Accept-Language':'ko-KR,ko;q=0.9'}
           BASE='https://momos.co.kr'
+          s=requests.Session(); s.headers.update(UA)
 
-          def probe(path):
-              print("\n"+"="*70)
-              print("URL:", BASE+path)
-              try:
-                  r=requests.get(BASE+path, headers=UA, timeout=30)
-              except Exception as e:
-                  print("요청 실패:", e); return None
-              print("HTTP", r.status_code, "| len", len(r.text))
-              html=r.text
-              soup=BeautifulSoup(html,'html.parser')
-              t=soup.find('title'); print("title:", t.get_text(strip=True) if t else None)
-              # 후보 셀렉터 카운트
-              for sel in ['div.shop-item','div._shop_item','li.shop-item','[class*=shop-item]',
-                          '[class*=product]','[class*=goods]','[class*=prod]','li','article']:
-                  try: n=len(soup.select(sel))
-                  except Exception: n=-1
-                  if n: print(f"  select {sel:24s} -> {n}")
-              # 상품 링크 패턴
-              hrefs=[a.get('href','') for a in soup.find_all('a', href=True)]
-              import collections
-              pat=collections.Counter()
-              for h in hrefs:
-                  for kw in ['idx=','/greenbean','Product_GreenBean','/product','goods','shop']:
-                      if kw in h: pat[kw]+=1
-              print("  링크 패턴:", dict(pat))
-              samp=[h for h in hrefs if any(k in h for k in ['idx=','greenbean','product','goods'])][:8]
-              for h in samp: print("     href:", h[:80])
-              # 품절/가격 신호
-              for kw in ['sold_out','soldout','품절','SOLD OUT','sold-out','재입고','일시품절']:
-                  c=html.count(kw)
-                  if c: print(f"  텍스트 '{kw}' x{c}")
-              prices=re.findall(r'[\d,]+\s*원', html)[:10]
-              print("  가격 표기 표본:", prices[:10])
-              return soup, html
+          # ── 1) /Product_GreenBean 카드별 품절 신호 분석 ─────────────
+          html=s.get(BASE+'/Product_GreenBean', timeout=30).text
+          soup=BeautifulSoup(html,'html.parser')
+          cards=soup.select('div.shop-item, div._shop_item')
+          print("카드 수:", len(cards))
+          print("\n### 카드별: 이름 / 가격 / sold_out요소 상태 (전 상품 품절이라는데 구분되나)")
+          for i,c in enumerate(cards[:8]):
+              h=c.find(['h2','h3']); name=h.get_text(' ',strip=True)[:35] if h else '?'
+              pay=c.select_one('p.pay, .item-pay p, .pay'); price=pay.get_text(' ',strip=True) if pay else '?'
+              # sold_out 관련 요소 전부
+              so=c.select('[class*=sold_out], [class*=soldout], .prod_icon')
+              so_desc=[]
+              for e in so:
+                  style=e.get('style','')
+                  txt=e.get_text(' ',strip=True)[:15]
+                  so_desc.append(f"{'.'.join(e.get('class',[]))}|style='{style}'|txt='{txt}'")
+              # 카드 최상위 class (품절 토글이 여기 있을 수도)
+              print(f"[{i}] {name:35s} 가격={price:12s}")
+              print(f"     카드class={'.'.join(c.get('class',[]))}")
+              for d in so_desc: print(f"     so: {d}")
 
-          # 1) 새 경로 후보들
-          for p in ['/greenbean','/Product_GreenBean','/greenbean/']:
-              probe(p)
+          # ── 2) 첫 카드 원본 HTML 통째로 ──────────────────────────
+          print("\n### 카드[0] 원본 HTML")
+          print(str(cards[0])[:2500] if cards else "카드 없음")
 
-          # 2) /greenbean 카드 원본 HTML 표본 (구조 파악 핵심)
-          print("\n"+"#"*70+"\n# /greenbean 카드 원본 HTML 표본\n"+"#"*70)
-          r=requests.get(BASE+'/greenbean', headers=UA, timeout=30)
-          soup=BeautifulSoup(r.text,'html.parser')
-          cards=soup.select('div.shop-item, div._shop_item, [class*=shop-item], [class*=item-wrap]')
-          print("카드 후보 수:", len(cards))
-          for c in cards[:2]:
-              print("-"*60)
-              print(str(c)[:1800])
-          # 인라인 스크립트에서 AJAX/위젯 코드 흔적
-          print("\n# get_shop_list_view / widget_code 흔적")
-          for m in re.findall(r'get_shop_list_view[^\n]{0,300}', r.text)[:3]:
-              print("  ", m[:280])
-          for m in re.findall(r'widget_code[^\n]{0,120}', r.text)[:3]:
-              print("  ", m[:120])
+          # ── 3) 상세페이지 품절 신호 (idx 2개) ────────────────────
+          idxs=re.findall(r'/Product_GreenBean/\?idx=(\d+)', html)[:2]
+          print("\n### 상세페이지 품절 신호, idx=", idxs)
+          for idx in idxs:
+              d=s.get(BASE+f'/Product_GreenBean/?idx={idx}', timeout=30).text
+              print(f"\n-- idx={idx} (len {len(d)}) --")
+              for kw in ['soldout_yn','sold_out','soldout','품절','SOLD OUT','일시품절','재입고','buy_button','장바구니','구매하기','disabled']:
+                  n=d.count(kw)
+                  if n:
+                      # 첫 등장 주변 문맥
+                      p=d.find(kw); ctx=re.sub(r'\s+',' ',d[max(0,p-60):p+60])
+                      print(f"   '{kw}' x{n}  …{ctx}…")
           PY

@@ -1,52 +1,52 @@
 {
-  "checked_at": "2026-08-24T21:31:01Z",
+  "checked_at": "2026-08-25T03:06:42Z",
   "total": 1184,
   "removed": [],
   "held_stores": [],
   "timing": {
-    "elapsed_sec": 518.5,
-    "requests": 959,
-    "skipped_unknown": 225,
+    "elapsed_sec": 454.7,
+    "requests": 958,
+    "skipped_unknown": 226,
     "slowest_domains": [
       {
         "domain": "comansa.kr",
-        "sec": 518.5,
+        "sec": 454.7,
         "count": 333
       },
       {
         "domain": "www.gsc.coffee",
-        "sec": 139.5,
-        "count": 78
-      },
-      {
-        "domain": "www.blessbean.co.kr",
-        "sec": 89.4,
-        "count": 88
+        "sec": 127.8,
+        "count": 76
       },
       {
         "domain": "www.micoffee.co.kr",
-        "sec": 88.1,
+        "sec": 104.8,
         "count": 71
       },
       {
-        "domain": "wbeans.com",
-        "sec": 75.3,
-        "count": 42
+        "domain": "www.blessbean.co.kr",
+        "sec": 87.3,
+        "count": 89
       },
       {
         "domain": "www.cobeans.com",
-        "sec": 72.3,
+        "sec": 68.1,
         "count": 86
       },
       {
+        "domain": "wbeans.com",
+        "sec": 64.7,
+        "count": 42
+      },
+      {
         "domain": "coffeeplant.co.kr",
-        "sec": 61.0,
+        "sec": 57.3,
         "count": 51
       },
       {
-        "domain": "compasscoffee.kr",
-        "sec": 45.3,
-        "count": 48
+        "domain": "korea.falcon-micro.com",
+        "sec": 52.4,
+        "count": 32
       }
     ]
   },
@@ -72,7 +72,7 @@
       "ambiguous": 0
     },
     "블레스빈": {
-      "ok": 88,
+      "ok": 89,
       "dead": 0,
       "ambiguous": 0
     },
@@ -97,7 +97,7 @@
       "ambiguous": 0
     },
     "지에스씨(GSC)": {
-      "ok": 78,
+      "ok": 76,
       "dead": 0,
       "ambiguous": 0
     },

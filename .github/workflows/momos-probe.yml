@@ -1,0 +1,51 @@
+name: 모모스 구조 진단
+
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 의존성
+        run: pip install requests beautifulsoup4
+      - name: /greenbean 위젯 파악
+        run: |
+          python3 - <<'PY'
+          import re, json, requests, collections
+          from bs4 import BeautifulSoup
+          UA={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36','Accept-Language':'ko-KR,ko;q=0.9'}
+          BASE='https://momos.co.kr'; s=requests.Session(); s.headers.update(UA)
+
+          html=s.get(BASE+'/greenbean', timeout=30).text
+          print("len", len(html))
+
+          # 위젯/카테고리 코드 후보 전부 (빈도순)
+          wids=collections.Counter(re.findall(r'w20\d{6}[0-9a-f]{6,}', html))
+          cats=collections.Counter(re.findall(r's20\d{6}[0-9a-f]{6,}', html))
+          print("widget_code 후보:", wids.most_common(6))
+          print("category/code 후보:", cats.most_common(6))
+
+          # get_shop_list_view 스크립트 문맥
+          for m in re.findall(r'.{40}get_shop_list_view.{200}', html)[:4]:
+              print("  ctx:", re.sub(r'\s+',' ',m))
+          # menu_url 후보
+          print("menu_url 후보:", collections.Counter(re.findall(r'menu_url["\']?\s*[:=]\s*["\']([^"\']+)', html)).most_common(4))
+
+          def try_widget(wc, menu, cat=''):
+              try:
+                  r=s.get(BASE+'/ajax/get_shop_list_view.cm',
+                          params={'page':1,'pagesize':8,'category':cat,'sort':'recent','menu_url':menu,'widget_code':wc},
+                          headers={'X-Requested-With':'XMLHttpRequest','Referer':BASE+'/greenbean'}, timeout=30)
+                  j=r.json(); h=j.get('html','')
+                  soup=BeautifulSoup(h,'html.parser')
+                  names=[x.get_text(' ',strip=True)[:40] for x in soup.select('h2,h3')][:6]
+                  print(f"  [wc={wc[:24]} menu={menu} cat={cat!r}] msg={j.get('msg')} 카드={len(soup.select('div.shop-item,div._shop_item'))} 이름={names}")
+              except Exception as e:
+                  print(f"  [wc={wc[:24]}] 실패 {type(e).__name__}: {e}")
+
+          print("\n=== 위젯 후보별 AJAX 시도 (볼리비아 신상품이 나오는 위젯 찾기) ===")
+          for wc,_ in wids.most_common(6):
+              for menu in ['/greenbean/','/greenbean']:
+                  try_widget(wc, menu)
+          PY

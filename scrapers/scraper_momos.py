@@ -28,6 +28,13 @@ URL: https://momos.co.kr/Product_GreenBean
    → {"msg":"SUCCESS","html":"<카드 HTML>"}
    category/widget_code 는 하드코딩하지 않고 **매번 페이지에서 추출**한다.
    모모스가 위젯을 다시 만들면 코드가 바뀌는데, 박아두면 그때 조용히 0개가 된다.
+
+**2026-08-25 품절 감지 추가**
+ - 모모스가 /greenbean 새 랜딩을 냈지만 거긴 JS 렌더라 서버 HTML에 카드가 없다.
+   실제 상품 그리드는 여전히 /Product_GreenBean 이고 상품 URL도 /Product_GreenBean/?idx= 다.
+ - 목록의 .prod_icon.sold_out 은 전 카드 템플릿이라 신뢰 불가. 대신 **상세페이지 서버
+   HTML의 "is_soldout":true/false** 가 상품별 권위 신호다(JS 없이 나온다). add_soldout()
+   이 수집된 생두마다 상세페이지를 받아 품절 여부를 채운다(상품 30개 안팎이라 부담 적음).
 """
 import json
 import os
@@ -48,6 +55,10 @@ AJAX_PATH = '/ajax/get_shop_list_view.cm'
 ID_START = 101          # 모모스 ID 구간 시작 (alloc_ids 가 충돌은 알아서 피한다)
 MAX_PAGES = 30          # 폭주 방지
 IDX_RE = re.compile(r'[?&]idx=(\d+)')
+# 상세페이지 서버 HTML 에 들어 있는 권위 있는 품절 플래그 (2026-08-25 실측).
+# 목록의 .prod_icon.sold_out 은 전 카드에 렌더되는 템플릿이라 신뢰 못 하지만,
+# 상세페이지의 "is_soldout":true/false 는 상품별 실제 재고 상태다(JS 없이도 나온다).
+SOLDOUT_RE = re.compile(r'"is_soldout"\s*:\s*(true|false)')
 
 # 페이지 인라인 스크립트가 알려주는 pagesize 는 98이다. 그대로 쓰면 상품이 그보다
 # 적을 때 페이징이 한 번도 실행되지 않아서, "한 번에 다 받았다"와 "서버가 page 를
@@ -60,6 +71,37 @@ def fetch_html(session, path, **kw):
     r = session.get(BASE + path, timeout=25, **kw)
     r.raise_for_status()
     return r.text
+
+
+def fetch_soldout(session, url):
+    """상세페이지에서 상품별 실제 품절 여부를 읽는다. 실패 시 None(모름)."""
+    try:
+        r = session.get(url, timeout=25)
+        m = SOLDOUT_RE.search(r.text)
+        if m:
+            return m.group(1) == 'true'
+    except requests.RequestException:
+        pass
+    return None
+
+
+def add_soldout(session, beans):
+    """수집된 생두마다 상세페이지를 받아 품절 여부를 채운다.
+
+    모모스는 상시 품절이 많은데 목록엔 신뢰할 품절 신호가 없어, 상품별 상세페이지의
+    "is_soldout" 을 권위 신호로 쓴다. 상품 수가 30개 안팎이라 부담이 크지 않다.
+    """
+    unknown = 0
+    for it in beans:
+        so = fetch_soldout(session, it['url'])
+        if so is None:
+            unknown += 1
+        else:
+            it['is_soldout'] = so
+        time.sleep(0.3)
+    sold = sum(1 for it in beans if it.get('is_soldout'))
+    print(f'  품절 확인: {sold}개 품절 / {len(beans)}개'
+          + (f' (판독 실패 {unknown}개는 모름 처리)' if unknown else ''))
 
 
 def parse_cards(html):
@@ -88,16 +130,14 @@ def parse_cards(html):
             if m:
                 price = int(m.group(1).replace(',', ''))
 
-        # 품절은 감지하지 않는다 — 아임웹의 .prod_icon.sold_out 은 **모든 카드에**
-        # 렌더되는 숨은 템플릿이다(2026-08-19 실측: 28/28 카드, 카드당 2개, style 없음.
-        # 상세페이지의 btn-soldout 계열도 표본 3건 전부 존재). 이걸 믿으면 전 상품이
-        # 품절로 표시된다 — cafe24 btnSoldout, godomall div.soldout 과 같은 함정이다.
-        # 신뢰할 신호를 찾기 전까지는 '모름'으로 두고 거짓 표시를 하지 않는다.
+        # 품절은 여기서 판단하지 않는다 — 목록의 .prod_icon.sold_out 은 모든 카드에
+        # 렌더되는 템플릿이라 신뢰 못 한다(2026-08-19 실측). 대신 수집 후 add_soldout()
+        # 이 상품별 상세페이지의 권위 신호 "is_soldout" 으로 채운다(2026-08-25 도입).
         items.append({
             'name': name,
             'price': price,
             'url': abs_url(BASE, a['href']),
-            'is_soldout': False,
+            'is_soldout': False,   # add_soldout() 에서 상세페이지 기준으로 덮어씀
         })
     return items
 
@@ -143,7 +183,9 @@ def scrape():
         # 그것도 급감이면 가드가 교체를 막아 기존 데이터가 보존된다.
         items = parse_cards(html)
         print(f'  ⚠️ 목록 AJAX 파라미터를 못 찾았습니다 — 목록 페이지 분 {len(items)}개만 수집')
-        return finalize(items)
+        beans = finalize(items)
+        add_soldout(session, beans)
+        return beans
 
     print(f'  목록 AJAX 파라미터: category={params["category"]} '
           f'widget_code={params["widget_code"]} (사이트 pagesize={params["pagesize"]}, '
@@ -175,7 +217,9 @@ def scrape():
         items.extend(fresh)
         time.sleep(0.5)
 
-    return finalize(items)
+    beans = finalize(items)
+    add_soldout(session, beans)
+    return beans
 
 
 def finalize(items):

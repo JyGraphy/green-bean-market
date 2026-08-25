@@ -9,49 +9,45 @@ jobs:
     steps:
       - name: 의존성
         run: pip install requests beautifulsoup4
-      - name: PRODUCT_CATEGORY 추출 + 실제 조회
+      - name: 생두 category 찾기
         run: |
           python3 - <<'PY'
-          import re, json, requests
+          import re, json, requests, collections
           from bs4 import BeautifulSoup
           UA={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36','Accept-Language':'ko-KR,ko;q=0.9'}
           BASE='https://momos.co.kr'; s=requests.Session(); s.headers.update(UA)
           html=s.get(BASE+'/greenbean', timeout=30).text
 
-          # PRODUCT_CATEGORY / PRODUCT_CACHE_KEY 및 관련 상수
-          for name in ['PRODUCT_CATEGORY','PRODUCT_CACHE_KEY','CATEGORY']:
-              for m in re.finditer(re.escape(name)+r'\s*=\s*["\']([^"\']+)["\']', html):
-                  print(f"{name} = {m.group(1)}")
-                  break
-          # loadProducts 이후 필터/가공 로직 (무엇으로 생두를 거르나)
-          m=re.search(r'forEach\(function \(node\) \{.{0,700}', html, re.S)
-          if m: print("\n[forEach 본문]", re.sub(r'\s+',' ',m.group(0))[:700])
-          # 클라 필터 단서 ([생두], 태그 등)
-          for kw in ['생두','[생두]','isBean','category_name','prod_type','filterBean']:
-              c=html.count(kw)
-              if c: print(f"  '{kw}' x{c}")
+          # PRODUCT_CATEGORY 로 지정된 모든 코드 + 페이지의 모든 s20 카테고리 후보
+          cats=[]
+          cats += re.findall(r'PRODUCT_CATEGORY\s*=\s*["\']([^"\']+)["\']', html)
+          cats += re.findall(r'category=["\']?\+?\s*["\']?(s20\d{6}[0-9a-f]{6,})', html)
+          extra=[c for c,_ in collections.Counter(re.findall(r's20\d{6}[0-9a-f]{6,}', html)).most_common(12)]
+          seen=set(); order=[]
+          for c in cats+extra:
+              if c not in seen: seen.add(c); order.append(c)
+          print("조회할 category 후보:", order)
 
-          # 추출한 category 로 실제 조회
-          mc=re.search(r'PRODUCT_CATEGORY\s*=\s*["\']([^"\']+)["\']', html)
-          if not mc:
-              print("PRODUCT_CATEGORY 못 찾음 — 원문 일부:", html[html.find('PRODUCT_CATEGORY')-50:html.find('PRODUCT_CATEGORY')+80] if 'PRODUCT_CATEGORY' in html else 'N/A')
-          else:
-              cat=mc.group(1)
-              print(f"\n=== get_shop_list_view.cm?category={cat} 조회 ===")
+          def q(cat):
               r=s.get(BASE+'/ajax/get_shop_list_view.cm', params={'category':cat},
                       headers={'Accept':'application/json','Referer':BASE+'/greenbean'}, timeout=30)
-              j=r.json(); doc=BeautifulSoup(j.get('html',''),'html.parser')
-              nodes=doc.select('._shop_item')
-              print(f"msg={j.get('msg')} _shop_item={len(nodes)}")
+              try: j=r.json()
+              except: return None,[]
+              doc=BeautifulSoup(j.get('html',''),'html.parser')
               seen=set(); uniq=[]
-              for n in nodes:
+              for n in doc.select('._shop_item'):
                   raw=n.get('data-product-properties')
                   if not raw: continue
                   try: p=json.loads(raw)
                   except: continue
                   if p.get('code') in seen: continue
                   seen.add(p.get('code')); uniq.append(p)
-              print(f"고유 상품 {len(uniq)}개. 처음 15개:")
-              for p in uniq[:15]:
-                  print(f"   idx={p.get('idx')} price={p.get('price')} {p.get('name','')[:45]}")
+              return j.get('msg'), uniq
+
+          print("\n=== category별 조회 결과 (생두 카테고리 찾기) ===")
+          for cat in order:
+              msg,uniq=q(cat)
+              names=[p.get('name','')[:38] for p in uniq[:4]]
+              bean = sum(1 for p in uniq if '생두' in p.get('name','') or 'Bolivia' in p.get('name','') or 'Los Rodriguez' in p.get('name',''))
+              print(f"[{cat}] msg={msg} 고유{len(uniq)}개 생두류{bean}개  예:{names}")
           PY

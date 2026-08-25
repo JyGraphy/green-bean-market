@@ -1,40 +1,32 @@
 """
 모모스커피 생두 스크래퍼
-URL: https://momos.co.kr/Product_GreenBean
+URL: https://momos.co.kr/greenbean (랜딩) / https://momos.co.kr/Product_GreenBean (구 그리드)
 플랫폼: 아임웹(imweb) — 2026년 cafe24에서 이전
 
-**2026-08-19 전면 재작성 배경**
-모모스가 cafe24 → 아임웹으로 옮기면서 옛 상품 URL
-`/product/<슬러그>/<id>/category/64/...` 가 전부 404가 됐다(저장된 115개 100% dead).
-안전장치는 정상 작동했다 — 스크래퍼가 0개를 수집하자 guard_store_replacement 가
-덮어쓰기를 막았고, check_links 는 dead 비율 100%를 "URL 구조 변경 의심"으로 보고
-삭제를 보류했다. 다만 그 뒤 아무도 후속 조치를 안 해 죽은 링크가 남아 있었다.
+**2026-08-25 전면 재작성 — 전체 카탈로그에서 [생두] 필터**
+그동안은 /Product_GreenBean 위젯의 category/widget_code 로 목록 AJAX 를 호출했다.
+그런데 모모스가 /greenbean 랜딩을 새로 내면서 위젯을 다시 만들었고, 그 위젯 category
+(`s20260722c87183a44b18a`)는 드립백 14개만 돌려준다. 정작 볼리비아 등 신상 생두는
+다른 category 에 흩어져 있어서, 위젯 하나만 보면 대부분을 놓친다(2026-08-25 실측:
+위젯 28개 vs 실제 생두 74개).
 
-**새 구조 (GitHub Actions 실측)**
- - 상품 URL: `/Product_GreenBean/?idx=<숫자>`  ← 서버 HTML 에 그대로 있다
- - 카드 구조:
-     div.shop-item._shop_item
-       └ div.item-wrap
-           └ a.shop-item-thumb[href="/Product_GreenBean/?idx=7374"]
-               └ div.item-overlay > div.item-pay > div
-                   ├ h2                      상품명 ("[생두] …")
-                   ├ p.pay                   가격 ("58,000원", 품절이면 "0원")
-                   └ div.prod_icon.sold_out  품절 배지
- - 첫 페이지는 일부만 오고 '더보기'가 목록 AJAX 로 나머지를 받는다.
-   호출 규격은 페이지 인라인 스크립트에 그대로 들어 있다:
-     GET /ajax/get_shop_list_view.cm
-       ?page=N&pagesize=98&category=<코드>&sort=recent
-        &menu_url=/Product_GreenBean/&widget_code=<코드>
-   → {"msg":"SUCCESS","html":"<카드 HTML>"}
-   category/widget_code 는 하드코딩하지 않고 **매번 페이지에서 추출**한다.
-   모모스가 위젯을 다시 만들면 코드가 바뀌는데, 박아두면 그때 조용히 0개가 된다.
+**해결: category 를 비워서 전체 상품을 받는다.**
+목록 AJAX `GET /ajax/get_shop_list_view.cm?category=&page=N&pagesize=K&sort=recent` 는
+category 가 비면 **전체 카탈로그**를 돌려준다(2026-08-25 실측 214개). 여기서 이름에
+`[생두]` 가 든 것만 생두로 추린다. 이 방식은 아임웹이 위젯을 다시 만들어도 영향받지
+않는다 — widget_code/category 에 의존하지 않기 때문이다.
 
-**2026-08-25 품절 감지 추가**
- - 모모스가 /greenbean 새 랜딩을 냈지만 거긴 JS 렌더라 서버 HTML에 카드가 없다.
-   실제 상품 그리드는 여전히 /Product_GreenBean 이고 상품 URL도 /Product_GreenBean/?idx= 다.
- - 목록의 .prod_icon.sold_out 은 전 카드 템플릿이라 신뢰 불가. 대신 **상세페이지 서버
-   HTML의 "is_soldout":true/false** 가 상품별 권위 신호다(JS 없이 나온다). add_soldout()
-   이 수집된 생두마다 상세페이지를 받아 품절 여부를 채운다(상품 30개 안팎이라 부담 적음).
+**카드 구조 (AJAX 응답 조각)**
+    div.shop-item._shop_item[data-product-properties='{...json...}']
+      └ a.shop-item-thumb[href="/Product_GreenBean/?idx=<숫자>"]
+          └ h2 상품명, p.pay 가격
+`data-product-properties` JSON 에 name/price/idx 가 그대로 들어 있어 이걸 1차 소스로,
+마크업(h2/p.pay/a[href])을 보강용으로 쓴다.
+
+**품절 감지 (2026-08-25 도입)**
+목록의 `.prod_icon.sold_out` 은 전 카드에 렌더되는 숨은 템플릿이라 신뢰 불가.
+대신 **상세페이지 서버 HTML 의 "is_soldout":true/false** 가 상품별 권위 신호다
+(JS 없이 나온다). add_soldout() 이 수집된 생두마다 상세페이지를 받아 채운다.
 """
 import json
 import os
@@ -46,31 +38,19 @@ import requests
 from bs4 import BeautifulSoup
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from common import HEADERS, abs_url, to_products, update_json
+from common import HEADERS, to_products, update_json
 
 STORE = '모모스커피'
 BASE = 'https://momos.co.kr'
 LIST_PATH = '/Product_GreenBean'
+LANDING = '/greenbean'
 AJAX_PATH = '/ajax/get_shop_list_view.cm'
 ID_START = 101          # 모모스 ID 구간 시작 (alloc_ids 가 충돌은 알아서 피한다)
-MAX_PAGES = 30          # 폭주 방지
+MAX_PAGES = 40          # 폭주 방지 (전체 카탈로그 ~200개 / pagesize)
+PAGE_SIZE = 100         # 전체를 몇 번의 요청으로 훑는다
 IDX_RE = re.compile(r'[?&]idx=(\d+)')
 # 상세페이지 서버 HTML 에 들어 있는 권위 있는 품절 플래그 (2026-08-25 실측).
-# 목록의 .prod_icon.sold_out 은 전 카드에 렌더되는 템플릿이라 신뢰 못 하지만,
-# 상세페이지의 "is_soldout":true/false 는 상품별 실제 재고 상태다(JS 없이도 나온다).
 SOLDOUT_RE = re.compile(r'"is_soldout"\s*:\s*(true|false)')
-
-# 페이지 인라인 스크립트가 알려주는 pagesize 는 98이다. 그대로 쓰면 상품이 그보다
-# 적을 때 페이징이 한 번도 실행되지 않아서, "한 번에 다 받았다"와 "서버가 page 를
-# 무시했다"를 구분할 수 없다. 실측(pagesize=6)에서 페이징이 정상 동작함을 확인했으므로
-# 일부러 작은 값을 써서 매 실행이 페이징을 거치게 한다.
-PAGE_SIZE = 24
-
-
-def fetch_html(session, path, **kw):
-    r = session.get(BASE + path, timeout=25, **kw)
-    r.raise_for_status()
-    return r.text
 
 
 def fetch_soldout(session, url):
@@ -89,7 +69,7 @@ def add_soldout(session, beans):
     """수집된 생두마다 상세페이지를 받아 품절 여부를 채운다.
 
     모모스는 상시 품절이 많은데 목록엔 신뢰할 품절 신호가 없어, 상품별 상세페이지의
-    "is_soldout" 을 권위 신호로 쓴다. 상품 수가 30개 안팎이라 부담이 크지 않다.
+    "is_soldout" 을 권위 신호로 쓴다.
     """
     unknown = 0
     for it in beans:
@@ -105,108 +85,83 @@ def add_soldout(session, beans):
 
 
 def parse_cards(html):
-    """상품 카드에서 이름·가격·링크·품절을 뽑는다.
+    """상품 카드에서 이름·가격·링크를 뽑는다.
 
-    목록 페이지와 AJAX 응답 조각이 같은 마크업이라 둘 다 이 함수로 처리한다.
+    data-product-properties JSON(name/price/idx)을 1차 소스로, 마크업을 보강용으로
+    쓴다. 목록 페이지와 AJAX 응답 조각이 같은 마크업이라 둘 다 이 함수로 처리한다.
     """
     soup = BeautifulSoup(html, 'html.parser')
     items = []
-    for card in soup.select('div.shop-item, div._shop_item'):
-        a = card.find('a', href=lambda h: h and IDX_RE.search(h))
-        if not a:
-            continue
-        h = card.find(['h2', 'h3'])
-        if not h:
-            continue
-        name = h.get_text(' ', strip=True)
+    for card in soup.select('div._shop_item, div.shop-item'):
+        name, price, idx = '', None, None
+
+        raw = card.get('data-product-properties')
+        if raw:
+            try:
+                p = json.loads(raw)
+                name = (p.get('name') or '').strip()
+                price = int(p.get('price') or 0)
+                idx = p.get('idx')
+            except (ValueError, TypeError):
+                pass
+
+        # data-product-properties 가 없으면 마크업에서 보강
+        if not name:
+            h = card.find(['h2', 'h3'])
+            name = h.get_text(' ', strip=True) if h else ''
         if not name:
             continue
+        if not price:
+            pay = card.select_one('p.pay, .item-pay p, .pay')
+            if pay:
+                m = re.search(r'([\d,]+)\s*원', pay.get_text(' ', strip=True))
+                if m:
+                    price = int(m.group(1).replace(',', ''))
+        if idx is None:
+            a = card.find('a', href=lambda h: h and IDX_RE.search(h))
+            if a:
+                mi = IDX_RE.search(a['href'])
+                idx = mi.group(1) if mi else None
 
-        # 가격 — p.pay 가 표준. 품절이면 "0원"으로 온다.
-        price = 0
-        pay = card.select_one('p.pay, .item-pay p, .pay')
-        if pay:
-            m = re.search(r'([\d,]+)\s*원', pay.get_text(' ', strip=True))
-            if m:
-                price = int(m.group(1).replace(',', ''))
+        # URL 확정: idx 로 /Product_GreenBean/?idx= 형식으로 구성한다.
+        # 전체 카탈로그 AJAX 카드의 a[href] 는 경로 없는 '?idx=' 라서 그대로 쓰면
+        # 'momos.co.kr?idx=' 가 되어 상세페이지로 안 간다(품절 판독·사용자 링크 모두
+        # 깨진다). idx 는 아임웹 전역 상품 id 라 이 경로로 항상 상세페이지가 열린다
+        # (2026-08-25 실측, "is_soldout" 도 이 URL 에서 읽힌다).
+        if idx is None:
+            continue
+        url = f'{BASE}{LIST_PATH}/?idx={idx}'
 
-        # 품절은 여기서 판단하지 않는다 — 목록의 .prod_icon.sold_out 은 모든 카드에
-        # 렌더되는 템플릿이라 신뢰 못 한다(2026-08-19 실측). 대신 수집 후 add_soldout()
-        # 이 상품별 상세페이지의 권위 신호 "is_soldout" 으로 채운다(2026-08-25 도입).
         items.append({
             'name': name,
-            'price': price,
-            'url': abs_url(BASE, a['href']),
+            'price': price or 0,
+            'url': url,
             'is_soldout': False,   # add_soldout() 에서 상세페이지 기준으로 덮어씀
         })
     return items
 
 
-def extract_ajax_params(html):
-    """페이지 인라인 스크립트에서 목록 AJAX 호출 파라미터를 그대로 읽어온다.
+def fetch_all_products(session):
+    """category 를 비워 전체 카탈로그를 페이지네이션으로 받는다.
 
-    하드코딩하지 않는 이유: category/widget_code 는 아임웹이 위젯마다 발급하는
-    값이라 모모스가 위젯을 다시 만들면 바뀐다. 박아두면 그날부터 조용히 0개가 되고,
-    가드가 막아주긴 해도 원인 파악에 또 며칠이 걸린다.
+    category='' → 전체 상품(2026-08-25 실측 214개). 위젯 category/widget_code 에
+    의존하지 않아 모모스가 위젯을 다시 만들어도 영향받지 않는다.
     """
-    m = re.search(r'get_shop_list_view\.cm.{0,600}', html, re.S)
-    if not m:
-        return None
-    blob = m.group(0)
-    params = {}
-    for key in ('pagesize', 'category', 'sort', 'menu_url', 'widget_code'):
-        km = re.search(r"['\"]" + key + r"['\"]\s*:\s*['\"]([^'\"]+)['\"]", blob)
-        if km:
-            params[key] = km.group(1)
-        else:  # pagesize 처럼 따옴표 없는 숫자
-            km = re.search(r"['\"]" + key + r"['\"]\s*:\s*(\d+)", blob)
-            if km:
-                params[key] = km.group(1)
-    if 'category' not in params or 'widget_code' not in params:
-        return None
-    params.setdefault('pagesize', '98')
-    params.setdefault('sort', 'recent')
-    params.setdefault('menu_url', LIST_PATH + '/')
-    return params
-
-
-def scrape():
-    print(f'[{STORE}] 스크래핑 시작...')
-    session = requests.Session()
-    session.headers.update(HEADERS)
-
-    html = fetch_html(session, LIST_PATH)
-    params = extract_ajax_params(html)
-
-    if not params:
-        # 파라미터를 못 찾으면 목록 페이지에 그려진 첫 화면 분량만 건진다.
-        # 그것도 급감이면 가드가 교체를 막아 기존 데이터가 보존된다.
-        items = parse_cards(html)
-        print(f'  ⚠️ 목록 AJAX 파라미터를 못 찾았습니다 — 목록 페이지 분 {len(items)}개만 수집')
-        beans = finalize(items)
-        add_soldout(session, beans)
-        return beans
-
-    print(f'  목록 AJAX 파라미터: category={params["category"]} '
-          f'widget_code={params["widget_code"]} (사이트 pagesize={params["pagesize"]}, '
-          f'수집은 {PAGE_SIZE})')
-
-    # 1페이지부터 AJAX 로 받는다. 목록 페이지 HTML 과 섞으면 pagesize 가 달라져
-    # 오프셋이 어긋난다 — 예를 들어 HTML(98개) + AJAX page2(pagesize 24 → 25~48번)를
-    # 합치면 전부 중복이라 '더 없음'으로 판단해 99번째 이후를 통째로 놓친다.
     items, seen = [], set()
     for page in range(1, MAX_PAGES + 1):
-        q = dict(params, page=page, pagesize=PAGE_SIZE)
+        q = {'category': '', 'page': page, 'pagesize': PAGE_SIZE, 'sort': 'recent'}
         try:
             r = session.get(BASE + AJAX_PATH, params=q, timeout=25,
                             headers={'X-Requested-With': 'XMLHttpRequest',
-                                     'Referer': BASE + LIST_PATH})
+                                     'Accept': 'application/json',
+                                     'Referer': BASE + LANDING})
             data = r.json()
         except Exception as e:
             print(f'  페이지 {page} 실패: {type(e).__name__}: {e}')
             break
-        if data.get('msg') != 'SUCCESS':
-            print(f'  페이지 {page}: msg={data.get("msg")} — 종료')
+        msg = data.get('msg')
+        if msg and msg != 'SUCCESS':
+            print(f'  페이지 {page}: msg={msg} — 종료')
             break
         page_items = parse_cards(data.get('html') or '')
         fresh = [it for it in page_items if it['url'] not in seen]
@@ -215,7 +170,29 @@ def scrape():
             break
         seen.update(it['url'] for it in fresh)
         items.extend(fresh)
-        time.sleep(0.5)
+        time.sleep(0.4)
+    return items
+
+
+def scrape():
+    print(f'[{STORE}] 스크래핑 시작...')
+    session = requests.Session()
+    session.headers.update(HEADERS)
+
+    items = fetch_all_products(session)
+
+    if not items:
+        # 전체 조회가 빈손이면 랜딩/그리드 페이지에 그려진 첫 화면 분량만 건진다.
+        # 그것도 급감이면 가드가 교체를 막아 기존 데이터가 보존된다.
+        for path in (LANDING, LIST_PATH):
+            try:
+                html = session.get(BASE + path, timeout=25).text
+            except requests.RequestException:
+                continue
+            items = parse_cards(html)
+            if items:
+                print(f'  ⚠️ 전체 AJAX 실패 — {path} 페이지 분 {len(items)}개만 수집')
+                break
 
     beans = finalize(items)
     add_soldout(session, beans)
@@ -224,21 +201,18 @@ def scrape():
 
 def finalize(items):
     """수집 결과를 생두만 남기고 정리한다."""
-    # 생두만 남긴다 — 목록에 원두/굿즈가 섞여 와도 [생두] 표기로 가른다.
+    # 생두만 남긴다 — 전체 카탈로그에 원두/드립백/굿즈가 섞여 오므로 [생두] 표기로 가른다.
+    # ('[개인결제창-생두]' 같은 결제창은 '[생두]' 정확 표기가 아니라 자동 제외된다)
     beans = [it for it in items if '[생두]' in it['name']]
     print(f'  전체 {len(items)}개 중 [생두] {len(beans)}개')
-    if not beans and items:
-        # [생두] 표기 규칙이 바뀐 경우까지 통째로 버리지는 않는다.
-        print('  ⚠️ [생두] 표기가 하나도 없습니다 — 표기 규칙 변경 가능성. 전체를 사용합니다.')
-        beans = items
 
     # 접두어 제거 (clean_name 은 상태 라벨만 떼므로 [생두]는 여기서 처리)
     for it in beans:
         it['name'] = re.sub(r'\[\s*생두\s*\]\s*', '', it['name']).strip()
 
     # 가격 없는 항목 제외 — 우리 사이트는 가격 비교가 목적이라 0원은 비교 대상이
-    # 아니다(전체 데이터에 0원 상품은 한 건도 없다). 실제로 걸리는 건 커핑 행사
-    # 같은 비판매 항목이다.
+    # 아니다. 실제로 걸리는 건 커핑 행사(예: "2026 Panama Business Cupping") 같은
+    # 비판매 항목이다.
     dropped = [it for it in beans if it['price'] <= 0]
     beans = [it for it in beans if it['price'] > 0]
     if dropped:

@@ -82,7 +82,7 @@ Identify the app, then map each curve using the legend you read in PHASE 0.
 
 // <<<MACHINE_KNOWLEDGE_START>>>
 // 자동 생성 — 직접 수정 금지. 원본: vault/raw/roast-profiles/machines/*.md
-// 등록 기기 8대
+// 등록 기기 9대
 
 ════════════════════════════════════════
 PHASE 1-B — MACHINE-SPECIFIC READING RULES (verified knowledge base)
@@ -96,12 +96,13 @@ chart app and total roast time, then apply that entry.
 | Machine | Heat source | Temp probe | Typical total | Chart app |
 |---|---|---|---|---|
 | Aillio Bullet R1 (v2 / R2 Pro) | 하이브리드 — 드럼 + 유도가열(IH), 가스/화염 아님 | BT+ET + 선택형 IBTS(적외선 표면센서, 열지연 없음) | 8–12분 (배치 약 400g–1.2kg) | RoasTime (Aillio 자체 앱) |
+| EASYSTER 800G (이지스터 800, 한국 로스터기 제조사) | 드럼(전도)+열풍(대류) 하이브리드(반열풍) — "소켓식 일체형 버너"(가스 추정, 전기식 여부 미확인) | 미확인 — 800G 모델의 기본 BT/ET 탑재 여부 확정 못함(아래 판독 규칙 참고) | 미확인 — 시간당 최대 처리량 3kg라는 수치만 확인, 분당 로스팅 시간은 역산하지 말 것 | Artisan(이지스터 계열 일반 — Autonics TK4 PID+MODBUS, 800G 개별 확인 아님) 추정 + 제조사 자체 "컴퓨터 프로파일링" 언급(상세 미확인) |
 | 후지로얄 Fuji Royal (R-101 / R-105 등 소형 드럼) | 드럼(전도) — 반직화식(semi-direct fire) 가스 드럼 | 내장 프로브 없음 (국내는 후장착 서모커플+Artisan 조합) | 10–15분 (드럼을 약 200℃로 예열 후 150℃ 부근으로 낮춰 투입) | Artisan (자체 차트 앱 없음 — 후장착 프로브+Artisan 조합이 일반적) |
 | Giesen (W6 / W15 / W30 시리즈) | 드럼(전도) — 가스버너 + 간접 드럼 가열(indirect-drum) 재킷 | BT+ET 옵션 (PT100 이중 프로브) | 약 12–13분 (실측 예: 브라질 옐로우 부르봉, 최종 BT 200℃ 기준 4회 평균 12:50) | Artisan / Cropster / Giesen Profiler (자체 소프트웨어, 2.0부터 색상 커스터마이징 가능) |
 | IKAWA Pro (50g / 100g) | 열풍(대류) — fluid-bed | 배기온도만 (원두 프로브 없음) | 3–10분 | IKAWA Pro app |
 | Loring (S15 Falcon / S35 Kestrel / S70 Peregrine) | 열풍(대류) — single burner heats inlet air, not the drum (smokeless afterburner) | BT(빠른 ~1.5mm 프로브)+ET(배기) | 10–16분 (예: S15 배치 15kg). 대형기(S35/S70)도 배치만 커질 뿐 시간대는 유사 | Cropster (Roasting Intelligence) / Loring 자체 제어 소프트웨어 ("Roast Architect") |
 | Probat (Probatone / P Series) | 드럼(전도) — gas burner + drum/air thermocouples | BT+ET (P series 표준, 구형 Probatone 2 base는 BT만) | 10–20분 (상업용 배치 5–60kg) | Artisan / Cropster (자체 차트 앱 없음, 외부 소프트웨어 연동) |
-| Stronghold (Roastware / Boost) | 하이브리드 — 열풍 + 할로겐(복사) + 드럼히터(전도) | BT+ET (원두 표면 / 내부) | 10–16분 | Roastware / Boost web app (dark UI, Korean labels) |
+| Stronghold S7X (850g 배치, Roastware / Boost) | 하이브리드 — 열풍(대류)+할로겐(복사)+드럼히터(전도), 제조사 명칭 "Triple Heat System+"(S7X 세대: 열풍 2kW/할로겐 1.5kW/드럼히터 2kW급으로 보도됨) | BT+ET (원두 표면/내부) + S7X 추가 "X-Lens" 비접촉 센서(측정 원리·응답특성 미확인, 아래 판독 규칙 참고) | 10–16분 | Roastware / Boost web app (dark UI, Korean labels) |
 | 태환 Proaster (Taehwan Automation) | 드럼(전도) — 드럼 하부 열원(가스 또는 전기, 모델별 상이) | 모델별 상이 — Artisan 연동은 THCR-01/01A/03/06/12/25 공식 지원 확인, 일부 모델 "3 TEMP" 가이드 존재(채널 구성은 미확인) | 5–20분 (모델별 편차 큼) — 확인 지점: THCR-01A 500g–1.5kg/5–20분, THCR-06 2–10kg/약10–15분 | 모델별 Artisan 연동 지원(공식 설치 매뉴얼 확인) + 자체 로깅 프로그램 "DAQ MASTER"(상세 기능 미확인) |
 
 ▶ Aillio Bullet R1 (v2 / R2 Pro)
@@ -128,6 +129,37 @@ chart app and total roast time, then apply that entry.
     stepped lines, expect discrete integer levels (not smooth curves) — conceptually similar to
     Stronghold's step controls, but the channel names differ (power/fan/drum, not
     열풍/할로겐/드럼히터/교반) — do not reuse Stronghold's Korean labels for this machine.
+
+▶ EASYSTER 800G (이지스터 800, 한국 로스터기 제조사)
+  - This is a Korean semi-hot-air (반열풍) HYBRID drum roaster: heat comes from a burner-fed duct
+    combining drum conduction with hot-air convection, NOT a pure direct-fire drum and NOT a
+    fluid-bed design. Treat its general curve shape like other Korean/gas drum roasters
+    (Fuji Royal, Taehwan Proaster, Giesen) rather than applying IKAWA's fluid-bed rules.
+  - The manufacturer describes the burner as a "socket-type integrated burner" comparable to
+    German 1kg-class roasters. This wording strongly implies a GAS burner, but the exact fuel
+    (LPG vs LNG) and any electric-heat variant are NOT confirmed — do not state a specific fuel
+    type or kcal/hr rating to the user.
+  - Rated batch range for the 800G unit is 200g–800g, with a manufacturer-stated throughput of
+    "up to 3kg/hour." Do NOT use the 3kg/hour figure to infer an exact per-batch roast time in
+    minutes — that conversion has not been confirmed and depends on unknown cooling/reload time.
+  - Temperature-probe configuration is UNCONFIRMED for the 800G model specifically. Two different
+    pieces of general "Easyster" information exist and may not both apply to this model:
+    (a) some smaller/older Easyster units (e.g. a user's "이지스터 300") are reported needing an
+    AFTERMARKET K-type thermocouple to log via Artisan — i.e. no built-in digital probe;
+    (b) the open-source Artisan machine directory separately describes an "Easyster" line as
+    compatible via two Autonics TK4 PID controllers (one set as BT, one as ET) over MODBUS RTU,
+    plus a newer "Easyster Smart" touchscreen series over MODBUS TCP/WiFi.
+    Do NOT assume either (a) or (b) applies to the 800G without confirming from the actual chart
+    or from the user. If a chart image is provided, read the on-image legend/axis labels rather
+    than guessing BT/ET channel identity from this note.
+  - Because this is a small-batch (≤800g) semi-hot-air drum roaster, do not default to
+    Probat/Loring-scale batch or timing assumptions, and do not apply IKAWA's "3–10 min" rule
+    just because the batch is small — that rule is specific to fluid-bed roasters only.
+  - If the chart looks like a standard Artisan interface (red BT / blue ET, ROR sub-axis), follow
+    Artisan's own legend conventions — no confirmed proprietary Easyster charting UI/color scheme
+    was found in available sources.
+  - When in doubt, prefer stating "미확인" / lowering confidence over inventing a specific number
+    for this machine — no verified chart exists yet to check assumptions against.
 
 ▶ 후지로얄 Fuji Royal (R-101 / R-105 등 소형 드럼)
   - This is an older-style small semi-direct-fire drum roaster with NO built-in data port or
@@ -229,7 +261,7 @@ chart app and total roast time, then apply that entry.
     ROR responds more SLOWLY to burner (gas) changes than IKAWA (fluid-bed) or Aillio (induction) —
     do not expect fast, step-like ROR jumps right after a burner adjustment.
 
-▶ Stronghold (Roastware / Boost)
+▶ Stronghold S7X (850g 배치, Roastware / Boost)
   - TOP CHART legend reads "■ 원두 표면  ■ 내부":
     BT = 원두 표면 (bean surface), ET = 내부 (internal drum). Match legend swatch colors.
     Sanity check only: BT usually finishes HIGHER than ET at drop.
@@ -243,6 +275,18 @@ chart app and total roast time, then apply that entry.
   - Read the ENTIRE 교반 line to DROP — late step-ups are frequently missed.
   - Because this machine mixes three heat sources, ROR behaviour differs from pure drum
     roasters: halogen changes cause faster BT response than a drum-only roaster would show.
+  - S7X ALSO markets a bean-surface sensor called "X-Lens" ("pinpoint accuracy of actual bean
+    surface measurement", "increased response time... unmatched by traditional probes"). NO
+    confirmed technical detail (measurement principle, numeric offset vs. the classic BT probe,
+    or whether it changes the post-charge dip shape) was found beyond this marketing description
+    — do NOT invent an offset number or assume it removes the turning point, similar to the
+    caution already applied to Aillio's IBTS in `aillio-bullet-r1.md`. If a curve is labeled
+    "X-Lens" in the legend, read it as an additional/alternative BT-family line and flag any
+    unusual behavior (e.g. no dip) as an open question rather than an error.
+  - This document covers the **850g S7X** specifically. If the user states a different model
+    (plain "S7", "S7 Pro" without X, or the larger "S9X"), do NOT assume the same 4-channel
+    heat-source layout or the same batch size — those are separate machines with their own
+    (currently undocumented) control-curve sets.
 
 ▶ 태환 Proaster (Taehwan Automation)
   - Korean-market drum roaster with the heat source located below/under the drum (conduction),

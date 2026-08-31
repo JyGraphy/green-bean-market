@@ -106,7 +106,7 @@ function wireUI() {
     $('fcsManualInput').style.borderColor = '';
     wizardData.events.fcs = sec;
     wizardData.dtr = +(((wizardData.total_time - sec) / wizardData.total_time) * 100).toFixed(1);
-    wizardData.current_roast_point = analyzeCurrentPoint(wizardData.drop_temp, wizardData.dtr)?.key || wizardData.current_roast_point;
+    wizardData.current_roast_point = analyzeCurrentPoint(wizardData.drop_temp, wizardData.dtr, wizardData.fluid_bed)?.key || wizardData.current_roast_point;
     $('fcsInputRow').style.display = 'none';
     renderMetrics($('metricsRow'), wizardData);
     // 이벤트 선 다시 그리기
@@ -694,7 +694,7 @@ function buildWizardFromParse(parse, extra) {
   }
   const dropTemp   = extra.dropTemp   != null ? extra.dropTemp   : +interp(btPts, dropT).toFixed(1);
   const dtr = evTimes.fcs != null ? +(((dropT - evTimes.fcs) / dropT) * 100).toFixed(1) : null;
-  const current = analyzeCurrentPoint(dropTemp, dtr);
+  const current = analyzeCurrentPoint(dropTemp, dtr, !!parse.fluidBed);
 
   return {
     bean_name:        $('fBeanName').value.trim() || parse.title || '',
@@ -924,7 +924,7 @@ function applyManualFcs() {
   $('fcsManualInput').style.borderColor = '';
   wizardData.events.fcs = sec;
   wizardData.dtr = +(((wizardData.total_time - sec) / wizardData.total_time) * 100).toFixed(1);
-  const pt = analyzeCurrentPoint(wizardData.drop_temp, wizardData.dtr);
+  const pt = analyzeCurrentPoint(wizardData.drop_temp, wizardData.dtr, wizardData.fluid_bed);
   if (pt) wizardData.current_roast_point = pt.key;
   $('fcsInputRow').style.display = 'none';
   renderMetrics($('metricsRow'), wizardData);
@@ -1061,7 +1061,11 @@ function generateProfile() {
   const chargeTemp = userCharge != null ? userCharge : +interp(dedup, 0).toFixed(1);
   const dropTemp = +interp(dedup, dropT).toFixed(1);
   const dtr = (evTimes.fcs!=null) ? +(((dropT - evTimes.fcs) / dropT) * 100).toFixed(1) : null;
-  const current = analyzeCurrentPoint(dropTemp, dtr);
+  // 사진 클릭 경로는 그동안 사용자가 입력한 로스팅기를 읽지 않아서, 기기를 알 수 없었고
+  // 열풍식에도 원두온도 기준 판정을 그대로 적용했다. 여기서 읽어 기기를 확정한다.
+  const roasterText = $('fRoaster').value.trim();
+  const fluidBed = detectFluidBed(roasterText);
+  const current = analyzeCurrentPoint(dropTemp, dtr, fluidBed === true);
 
   const chargeWeight = numOrNull('fChargeWeight');
   const dropWeight = numOrNull('fDropWeight');
@@ -1075,6 +1079,9 @@ function generateProfile() {
     ambient_temp: numOrNull('fAmbientTemp'),
     ambient_humidity: numOrNull('fAmbientHumidity'),
     memo: $('fMemo').value.trim(),
+    roaster: roasterText || null,
+    machine: roasterText || null,
+    fluid_bed: fluidBed === true,
     charge_temp: chargeTemp, drop_temp: dropTemp, total_time: dropT, dtr,
     current_roast_point: current ? current.key : null,
     time_series: times, bt_series: bts, ror, et_ror: [], et_drop_temp: null,
@@ -1135,8 +1142,36 @@ function computeRoR(times, bts, span=30) {
 }
 
 /* ════════ 로스팅 포인트 분석 ════════ */
-function analyzeCurrentPoint(dropTemp, dtr) {
-  if (dropTemp!=null) {
+/* ── 열원 방식 판별 ────────────────────────────────────────────────
+   사용자가 입력한 로스팅기 이름(자유 텍스트)에서 **열풍식(fluid-bed)** 여부를 가른다.
+   열풍식은 원두 프로브가 없어 배출온도의 의미 자체가 달라서, 피드백 기준을 바꿔야 한다.
+
+   ⚠️ 확인된 기기만 넣는다. 근거는 vault/raw/roast-profiles/machines/*.md 이고,
+   현재 8대 중 열풍식으로 확인된 것은 IKAWA 뿐이다.
+   (Loring 도 열풍이지만 드럼 안에 원두 프로브가 있어 배출 BT 가 존재한다 — 다른 범주다.)
+   모르는 기기는 null(모름)을 돌려준다. 추측해서 false 로 단정하지 않는다. */
+const FLUID_BED_PATTERNS = [/ikawa/i];
+
+function detectFluidBed(roasterText) {
+  const s = (roasterText || '').trim();
+  if (!s) return null;                                   // 미입력 → 모름
+  if (FLUID_BED_PATTERNS.some(re => re.test(s))) return true;
+  return null;                                           // 목록에 없음 → 모름
+}
+
+/* 현재 로스팅 포인트 판정.
+
+   ⚠️ fluidBed(열풍식)에서는 배출온도로 판정하지 않는다.
+   ROAST_POINTS 의 dropMin/dropMax 는 **원두온도(BT) 기준** SCA 색도 값인데,
+   IKAWA 같은 열풍식은 원두 프로브가 아예 없어서 우리가 'drop_temp' 로 들고 있는
+   값이 실제로는 **배기(exhaust) 공기 온도**다. 이 둘을 같은 자로 재면 원리적으로
+   맞을 수 없다 — 그런데도 기존 코드는 범위를 벗어나면 '가장 가까운 포인트'를
+   돌려줘서, 열풍식 사용자에게 늘 그럴듯한(그러나 근거 없는) 판정을 내보냈다.
+
+   DTR 은 시간 비율이라 열원 방식과 무관하므로 열풍식에서도 그대로 쓴다.
+   DTR 도 없으면 null 을 돌려준다 — 틀린 판정보다 '판정 없음'이 낫다. */
+function analyzeCurrentPoint(dropTemp, dtr, fluidBed) {
+  if (!fluidBed && dropTemp!=null) {
     for (const p of ROAST_POINTS) if (dropTemp>=p.dropMin && dropTemp<=p.dropMax) return p;
     let best=null, bd=1e9;
     for (const p of ROAST_POINTS){ const mid=(p.dropMin+p.dropMax)/2, d=Math.abs(dropTemp-mid); if(d<bd){bd=d;best=p;} }
@@ -1156,7 +1191,7 @@ function renderMetrics(el, d) {
     { label:'DTR', value: d.dtr!=null? d.dtr.toFixed(1):'—', unit:'%',
       cls: d.dtr==null?'':d.dtr<15?'bad':d.dtr>30?'warn':'good' },
     { label:'투입온도', value: d.charge_temp ?? '—', unit:'°C', cls:'' },
-    { label:'배출(BT)', value: d.drop_temp ?? '—', unit:'°C', cls:'' },
+    { label: d.fluid_bed ? '배출(배기)' : '배출(BT)', value: d.drop_temp ?? '—', unit:'°C', cls:'' },
     ...(d.et_drop_temp != null ? [{ label:'배출(ET)', value: d.et_drop_temp, unit:'°C', cls:'' }] : []),
     ...(d.weight_loss != null ? [{ label:'무게 손실률', value: d.weight_loss.toFixed(1), unit:'%',
       cls: d.weight_loss < 12 ? 'warn' : d.weight_loss > 20 ? 'warn' : 'good' }] : []),
@@ -1297,7 +1332,7 @@ function renderFeedback(el, d, targetKey) {
       d.events = d.events || {};
       d.events.fcs = sec;
       d.dtr = +(((d.total_time - sec) / d.total_time) * 100).toFixed(1);
-      const pt = analyzeCurrentPoint(d.drop_temp, d.dtr);
+      const pt = analyzeCurrentPoint(d.drop_temp, d.dtr, d.fluid_bed);
       if (pt) d.current_roast_point = pt.key;
       // step3 상단 fcsInputRow도 숨기기
       const row = $('fcsInputRow'); if (row) row.style.display = 'none';
@@ -1455,6 +1490,11 @@ function comprehensiveAnalysis(d) {
   if (d.fluid_bed) {
     items.push({type:'info', icon:'', title:`열풍식(${d.machine || 'fluid-bed'}) 프로파일`,
       text:'드럼 없이 열풍 대류로 로스팅하는 방식입니다. BT는 배기(exhaust) 공기 온도의 대리값이며, 교반 축에는 팬 속도(%÷10)가 표시됩니다. 드럼 로스터의 온도·시간 기준과 직접 비교하지 마세요.'});
+    // 로스팅 포인트는 SCA 색도(원두온도 기준)라 배기온도로 판정할 수 없다.
+    // 예전엔 그래도 '가장 가까운 포인트'를 돌려줘 근거 없는 판정을 내보냈다.
+    items.push({type:'info', icon:'', title:'로스팅 포인트 — 배출온도 기준 판정 제외',
+      text:'로스팅 포인트 기준(배출 191~225°C)은 원두온도(BT) 기준 SCA 색도값인데, 열풍식은 원두 프로브가 없어 배출값이 배기 공기 온도입니다. 같은 자로 재면 맞을 수 없어 배출온도 판정은 적용하지 않습니다. 대신 시간 비율이라 열원과 무관한 DTR로 판정합니다'
+        + (d.dtr==null ? '. 1차 크랙 시간을 입력하면 DTR 기준 판정이 나옵니다.' : '.')});
     if (total_time < 150) items.push({type:'warn',icon:'',title:`총 ${fmtTime(total_time)} — 열풍식 기준으로도 짧음`,
       text:'3분 미만 로스팅은 발달 부족 위험이 있습니다. 프로파일 시간을 늘려보세요.'});
     else if (total_time > 720) items.push({type:'warn',icon:'',title:`총 ${fmtTime(total_time)} — 열풍식 기준 김`,

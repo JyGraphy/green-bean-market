@@ -79,16 +79,6 @@ Aantal verhogen voor PT100 Temperature sensor
 SKU:
 400006
 Replacement temperature sensor for your Giesen Roaster.
-Choose your model from the list.
-Note: You can observe some differences in readings between the new and old sensors due to several factors:
-The new sensor is clean and more sensitive than the old, which was covered with coffee oils
-Measurement variations can occur because the sensors are possibly sourced from different suppliers.
-Slight profile correction may be needed after the replacement
-Share
-Share
-Link
-Delen sluiten
-Link kopiëren
-Alle details bekijken
-Een selectie kiezen resulteert in het geheel verversen van de pagina.
-Opent in een nieuw venster.
+Choose your 
+
+…(발췌 2000자. 전문은 위 source_url 에서 확인)

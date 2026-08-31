@@ -48,6 +48,20 @@ HEADERS = {
 # 본문이 아닌 것들 — 남겨두면 규칙을 쓸 때 잡음이 된다
 DROP_TAGS = ('script', 'style', 'nav', 'header', 'footer', 'noscript', 'form', 'iframe')
 
+# ── 저장 정책 (2026-08-31) ─────────────────────────────────────────
+# 처음엔 받아온 페이지의 **본문 전체**를 저장소에 커밋했다. 두 가지가 잘못됐다.
+#  ① 남의 매뉴얼·블로그 전문을 그대로 복사해 저장소에 넣는 것은 재배포에 해당한다.
+#  ② PDF 를 HTML 로 착각해 파싱하는 바람에 바이너리 1MB 가 그대로 커밋됐다
+#     (fuji-royal PXG4 매뉴얼, 내용이 '%PD…' 로 시작하는 읽을 수 없는 파일).
+#
+# 학습에 필요한 건 "PT100 프로브가 3mm/6mm 여러 종류"라는 **사실**이지 원문이 아니다.
+# 그래서 이렇게 바꾼다:
+#  - 표(사양표)는 전량 보존한다 — 열원·프로브·용량 수치가 규칙의 근거다.
+#  - 산문은 EXCERPT_LIMIT 까지만 발췌하고 나머지는 출처 URL 로 넘긴다.
+#  - HTML 이 아닌 응답(PDF 등)은 본문을 저장하지 않고 메타데이터만 남긴다.
+EXCERPT_LIMIT = 2000
+HTML_TYPES = ('text/html', 'application/xhtml')
+
 
 def kst_today() -> str:
     return (datetime.datetime.utcnow() + datetime.timedelta(hours=9)).strftime('%Y-%m-%d')
@@ -60,7 +74,7 @@ def slugify(s: str) -> str:
 
 
 def extract(html: str) -> tuple[str, str]:
-    """제목과 본문 텍스트를 뽑는다. 표는 마크다운으로 살린다(사양표가 핵심 자료다)."""
+    """제목과 (표 전량 + 산문 발췌)를 뽑는다. 표가 사양의 근거라 표는 자르지 않는다."""
     soup = BeautifulSoup(html, 'lxml')
     title = soup.title.get_text(strip=True) if soup.title else ''
     for t in soup(DROP_TAGS):
@@ -82,9 +96,13 @@ def extract(html: str) -> tuple[str, str]:
     body = soup.get_text('\n', strip=True)
     body = re.sub(r'\n{3,}', '\n\n', body)
 
-    out = body
+    # 산문은 발췌만 — 전문 복사를 피한다(저장 정책 참조)
+    clipped = len(body) > EXCERPT_LIMIT
+    out = body[:EXCERPT_LIMIT]
+    if clipped:
+        out += f'\n\n…(발췌 {EXCERPT_LIMIT}자. 전문은 위 source_url 에서 확인)'
     if parts:
-        out += '\n\n## 표\n\n' + '\n\n'.join(parts)
+        out += '\n\n## 표 (사양 — 전량 보존)\n\n' + '\n\n'.join(parts)
     return title, out
 
 
@@ -96,7 +114,16 @@ def fetch_one(machine: str, url: str, note: str = '') -> pathlib.Path | None:
         print(f'   ✗ {machine} · {url[:70]} — {type(e).__name__}: {e}')
         return None
 
-    title, body = extract(r.text)
+    ctype = r.headers.get('content-type', '').lower()
+    if not any(h in ctype for h in HTML_TYPES):
+        # PDF·이미지 등은 파싱하면 바이너리가 그대로 텍스트로 들어간다.
+        # 본문은 남기지 않고 "여기에 이런 자료가 있다"는 사실만 기록한다.
+        title = machine
+        body = (f'> 이 주소는 HTML 이 아니라 `{ctype or "형식 미상"}` 이라 본문을 저장하지 않았다.\n'
+                f'> 내용 확인이 필요하면 source_url 을 직접 열어야 한다.')
+        print(f'   ⏭️  {machine} · 비-HTML({ctype or "?"}) — 메타데이터만 기록')
+    else:
+        title, body = extract(r.text)
     SOURCES.mkdir(parents=True, exist_ok=True)
     path = SOURCES / f'{machine}-{slugify(url)}.md'
     path.write_text(
@@ -111,6 +138,26 @@ def fetch_one(machine: str, url: str, note: str = '') -> pathlib.Path | None:
         encoding='utf-8')
     print(f'   ✓ {machine} · {len(body):,}자 → {path.relative_to(ROOT)}')
     return path
+
+
+def mark_done(done_urls: set[str]) -> int:
+    """수집에 성공한 줄을 `- [x]` 로 체크한다.
+
+    **왜 필요한가** — 예전엔 대기열을 읽기만 하고 체크하지 않아서, 매주 월요일마다
+    같은 URL 을 다시 받았다(2026-08-31 확인: 완료 0건, 대기 14건 그대로).
+    낭비일 뿐 아니라 남의 사이트를 매주 불필요하게 두드리는 일이다.
+    """
+    if not QUEUE.exists() or not done_urls:
+        return 0
+    out, n = [], 0
+    for line in QUEUE.read_text(encoding='utf-8').splitlines():
+        m = re.match(r'(\s*-\s*)\[ \](\s*\S+\s+)(https?://\S+)(.*)', line)
+        if m and m.group(3) in done_urls:
+            line = f'{m.group(1)}[x]{m.group(2)}{m.group(3)}{m.group(4)}'
+            n += 1
+        out.append(line)
+    QUEUE.write_text('\n'.join(out) + '\n', encoding='utf-8')
+    return n
 
 
 def read_queue() -> list[tuple[str, str, str]]:
@@ -161,9 +208,16 @@ def main() -> int:
         return 0
 
     print(f'로스터기 자료 {len(targets)}건 수집')
-    got = [p for m, u, n in targets if (p := fetch_one(m, u, n))]
+    got, done_urls = [], set()
+    for m, u, n in targets:
+        path = fetch_one(m, u, n)
+        if path:
+            got.append(path)
+            done_urls.add(u)
 
-    print(f'\n수집 완료 {len(got)}/{len(targets)}건')
+    # 성공한 것만 체크한다 — 실패한 URL 은 대기열에 남아 다음 실행이 다시 시도한다.
+    marked = mark_done(done_urls)
+    print(f'\n수집 완료 {len(got)}/{len(targets)}건 · 대기열 체크 {marked}건')
     pending = unverified_machines()
     if pending:
         print(f'검증 대기 기기 {len(pending)}대: {", ".join(pending)}')

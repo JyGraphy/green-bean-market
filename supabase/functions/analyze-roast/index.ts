@@ -280,7 +280,7 @@ chart app and total roast time, then apply that entry.
     confirmed technical detail (measurement principle, numeric offset vs. the classic BT probe,
     or whether it changes the post-charge dip shape) was found beyond this marketing description
     — do NOT invent an offset number or assume it removes the turning point, similar to the
-    caution already applied to Aillio's IBTS in `aillio-bullet-r1.md`. If a curve is labeled
+    caution already applied to Aillio's IBTS in \`aillio-bullet-r1.md\`. If a curve is labeled
     "X-Lens" in the legend, read it as an additional/alternative BT-family line and flag any
     unusual behavior (e.g. no dip) as an open question rather than an error.
   - This document covers the **850g S7X** specifically. If the user states a different model

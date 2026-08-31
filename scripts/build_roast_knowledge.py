@@ -111,7 +111,38 @@ def build_block(machines: list[dict]) -> str:
     return '\n'.join(lines)
 
 
+def escape_for_template(text: str) -> str:
+    """주입 대상이 **TypeScript 템플릿 리터럴 내부**라서 백틱과 ${ 를 이스케이프한다.
+
+    **왜 필요한가 (2026-08-31 실제 사고)**
+    기기 문서에 마크다운 습관대로 `aillio-bullet-r1.md` 처럼 백틱을 쓰면, 그 백틱이
+    프롬프트를 감싼 템플릿 리터럴을 조기 종료시켜 **함수 전체가 문법 오류**가 된다.
+    실제로 이것 때문에 배포가 실패했고(Expected a semicolon at index.ts:283:50),
+    그동안 실서비스는 옛 프롬프트로 돌고 있었다. 더 나쁜 건 조용히 실패했다는 점이다 —
+    --check 는 텍스트만 비교하므로 통과했고, 배포 단계에서야 드러났다.
+
+    기기 문서를 쓰는 사람이 이 제약을 기억할 필요는 없어야 한다. 여기서 막는다.
+    """
+    return text.replace('\\', '\\\\').replace('`', '\\`').replace('${', '\\${')
+
+
+def assert_template_safe(block: str) -> None:
+    """템플릿 리터럴을 깨뜨릴 문자가 남아 있으면 주입 전에 멈춘다.
+
+    이스케이프를 빼먹거나 build_block 이 바뀌어도 여기서 걸린다. 배포 단계까지
+    가서야 터지면 그 사이 실서비스는 옛 프롬프트로 돈다 — 조용한 실패가 제일 나쁘다.
+    """
+    bad_tick = len(re.findall(r'(?<!\\)`', block))
+    bad_expr = len(re.findall(r'(?<!\\)\$\{', block))
+    if bad_tick or bad_expr:
+        print(f'✗ 주입 중단 — 이스케이프 안 된 백틱 {bad_tick}개 / ${{ {bad_expr}개.\n'
+              f'  이대로 넣으면 analyze-roast 가 문법 오류로 배포 실패합니다.',
+              file=sys.stderr)
+        sys.exit(3)
+
+
 def inject(block: str) -> bool:
+    assert_template_safe(block)
     src = TARGET.read_text(encoding='utf-8')
     if START not in src or END not in src:
         print(f'✗ {TARGET.relative_to(ROOT)} 에 주입 마커가 없습니다.', file=sys.stderr)
@@ -185,7 +216,8 @@ def main():
     a = ap.parse_args()
 
     machines = load_all()
-    block = build_block(machines)
+    # 템플릿 리터럴 안으로 들어가므로 백틱·${ 를 이스케이프한다 (escape_for_template 주석 참고)
+    block = escape_for_template(build_block(machines))
 
     if a.check:
         src = TARGET.read_text(encoding='utf-8')

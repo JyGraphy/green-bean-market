@@ -2,7 +2,7 @@
 
 - machine: fuji-royal
 - source_url: http://kostverlorenvaart.blogspot.com/2014/01/fuji-pxg4-setup-for-coffee-roasting.html
-- fetched_at: 2026-08-24
+- fetched_at: 2026-08-31
 - note: Fuji PXG4 컨트롤러+서모커플 로스팅 셋업 블로그 (세션 WebFetch 403, blogspot 차단)
 
 > 이 파일은 자동 수집된 **원본**이다. 수정하지 않는다.

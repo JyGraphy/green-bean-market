@@ -3,7 +3,7 @@
 
 - machine: loring
 - source_url: https://shop.loring.com/collections/thermocouple
-- fetched_at: 2026-08-24
+- fetched_at: 2026-08-31
 - note: Loring 자체 서모커플 판매 페이지 — BT 프로브 굵기(1.5mm) 공식 확인용
 
 > 이 파일은 자동 수집된 **원본**이다. 수정하지 않는다.
@@ -51,19 +51,19 @@ $316.58
 Sale price
 $316.58
 Sale
-S7 Nighthawk Bean Thermocouple connector lead wire
-S7 Nighthawk Bean Thermocouple connector lead wire
+S15C Falcon bean thermocouple (Harness not included)
+S15C Falcon bean thermocouple (Harness not included)
 Regular price
-$57.04
+$273.24
 Sale price
-$57.04
+$273.24
 Sale
-S15C Falcon bean thermocouple (Harness not included)
-S15C Falcon bean thermocouple (Harness not included)
+S7 Nighthawk Bean Thermocouple connector lead wire
+S7 Nighthawk Bean Thermocouple connector lead wire
 Regular price
-$273.24
+$57.04
 Sale price
-$273.24
+$57.04
 Sale
 S35 Kestrel CMOD Return Air Thermocouple
 S35 Kestrel CMOD Return Air Thermocouple

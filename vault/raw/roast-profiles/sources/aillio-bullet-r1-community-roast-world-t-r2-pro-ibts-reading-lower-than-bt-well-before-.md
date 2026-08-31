@@ -2,7 +2,7 @@
 
 - machine: aillio-bullet-r1
 - source_url: https://community.roast.world/t/r2-pro-ibts-reading-lower-than-bt-well-before-first-crack-on-1200g-batches-normal-behaviour-or-sensor-issue/21143
-- fetched_at: 2026-08-24
+- fetched_at: 2026-08-31
 - note: IBTS-BT 오프셋이 배치 크기에 따라 달라지고 1차크랙 전에는 역전(IBTS<BT)될 수 있다는 실사용 보고
 
 > 이 파일은 자동 수집된 **원본**이다. 수정하지 않는다.

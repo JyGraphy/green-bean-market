@@ -2,7 +2,7 @@
 
 - machine: fuji-royal
 - source_url: https://www.coulton.com/res/IMPXWa.pdf
-- fetched_at: 2026-08-24
+- fetched_at: 2026-08-31
 - note: Fuji Electric PXG4 컨트롤러 공식 매뉴얼 PDF — 온도입력 사양 확인용
 
 > 이 파일은 자동 수집된 **원본**이다. 수정하지 않는다.

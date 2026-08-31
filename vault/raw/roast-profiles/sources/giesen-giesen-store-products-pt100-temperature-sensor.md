@@ -3,7 +3,7 @@
 
 - machine: giesen
 - source_url: https://giesen.store/products/pt100-temperature-sensor
-- fetched_at: 2026-08-24
+- fetched_at: 2026-08-31
 - note: PT100 프로브 종류(빈/에어, 길이·두께별) 공식 판매 사양 (세션 WebFetch 403)
 
 > 이 파일은 자동 수집된 **원본**이다. 수정하지 않는다.
@@ -13,9 +13,9 @@
 
 PT100 Temperature sensor
  – Giesen Roasting Solutions
+03:12 AM
 files/ChatGPT_Image_Apr_23_2026_01_48_20_PM.png
-01:24 AM
-01:24 AM
+03:12 AM
 Meteen naar de content
 Please note that the delivery time for certain items may be extended due to a production shutdown during the summer holiday period.
 Welcome to our store
@@ -31,12 +31,12 @@ van
 Giesen Coffee Roasters
 PT100 Temperature sensor
 PT100 Temperature sensor
-26 op voorraad
+22 op voorraad
 Loading....!
-01:24 AM
+03:12 AM
 Loading locations...
 files/ChatGPT_Image_Apr_23_2026_01_48_20_PM.png
-01:24 AM
+03:12 AM
 Normale prijs
 €73,75 EUR
 Normale prijs

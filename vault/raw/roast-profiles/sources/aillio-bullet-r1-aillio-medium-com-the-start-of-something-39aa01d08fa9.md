@@ -2,7 +2,7 @@
 
 - machine: aillio-bullet-r1
 - source_url: https://aillio.medium.com/the-start-of-something-39aa01d08fa9
-- fetched_at: 2026-08-24
+- fetched_at: 2026-08-31
 - note: IBTS 공식 소개 글 원문 (세션 WebFetch 403, medium 차단)
 
 > 이 파일은 자동 수집된 **원본**이다. 수정하지 않는다.

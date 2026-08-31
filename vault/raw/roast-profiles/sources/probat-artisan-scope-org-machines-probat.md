@@ -2,7 +2,7 @@
 
 - machine: probat
 - source_url: https://artisan-scope.org/machines/probat/
-- fetched_at: 2026-08-24
+- fetched_at: 2026-08-31
 - note: Probat-Artisan 연동 페이지 원문 — 샘플링 주기·로그 포맷 확인용 (세션 WebFetch 403)
 
 > 이 파일은 자동 수집된 **원본**이다. 수정하지 않는다.

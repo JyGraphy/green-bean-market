@@ -1,4 +1,4 @@
-# Stronghold S7X (850g 배치, Roastware / Boost)
+# Stronghold S7X (배치 150g–850g, Roastware / Boost)
 
 <!-- 2026-08-31 갱신: 이 문서에 "S7X"라는 모델명이 한 번도 없어 어느 모델을 검증한 것인지
      불명확했다. 아래에서 모델을 특정하고, 기존 verified:yes 의 적용 범위를 S7X 세대로
@@ -8,11 +8,12 @@
 - temp_probe: BT+ET (원두 표면/내부) + S7X 추가 "X-Lens" 비접촉 센서(측정 원리·응답특성 미확인, 아래 판독 규칙 참고)
 - typical_total_time: 10–16분
 - chart_app: Roastware / Boost web app (dark UI, Korean labels)
-- verified: yes — 단, **S7X(850g) 세대 한정.** 근거는 아래 '모델 확정 근거' 참고.
+- verified: yes — 단, **S7X 세대 한정.** 근거는 아래 '모델 확정 근거' 참고.
 
 ## 모델 확정 근거 (S7X)
 
-- Stronghold 공식/판매처 자료에 따르면 S7X는 **850g 배치**의 100% 전기 로스터로, 2026 US
+- Stronghold **공식 제품 페이지(2026-09-01 수집)** 기준 S7X 배치 용량은 **150g–850g**이다
+  (기존 문서에 '850g'로만 적혀 있던 것을 정정 — 850g 은 최대치다). 100% 전기 로스터로, 2026 US
   Coffee Roasters Championship 및 2025-26 Best of Panama / Best of Hawaii 공식 로스터기로
   쓰였다.
 - S7X의 핵심 차별점은 **드럼 히터(Drum Heater)를 별도 제어 채널로 추가**한 것이다: 판매처
@@ -50,7 +51,7 @@
   caution already applied to Aillio's IBTS in `aillio-bullet-r1.md`. If a curve is labeled
   "X-Lens" in the legend, read it as an additional/alternative BT-family line and flag any
   unusual behavior (e.g. no dip) as an open question rather than an error.
-- This document covers the **850g S7X** specifically. If the user states a different model
+- This document covers the **S7X (150g–850g batch)** specifically. If the user states a different model
   (plain "S7", "S7 Pro" without X, or the larger "S9X"), do NOT assume the same 4-channel
   heat-source layout or the same batch size — those are separate machines with their own
   (currently undocumented) control-curve sets.

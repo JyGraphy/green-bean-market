@@ -4,12 +4,26 @@
      아직 실측 차트가 없어 verified: no 로 둔다. -->
 
 - heat_source: 드럼(전도)+열풍(대류) 하이브리드(반열풍) — "소켓식 일체형 버너"(가스 추정, 전기식 여부 미확인)
-- temp_probe: 미확인 — 800G 모델의 기본 BT/ET 탑재 여부 확정 못함(아래 판독 규칙 참고)
+- temp_probe: BT + ET (Artisan 공식 연동 문서로 확인 — 이지스터 계열은 원두온도·환경온도를 로깅). 일부 기종은 배기온도를 3번째 채널로 제공. 800G가 어느 계열(Autonics TK4 PID / Smart)인지는 미확인
 - typical_total_time: 미확인 — 시간당 최대 처리량 3kg라는 수치만 확인, 분당 로스팅 시간은 역산하지 말 것
-- chart_app: Artisan(이지스터 계열 일반 — Autonics TK4 PID+MODBUS, 800G 개별 확인 아님) 추정 + 제조사 자체 "컴퓨터 프로파일링" 언급(상세 미확인)
+- chart_app: Artisan 공식 지원 — Autonics TK4 PID 탑재기는 MODBUS RTU(USB, 시리얼 드라이버 필요), Smart 시리즈(터치 디스플레이)는 MODBUS TCP(WiFi). 800G 개별 확인은 아님
 - verified: no
 
 ## 판독 규칙
+
+- CONFIRMED CHANNELS (Artisan official integration docs, 2026-09-01): Easyster machines log
+  BEAN TEMPERATURE (BT) and ENVIRONMENTAL TEMPERATURE (ET). SOME models additionally expose
+  EXHAUST TEMPERATURE as a THIRD temperature channel. So a 3-temperature Easyster chart is
+  normal and expected — do NOT assume the third line is a mislabeled duplicate of ET.
+- The "Smart" series (touch display) additionally logs DRUM PRESSURE (Pa), DRUM and FAN SPEED
+  (RPM), and BURNER LEVEL (%). If those non-temperature channels are present, the machine is a
+  Smart-series unit; read them on their own axes and never confuse burner % with a temperature.
+- ⚠️ WHICH SERIES the 800G belongs to is NOT confirmed. Do not assert TK4-PID vs Smart from the
+  model number alone — infer it from which channels actually appear in the uploaded chart.
+- OPTIONAL HARDWARE (manufacturer product page): exhaust-fan/air-pressure control, a digital
+  micro-pressure gauge, and drum-speed control are PURCHASE OPTIONS on the 800G, not standard.
+  Therefore the presence or absence of drum-pressure / drum-speed / fan-speed curves varies
+  between two 800G units. A missing channel is a configuration difference, NOT a reading error.
 
 - This is a Korean semi-hot-air (반열풍) HYBRID drum roaster: heat comes from a burner-fed duct
   combining drum conduction with hot-air convection, NOT a pure direct-fire drum and NOT a

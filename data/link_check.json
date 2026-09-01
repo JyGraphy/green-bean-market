@@ -1,51 +1,51 @@
 {
-  "checked_at": "2026-09-01T00:24:33Z",
-  "total": 1223,
+  "checked_at": "2026-09-01T23:08:50Z",
+  "total": 1237,
   "removed": [],
   "held_stores": [],
   "timing": {
-    "elapsed_sec": 485.5,
-    "requests": 994,
+    "elapsed_sec": 526.2,
+    "requests": 1008,
     "skipped_unknown": 229,
     "slowest_domains": [
       {
         "domain": "comansa.kr",
-        "sec": 485.4,
-        "count": 324
+        "sec": 526.2,
+        "count": 325
       },
       {
         "domain": "www.gsc.coffee",
-        "sec": 129.1,
-        "count": 74
+        "sec": 142.8,
+        "count": 77
       },
       {
         "domain": "www.micoffee.co.kr",
-        "sec": 104.0,
-        "count": 75
-      },
-      {
-        "domain": "www.blessbean.co.kr",
-        "sec": 90.0,
-        "count": 89
+        "sec": 127.5,
+        "count": 76
       },
       {
         "domain": "momos.co.kr",
-        "sec": 82.7,
-        "count": 68
+        "sec": 94.8,
+        "count": 78
+      },
+      {
+        "domain": "www.blessbean.co.kr",
+        "sec": 92.2,
+        "count": 89
       },
       {
         "domain": "wbeans.com",
-        "sec": 72.6,
+        "sec": 78.9,
         "count": 42
       },
       {
         "domain": "www.cobeans.com",
-        "sec": 70.1,
+        "sec": 72.6,
         "count": 86
       },
       {
         "domain": "coffeeplant.co.kr",
-        "sec": 64.7,
+        "sec": 65.3,
         "count": 54
       }
     ]
@@ -67,7 +67,7 @@
       "ambiguous": 18
     },
     "모모스커피": {
-      "ok": 68,
+      "ok": 78,
       "dead": 0,
       "ambiguous": 0
     },
@@ -82,7 +82,7 @@
       "ambiguous": 0
     },
     "엠아이커피": {
-      "ok": 75,
+      "ok": 76,
       "dead": 0,
       "ambiguous": 0
     },
@@ -97,17 +97,17 @@
       "ambiguous": 0
     },
     "지에스씨(GSC)": {
-      "ok": 74,
+      "ok": 77,
       "dead": 0,
       "ambiguous": 0
     },
     "커만사": {
-      "ok": 324,
+      "ok": 325,
       "dead": 0,
       "ambiguous": 0
     },
     "커피리브레": {
-      "ok": 20,
+      "ok": 19,
       "dead": 0,
       "ambiguous": 0
     },

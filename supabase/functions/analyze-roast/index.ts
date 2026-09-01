@@ -102,7 +102,7 @@ chart app and total roast time, then apply that entry.
 | IKAWA Pro (50g / 100g) | 열풍(대류) — fluid-bed | 배기온도만 (원두 프로브 없음) | 3–10분 | IKAWA Pro app |
 | Loring (S15 Falcon / S35 Kestrel / S70 Peregrine) | 열풍(대류) — single burner heats inlet air, not the drum (smokeless afterburner) | BT(빠른 ~1.5mm 프로브)+ET(배기) | 10–16분 (예: S15 배치 15kg). 대형기(S35/S70)도 배치만 커질 뿐 시간대는 유사 | Cropster (Roasting Intelligence) / Loring 자체 제어 소프트웨어 ("Roast Architect") |
 | Probat (Probatone / P Series) | 드럼(전도) — gas burner + drum/air thermocouples | BT+ET (P series 표준, 구형 Probatone 2 base는 BT만) | 10–20분 (상업용 배치 5–60kg) | Artisan / Cropster (자체 차트 앱 없음, 외부 소프트웨어 연동) |
-| ROEST (S100 / S100 Plus / L100 계열 샘플 로스터, 노르웨이) | 하이브리드 — 열풍(대류)을 주 열원으로 쓰되 원두를 띄우지 않고(NOT fluid-bed) | BT+ET 추정 + inlet(유입 공기) 센서 + 자동 1차크랙 감지 센서 — 검색 요약 기준, | 6–7분 (n=1 학술 논문 기준, ROEST 공식 typical range 아님 — 아래 판독 규칙 참고) | ROEST 자체 앱(터치 컨트롤러+클라우드 프로파일 라이브러리로 알려짐, 세부 미확인) |
+| ROEST 샘플 로스터 (노르웨이) — 확인된 모델: S100, S200, L200 | 하이브리드 — 열풍(대류)을 주 열원으로 쓰되 원두를 띄우지 않고(NOT fluid-bed) | BT+ET 추정 + inlet(유입 공기) 센서 + 자동 1차크랙 감지 센서 — 검색 요약 기준, | 6–7분 (n=1 학술 논문 기준, ROEST 공식 typical range 아님 — 아래 판독 규칙 참고) | ROEST 자체 앱(터치 컨트롤러+클라우드 프로파일 라이브러리로 알려짐, 세부 미확인) |
 | Stronghold S7X Pro (배치 150g–850g, Roastware / Boost) | 하이브리드 — 열풍(대류)+할로겐(복사)+드럼히터(전도), 제조사 명칭 "Triple Heat System+"(S7X 세대: 열풍 2kW/할로겐 1.5kW/드럼히터 2kW급으로 보도됨) | BT+ET (원두 표면/내부) + S7X 추가 "X-Lens" 비접촉 센서(측정 원리·응답특성 미확인, 아래 판독 규칙 참고) | 10–16분 | Roastware / Boost web app (dark UI, Korean labels) |
 | 태환 Proaster (Taehwan Automation) | 드럼(전도) — 드럼 하부 열원(가스 또는 전기, 모델별 상이) | 모델별 상이 — Artisan 연동은 THCR-01/01A/03/06/12/25 공식 지원 확인, 일부 모델 "3 TEMP" 가이드 존재(채널 구성은 미확인) | 5–20분 (모델별 편차 큼) — 확인 지점: THCR-01A 500g–1.5kg/5–20분, THCR-06 2–10kg/약10–15분 | 모델별 Artisan 연동 지원(공식 설치 매뉴얼 확인) + 자체 로깅 프로그램 "DAQ MASTER"(상세 기능 미확인) |
 
@@ -221,6 +221,16 @@ chart app and total roast time, then apply that entry.
   - FLUID-BED air roaster — there is NO bean-temperature probe. Never invent a BT probe reading.
   - Temperature curves are setpoint (target) vs actual AIR temperature. If both inlet and exhaust
     are shown, treat EXHAUST as BT and INLET as ET. If only one line, output it as BT.
+  - MANUFACTURER COLOUR MAPPING (IKAWA's own Profile Library page, fetched 2026-09-01 — see
+    sources/ikawa-pro-www-ikawacoffee-com-pro-sample-roaster-profiles.md): on IKAWA profile
+    charts the RED line is the EXHAUST profile and the YELLOW line is the INLET profile.
+    Use this only as a FALLBACK when the on-image legend is missing or unreadable — PHASE 0
+    (read the legend) still wins if a legend is present, because users may re-colour exports.
+  - BATCH-SIZE CAVEAT (same source, manufacturer statement): exhaust profiles are described as
+    compatible across all IKAWA Pro roasters, but INLET profiles "do not translate across
+    different batch sizes". So an inlet-temperature value read from a Pro50 chart is NOT
+    comparable to one from a Pro100/Pro100x. If the user states a batch size or model, do not
+    carry inlet-based expectations over from a different size; say so in notes instead.
   - Fan speed curve (%) has its own axis, usually 60–95%. Report step changes in "agitation"
     as percent ÷ 10 (e.g. 80% → 8).
   - Roasts are SHORT (3–10 min). Do NOT stretch the time axis to drum-roaster lengths —
@@ -287,7 +297,7 @@ chart app and total roast time, then apply that entry.
     this only as a loose sanity check that first-crack timing anywhere from ~8–12+ min into a
     drum roast on this class of machine is plausible.
 
-▶ ROEST (S100 / S100 Plus / L100 계열 샘플 로스터, 노르웨이)
+▶ ROEST 샘플 로스터 (노르웨이) — 확인된 모델: S100, S200, L200
   - This is a SMALL-BATCH ELECTRIC sample roaster (batch capacity reported as 50–200g), NOT a
     commercial drum roaster. Do not apply Probat/Loring/Giesen-scale batch or timing assumptions.
   - Heat transfer is described (by manufacturer/reseller sources) as a HYBRID: primarily hot-air

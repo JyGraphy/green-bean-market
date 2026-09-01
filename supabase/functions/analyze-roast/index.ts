@@ -82,7 +82,7 @@ Identify the app, then map each curve using the legend you read in PHASE 0.
 
 // <<<MACHINE_KNOWLEDGE_START>>>
 // 자동 생성 — 직접 수정 금지. 원본: vault/raw/roast-profiles/machines/*.md
-// 등록 기기 9대
+// 등록 기기 10대
 
 ════════════════════════════════════════
 PHASE 1-B — MACHINE-SPECIFIC READING RULES (verified knowledge base)
@@ -102,6 +102,7 @@ chart app and total roast time, then apply that entry.
 | IKAWA Pro (50g / 100g) | 열풍(대류) — fluid-bed | 배기온도만 (원두 프로브 없음) | 3–10분 | IKAWA Pro app |
 | Loring (S15 Falcon / S35 Kestrel / S70 Peregrine) | 열풍(대류) — single burner heats inlet air, not the drum (smokeless afterburner) | BT(빠른 ~1.5mm 프로브)+ET(배기) | 10–16분 (예: S15 배치 15kg). 대형기(S35/S70)도 배치만 커질 뿐 시간대는 유사 | Cropster (Roasting Intelligence) / Loring 자체 제어 소프트웨어 ("Roast Architect") |
 | Probat (Probatone / P Series) | 드럼(전도) — gas burner + drum/air thermocouples | BT+ET (P series 표준, 구형 Probatone 2 base는 BT만) | 10–20분 (상업용 배치 5–60kg) | Artisan / Cropster (자체 차트 앱 없음, 외부 소프트웨어 연동) |
+| ROEST (S100 / S100 Plus / L100 계열 샘플 로스터, 노르웨이) | 하이브리드 — 열풍(대류)을 주 열원으로 쓰되 원두를 띄우지 않고(NOT fluid-bed) | BT+ET 추정 + inlet(유입 공기) 센서 + 자동 1차크랙 감지 센서 — 검색 요약 기준, | 6–7분 (n=1 학술 논문 기준, ROEST 공식 typical range 아님 — 아래 판독 규칙 참고) | ROEST 자체 앱(터치 컨트롤러+클라우드 프로파일 라이브러리로 알려짐, 세부 미확인) |
 | Stronghold S7X (배치 150g–850g, Roastware / Boost) | 하이브리드 — 열풍(대류)+할로겐(복사)+드럼히터(전도), 제조사 명칭 "Triple Heat System+"(S7X 세대: 열풍 2kW/할로겐 1.5kW/드럼히터 2kW급으로 보도됨) | BT+ET (원두 표면/내부) + S7X 추가 "X-Lens" 비접촉 센서(측정 원리·응답특성 미확인, 아래 판독 규칙 참고) | 10–16분 | Roastware / Boost web app (dark UI, Korean labels) |
 | 태환 Proaster (Taehwan Automation) | 드럼(전도) — 드럼 하부 열원(가스 또는 전기, 모델별 상이) | 모델별 상이 — Artisan 연동은 THCR-01/01A/03/06/12/25 공식 지원 확인, 일부 모델 "3 TEMP" 가이드 존재(채널 구성은 미확인) | 5–20분 (모델별 편차 큼) — 확인 지점: THCR-01A 500g–1.5kg/5–20분, THCR-06 2–10kg/약10–15분 | 모델별 Artisan 연동 지원(공식 설치 매뉴얼 확인) + 자체 로깅 프로그램 "DAQ MASTER"(상세 기능 미확인) |
 
@@ -274,6 +275,40 @@ chart app and total roast time, then apply that entry.
   - Because heat transfer is drum conduction plus burner-heated air (not induction or fluid-bed),
     ROR responds more SLOWLY to burner (gas) changes than IKAWA (fluid-bed) or Aillio (induction) —
     do not expect fast, step-like ROR jumps right after a burner adjustment.
+  - OBSERVED PROFILE RANGES (n=2 documented events, single Probat P5 unit at UC Davis Coffee
+    Center, academic source — see profiles/probat-ucdavis-*.json): a "Fast Start" style profile
+    hit first crack at ~8 min with drop at 16 min; a "Slow Start" style profile hit first crack
+    at ~12 min with the same 16 min drop. Reported start/drop temperatures were ~215±8°C and
+    ~237±2°C respectively (BT vs ET not specified in the source). IMPORTANT CAVEAT: the 16-minute
+    total time was an EXPERIMENTAL DESIGN CHOICE (researchers fixed all 7 tested profiles to the
+    same duration for sampling purposes) — do NOT treat 16 min as this machine's natural/typical
+    roast length, and do NOT lower confidence just because a real Probat P5 chart shows a
+    shorter total time (e.g. 10–12 min, which is more typical for commercial production). Use
+    this only as a loose sanity check that first-crack timing anywhere from ~8–12+ min into a
+    drum roast on this class of machine is plausible.
+
+▶ ROEST (S100 / S100 Plus / L100 계열 샘플 로스터, 노르웨이)
+  - This is a SMALL-BATCH ELECTRIC sample roaster (batch capacity reported as 50–200g), NOT a
+    commercial drum roaster. Do not apply Probat/Loring/Giesen-scale batch or timing assumptions.
+  - Heat transfer is described (by manufacturer/reseller sources) as a HYBRID: primarily hot-air
+    convection, but beans are tumbled by a rotating drum rather than fluidized/lifted by airflow
+    the way IKAWA's fluid-bed works. Treat this as its OWN category — do not apply IKAWA's
+    fluid-bed rules (e.g. "no BT probe") automatically; ROEST is reported to have both BT and ET
+    probes plus an inlet-air sensor, unlike IKAWA which has no bean probe.
+  - OBSERVED PROFILE RANGE (n=1 documented profile config, single academic source, applied to 2
+    origins — see profiles/roest-guatemala-*.json): roast start (read) temperature ~165°C, drop
+    temperature ~205°C, total roast time 6–7 min, development time (first-crack-to-drop) fixed at
+    53 sec by the researchers' controlled protocol. Do NOT treat 6–7 min as ROEST's universal
+    range — this is ONE lab's fixed settings for ONE study, not a manufacturer-published range.
+    If a chart shows a very different total time (e.g. 3 min or 12+ min), do not force it toward
+    6–7 min — ROEST profiles are fully user-programmable and vary widely between users.
+  - Because this is a low-thermal-mass small-batch machine, expect FASTER BT response to heater/
+    airflow changes than a multi-kg drum roaster, but slower than IKAWA's fluid-bed (which has
+    no drum mass at all).
+  - No confirmed proprietary chart color scheme was found — read on-image legend, do not assume
+    fixed BT/ET colors.
+  - When in doubt, prefer "미확인" over inventing a number — this machine has no verified chart
+    test yet (see 검증 대기 below).
 
 ▶ Stronghold S7X (배치 150g–850g, Roastware / Boost)
   - TOP CHART legend reads "■ 원두 표면  ■ 내부":

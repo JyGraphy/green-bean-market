@@ -25,6 +25,17 @@
 - Because heat transfer is drum conduction plus burner-heated air (not induction or fluid-bed),
   ROR responds more SLOWLY to burner (gas) changes than IKAWA (fluid-bed) or Aillio (induction) —
   do not expect fast, step-like ROR jumps right after a burner adjustment.
+- OBSERVED PROFILE RANGES (n=2 documented events, single Probat P5 unit at UC Davis Coffee
+  Center, academic source — see profiles/probat-ucdavis-*.json): a "Fast Start" style profile
+  hit first crack at ~8 min with drop at 16 min; a "Slow Start" style profile hit first crack
+  at ~12 min with the same 16 min drop. Reported start/drop temperatures were ~215±8°C and
+  ~237±2°C respectively (BT vs ET not specified in the source). IMPORTANT CAVEAT: the 16-minute
+  total time was an EXPERIMENTAL DESIGN CHOICE (researchers fixed all 7 tested profiles to the
+  same duration for sampling purposes) — do NOT treat 16 min as this machine's natural/typical
+  roast length, and do NOT lower confidence just because a real Probat P5 chart shows a
+  shorter total time (e.g. 10–12 min, which is more typical for commercial production). Use
+  this only as a loose sanity check that first-crack timing anywhere from ~8–12+ min into a
+  drum roast on this class of machine is plausible.
 
 ## 근거
 
@@ -34,4 +45,11 @@
 - [P Series | PROBAT SE](https://www.probat.com/en/products/shop-roaster/p-series/)
 - [12 Kg - P12-3 Probat Coffee Roaster - coffeetec](https://coffeetec.com/products/12-kg-p12-3-probat-2022-model-excellent-condition-used)
 - [12 kilo Probat P12-2 Probatone Roaster - coffeetec](https://coffeetec.com/products/12-kilo-probat-p12-2-probatone-roaster-amazing-condition-2019-model-used)
+- [The effect of roast profiles on the dynamics of titratable acidity during coffee roasting — Anokye-Bempah et al. 2024, Scientific Reports (PMC11002029)](https://europepmc.org/article/PMC/PMC11002029)
+  — Probat P5(5kg, 천연가스) 실측: FS/SS 프로파일의 시작·투입·1차크랙·배출 시각/온도.
+  vault/raw/roast-profiles/profiles/probat-ucdavis-fs-uganda-washed.json,
+  probat-ucdavis-ss-uganda-washed.json 참고.
+- [A universal color curve for roasted arabica coffee — Anokye-Bempah et al. 2025, Scientific
+  Reports (PMC12234775)](https://europepmc.org/article/PMC/PMC12234775) — 동일 실험실·동일 로스터를
+  "P5 model 2, Probat GmbH, Emmerich am Rhein, Germany"로 모델 특정(교차 확인)
 - 검증 대기 — 실제 Probat/Artisan 차트 이미지로 아직 테스트하지 못함

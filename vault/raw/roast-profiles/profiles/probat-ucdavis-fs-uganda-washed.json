@@ -1,0 +1,32 @@
+{
+  "source_url": "https://europepmc.org/article/PMC/PMC11002029",
+  "source_type": "academic",
+  "collected_at": "2026-09-01",
+  "license_note": "CC BY 4.0 (Anokye-Bempah et al. 2024, Scientific Reports, DOI 10.1038/s41598-024-57256-y) — 수치 인용 가능. 원문 그림(Fig.2/3) 이미지는 재배포하지 않음, 이 파일은 본문 텍스트에 명시된 값만 옮긴 것.",
+  "machine": "probat",
+  "machine_stated_as": "Probat P5 (natural gas drum coffee roaster, 5-kg capacity; PMC12234775 후속 논문에서 'P5 model 2, Probat GmbH, Emmerich am Rhein, Germany'로 모델 특정)",
+  "batch_size_g": 4000,
+  "bean": {
+    "origin": "Uganda, Sipi Falls (USF)",
+    "process": "washed",
+    "variety": "unspecified (Coffea arabica)"
+  },
+  "roast_profile_name": "Fast Start (FS) — high initial heat application, followed by constant deceleration in roast energy",
+  "curve": [],
+  "events": {
+    "charge_sec": 0,
+    "color_change_sec": null,
+    "first_crack_sec": 480,
+    "drop_sec": 960
+  },
+  "temps_c": {
+    "roast_start_temp_c": 215,
+    "roast_start_temp_uncertainty": "±8°C — stated as common to ALL SEVEN profiles tested on this Probat P5 unit, not FS-specific",
+    "roast_drop_temp_c": 237,
+    "roast_drop_temp_uncertainty": "±2°C — also common to all seven profiles",
+    "preheat_temp_c": 210,
+    "preheat_temp_uncertainty": "±5°C, held ≥30 min before charge — this is the drum preheat setpoint, NOT the charge/turning-point temperature"
+  },
+  "notes": "본문 직접 인용: 'The FS roast profile is characterized by a high initial heat application, followed by a constant deceleration in roast energy. It has a relatively short pre-color change phase (4 min), with first crack occurring at approximately 8 min into the roast.' first_crack_sec=480(8분)은 이 문장을 그대로 사용. 표(Table 1)에는 FS의 pre-color 구간이 4.0분이 아니라 5.0분으로 기재돼 있어(본문 서술과 0.5~1분 오차) — 원문 자체의 불일치이며 임의로 하나를 고르지 않고 본문 서술(약 8분)을 채택했다. 전체 로스팅 시간 16분은 '충분한 샘플링 윈도우 확보를 위해 실험 설계상 7개 프로파일 모두 동일하게 고정'한 것이라고 본문에 명시돼 있다 — Probat P5의 자연스러운/전형적 로스팅 시간으로 일반화하지 말 것. roast_start_temp_c(215°C)/roast_drop_temp_c(237°C)가 BT(원두온도)인지 드럼/ET 온도인지 본문에 명시돼 있지 않다 — Cropster Roasting Software(v4.15.2)로 기록했다고만 서술됨. 실제 온도-시간 곡선은 Fig. 2A 이미지로만 존재하며 이 세션에서 이미지를 열람하지 못해 curve 배열은 비워둠(차트 판독 정책 준수).",
+  "n_context": "같은 실험실(UC Davis Coffee Center)의 단일 Probat P5 1대. 이 연구에서 FS/SS 등 7개 프로파일을 만들었으나, 본문 서술로 시각(time)이 명시적으로 확인되는 것은 FS·SS 둘 뿐이다."
+}

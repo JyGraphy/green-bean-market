@@ -1,0 +1,32 @@
+{
+  "source_url": "https://europepmc.org/article/PMC/PMC11002029",
+  "source_type": "academic",
+  "collected_at": "2026-09-01",
+  "license_note": "CC BY 4.0 (Anokye-Bempah et al. 2024, Scientific Reports, DOI 10.1038/s41598-024-57256-y) — 수치 인용 가능. 원문 그림(Fig.2/3) 이미지는 재배포하지 않음, 이 파일은 본문 텍스트에 명시된 값만 옮긴 것.",
+  "machine": "probat",
+  "machine_stated_as": "Probat P5 (natural gas drum coffee roaster, 5-kg capacity; PMC12234775 후속 논문에서 'P5 model 2, Probat GmbH, Emmerich am Rhein, Germany'로 모델 특정)",
+  "batch_size_g": 4000,
+  "bean": {
+    "origin": "Uganda, Sipi Falls (USF)",
+    "process": "washed",
+    "variety": "unspecified (Coffea arabica)"
+  },
+  "roast_profile_name": "Slow Start (SS) — low initial heat application, followed by constant acceleration in roast energy",
+  "curve": [],
+  "events": {
+    "charge_sec": 0,
+    "color_change_sec": null,
+    "first_crack_sec": 720,
+    "drop_sec": 960
+  },
+  "temps_c": {
+    "roast_start_temp_c": 215,
+    "roast_start_temp_uncertainty": "±8°C — stated as common to ALL SEVEN profiles tested on this Probat P5 unit, not SS-specific",
+    "roast_drop_temp_c": 237,
+    "roast_drop_temp_uncertainty": "±2°C — also common to all seven profiles",
+    "preheat_temp_c": 210,
+    "preheat_temp_uncertainty": "±5°C, held ≥30 min before charge — drum preheat setpoint, NOT charge/turning-point temperature"
+  },
+  "notes": "본문 직접 인용: 'Compared to the FS profile, the SS roast profile has a longer pre-color change phase of approximately 8 min, with first crack occurring at 12 min into the roast.' first_crack_sec=720(12분)은 이 문장을 그대로 사용. 표(Table 1)로 역산하면 pre-color 8.5분 + color-to-FC 4.0분 = 12.5분으로 0.5분 차이가 난다 — 원문 표와 서술 간의 사소한 불일치이며, 임의 보정 없이 본문 서술(12분)을 채택했다. 전체 로스팅 시간 16분은 실험 설계상 7개 프로파일 모두 동일하게 고정한 것 — Probat P5의 전형적 로스팅 시간으로 일반화하지 말 것. BT/ET 여부 및 curve 이미지 관련 제약은 FS 프로파일 파일(probat-ucdavis-fs-uganda-washed.json)과 동일하다.",
+  "n_context": "같은 실험실(UC Davis Coffee Center)의 단일 Probat P5 1대. 이 파일은 FS 프로파일과 함께 본문 서술로 시각(time)이 명시적으로 확인되는 두 건 중 하나다."
+}

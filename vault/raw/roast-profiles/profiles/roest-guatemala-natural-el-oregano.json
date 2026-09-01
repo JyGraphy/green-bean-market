@@ -1,0 +1,33 @@
+{
+  "source_url": "https://europepmc.org/article/PMC/PMC8854711",
+  "source_type": "academic",
+  "collected_at": "2026-09-01",
+  "license_note": "CC BY 4.0 (Zarebska et al. 2022, Scientific Reports, DOI 10.1038/s41598-022-06676-9) — 수치 인용 가능, 원문 이미지 재배포 안 함.",
+  "machine": "roest",
+  "machine_stated_as": "ROEST S100 sample roaster",
+  "batch_size_g": null,
+  "batch_size_note": "본문에 로스팅 배치량 명시 없음. 앞 문단에서 녹생두를 100g 단위로 소분·보관했고 '절반은 화학분석용, 절반은 로스팅용'이라고만 서술 — 로스팅량이 약 50g이었을 것으로 추정되나 확정 아님(추정치이므로 batch_size_g는 null로 둔다).",
+  "bean": {
+    "origin": "Guatemala, Huehuetenango — Finca El Oregano (1700 masl)",
+    "process": "natural",
+    "variety": "unspecified (Coffea arabica L.)"
+  },
+  "roast_profile_name": "고정 프로토콜 (연구진이 모든 저장조건 표본에 동일하게 적용한 단일 프로파일)",
+  "curve": [],
+  "events": {
+    "charge_sec": null,
+    "color_change_sec": null,
+    "first_crack_sec": null,
+    "drop_sec": null
+  },
+  "temps_c": {
+    "roast_start_temp_c": 165,
+    "roast_drop_temp_c": 205
+  },
+  "timing": {
+    "total_roast_time_min_range": "6–7",
+    "development_time_sec": 53,
+    "development_time_note": "1차크랙~배출까지의 시간(development time)이 53초로 모든 표본에 동일하게 고정됐다고 본문에 명시. 절대 시각(초 단위 charge/first_crack/drop)은 논문에 없어 events 필드는 비워둠 — timing 필드로 대체."
+  },
+  "notes": "본문 직접 인용: 'A ROEST S100 sample roaster designed for optimal workflow and efficiency in a coffee lab maintained the following conditions: roasting start temperature: 165 °C, final temperature: 205 °C, roasting time: 6–7 min with a fixed airflow and heater setting, and development time: 53 s. The heat application during roasting was the same for each sample in each stage of the roasting process.' 이 파라미터는 저장기간·온도·포장재 조건에 관계없이 모든 로스팅 표본(그린빈 저장실험용)에 동일하게 적용된 것으로, '다양한 프로파일'이 아니라 실험 통제를 위한 단일 고정 프로토콜이다. 로스팅 온도(165→205°C)가 BT인지 ET/환경온도인지 본문에 명시돼 있지 않음 — 미확인으로 남김. 실제 온도-시간 곡선 이미지는 논문에 없음(수치만 산문으로 서술)."
+}

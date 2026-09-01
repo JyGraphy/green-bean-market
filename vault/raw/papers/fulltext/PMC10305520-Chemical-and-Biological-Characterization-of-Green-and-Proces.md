@@ -12,7 +12,7 @@
 | 저자 | Gallardo-Ignacio Javier, Santibáñez Anislada, Oropeza-Mariano Octavio, Salazar Ricardo, Montiel-Ruiz Rosa Mariana, Cabrera-Hilerio Sandra, Gonzáles-Cortazar Manasés, Cruz-Sosa Francisco, Nicasio-Torres Pilar, Morales Patricia, Fernández-Ruiz Virginia, Ciudad-Mulero Maria |
 | 본문 그림 | 4개 |
 | 본문 표 | 6개 |
-| 수집 | 2026-08-31 · scripts/paper_fetch.py (GitHub Actions) |
+| 수집 | 2026-09-01 · scripts/paper_fetch.py (GitHub Actions) |
 
 출처: https://europepmc.org/article/PMC/PMC10305520
 

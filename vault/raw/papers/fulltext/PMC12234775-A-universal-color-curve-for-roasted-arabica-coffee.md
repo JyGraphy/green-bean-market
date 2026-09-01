@@ -12,7 +12,7 @@
 | 저자 | Anokye-Bempah Laudia, Styczynski Timothy, Ristenpart William D., Donis-González Irwin R., Bicho NC, Leitão AE, Ramalho JC, Lidon FC, Samoggia A, Riedel B, Summa CA, de la Calle B, Brohee M, Stadler RH, Anklam E, Ruosi MR, Sacchetti G, Di Mattia C, Pittia P, Mastrocola D, Pathare PB, Opara UL, Al-Said FAJ, Papadakis SE, Abdul-Malek S, Kamdem RE, Yam KL, Santos JR, Odžaković B, Džinić N, Jokanović M |
 | 본문 그림 | 6개 |
 | 본문 표 | 4개 |
-| 수집 | 2026-08-31 · scripts/paper_fetch.py (GitHub Actions) |
+| 수집 | 2026-09-01 · scripts/paper_fetch.py (GitHub Actions) |
 
 출처: https://europepmc.org/article/PMC/PMC12234775
 

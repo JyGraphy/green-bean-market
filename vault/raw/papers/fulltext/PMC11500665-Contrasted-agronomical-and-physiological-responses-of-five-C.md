@@ -12,7 +12,7 @@
 | 저자 | Sarzynski Thuan, Vaast Philippe, Rigal Clément, Marraccini Pierre, Delahaie Boris, Georget Frédéric, Nguyen Chang Thi Quynh, Nguyen Hung Phi, Nguyen Hai Thi Thanh, Ngoc Quyen Luu, Ngan Giang Khong, Bossolasco Laurent, Etienne Hervé |
 | 본문 그림 | 6개 |
 | 본문 표 | 0개 |
-| 수집 | 2026-08-31 · scripts/paper_fetch.py (GitHub Actions) |
+| 수집 | 2026-09-01 · scripts/paper_fetch.py (GitHub Actions) |
 
 출처: https://europepmc.org/article/PMC/PMC11500665
 

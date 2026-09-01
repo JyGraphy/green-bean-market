@@ -2,7 +2,7 @@
 
 _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0) · 2026-09-01_
 
-정리된 주제 **5개** · 원본 문서 **80건**
+정리된 주제 **5개** · 원본 문서 **87건**
 
 ---
 
@@ -91,7 +91,7 @@ _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0
 
 ## ⚠️ 정리 대기
 
-아래 51건은 아직 wiki에 반영되지 않았습니다.
+아래 58건은 아직 wiki에 반영되지 않았습니다.
 정리하려면 Claude에게 다음처럼 지시하세요:
 
 ```
@@ -134,6 +134,8 @@ vault/raw의 아래 문서를 읽고 vault/CLAUDE.md 규칙대로 wiki로 정리
   - raw/roast-profiles/2026-09-01-AI학습현황.md
   - raw/roast-profiles/_수집대기.md
   - raw/roast-profiles/machines/easyster-800.md
+  - raw/roast-profiles/machines/roest.md
+  - raw/roast-profiles/profiles/_README.md
   - raw/roast-profiles/sources/aillio-bullet-r1-aillio-medium-com-the-start-of-something-39aa01d08fa9.md
   - raw/roast-profiles/sources/aillio-bullet-r1-community-roast-world-t-r2-pro-ibts-reading-lower-than-bt-well-before-.md
   - raw/roast-profiles/sources/easyster-800-artisan-scope-org-machines-easyster.md
@@ -142,8 +144,13 @@ vault/raw의 아래 문서를 읽고 vault/CLAUDE.md 규칙대로 wiki로 정리
   - raw/roast-profiles/sources/fuji-royal-kostverlorenvaart-blogspot-com-2014-01-fuji-pxg4-setup-for-coffee-roas.md
   - raw/roast-profiles/sources/fuji-royal-www-coulton-com-res-impxwa-pdf.md
   - raw/roast-profiles/sources/giesen-giesen-store-products-pt100-temperature-sensor.md
+  - raw/roast-profiles/sources/giesen-www-cropster-com-blog-post-2023-world-coffee-roasting-championship.md
+  - raw/roast-profiles/sources/ikawa-pro-www-ikawacoffee-com-blog-roasting-ethiopian-coffee.md
+  - raw/roast-profiles/sources/ikawa-pro-www-ikawacoffee-com-pro-sample-roaster-profiles.md
   - raw/roast-profiles/sources/loring-shop-loring-com-collections-thermocouple.md
   - raw/roast-profiles/sources/probat-artisan-scope-org-machines-probat.md
+  - raw/roast-profiles/sources/roest-www-roestcoffee-com-faqs.md
+  - raw/roast-profiles/sources/roest-www-roestcoffee-com-sampleroaster.md
   - raw/roast-profiles/sources/stronghold-stronghold-coffee-product-s7x-sq.md
   - raw/roast-profiles/sources/taehwan-proaster-taehwan-co-kr-bbs-board-php-bo-table-coffee-roaster-wr-id-30.md
   - raw/roast-profiles/sources/taehwan-proaster-taehwan-co-kr-en-bbs-board-php-bo-table-down-wr-id-1.md

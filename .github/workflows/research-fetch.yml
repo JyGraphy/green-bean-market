@@ -83,6 +83,13 @@ jobs:
 
       # 수집만으로는 AI가 똑똑해지지 않는다 — 기기 규칙을 프롬프트에 주입해야 학습이다.
       # 여기서 supabase/functions/ 가 바뀌면 deploy-functions.yml 이 이어받아 배포한다.
+      # 틀린 기기 지식은 없느니만 못하다 — AI가 확신을 갖고 잘못 읽는다.
+      # 그래서 프롬프트에 넣기 전에 문서 무결성을 먼저 본다.
+      - name: 기기 문서 무결성 검사
+        id: verify
+        continue-on-error: true
+        run: python scripts/verify_machines.py
+
       - name: 로스팅 AI 학습 주입
         id: learn
         continue-on-error: true
@@ -137,5 +144,11 @@ jobs:
           # 학습 주입 실패는 조용히 넘기지 않는다 — 여기가 막히면 아무리 모아도 AI는 그대로다.
           if [ "$L" != "success" ]; then
             echo "::error::로스팅 AI 학습 주입 실패 — 기기 규칙이 프롬프트에 반영되지 않았습니다."
+            exit 1
+          fi
+          # 무결성 검사 실패는 주입을 막지는 않지만(이미 있는 지식까지 묶이면 손해가 크다)
+          # 반드시 표면화한다 — 근거 없는 기기 지식이 실서비스 판독에 쓰이고 있다는 뜻이다.
+          if [ "${{ steps.verify.outcome }}" != "success" ]; then
+            echo "::error::기기 문서 무결성 검사 실패 — 위 '기기 문서 무결성 검사' 로그를 확인하세요."
             exit 1
           fi

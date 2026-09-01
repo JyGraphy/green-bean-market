@@ -97,13 +97,13 @@ chart app and total roast time, then apply that entry.
 |---|---|---|---|---|
 | Aillio Bullet R1 (v2 / R2 Pro) | 하이브리드 — 드럼 + 유도가열(IH), 가스/화염 아님 | BT+ET + 선택형 IBTS(적외선 표면센서, 열지연 없음) | 8–12분 (배치 약 400g–1.2kg) | RoasTime (Aillio 자체 앱) |
 | EASYSTER 800G (이지스터 800, 한국 로스터기 제조사) | 드럼(전도)+열풍(대류) 하이브리드(반열풍) — "소켓식 일체형 버너"(가스 추정, 전기식 여부 미확인) | BT + ET (Artisan 공식 연동 문서로 확인 — 이지스터 계열은 원두온도·환경온도를 로깅). 일부 기종은 배기온도를 3번째 채널로 제공. 800G가 어느 계열(Autonics TK4 PID / Smart)인지는 미확인 | 미확인 — 시간당 최대 처리량 3kg라는 수치만 확인, 분당 로스팅 시간은 역산하지 말 것 | Artisan 공식 지원 — Autonics TK4 PID 탑재기는 MODBUS RTU(USB, 시리얼 드라이버 필요), Smart 시리즈(터치 디스플레이)는 MODBUS TCP(WiFi). 800G 개별 확인은 아님 |
-| 후지로얄 Fuji Royal (R-101 / R-105 등 소형 드럼) | 드럼(전도) — 반직화식(semi-direct fire) 가스 드럼 | 내장 프로브 없음 (국내는 후장착 서모커플+Artisan 조합) | 10–15분 (드럼을 약 200℃로 예열 후 150℃ 부근으로 낮춰 투입) | Artisan (자체 차트 앱 없음 — 후장착 프로브+Artisan 조합이 일반적) |
+| 후지로얄 Fuji Royal (소형 드럼 — 구체 모델 미확인) | 드럼(전도) — 반직화식(semi-direct fire) 가스 드럼 | 내장 프로브 없음 (국내는 후장착 서모커플+Artisan 조합) | 10–15분 (드럼을 약 200℃로 예열 후 150℃ 부근으로 낮춰 투입) | Artisan (자체 차트 앱 없음 — 후장착 프로브+Artisan 조합이 일반적) |
 | Giesen (W6 / W15 / W30 시리즈) | 드럼(전도) — 가스버너 + 간접 드럼 가열(indirect-drum) 재킷 | BT+ET 옵션 (PT100 이중 프로브) | 약 12–13분 (실측 예: 브라질 옐로우 부르봉, 최종 BT 200℃ 기준 4회 평균 12:50) | Artisan / Cropster / Giesen Profiler (자체 소프트웨어, 2.0부터 색상 커스터마이징 가능) |
 | IKAWA Pro (50g / 100g) | 열풍(대류) — fluid-bed | 배기온도만 (원두 프로브 없음) | 3–10분 | IKAWA Pro app |
 | Loring (S15 Falcon / S35 Kestrel / S70 Peregrine) | 열풍(대류) — single burner heats inlet air, not the drum (smokeless afterburner) | BT(빠른 ~1.5mm 프로브)+ET(배기) | 10–16분 (예: S15 배치 15kg). 대형기(S35/S70)도 배치만 커질 뿐 시간대는 유사 | Cropster (Roasting Intelligence) / Loring 자체 제어 소프트웨어 ("Roast Architect") |
 | Probat (Probatone / P Series) | 드럼(전도) — gas burner + drum/air thermocouples | BT+ET (P series 표준, 구형 Probatone 2 base는 BT만) | 10–20분 (상업용 배치 5–60kg) | Artisan / Cropster (자체 차트 앱 없음, 외부 소프트웨어 연동) |
 | ROEST (S100 / S100 Plus / L100 계열 샘플 로스터, 노르웨이) | 하이브리드 — 열풍(대류)을 주 열원으로 쓰되 원두를 띄우지 않고(NOT fluid-bed) | BT+ET 추정 + inlet(유입 공기) 센서 + 자동 1차크랙 감지 센서 — 검색 요약 기준, | 6–7분 (n=1 학술 논문 기준, ROEST 공식 typical range 아님 — 아래 판독 규칙 참고) | ROEST 자체 앱(터치 컨트롤러+클라우드 프로파일 라이브러리로 알려짐, 세부 미확인) |
-| Stronghold S7X (배치 150g–850g, Roastware / Boost) | 하이브리드 — 열풍(대류)+할로겐(복사)+드럼히터(전도), 제조사 명칭 "Triple Heat System+"(S7X 세대: 열풍 2kW/할로겐 1.5kW/드럼히터 2kW급으로 보도됨) | BT+ET (원두 표면/내부) + S7X 추가 "X-Lens" 비접촉 센서(측정 원리·응답특성 미확인, 아래 판독 규칙 참고) | 10–16분 | Roastware / Boost web app (dark UI, Korean labels) |
+| Stronghold S7X Pro (배치 150g–850g, Roastware / Boost) | 하이브리드 — 열풍(대류)+할로겐(복사)+드럼히터(전도), 제조사 명칭 "Triple Heat System+"(S7X 세대: 열풍 2kW/할로겐 1.5kW/드럼히터 2kW급으로 보도됨) | BT+ET (원두 표면/내부) + S7X 추가 "X-Lens" 비접촉 센서(측정 원리·응답특성 미확인, 아래 판독 규칙 참고) | 10–16분 | Roastware / Boost web app (dark UI, Korean labels) |
 | 태환 Proaster (Taehwan Automation) | 드럼(전도) — 드럼 하부 열원(가스 또는 전기, 모델별 상이) | 모델별 상이 — Artisan 연동은 THCR-01/01A/03/06/12/25 공식 지원 확인, 일부 모델 "3 TEMP" 가이드 존재(채널 구성은 미확인) | 5–20분 (모델별 편차 큼) — 확인 지점: THCR-01A 500g–1.5kg/5–20분, THCR-06 2–10kg/약10–15분 | 모델별 Artisan 연동 지원(공식 설치 매뉴얼 확인) + 자체 로깅 프로그램 "DAQ MASTER"(상세 기능 미확인) |
 
 ▶ Aillio Bullet R1 (v2 / R2 Pro)
@@ -176,7 +176,7 @@ chart app and total roast time, then apply that entry.
   - When in doubt, prefer stating "미확인" / lowering confidence over inventing a specific number
     for this machine — no verified chart exists yet to check assumptions against.
 
-▶ 후지로얄 Fuji Royal (R-101 / R-105 등 소형 드럼)
+▶ 후지로얄 Fuji Royal (소형 드럼 — 구체 모델 미확인)
   - This is an older-style small semi-direct-fire drum roaster with NO built-in data port or
     proprietary charting software. In Korea it is almost always paired with an aftermarket
     thermocouple + Artisan (occasionally Cropster) — so a chart labeled "Fuji Royal" actually
@@ -310,7 +310,7 @@ chart app and total roast time, then apply that entry.
   - When in doubt, prefer "미확인" over inventing a number — this machine has no verified chart
     test yet (see 검증 대기 below).
 
-▶ Stronghold S7X (배치 150g–850g, Roastware / Boost)
+▶ Stronghold S7X Pro (배치 150g–850g, Roastware / Boost)
   - TOP CHART legend reads "■ 원두 표면  ■ 내부":
     BT = 원두 표면 (bean surface), ET = 내부 (internal drum). Match legend swatch colors.
     Sanity check only: BT usually finishes HIGHER than ET at drop.

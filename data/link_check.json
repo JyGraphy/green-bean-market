@@ -1,51 +1,51 @@
 {
-  "checked_at": "2026-09-01T23:08:50Z",
-  "total": 1237,
+  "checked_at": "2026-09-02T23:09:12Z",
+  "total": 1242,
   "removed": [],
   "held_stores": [],
   "timing": {
-    "elapsed_sec": 526.2,
-    "requests": 1008,
+    "elapsed_sec": 514.9,
+    "requests": 1013,
     "skipped_unknown": 229,
     "slowest_domains": [
       {
         "domain": "comansa.kr",
-        "sec": 526.2,
-        "count": 325
+        "sec": 514.9,
+        "count": 329
       },
       {
         "domain": "www.gsc.coffee",
-        "sec": 142.8,
-        "count": 77
-      },
-      {
-        "domain": "www.micoffee.co.kr",
-        "sec": 127.5,
-        "count": 76
-      },
-      {
-        "domain": "momos.co.kr",
-        "sec": 94.8,
+        "sec": 152.7,
         "count": 78
       },
       {
+        "domain": "www.micoffee.co.kr",
+        "sec": 116.4,
+        "count": 75
+      },
+      {
         "domain": "www.blessbean.co.kr",
-        "sec": 92.2,
-        "count": 89
+        "sec": 93.5,
+        "count": 90
+      },
+      {
+        "domain": "momos.co.kr",
+        "sec": 93.4,
+        "count": 78
       },
       {
         "domain": "wbeans.com",
-        "sec": 78.9,
+        "sec": 76.4,
         "count": 42
       },
       {
         "domain": "www.cobeans.com",
-        "sec": 72.6,
+        "sec": 72.9,
         "count": 86
       },
       {
         "domain": "coffeeplant.co.kr",
-        "sec": 65.3,
+        "sec": 65.4,
         "count": 54
       }
     ]
@@ -72,7 +72,7 @@
       "ambiguous": 0
     },
     "블레스빈": {
-      "ok": 89,
+      "ok": 90,
       "dead": 0,
       "ambiguous": 0
     },
@@ -82,7 +82,7 @@
       "ambiguous": 0
     },
     "엠아이커피": {
-      "ok": 76,
+      "ok": 75,
       "dead": 0,
       "ambiguous": 0
     },
@@ -97,12 +97,12 @@
       "ambiguous": 0
     },
     "지에스씨(GSC)": {
-      "ok": 77,
+      "ok": 78,
       "dead": 0,
       "ambiguous": 0
     },
     "커만사": {
-      "ok": 325,
+      "ok": 329,
       "dead": 0,
       "ambiguous": 0
     },

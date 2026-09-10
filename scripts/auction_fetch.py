@@ -13,6 +13,7 @@
     python3 scripts/auction_fetch.py                    # 전체 소스
     python3 scripts/auction_fetch.py --source coe       # COE만
     python3 scripts/auction_fetch.py --source bop       # BOP만
+    python3 scripts/auction_fetch.py --source lamastus  # Lamastus 프라이빗 옥션만
 """
 from __future__ import annotations
 
@@ -70,7 +71,26 @@ def bop_pages(year: int) -> dict[str, str]:
     }
 
 
-SOURCES = {'coe': coe_pages, 'bop': bop_pages}
+def lamastus_pages(year: int) -> dict[str, str]:
+    """Lamastus Family Estates 프라이빗 옥션 — COE·BOP 와 별개로 농장이 직접 연다.
+
+    **왜 추가했나 (2026-09-10)**: 사장님이 "BOP든 COE든 가리지 않고" 각국 옥션을
+    보라고 하셨는데 이 옥션이 빠져 있었다. Elida Estate 게이샤로 파운드당 최고가
+    기록을 여러 번 경신한 곳이라, 스페셜티 가격 흐름을 보려면 빼놓을 수 없다.
+    COE(대회 입상 랏 경매)·BOP(국가 대회 경매)와 달리 **단일 농장 자체 경매**라
+    별도 소스로 둔다.
+
+    URL 은 전부 검색 결과에 실제로 나타난 주소다(추측 금지 원칙).
+    """
+    return {
+        'Lamastus 옥션 공식': 'https://lamastusfamilyestates.auction/',
+        'Lamastus 농장 공식': 'https://lamastusfamilyestates.com/',
+        'Lamastus 프라이빗 옥션 안내': 'https://lamastusfamilyestates.com/pages/our-private-auction',
+        'M-Cultivo Lamastus': 'https://mcultivo.com/customer-stories/lamastus-family-estates',
+    }
+
+
+SOURCES = {'coe': coe_pages, 'bop': bop_pages, 'lamastus': lamastus_pages}
 
 # 낙찰자·낙찰가로 볼 만한 컬럼명 (표 안에 있으면 강조 표시)
 BUYER_HINTS = ('buyer', 'winning', 'winner', 'bid', 'price', 'purchaser', 'sold',
@@ -136,7 +156,8 @@ def write_report(source: str, pages: list[dict], today: str) -> pathlib.Path:
     failed = [p for p in pages if not p['ok']]
     total_tables = sum(len(p['tables']) for p in ok)
 
-    name = {'coe': 'COE (Cup of Excellence)', 'bop': 'BOP (Best of Panama)'}.get(source, source.upper())
+    name = {'coe': 'COE (Cup of Excellence)', 'bop': 'BOP (Best of Panama)',
+            'lamastus': 'Lamastus Family Estates 프라이빗 옥션'}.get(source, source.upper())
 
     L = [
         f'# {name} 옥션 결과 — 전체 랏 수집',

@@ -1,5 +1,10 @@
 {
-  "updated_at": "2026-09-22T00:00:35Z",
-  "stores": [],
-  "total_new": 0
+  "updated_at": "2026-09-22T23:38:51Z",
+  "stores": [
+    {
+      "name": "지에스씨(GSC)",
+      "new_count": 1
+    }
+  ],
+  "total_new": 1
 }

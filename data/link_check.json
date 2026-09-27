@@ -1,51 +1,51 @@
 {
-  "checked_at": "2026-09-26T23:25:57Z",
-  "total": 1296,
+  "checked_at": "2026-09-27T23:39:20Z",
+  "total": 1295,
   "removed": [],
   "held_stores": [],
   "timing": {
-    "elapsed_sec": 488.7,
-    "requests": 1072,
+    "elapsed_sec": 453.9,
+    "requests": 1071,
     "skipped_unknown": 224,
     "slowest_domains": [
       {
         "domain": "comansa.kr",
-        "sec": 488.6,
+        "sec": 453.9,
         "count": 337
       },
       {
         "domain": "www.gsc.coffee",
-        "sec": 185.9,
+        "sec": 170.5,
         "count": 105
       },
       {
         "domain": "www.micoffee.co.kr",
-        "sec": 127.5,
-        "count": 85
+        "sec": 117.9,
+        "count": 84
       },
       {
         "domain": "momos.co.kr",
-        "sec": 98.4,
+        "sec": 98.3,
         "count": 83
       },
       {
         "domain": "www.cobeans.com",
-        "sec": 76.7,
+        "sec": 75.2,
         "count": 95
       },
       {
-        "domain": "wbeans.com",
-        "sec": 67.3,
-        "count": 42
-      },
-      {
         "domain": "www.blessbean.co.kr",
-        "sec": 63.3,
+        "sec": 63.4,
         "count": 98
       },
       {
+        "domain": "wbeans.com",
+        "sec": 62.9,
+        "count": 42
+      },
+      {
         "domain": "coffeeplant.co.kr",
-        "sec": 54.0,
+        "sec": 57.3,
         "count": 48
       }
     ]
@@ -82,7 +82,7 @@
       "ambiguous": 0
     },
     "엠아이커피": {
-      "ok": 85,
+      "ok": 84,
       "dead": 0,
       "ambiguous": 0
     },

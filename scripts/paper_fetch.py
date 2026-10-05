@@ -260,6 +260,40 @@ def read_queue() -> list[str]:
     return ids
 
 
+def mark_queue_done(done: set[str]) -> None:
+    """수집에 **성공한** PMCID만 대기열에서 '완료' 절로 옮긴다.
+
+    이게 없으면 매주 월요일 같은 논문을 Europe PMC에서 다시 받는다(2026-10-05 실측:
+    대기 6건 전부 fulltext/ 에 이미 있는데도 대기 상태로 남아 재수집 중이었다).
+    실패한 건은 체크하지 않고 그대로 둬서 다음 주에 다시 시도되게 한다.
+    """
+    if not done or not QUEUE.exists():
+        return
+    lines = QUEUE.read_text(encoding='utf-8').splitlines()
+    today = time.strftime('%Y-%m-%d')
+    moved = []
+    kept = []
+    for line in lines:
+        m = re.match(r'^-\s*\[ \]\s*(PMC\d+)', line.strip())
+        if m and m.group(1) in done:
+            moved.append(re.sub(r'^(-\s*)\[ \]', r'\1[x]', line) + f'  ✅ {today}')
+        else:
+            kept.append(line)
+    if not moved:
+        return
+
+    out, inserted = [], False
+    for line in kept:
+        out.append(line)
+        if not inserted and line.strip().startswith('## 완료'):
+            out.extend(['', *moved])
+            inserted = True
+    if not inserted:                      # '## 완료' 절이 없으면 끝에 만든다
+        out.extend(['', '## 완료', ''] + moved)
+    QUEUE.write_text('\n'.join(out).rstrip() + '\n', encoding='utf-8')
+    print(f'📋 대기열 정리: {len(moved)}건을 완료로 이동')
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--pmcid', nargs='*', default=[])
@@ -294,10 +328,13 @@ def main():
 
     print(f'전문 수집 {len(targets)}건\n')
     ok = 0
+    done: set[str] = set()
     for pid in dict.fromkeys(targets):
         if process(pid):
             ok += 1
+            done.add(pid)
         time.sleep(DELAY)
+    mark_queue_done(done)
     print(f'\n완료: {ok}/{len(set(targets))}건 저장 → {OUT_DIR.relative_to(ROOT)}')
     if ok == 0:
         sys.exit(1)

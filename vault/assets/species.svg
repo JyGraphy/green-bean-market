@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 790 440" width="100%">
+<defs>
+  <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6"
+          markerHeight="6" orient="auto-start-reverse">
+    <path d="M 0 1 L 9 5 L 0 9 z" fill="#9aa3aa"/>
+  </marker>
+</defs>
+<rect width="790" height="440" fill="#ffffff"/>
+<text x="26" y="34" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="23" font-weight="800"
+      fill="#17202a">① 종(species) 관계도 — 아라비카는 어디서 왔나</text>
+<text x="26" y="56" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="12.5"
+      fill="#6b7280">분류 층위: 속(Coffea) → 종(species) → 품종(variety)</text>
+<text x="10" y="416" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11.5" fill="#5b6166"><tspan font-weight="700">“아라비카 · 로부스타”는 종(species) 이름</tspan><tspan>, </tspan><tspan font-weight="700">“게이샤 · 카투라”는 아라비카 안의 품종 이름</tspan><tspan>이다. 이 둘을 같은 층에 놓고 비교하면 계속 헷갈린다.</tspan></text>
+<path d="M 242 112.5 H 265 V 181.0 H 281" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<rect x="267" y="132.75" width="23.2" height="14" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="271" y="142.75" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="10.5" fill="#5b6166">교배</text>
+<path d="M 242 232.5 H 265 V 181.0 H 281" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 520 181.0 H 539 V 183.5 H 551" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<rect x="541" y="168.25" width="46.0" height="14" rx="3" fill="#ffffff" opacity="0.92"/>
+<text x="545" y="178.25" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="10.5" fill="#5b6166">품종 분화</text>
+<rect x="10" y="74" width="232" height="77" rx="5" fill="#eef0f2" stroke="#4b5563" stroke-width="1.6"/>
+<rect x="10" y="74" width="4" height="77" rx="2" fill="#4b5563"/>
+<text x="22" y="97" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">Coffea eugenioides</text>
+<text x="22" y="114" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">동아프리카 · 2배체(2n=22)</text>
+<text x="22" y="131" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">카페인이 매우 낮다</text>
+<rect x="10" y="194" width="232" height="77" rx="5" fill="#fcebf2" stroke="#be185d" stroke-width="1.6"/>
+<rect x="10" y="194" width="4" height="77" rx="2" fill="#be185d"/>
+<text x="22" y="217" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">Coffea canephora (로부스타)</text>
+<text x="22" y="234" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">2배체(2n=22) · 타가수분</text>
+<text x="22" y="251" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">쓴맛·카페인 높고 병에 강하다</text>
+<rect x="288" y="134" width="232" height="94" rx="5" fill="#e9eefb" stroke="#1d4ed8" stroke-width="1.6"/>
+<rect x="288" y="134" width="4" height="94" rx="2" fill="#1d4ed8"/>
+<text x="300" y="157" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="14" font-weight="700" fill="#17202a">Coffea arabica</text>
+<text x="300" y="174" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">4배체(2n=44) · 자가수분</text>
+<text x="300" y="191" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">두 종이 합쳐진 이질사배체</text>
+<text x="300" y="208" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">약 35만~61만 년 전 단 한 번</text>
+<rect x="558" y="145" width="222" height="77" rx="5" fill="#fbf0e3" stroke="#b45309" stroke-width="1.6"/>
+<rect x="558" y="145" width="4" height="77" rx="2" fill="#b45309"/>
+<text x="570" y="168" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">아라비카 안의 품종(variety)</text>
+<text x="570" y="185" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">티피카 · 부르봉 · 게이샤 · 카투라 …</text>
+<text x="570" y="202" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">이 문서가 다루는 층이 여기다</text>
+<rect x="288" y="306" width="492" height="60" rx="5" fill="#f6f7f8" stroke="#6b7280" stroke-width="1.6" stroke-dasharray="5 3"/>
+<rect x="288" y="306" width="4" height="60" rx="2" fill="#6b7280"/>
+<text x="300" y="329" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">같은 속(Coffea)의 다른 종들</text>
+<text x="300" y="346" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">C. liberica / C. excelsa — 극소수 재배 · C. stenophylla — 2018년 야생 재발견</text>
+</svg>

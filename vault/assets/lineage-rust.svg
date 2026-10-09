@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1030 540" width="100%">
+<defs>
+  <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6"
+          markerHeight="6" orient="auto-start-reverse">
+    <path d="M 0 1 L 9 5 L 0 9 z" fill="#9aa3aa"/>
+  </marker>
+</defs>
+<rect width="1030" height="540" fill="#ffffff"/>
+<text x="26" y="34" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="23" font-weight="800"
+      fill="#17202a">④ 계보도 3 — 로부스타 유전자가 들어온 길</text>
+<text x="26" y="56" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="12.5"
+      fill="#6b7280">아라비카는 유전적 폭이 좁아 병 저항성을 종 안에서 못 찾았다. 그래서 밖에서 끌어왔다 — 대신 컵 품질을 내줬다.</text>
+<rect x="20" y="500" width="15" height="15" rx="3" fill="#fcebf2" stroke="#be185d" stroke-width="1.6"/>
+<text x="41" y="512" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11.5" fill="#4a5258">로부스타 유전자 이입</text>
+<rect x="202" y="500" width="15" height="15" rx="3" fill="#fbf0e3" stroke="#b45309" stroke-width="1.6"/>
+<text x="223" y="512" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11.5" fill="#4a5258">부르봉 계통</text>
+<rect x="384" y="500" width="15" height="15" rx="3" fill="#e9eefb" stroke="#1d4ed8" stroke-width="1.6"/>
+<text x="405" y="512" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11.5" fill="#4a5258">아라비카 본류</text>
+<path d="M 233 148.5 H 238 V 187.0 H 245" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 233 275.0 H 244 V 187.0 H 245" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 490 187.0 H 482 V 168.5 H 495" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 490 310.0 H 474 V 168.5 H 495" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 490 187.0 H 490 V 280.0 H 495" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 490 382.0 H 482 V 280.0 H 495" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 490 187.0 H 466 V 375.0 H 495" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 490 445.5 H 474 V 375.0 H 495" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 740 168.5 H 751.0 V 116.0 H 755" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 740 168.5 H 751.0 V 196.5 H 755" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 740 280.0 H 751.0 V 296.5 H 755" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 740 280.0 H 751.0 V 396.5 H 755" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<rect x="18" y="110" width="215" height="77" rx="5" fill="#fcebf2" stroke="#be185d" stroke-width="1.6"/>
+<rect x="18" y="110" width="4" height="77" rx="2" fill="#be185d"/>
+<text x="30" y="133" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">로부스타</text>
+<text x="30" y="150" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">Coffea canephora</text>
+<text x="30" y="167" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">녹병·커피베리병에 강하다</text>
+<rect x="18" y="245" width="215" height="60" rx="5" fill="#e9eefb" stroke="#1d4ed8" stroke-width="1.6"/>
+<rect x="18" y="245" width="4" height="60" rx="2" fill="#1d4ed8"/>
+<text x="30" y="268" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">아라비카</text>
+<text x="30" y="285" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">맛은 좋은데 병에 약하다</text>
+<rect x="252" y="140" width="238" height="94" rx="5" fill="#fcebf2" stroke="#be185d" stroke-width="1.6"/>
+<rect x="252" y="140" width="4" height="94" rx="2" fill="#be185d"/>
+<text x="264" y="163" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">티모르 하이브리드 (1927)</text>
+<text x="264" y="180" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">티모르섬에서 발견된</text>
+<text x="264" y="197" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">아라비카 × 로부스타 자연 교배종</text>
+<text x="264" y="214" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">컵 품질은 두 종의 중간</text>
+<rect x="252" y="280" width="238" height="60" rx="5" fill="#fbf0e3" stroke="#b45309" stroke-width="1.6"/>
+<rect x="252" y="280" width="4" height="60" rx="2" fill="#b45309"/>
+<text x="264" y="303" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">카투라 (왜성)</text>
+<text x="264" y="320" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">부르봉 돌연변이</text>
+<rect x="252" y="352" width="238" height="60" rx="5" fill="#fbf0e3" stroke="#b45309" stroke-width="1.6"/>
+<rect x="252" y="352" width="4" height="60" rx="2" fill="#b45309"/>
+<text x="264" y="375" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">비야사치 (왜성)</text>
+<text x="264" y="392" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">부르봉 돌연변이</text>
+<rect x="252" y="424" width="238" height="43" rx="5" fill="#e9eefb" stroke="#1d4ed8" stroke-width="1.6"/>
+<rect x="252" y="424" width="4" height="43" rx="2" fill="#1d4ed8"/>
+<text x="264" y="447" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">티피카 · 부르봉</text>
+<rect x="502" y="130" width="238" height="77" rx="5" fill="#fcebf2" stroke="#be185d" stroke-width="1.6"/>
+<rect x="502" y="130" width="4" height="77" rx="2" fill="#be185d"/>
+<text x="514" y="153" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">카티모르 계열</text>
+<text x="514" y="170" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">TH × 카투라</text>
+<text x="514" y="187" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">저고도에서 나무맛·고무 뉘앙스 지적</text>
+<rect x="502" y="250" width="238" height="60" rx="5" fill="#fcebf2" stroke="#be185d" stroke-width="1.6"/>
+<rect x="502" y="250" width="4" height="60" rx="2" fill="#be185d"/>
+<text x="514" y="273" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">사치모르 계열</text>
+<text x="514" y="290" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">TH × 비야사치</text>
+<rect x="502" y="345" width="238" height="60" rx="5" fill="#fcebf2" stroke="#be185d" stroke-width="1.6"/>
+<rect x="502" y="345" width="4" height="60" rx="2" fill="#be185d"/>
+<text x="514" y="368" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">타비 (2002·콜롬비아)</text>
+<text x="514" y="385" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">TH × 티피카·부르봉</text>
+<rect x="762" y="86" width="238" height="60" rx="5" fill="#fcebf2" stroke="#be185d" stroke-width="1.6"/>
+<rect x="762" y="86" width="4" height="60" rx="2" fill="#be185d"/>
+<text x="774" y="109" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">콜롬비아 (1982)</text>
+<text x="774" y="126" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">세니카페 — 카티모르 1세대</text>
+<rect x="762" y="158" width="238" height="77" rx="5" fill="#fcebf2" stroke="#be185d" stroke-width="1.6"/>
+<rect x="762" y="158" width="4" height="77" rx="2" fill="#be185d"/>
+<text x="774" y="181" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">카스티요 (2005)</text>
+<text x="774" y="198" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">세니카페 — 23년 육종</text>
+<text x="774" y="215" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">컵 품질 평가는 논쟁 중</text>
+<rect x="762" y="258" width="238" height="77" rx="5" fill="#fcebf2" stroke="#be185d" stroke-width="1.6"/>
+<rect x="762" y="258" width="4" height="77" rx="2" fill="#be185d"/>
+<text x="774" y="281" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">마르셀레사</text>
+<text x="774" y="298" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">CIRAD·CATIE — 사치모르</text>
+<text x="774" y="315" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">TH 832/2 × 비야사치 CIFC 971/10</text>
+<rect x="762" y="358" width="238" height="77" rx="5" fill="#fcebf2" stroke="#be185d" stroke-width="1.6"/>
+<rect x="762" y="358" width="4" height="77" rx="2" fill="#be185d"/>
+<text x="774" y="381" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">오바타 · IAPAR59 · 투피</text>
+<text x="774" y="398" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">브라질 사치모르 선발</text>
+<text x="774" y="415" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">고고도에서 스페셜티 등급 보고</text>
+</svg>

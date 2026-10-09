@@ -37,6 +37,22 @@ FONT_URL = ('https://raw.githubusercontent.com/google/fonts/main/ofl/'
 
 # 주제별 묶음. 각 항목 = (문서 경로, 섹션 제목, 한 줄 설명)
 PRESETS: dict[str, dict] = {
+    '품종도감': {
+        'title': '커피 품종 도감',
+        'subtitle': '계보도와 품종별 설명 — 품종을 처음 보는 사람을 위한 안내서',
+        'docs': [
+            ('raw/papers/2026-10-09-품종도감.md', '품종 도감',
+             '용어 → 계보도 3장 → 품종 40여 종 개별 설명 → 비교표 → 라벨 읽는 법'),
+            ('raw/papers/2026-10-05-품종-기초이론.md', '부록 — 품종 기초이론',
+             '종 지도·배수체화·분류 5유형을 이론 쪽에서 한 번 더'),
+            ('raw/papers/2026-08-03-wcr-f1하이브리드-스타마야.md',
+             '부록 — 스타마야 F1 하이브리드 원논문 정리',
+             '씨앗으로 번식하는 F1 을 만든 방법'),
+            ('raw/papers/2026-08-03-wcr-커피잎녹병-품종시험.md',
+             '부록 — 29개 품종 × 23개 지역 잎녹병 시험',
+             '"저항성 품종" 라벨을 지역 검증 없이 믿으면 안 되는 이유'),
+        ],
+    },
     '품종': {
         'title': '커피 품종',
         'subtitle': '종(species)·계통(lineage)·분류체계 — 기초이론 종합',
@@ -92,6 +108,31 @@ def ensure_font() -> bool:
 
 WIKILINK = re.compile(r'\[\[([^\]|]+?)(?:\|[^\]]+?)?\]\]')
 CHECKBOX = re.compile(r'^(\s*)-\s*\[( |x|X)\]\s*', re.M)
+# ![설명](assets/x.svg "landscape") — 제목이 landscape 면 가로 페이지 한 장을 통째로 쓴다
+SVGIMG = re.compile(r'^!\[([^\]]*)\]\(([^)\s]+\.svg)(?:\s+"([^"]*)")?\)\s*$', re.M)
+
+
+def inline_svgs(md: str, base: pathlib.Path) -> str:
+    """SVG 이미지를 파일째 본문에 박는다.
+
+    <img src> 로 두면 PDF 에 래스터로 들어가 확대 시 깨지고, 파일 경로가 어긋나면
+    조용히 빈칸이 된다. 인라인 SVG 면 벡터로 들어가고 누락도 바로 드러난다.
+    마크다운 원문은 표준 이미지 문법이라 옵시디언에서도 그대로 보인다.
+    """
+    def sub(m: re.Match) -> str:
+        alt, rel, title = m.group(1), m.group(2), (m.group(3) or '')
+        path = base / rel
+        if not path.exists():
+            print(f'⚠️  SVG 없음: {rel}')
+            return f'> ⚠️ 그림을 찾지 못했다: `{rel}`'
+        svg = path.read_text(encoding='utf-8')
+        land = title == 'landscape'
+        cls = 'fig fig-land' if land else 'fig'
+        # 가로 전면 그림은 SVG 안에 제목이 들어 있다 — 캡션을 또 붙이면 높이를
+        # 넘겨 다음 장으로 밀린다.
+        cap = '' if land or not alt else f'<figcaption>{html.escape(alt)}</figcaption>'
+        return f'<figure class="{cls}">{svg}{cap}</figure>'
+    return SVGIMG.sub(sub, md)
 
 
 def preprocess(md: str) -> str:
@@ -140,11 +181,12 @@ def slugify(text: str, used: set[str]) -> str:
     return s
 
 
-def render_doc(md: str, idx: int, used: set[str]) -> tuple[str, list[tuple[int, str, str]]]:
+def render_doc(md: str, idx: int, used: set[str],
+               base: pathlib.Path) -> tuple[str, list[tuple[int, str, str]]]:
     """마크다운 1건 → (HTML, 목차항목[(레벨, 제목, 앵커)])."""
     import markdown
     body = markdown.markdown(
-        preprocess(md),
+        inline_svgs(preprocess(md), base),
         extensions=['tables', 'fenced_code', 'sane_lists', 'nl2br', 'attr_list'],
     )
 
@@ -255,6 +297,21 @@ blockquote{ margin:3.5mm 0; padding:3mm 4mm; background:var(--soft);
             page-break-inside:avoid; }
 blockquote p:last-child{ margin-bottom:0; }
 
+/* 그림(인라인 SVG) */
+@page land { size: A4 landscape; margin: 11mm; }
+figure.fig{ margin:5mm 0 6mm; page-break-inside:avoid; }
+figure.fig svg{ display:block; width:100%; height:auto; }
+figure.fig figcaption{ margin-top:2.5mm; font-size:8.6pt; color:var(--muted);
+                       text-align:center; }
+/* 큰 계보도는 가로 A4 한 장을 통째로 쓴다 — 세로폭에 욱여넣으면 글자가 안 읽힌다.
+   높이를 고정해야 한다: width:100%/height:auto 로 두면 그림이 인쇄영역보다 길어져
+   아래쪽(범례)이 다음 장으로 잘려 넘어간다. viewBox + preserveAspectRatio 가
+   이 상자 안에 비율 그대로 맞춰 넣는다. */
+figure.fig-land{ page:land; page-break-before:always; page-break-after:always;
+                 margin:0; width:100%; height:168mm;
+                 display:flex; align-items:center; }
+figure.fig-land svg{ width:100%; height:100%; }
+
 /* 코드/위키참조 */
 code{ font-family:ui-monospace,"DejaVu Sans Mono",monospace; font-size:8.9pt;
       background:#eef1f3; padding:.4mm 1.2mm; border-radius:2px;
@@ -277,7 +334,7 @@ def build_html(title: str, subtitle: str, docs: list[tuple[str, str, str]],
         if not path.exists():
             print(f'⚠️  건너뜀 (없음): {rel}')
             continue
-        body, toc = render_doc(path.read_text(encoding='utf-8'), i, used)
+        body, toc = render_doc(path.read_text(encoding='utf-8'), i, used, base)
 
         # 원문 첫 h1 은 섹션 헤더와 중복이라 본문에서 제거한다.
         body = re.sub(r'<h2 id="[^"]*">(?:(?!</h2>).)*?</h2>', '', body, count=1,
@@ -353,13 +410,15 @@ def main() -> int:
     if a.preset:
         p = PRESETS[a.preset]
         title, subtitle, docs = p['title'], p['subtitle'], p['docs']
-        out = pathlib.Path(a.out) if a.out else ROOT / 'vault' / 'pdf' / f'커피-{a.preset}.pdf'
+        out = (pathlib.Path(a.out).resolve() if a.out
+               else ROOT / 'vault' / 'pdf' / f'커피-{a.preset}.pdf')
     else:
         if not a.docs or not a.title:
             ap.error('--preset 을 쓰거나, --title 과 문서 경로를 직접 주세요.')
         title, subtitle = a.title, a.subtitle
         docs = [(d, pathlib.Path(d).stem, '') for d in a.docs]
-        out = pathlib.Path(a.out) if a.out else ROOT / 'vault' / 'pdf' / f'{title}.pdf'
+        out = (pathlib.Path(a.out).resolve() if a.out
+               else ROOT / 'vault' / 'pdf' / f'{title}.pdf')
 
     ensure_font()
 

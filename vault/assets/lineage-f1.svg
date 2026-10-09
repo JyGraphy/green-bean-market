@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 500" width="100%">
+<defs>
+  <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6"
+          markerHeight="6" orient="auto-start-reverse">
+    <path d="M 0 1 L 9 5 L 0 9 z" fill="#9aa3aa"/>
+  </marker>
+</defs>
+<rect width="1120" height="500" fill="#ffffff"/>
+<text x="26" y="34" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="23" font-weight="800"
+      fill="#17202a">⑤ 계보도 4 — F1 하이브리드와 케냐 복합 육종</text>
+<text x="26" y="56" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="12.5"
+      fill="#6b7280">지금 육종의 주류. 저항성 계열과 야생 다양성을 다시 교배해 수확량과 품질을 같이 잡으려는 시도.</text>
+<text x="580" y="420" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11.5" fill="#5b6166">F1 = 유전적으로 먼 두 부모의 1세대. 잡종강세로 수확량·기후 적응폭·내병성이 한꺼번에 올라간다.</text>
+<text x="580" y="440" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11.5" fill="#5b6166">육종 기간도 순계 25~30년 → 10~20년으로 짧다. 난점은 번식이었고, 스타마야가 그것을 풀었다.</text>
+<rect x="20" y="464" width="15" height="15" rx="3" fill="#fcebf2" stroke="#be185d" stroke-width="1.6"/>
+<text x="41" y="476" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11.5" fill="#4a5258">이입 계열</text>
+<rect x="202" y="464" width="15" height="15" rx="3" fill="#eef0f2" stroke="#4b5563" stroke-width="1.6"/>
+<text x="223" y="476" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11.5" fill="#4a5258">야생 수단</text>
+<rect x="384" y="464" width="15" height="15" rx="3" fill="#e6f5f3" stroke="#0d9488" stroke-width="1.6"/>
+<text x="405" y="476" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11.5" fill="#4a5258">F1 하이브리드</text>
+<rect x="566" y="464" width="15" height="15" rx="3" fill="#e8f2f9" stroke="#0369a1" stroke-width="1.6"/>
+<text x="587" y="476" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11.5" fill="#4a5258">케냐 복합 육종</text>
+<path d="M 276 118.5 H 282 V 167.0 H 293" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 276 228.5 H 276 V 167.0 H 293" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 276 340.0 H 288 V 368.5 H 293" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 276 420.0 H 282 V 368.5 H 293" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 276 228.5 H 560 V 148.5 H 573" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 276 228.5 H 552 V 258.5 H 573" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<rect x="18" y="80" width="258" height="77" rx="5" fill="#fcebf2" stroke="#be185d" stroke-width="1.6"/>
+<rect x="18" y="80" width="4" height="77" rx="2" fill="#be185d"/>
+<text x="30" y="103" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">사치모르 T5296</text>
+<text x="30" y="120" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">티모르 하이브리드 × 비야사치</text>
+<text x="30" y="137" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">→ 녹병 저항성 담당</text>
+<rect x="18" y="190" width="258" height="77" rx="5" fill="#eef0f2" stroke="#4b5563" stroke-width="1.6"/>
+<rect x="18" y="190" width="4" height="77" rx="2" fill="#4b5563"/>
+<text x="30" y="213" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">루메 수단 Rume Sudan</text>
+<text x="30" y="230" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">1941년 남수단 보마고원 야생 채집</text>
+<text x="30" y="247" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">좁은 아라비카 풀의 희귀한 외부 다양성</text>
+<rect x="18" y="310" width="258" height="60" rx="5" fill="#fcebf2" stroke="#be185d" stroke-width="1.6"/>
+<rect x="18" y="310" width="4" height="60" rx="2" fill="#be185d"/>
+<text x="30" y="333" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">마르셀레사</text>
+<text x="30" y="350" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">사치모르 계열 순계</text>
+<rect x="18" y="390" width="258" height="60" rx="5" fill="#e6f5f3" stroke="#0d9488" stroke-width="1.6"/>
+<rect x="18" y="390" width="4" height="60" rx="2" fill="#0d9488"/>
+<text x="30" y="413" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">웅성불임 모계 (CIR-SM01)</text>
+<text x="30" y="430" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">씨앗 번식을 가능하게 한 열쇠</text>
+<rect x="300" y="120" width="258" height="94" rx="5" fill="#e6f5f3" stroke="#0d9488" stroke-width="1.6"/>
+<rect x="300" y="120" width="4" height="94" rx="2" fill="#0d9488"/>
+<text x="312" y="143" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">센트로아메리카노 (H1)</text>
+<text x="312" y="160" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">사치모르 T5296 × 루메 수단</text>
+<text x="312" y="177" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">수확량·품질 모두 높다</text>
+<text x="312" y="194" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">뿌리가 얕아 바람·가뭄에 약함</text>
+<rect x="300" y="330" width="258" height="77" rx="5" fill="#e6f5f3" stroke="#0d9488" stroke-width="1.6"/>
+<rect x="300" y="330" width="4" height="77" rx="2" fill="#0d9488"/>
+<text x="312" y="353" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">스타마야 Starmaya</text>
+<text x="312" y="370" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">웅성불임 모계 × 마르셀레사</text>
+<text x="312" y="387" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">씨앗으로 대량 보급 가능한 첫 F1</text>
+<rect x="580" y="110" width="258" height="77" rx="5" fill="#e8f2f9" stroke="#0369a1" stroke-width="1.6"/>
+<rect x="580" y="110" width="4" height="77" rx="2" fill="#0369a1"/>
+<text x="592" y="133" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">루이루 11 (1985)</text>
+<text x="592" y="150" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">왜성·다수확·내병성</text>
+<text x="592" y="167" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">부계에 K7 · SL28 · 루메 수단</text>
+<rect x="580" y="220" width="258" height="77" rx="5" fill="#e8f2f9" stroke="#0369a1" stroke-width="1.6"/>
+<rect x="580" y="220" width="4" height="77" rx="2" fill="#0369a1"/>
+<text x="592" y="243" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">바티안 (2010·KALRO)</text>
+<text x="592" y="260" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">녹병·CBD 저항 + 품질 유지 목표</text>
+<text x="592" y="277" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">SL28·SL34·루메수단·N39·K7·SL4·TH</text>
+</svg>

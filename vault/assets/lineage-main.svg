@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1190 650" width="100%">
+<defs>
+  <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6"
+          markerHeight="6" orient="auto-start-reverse">
+    <path d="M 0 1 L 9 5 L 0 9 z" fill="#9aa3aa"/>
+  </marker>
+</defs>
+<rect width="1190" height="650" fill="#ffffff"/>
+<text x="26" y="34" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="23" font-weight="800"
+      fill="#17202a">③ 계보도 2 — 예멘을 거친 두 계통과 그 자손</text>
+<text x="26" y="56" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="12.5"
+      fill="#6b7280">현대 재배 품종의 거의 전부가 여기 있다. 돌연변이는 한 나무에서 저절로 생긴 변종, 교잡은 두 품종을 교배한 것.</text>
+<rect x="22" y="614" width="15" height="15" rx="3" fill="#eef0f2" stroke="#4b5563" stroke-width="1.6"/>
+<text x="43" y="626" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11.5" fill="#4a5258">예멘</text>
+<rect x="204" y="614" width="15" height="15" rx="3" fill="#e9eefb" stroke="#1d4ed8" stroke-width="1.6"/>
+<text x="225" y="626" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11.5" fill="#4a5258">티피카 계통</text>
+<rect x="386" y="614" width="15" height="15" rx="3" fill="#fbf0e3" stroke="#b45309" stroke-width="1.6"/>
+<text x="407" y="626" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11.5" fill="#4a5258">부르봉 계통</text>
+<rect x="568" y="614" width="15" height="15" rx="3" fill="#f1ebfd" stroke="#7c3aed" stroke-width="1.6"/>
+<text x="589" y="626" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11.5" fill="#4a5258">아라비카끼리 교잡</text>
+<rect x="750" y="614" width="15" height="15" rx="3" fill="#e8f2f9" stroke="#0369a1" stroke-width="1.6"/>
+<text x="771" y="626" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11.5" fill="#4a5258">케냐 선발</text>
+<path d="M 208 288.5 H 400 V 197.0 H 208" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 208 288.5 H 400 V 347.0 H 208" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 437 197.0 H 438.5 V 126.0 H 433" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 437 197.0 H 438.5 V 198.0 H 433" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 437 347.0 H 438.5 V 278.5 H 433" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 437 347.0 H 438.5 V 359.0 H 433" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 437 347.0 H 438.5 V 431.0 H 433" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 437 347.0 H 438.5 V 503.0 H 433" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 437 197.0 H 672 V 158.5 H 685" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 437 347.0 H 680 V 158.5 H 685" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 803.0 197 V 196 H 803.0 V 209" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 662 278.5 H 676 V 254.5 H 685" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 662 359.0 H 666 V 350.5 H 685" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 662 126.0 H 684 V 350.5 H 685" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 437 347.0 H 924 V 458.5 H 937" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<path d="M 437 197.0 H 916 V 554.5 H 937" fill="none" stroke="#9aa3aa" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#arw)"/>
+<rect x="18" y="250" width="190" height="77" rx="5" fill="#eef0f2" stroke="#4b5563" stroke-width="1.6"/>
+<rect x="18" y="250" width="4" height="77" rx="2" fill="#4b5563"/>
+<text x="30" y="273" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">예멘 재배</text>
+<text x="30" y="290" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">15~16세기 전파</text>
+<text x="30" y="307" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">여기서 소수만 밖으로</text>
+<rect x="215" y="150" width="222" height="94" rx="5" fill="#e9eefb" stroke="#1d4ed8" stroke-width="1.6"/>
+<rect x="215" y="150" width="4" height="94" rx="2" fill="#1d4ed8"/>
+<text x="227" y="173" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">티피카 Typica</text>
+<text x="227" y="190" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">예멘→인도→자바(1699)</text>
+<text x="227" y="207" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">→암스테르담(1706)→파리(1714)</text>
+<text x="227" y="224" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">→마르티니크(1723)→중남미</text>
+<rect x="215" y="300" width="222" height="94" rx="5" fill="#fbf0e3" stroke="#b45309" stroke-width="1.6"/>
+<rect x="215" y="300" width="4" height="94" rx="2" fill="#b45309"/>
+<text x="227" y="323" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">부르봉 Bourbon</text>
+<text x="227" y="340" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">예멘→부르봉섬(레위니옹)</text>
+<text x="227" y="357" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">1708·1715·1718 세 번 시도</text>
+<text x="227" y="374" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">→19세기 중반 브라질로</text>
+<rect x="440" y="96" width="222" height="60" rx="5" fill="#e9eefb" stroke="#1d4ed8" stroke-width="1.6"/>
+<rect x="440" y="96" width="4" height="60" rx="2" fill="#1d4ed8"/>
+<text x="452" y="119" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">마라고지페 (1800년대·브라질)</text>
+<text x="452" y="136" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">티피카 변이 — 생두가 가장 크다</text>
+<rect x="440" y="168" width="222" height="60" rx="5" fill="#e9eefb" stroke="#1d4ed8" stroke-width="1.6"/>
+<rect x="440" y="168" width="4" height="60" rx="2" fill="#1d4ed8"/>
+<text x="452" y="191" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">파체 (과테말라)</text>
+<text x="452" y="208" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">티피카 변이 — 왜성</text>
+<rect x="440" y="240" width="222" height="77" rx="5" fill="#fbf0e3" stroke="#b45309" stroke-width="1.6"/>
+<rect x="440" y="240" width="4" height="77" rx="2" fill="#b45309"/>
+<text x="452" y="263" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">카투라 (1937·브라질)</text>
+<text x="452" y="280" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">부르봉 변이 — 왜성</text>
+<text x="452" y="297" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">밀식이 가능해졌다 = 산업이 바뀜</text>
+<rect x="440" y="329" width="222" height="60" rx="5" fill="#fbf0e3" stroke="#b45309" stroke-width="1.6"/>
+<rect x="440" y="329" width="4" height="60" rx="2" fill="#b45309"/>
+<text x="452" y="352" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">파카스 (1949·엘살바도르)</text>
+<text x="452" y="369" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">부르봉 변이 — 왜성</text>
+<rect x="440" y="401" width="222" height="60" rx="5" fill="#fbf0e3" stroke="#b45309" stroke-width="1.6"/>
+<rect x="440" y="401" width="4" height="60" rx="2" fill="#b45309"/>
+<text x="452" y="424" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">비야사치 (1950~60년대·코스타리카)</text>
+<text x="452" y="441" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">부르봉 변이 — 왜성</text>
+<rect x="440" y="473" width="222" height="60" rx="5" fill="#fbf0e3" stroke="#b45309" stroke-width="1.6"/>
+<rect x="440" y="473" width="4" height="60" rx="2" fill="#b45309"/>
+<text x="452" y="496" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">라우리나 / 부르봉 포인투</text>
+<text x="452" y="513" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">레위니옹 변이 — 카페인 약 절반</text>
+<rect x="692" y="120" width="222" height="77" rx="5" fill="#f1ebfd" stroke="#7c3aed" stroke-width="1.6"/>
+<rect x="692" y="120" width="4" height="77" rx="2" fill="#7c3aed"/>
+<text x="704" y="143" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">문도노보 (1943·브라질)</text>
+<text x="704" y="160" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">티피카 × 부르봉 자연 교잡</text>
+<text x="704" y="177" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">키 크고 수확량 많다</text>
+<rect x="692" y="216" width="222" height="77" rx="5" fill="#f1ebfd" stroke="#7c3aed" stroke-width="1.6"/>
+<rect x="692" y="216" width="4" height="77" rx="2" fill="#7c3aed"/>
+<text x="704" y="239" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">카투아이</text>
+<text x="704" y="256" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">문도노보 × 카투라 (IAC)</text>
+<text x="704" y="273" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">문도노보의 힘 + 카투라의 왜성</text>
+<rect x="692" y="312" width="222" height="77" rx="5" fill="#f1ebfd" stroke="#7c3aed" stroke-width="1.6"/>
+<rect x="692" y="312" width="4" height="77" rx="2" fill="#7c3aed"/>
+<text x="704" y="335" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">파카마라 (1958·엘살바도르)</text>
+<text x="704" y="352" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">파카스 × 마라고지페</text>
+<text x="704" y="369" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">생두가 크고 향미가 튄다</text>
+<rect x="944" y="420" width="222" height="77" rx="5" fill="#e8f2f9" stroke="#0369a1" stroke-width="1.6"/>
+<rect x="944" y="420" width="4" height="77" rx="2" fill="#0369a1"/>
+<text x="956" y="443" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">SL28 (1935·케냐)</text>
+<text x="956" y="460" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">부르봉 계열로 판정 · 케냐 컵의 원형</text>
+<text x="956" y="477" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">내건성↑ 수확량↓ 내병성↓</text>
+<rect x="944" y="516" width="222" height="77" rx="5" fill="#e8f2f9" stroke="#0369a1" stroke-width="1.6"/>
+<rect x="944" y="516" width="4" height="77" rx="2" fill="#0369a1"/>
+<text x="956" y="539" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="13" font-weight="700" fill="#17202a">SL34 (1930년대·케냐)</text>
+<text x="956" y="556" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">"프렌치미션" 라벨 탓에 부르봉으로 오해</text>
+<text x="956" y="573" font-family='"Noto Sans KR","NanumGothic",sans-serif' font-size="11" fill="#4a5258">유전자는 티피카 계열</text>
+</svg>

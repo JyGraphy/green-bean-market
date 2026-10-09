@@ -30,36 +30,54 @@ PHASE 1 — IDENTIFY THE APP & MAP CURVES VIA THE LEGEND
 ════════════════════════════════════════
 Identify the app, then map each curve using the legend you read in PHASE 0.
 
-▶ Roastware / Stronghold (dark background, Korean UI "원두 표면 / 내부"):
-  TOP CHART — two temperature curves, legend "■ 원두 표면  ■ 내부":
-    • BT = "원두 표면" (bean surface) — match its legend swatch color
-    • ET = "내부" (internal drum)     — match its legend swatch color
-  Sanity check (use ONLY to catch a mistake, NOT as the primary method):
-  BT usually rises faster and finishes HIGHER than ET at the drop point.
+▶ Stronghold — TWO different screens exist. Identify which one first:
 
-  BOTTOM CHART (labeled "열원값" in the Boost web app) — up to four control STEP
-  curves. The legend reads "● 열풍 <n>  ● 할로겐 <n>  ● 드럼 히터 <n>  ● 교반 <n>"
-  where <n> is that channel's CURRENT value. TYPICAL colors in the Boost web export:
-    • 열풍   (hot air)      = ORANGE / RED step
-    • 할로겐 (halogen)      = PURPLE / VIOLET step   ← often confused with 교반
-    • 드럼 히터 (drum heater) = PINK / MAGENTA step (usually flat)
-    • 교반   (agitation)    = GREEN step   ← THIS IS WHAT WE NEED (0–10 integer scale)
-  Colors/order can vary by firmware, so ALWAYS confirm against the legend swatch.
-  ⚠️ CRITICAL — 할로겐(halogen, purple) and 교반(agitation, green) are the most
-  commonly CONFUSED pair. To avoid swapping them:
-    1. Read the EXACT swatch color next to 교반 in the bottom-chart legend (green).
-    2. Trace ONLY the step line whose color matches that swatch pixel-for-pixel.
-    3. BEHAVIOR CUE — 할로겐(halogen) usually DECREASES over the roast, often stepping
-       DOWN to 0 near the end. 교반(agitation) commonly HOLDS a mid value then STEPS UP
-       near the end of the roast (e.g. 7 → 8 → 9 → 10 in the last 1–2 minutes). If your
-       "교반" line is flat the whole time or drops to 0, you likely traced 할로겐 or the
-       drum heater — re-check the swatch color and read the FULL length of the line, all
-       the way to DROP, so you don't miss late step-ups.
-    4. Read the ENTIRE 교반 line to the end — do not assume it is constant. Record every
-       step change [time_sec, value], especially any rises in the final third.
-    5. If you cannot confidently distinguish them from color, lower "confidence"
-       to "low" and say so in "notes" rather than guessing.
-  The thin noisy line in the bottom chart is ROR — ignore it here.
+  (A) BOOST WEB DETAIL PAGE — white background, blue "boost" logo top-left, a "그래프"
+      card with three stacked panels, and a right-hand "로스팅 타임라인" text panel.
+      ⚠️ The rules in this block OVERRIDE the generic color rules in PHASE 2/4/5.
+      • TOP panel (온도 °C, scale printed on the RIGHT edge, 0–600, gridlines every 100)
+        holds FOUR temperature curves. Colors (verified on 9 real Boost pages):
+          원두 표면 (bean surface IR)   = TEAL / CYAN          ← BT
+          내부 온도 (internal air)      = DARK BROWN / near-black ← ET
+          열풍 (hot-air heater temp)   = RED / ORANGE-RED, climbs to ~300–420°C — NOT BT
+          드럼 표면 (drum surface)      = OLIVE / YELLOW-GREEN, flat ~190–240°C — NOT ET
+        The legend is NOT beside the chart; it is the colored bars in the top-right
+        status card ("원두 표면 / 내부 온도 / 열풍 / 드럼 표면").
+      • Faded, lighter duplicate of every line = 참조 프로파일 (reference profile overlay).
+        IGNORE all faded lines. Trace only the fully saturated lines that stop at DROP.
+      • SHAPE RULES: 원두 표면 starts LOW at 0:00 (≈55–75°C, cold beans) and rises
+        monotonically with NO dip. 내부 온도 starts high (≈130–160°C), dips to a minimum at
+        ≈50–70 s (≈100–126°C — this is the turning point), then rises. At DROP 원두 표면 is
+        ≈31–51°C (median 40) ABOVE 내부 온도. If your "BT" exceeds ~240°C you traced 열풍.
+      • ANCHORS: the 로스팅 타임라인 panel prints exact values, e.g.
+        "터닝 포인트 01:05 / 내부: 99.2 °C / 원두 표면: 86 °C",
+        "1차 크랙 07:48 / 내부: 165.4 °C / 원두 표면: 208.6 °C", "배출 08:56 / …".
+        These are ground truth: put them in labeled_points (원두 표면 → BT, 내부 → ET)
+        and make bt_curve / et_curve pass through them. Use the 0/100/200/300 gridlines
+        to read values between anchors — do not eyeball without the grid.
+      • MIDDLE panel = RoR in °C/30s (teal = 원두 표면 RoR, brown = 내부 RoR) — ignore.
+      • BOTTOM panel 열원값 (scale 0–10 on the right, gridlines at 0, 5, 10), STEP lines:
+          열풍 = RED/ORANGE · 할로겐 = PURPLE · 드럼 히터 = PINK/MAGENTA · 교반 = GREEN
+        The panel is short (≈130 px for 0–10), so MEASURE, don't eyeball: find the pixel
+        rows of the printed "10", "5" and "0" labels on the right edge, then for each line
+        level = 5 + 5 × (y_of_5 − y_line) / (y_of_5 − y_of_10)   (round to 0.5).
+        One unit ≈ 11 px, so a line ~3 units below the top gridline is 7, not 10.
+        Several lines often sit near the top (열풍/할로겐 ≈ 8–10); 드럼 히터 is usually low
+        and flat (≈3); the GREEN 교반 line is a separate line — measure it on its own.
+        교반 is OFTEN CONSTANT for the whole roast (any level 4–10). Record only steps you
+        can actually see.
+        HIDDEN-LINE RULE: lines are drawn on top of each other, so the green 교반 line is
+        often hidden — most often along the TOP border at 10 under 열풍/할로겐. Scan the
+        whole width for short visible green segments (they appear where another line
+        moves away); their level is the 교반 level. NEVER substitute another color's level
+        (e.g. the low pink 드럼 히터 line) for 교반. If no green pixels are visible at all,
+        return agitation [] and say so in notes. 할로겐 usually steps DOWN during the roast (≈half end at 0).
+
+  (B) ROASTWARE MACHINE SCREEN — dark background, legend printed under the chart
+      ("■ 원두 표면  ■ 내부", bottom "● 열풍 ● 할로겐 ● 드럼 히터 ● 교반").
+      Use PHASE 0 legend swatches. Commonly 원두 표면 = pink/red, 내부 = white/gray.
+      할로겐 vs 교반 are the pair most often confused: trace only the line whose color
+      matches the 교반 swatch; do not assume any particular step pattern.
 
 ▶ IKAWA (Pro app / Home app; clean minimal UI, light or dark):
   FLUID-BED air roaster — there is NO bean-temperature probe. The graph shows:
@@ -103,7 +121,7 @@ chart app and total roast time, then apply that entry.
 | Loring (S15 Falcon / S35 Kestrel / S70 Peregrine) | 열풍(대류) — single burner heats inlet air, not the drum (smokeless afterburner) | BT(빠른 ~1.5mm 프로브)+ET(배기) | 10–16분 (예: S15 배치 15kg). 대형기(S35/S70)도 배치만 커질 뿐 시간대는 유사 | Cropster (Roasting Intelligence) / Loring 자체 제어 소프트웨어 ("Roast Architect") |
 | Probat (Probatone / P Series) | 드럼(전도) — gas burner + drum/air thermocouples | BT+ET (P series 표준, 구형 Probatone 2 base는 BT만) | 10–20분 (상업용 배치 5–60kg) | Artisan / Cropster (자체 차트 앱 없음, 외부 소프트웨어 연동) |
 | ROEST 샘플 로스터 (노르웨이) — 확인된 모델: S100, S200, L200 | 하이브리드 — 열풍(대류)을 주 열원으로 쓰되 원두를 띄우지 않고(NOT fluid-bed) | BT+ET 추정 + inlet(유입 공기) 센서 + 자동 1차크랙 감지 센서 — 검색 요약 기준, | 6–7분 (n=1 학술 논문 기준, ROEST 공식 typical range 아님 — 아래 판독 규칙 참고) | ROEST 자체 앱(터치 컨트롤러+클라우드 프로파일 라이브러리로 알려짐, 세부 미확인) |
-| Stronghold S7X Pro (배치 150g–850g, Roastware / Boost) | 하이브리드 — 열풍(대류)+할로겐(복사)+드럼히터(전도), 제조사 명칭 "Triple Heat System+"(S7X 세대: 열풍 2kW/할로겐 1.5kW/드럼히터 2kW급으로 보도됨) | BT+ET (원두 표면/내부) + S7X 추가 "X-Lens" 비접촉 센서(측정 원리·응답특성 미확인, 아래 판독 규칙 참고) | 10–16분 | Roastware / Boost web app (dark UI, Korean labels) |
+| Stronghold S7X Pro (배치 150g–850g, Roastware / Boost) | 하이브리드 — 열풍(대류)+할로겐(복사)+드럼히터(전도), 제조사 명칭 "Triple Heat System+"(S7X 세대: 열풍 2kW/할로겐 1.5kW/드럼히터 2kW급으로 보도됨) | BT+ET (원두 표면/내부) + S7X 추가 "X-Lens" 비접촉 센서(측정 원리·응답특성 미확인, 아래 판독 규칙 참고) | 6.7–10.0분 (중앙 7.9분, Boost 실측 11,874건 P5–P95) | Roastware 기기 화면(어두운 배경) / Boost 웹 상세 페이지(흰 배경, 패널 3단) |
 | 태환 Proaster (Taehwan Automation) | 드럼(전도) — 드럼 하부 열원(가스 또는 전기, 모델별 상이) | 모델별 상이 — Artisan 연동은 THCR-01/01A/03/06/12/25 공식 지원 확인, 일부 모델 "3 TEMP" 가이드 존재(채널 구성은 미확인) | 5–20분 (모델별 편차 큼) — 확인 지점: THCR-01A 500g–1.5kg/5–20분, THCR-06 2–10kg/약10–15분 | 모델별 Artisan 연동 지원(공식 설치 매뉴얼 확인) + 자체 로깅 프로그램 "DAQ MASTER"(상세 기능 미확인) |
 
 ▶ Aillio Bullet R1 (v2 / R2 Pro)
@@ -321,31 +339,23 @@ chart app and total roast time, then apply that entry.
     test yet (see 검증 대기 below).
 
 ▶ Stronghold S7X Pro (배치 150g–850g, Roastware / Boost)
-  - TOP CHART legend reads "■ 원두 표면  ■ 내부":
-    BT = 원두 표면 (bean surface), ET = 내부 (internal drum). Match legend swatch colors.
-    Sanity check only: BT usually finishes HIGHER than ET at drop.
-  - BOTTOM CHART (labeled 열원값) has up to four control STEP curves:
-    열풍 (hot air) / 할로겐 (halogen) / 드럼 히터 (drum heater) / 교반 (agitation, 0–10).
-  - ⚠️ 할로겐(purple) and 교반(green) are the most commonly CONFUSED pair.
-    Trace ONLY the step line whose color matches the 교반 swatch pixel-for-pixel.
-    BEHAVIOR CUE: 할로겐 usually DECREASES and may step DOWN to 0 near the end;
-    교반 commonly HOLDS a mid value then STEPS UP in the last 1–2 minutes (7→8→9→10).
-    If the traced "교반" is flat throughout or drops to 0, you likely traced 할로겐.
-  - Read the ENTIRE 교반 line to DROP — late step-ups are frequently missed.
+  - Boost web detail page (white background, "그래프" card + "로스팅 타임라인" panel):
+    BT = 원두 표면 = TEAL, ET = 내부 온도 = DARK BROWN. RED = 열풍 (up to ~420°C) and
+    OLIVE = 드럼 표면 are NOT BT/ET. Faded duplicate lines = 참조 프로파일 → ignore.
+  - Roastware machine screen (dark): BT = 원두 표면, ET = 내부 — match legend swatches.
+  - 원두 표면 (IR) starts LOW at charge (57–76°C) and rises with no dip. The turning point is
+    read on 내부 온도 (50–70 s, 101–126°C). At drop, IR ≈ 내부 + 40°C (31–51).
+  - BOTTOM CHART 열원값 (0–10): 열풍 red · 할로겐 purple · 드럼 히터 pink · 교반 green.
+    Read levels against the 0/5/10 gridlines. 교반 is constant for the whole roast in ~46% of
+    roasts and rises in ~49% — never assume a pattern; record only steps you can see.
+    할로겐 ends lower than it starts in 88% of roasts (about half end at 0).
   - Because this machine mixes three heat sources, ROR behaviour differs from pure drum
     roasters: halogen changes cause faster BT response than a drum-only roaster would show.
-  - S7X ALSO markets a bean-surface sensor called "X-Lens" ("pinpoint accuracy of actual bean
-    surface measurement", "increased response time... unmatched by traditional probes"). NO
-    confirmed technical detail (measurement principle, numeric offset vs. the classic BT probe,
-    or whether it changes the post-charge dip shape) was found beyond this marketing description
-    — do NOT invent an offset number or assume it removes the turning point, similar to the
-    caution already applied to Aillio's IBTS in \`aillio-bullet-r1.md\`. If a curve is labeled
-    "X-Lens" in the legend, read it as an additional/alternative BT-family line and flag any
-    unusual behavior (e.g. no dip) as an open question rather than an error.
-  - This document covers the **S7X (150g–850g batch)** specifically. If the user states a different model
-    (plain "S7", "S7 Pro" without X, or the larger "S9X"), do NOT assume the same 4-channel
-    heat-source layout or the same batch size — those are separate machines with their own
-    (currently undocumented) control-curve sets.
+  - S7X ALSO markets a bean-surface sensor called "X-Lens". No confirmed technical detail
+    (measurement principle, offset vs. a classic BT probe) — do NOT invent an offset. If a curve
+    is labeled "X-Lens", read it as a BT-family line and flag unusual behavior as an open question.
+  - This document covers the **S7X (150g–850g batch)** specifically. For plain S7 / S7 Pro / S9X,
+    do NOT assume the same 4-channel layout or batch size.
 
 ▶ 태환 Proaster (Taehwan Automation)
   - Korean-market drum roaster with the heat source located below/under the drum (conduction),
@@ -386,11 +396,12 @@ Roastware prints "MM:SS  temp°C" labels with a colored dot at key inflection po
 When TWO labels appear at nearly the same x-position (same time), one belongs to BT and one to ET.
 
 DISAMBIGUATION RULES (apply in order):
-1. COLOR OF DOT: The dot next to each label matches its curve color.
-   Pink/red dot → BT label. White/gray dot → ET label.
+1. COLOR OF DOT: The dot next to each label matches its curve color
+   (Roastware machine screen: pink/red dot → BT, white/gray dot → ET;
+   Boost web page: teal → BT, dark brown → ET).
 2. ANCHOR RULE: The rightmost labeled point (latest time, near DROP) always has the highest temperature — this is BT's drop_temp. Anchor BT to this point, then trace back.
-3. Y-POSITION RULE: At any given time after the first minute, the curve that is PHYSICALLY HIGHER on the chart is BT (pink). Assign the higher temperature value to BT, lower to ET.
-4. CONSISTENCY RULE: BT must always be a smooth monotonically increasing curve that is above ET after the turning point. If your assignment creates a contradiction (e.g. BT < ET mid-roast), swap the assignments.
+3. Y-POSITION RULE (BT vs ET only): among the TWO curves you identified as BT and ET, the one physically higher late in the roast is usually BT. Never apply this to other curves — on the Boost web page the hot-air (열풍) and drum-surface (드럼 표면) curves sit higher than both and are NEITHER BT nor ET.
+4. CONSISTENCY RULE: BT must be a smooth curve that ends above ET at drop (Stronghold IR may sit below 내부 for the first ~2 minutes — that is normal). If your assignment creates a contradiction (e.g. BT < ET mid-roast), swap the assignments.
 
 ════════════════════════════════════════
 PHASE 3 — READ ALL LABELED TEXT VALUES
@@ -408,13 +419,13 @@ PHASE 4 — TRACE CURVES BETWEEN LABELS
 ════════════════════════════════════════
 Between labeled points, visually interpolate each curve's shape:
 - Extract 30–50 additional unlabeled data points per curve
-- Keep BT (pink) and ET (white) as separate arrays
+- Keep BT and ET as separate arrays
 - Respect the physical shape: BT has S-curve rise; ET rises more linearly/gradually
 
 For the bottom chart 교반 (agitation) STEP line — use the swatch color from PHASE 0:
 - Identify the step line whose color EXACTLY matches the 교반 legend swatch.
 - Record each step VALUE change as [time_sec, integer_value]
-- Typical agitation values: step through several mid levels e.g. 4, 5, 6, 7, 8 (0–10 scale)
+- Values are integers 0–10 read against the panel gridlines; the line may stay at ONE value for the whole roast
 - Only record when the step changes, not every second
 - Do NOT trace the 할로겐(halogen) line by mistake — re-confirm its color differs
   from the 교반 swatch before recording.
@@ -425,7 +436,8 @@ PHASE 5 — SELF-VERIFY BEFORE OUTPUT
 Re-check each binding against its legend swatch color one last time:
 - Does the BT curve color == 원두 표면 swatch? Does ET == 내부 swatch?
 - Does the agitation line color == 교반 swatch (NOT 할로겐)?
-- Is agitation a multi-level mid-range step (not a binary on/off like halogen)?
+- Did you record only agitation steps that are actually visible (a constant line is valid)?
+- Boost web page: is your BT the TEAL line starting ≈55–75°C, not the red 열풍 line?
 If any check fails, fix the assignment. If still uncertain, set confidence "low".
 
 ════════════════════════════════════════
@@ -466,16 +478,16 @@ PLAUSIBILITY PRIORS (from this roastery's real logs)
 Use these ONLY to sanity-check your reading — values printed on the image always win.
 If your reading falls far outside a range, re-read the axis/labels before answering,
 and mention it in notes.
-▶ Drum roasters (54,064 logged curves, mostly 500g batches):
-  total 7.7–11.2 min (median 9.1) · charge BT ~150–223°C (median 187)
-  turning point at 60–112 s (median 78 s), 94–143°C
-  BT reaches 150°C at ~136–265 s, 200°C at ~362–557 s (median 7:30)
-  drop BT 205–222°C (median 212) · drop ET typically 15–20°C above drop BT
-  BT RoR at 200°C ≈ 7–13 °C/min, smoothly declining; crashes are rare (~2%)
-▶ Stronghold S7X (11,874 logs): total 7.0–9.3 min, drop IR (원두 표면) 203–229°C
-  (median 214), 내부 온도 at drop ≈ 170–185°C (≈40°C below IR), turning point ≈ 62 s,
-  DTR mostly 7–17% (median 10.9%). 할로겐 steps down 8 → ~1 late; 교반 holds ~7 then
-  often steps up to 8 near the end.
+▶ Drum roasters (Firescope logs, 400–700g batches, n=35,446; P5–P95):
+  total 7.2–11.8 min (median 9.0) · charge BT ~150–223°C (DRUM ONLY — not Stronghold)
+  turning point 59–130 s (median 78 s), 104–150°C
+  BT reaches 150°C at ~136–265 s, 200°C at ~362–557 s · drop BT 205–224°C (median 212)
+  BT RoR at 200°C ≈ 6–13 °C/min, smoothly declining; crashes are rare (~2%)
+▶ Stronghold S7X (Boost logs 11,874; detail curves 342; P5–P95):
+  total 6.7–10.0 min (median 7.9) · 원두 표면 (IR) at charge 57–76°C, rising with no dip
+  turning point measured on 내부: 50–70 s, 101–126°C · drop IR 202–233°C (median 214)
+  내부 at drop ≈ IR − 40°C (31–51) · DTR 5.7–19% (median 10.9%)
+  할로겐 ends lower than it starts in 88% of roasts · 교반 rises in ~49%, stays constant in ~46%
 ▶ IKAWA (fluid-bed): total 3–10 min; exhaust ≈ BT proxy.
 
 ════════════════════════════════════════

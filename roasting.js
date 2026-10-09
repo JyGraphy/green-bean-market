@@ -1191,7 +1191,7 @@ function renderMetrics(el, d) {
         ? (d.total_time<150?'warn':d.total_time>720?'warn':'good')
         : (d.total_time<420?'warn':d.total_time>1200?'warn':'good') },
     { label:'DTR', value: d.dtr!=null? d.dtr.toFixed(1):'—', unit:'%',
-      cls: d.dtr==null?'':d.dtr<pickBaseline(d).dtr[0]?'bad':d.dtr>pickBaseline(d).dtr[1]?'warn':'good' },
+      cls: d.dtr==null?'':d.dtr<dtrRange(pickBaseline(d))[0]?'bad':d.dtr>dtrRange(pickBaseline(d))[1]?'warn':'good' },
     { label:'투입온도', value: d.charge_temp ?? '—', unit:'°C', cls:'' },
     { label: d.fluid_bed ? '배출(배기)' : '배출(BT)', value: d.drop_temp ?? '—', unit:'°C', cls:'' },
     ...(d.et_drop_temp != null ? [{ label:'배출(ET)', value: d.et_drop_temp, unit:'°C', cls:'' }] : []),
@@ -1415,23 +1415,31 @@ function pointChangeGuide(d, targetKey) {
 
 /* 종합 분석 */
 /* ── 로스터리 실측 기준선 ──
-   중앙값과 [P10, P90]. 출처:
-   - drum*: Firescope 기록 곡선 54,064건(2020-06~2026-10, 1초 BT/ET)에서 산출.
-     발달 = 200°C(BT) 도달~배출, 건조 = 150°C 도달까지.
-   - s7x: Stronghold Boost 기록 11,874건(S7X 3대, 2019-03~2026-10), 배출은 IR(원두 표면).
-   - ikawa: 열풍식은 표본이 없어 일반 권장 범위를 사용. */
+   각 지표는 [P5, 중앙값, P95]. 앱과 같은 정의(5초 리샘플, RoR 30초 창)로 산출했다.
+   - drum / drumSmall / drumLarge: Firescope 기록 곡선(2020-06~2026-10, 1초 BT/ET)
+     중 투입량 400~700g / ≤300g / ≥800g. 건조 = 150°C 도달까지, 발달 = 200°C 도달~배출.
+   - s7x: Stronghold Boost 상세 곡선 342건. 총 시간·배출·DTR은 Boost 기록 11,874건.
+     원두 표면(IR)은 투입 시 낮게 시작해 꺾이지 않으므로 터닝포인트는 내부 온도로 잰다.
+   - ikawa: 열풍식 표본이 없어 일반 권장 범위를 쓰고 곡선 비교는 하지 않는다.
+   검증: 학습에 쓰지 않은 기록에서 'P5~P95를 2개 이상 벗어나면 경고' 규칙의
+   정상 로스팅 경고율이 drum 19% · drumSmall 19% · drumLarge 17% · s7x 16%. */
 const ROAST_BASELINES = {
-  drum:      { label:'드럼 로스터(500g급)', n:25153, total:[7.7,9.1,11.2], tpT:[60,79,112], tpBt:[94,126,143],
-               dry:[26,34,46], mai:[37,46,56], dtr:[10,27], dtrMed:17.7, drop:[205.6,212.1,221.6], ror200:[6.9,9.6,13.0] },
-  drumSmall: { label:'드럼 소배치(250g)', n:3527, total:[7.5,8.9,10.5], tpT:[50,62,90], tpBt:[105,130,148],
-               dry:[22,29,38], mai:[40,50,60], dtr:[6,18], dtrMed:10.4, drop:[198,205.2,214], ror200:[5.5,7.4,10.5] },
-  drumLarge: { label:'드럼 대배치(1kg+)', n:5691, total:[8.0,9.5,11.8], tpT:[62,78,105], tpBt:[85,100,120],
-               dry:[32,42,50], mai:[35,43,52], dtr:[11,28], dtrMed:17.0, drop:[207,214.7,224], ror200:[8.5,11.9,15] },
-  s7x:       { label:'Stronghold S7X', n:11874, total:[7.0,7.9,9.3], tpT:[48,62,80], tpBt:null,
-               dry:[38,45,52], mai:[44,50,56], dtr:[7,17], dtrMed:10.9, drop:[203.5,214.3,228.6], ror200:null },
-  ikawa:     { label:'IKAWA 열풍식', n:0, total:[3,5.5,10], tpT:null, tpBt:null,
-               dry:null, mai:null, dtr:[12,25], dtrMed:null, drop:null, ror200:null },
+  drum:      { label:'드럼 로스터(500g급)', n:35446, tpOn:'bt',
+               total:[7.2,9.0,11.8], tpT:[59,78,130], tpBt:[103.7,125.5,149.6], dry:[23.1,34.5,45.2],
+               mai:[38.8,47.1,56.2], ror200:[6.2,9.6,13.0], drop:[205.0,212.1,223.7], dtr:[8.8,17.6,30.8] },
+  drumSmall: { label:'드럼 소배치(300g 이하)', n:4630, tpOn:'bt',
+               total:[6.7,8.9,11.5], tpT:[41,63,125], tpBt:[76.7,131.2,159.1], dry:[16.1,28.5,48.8],
+               mai:[40.2,58.3,73.5], ror200:[3.4,7.2,13.2], drop:[200.5,205.6,219.5], dtr:[1.2,11.0,28.3] },
+  drumLarge: { label:'드럼 대배치(800g 이상)', n:10842, tpOn:'bt',
+               total:[7.5,9.5,12.9], tpT:[56,80,145], tpBt:[75.5,99.7,135.5], dry:[31.0,41.8,56.1],
+               mai:[30.2,38.8,49.1], ror200:[7.0,11.4,15.2], drop:[207.1,215.0,230.5], dtr:[8.3,17.3,32.3] },
+  s7x:       { label:'Stronghold S7X', n:11874, tpOn:'et',
+               total:[6.7,7.9,10.0], tpT:[50,60,70], tpBt:[101.1,114.7,125.9], dry:[28.2,34.0,42.4],
+               mai:[32.5,41.1,52.5], ror200:[6.8,10.8,17.4], drop:[201.6,214.3,233.1], dtr:[5.7,10.9,19.0] },
+  ikawa:     { label:'IKAWA 열풍식', n:0, total:[3,5.5,10], dtr:[12,18,25] },
 };
+// 발달이 이보다 짧으면 기기와 무관하게 언더디벨롭 위험으로 본다 (소배치 P5가 1.2%라 하한이 필요)
+const DTR_ABS_MIN = 5;
 
 function pickBaseline(d) {
   if (d.fluid_bed) return Object.assign({ key:'ikawa' }, ROAST_BASELINES.ikawa);
@@ -1443,63 +1451,70 @@ function pickBaseline(d) {
   return Object.assign({ key:'drum' }, ROAST_BASELINES.drum);
 }
 
-/* 실제 곡선에서 터닝포인트·150/200°C 도달·RoR@200을 직접 계산해 기준선과 비교 */
-function curveShape(d) {
+/* 실제 곡선에서 터닝포인트·150/200°C 도달·RoR@200을 직접 계산 (기준선과 같은 정의) */
+function curveShape(d, base) {
   const t = d.time_series || [], bt = d.bt_series || [], ror = d.ror || [];
   if (bt.length < 10) return null;
+  const tpSrc = base && base.tpOn === 'et' && (d.et_series || []).length === bt.length ? d.et_series : bt;
   let tp = 0;
-  for (let i = 0; i < bt.length && t[i] <= 150; i++) if (bt[i] < bt[tp]) tp = i;
-  const reach = th => { for (let i = tp; i < bt.length; i++) if (bt[i] >= th) return i; return -1; };
+  for (let i = 0; i < tpSrc.length && t[i] <= 150; i++) if (tpSrc[i] < tpSrc[tp]) tp = i;
+  const from = tpSrc === bt ? tp : 0;
+  const reach = th => { for (let i = from; i < bt.length; i++) if (bt[i] >= th) return i; return -1; };
   const i150 = reach(150), i200 = reach(200);
   const dur = d.total_time || t[t.length - 1];
   return {
-    tpT: t[tp], tpBt: bt[tp],
+    tpT: t[tp], tpBt: tpSrc[tp],
     dry: i150 > 0 ? t[i150] / dur * 100 : null,
     mai: i150 > 0 && i200 > 0 ? (t[i200] - t[i150]) / dur * 100 : null,
     ror200: i200 > 0 && ror[i200] != null ? ror[i200] : null,
   };
 }
 
+function dtrRange(base) {
+  return [Math.max(base.dtr[0], DTR_ABS_MIN), base.dtr[2]];
+}
+
 function baselineComparison(d, base) {
   const out = [];
-  if (!base.n) return out;
-  const s = curveShape(d) || {};
-  const notes = [], off = [];
+  if (!base.n || d.fluid_bed) return out;
+  const s = curveShape(d, base) || {};
+  const inRange = [], off = [];
   const chk = (name, v, rng, unit, fmt = 0) => {
     if (v == null || !rng) return;
-    const [lo, med, hi] = rng;
+    const [lo, , hi] = rng;
     const val = `${(+v).toFixed(fmt)}${unit}`;
     if (v < lo) off.push(`${name} ${val} (기준 ${lo}~${hi}${unit}보다 낮음)`);
     else if (v > hi) off.push(`${name} ${val} (기준 ${lo}~${hi}${unit}보다 높음)`);
-    else notes.push(`${name} ${val}`);
+    else inRange.push(`${name} ${val}`);
   };
+  const tpLabel = base.tpOn === 'et' ? '터닝포인트(내부)' : '터닝포인트';
   chk('총 시간', d.total_time / 60, base.total, '분', 1);
-  if (!d.fluid_bed) {
-    chk('터닝포인트 시각', s.tpT, base.tpT, '초');
-    chk('터닝포인트 온도', s.tpBt, base.tpBt, '°C');
-    chk('건조 비율', s.dry, base.dry, '%');
-    chk('마이야르 비율', s.mai, base.mai, '%');
-    chk('RoR@200°C', s.ror200, base.ror200, '°C/분', 1);
-    chk('배출온도', d.drop_temp, base.drop, '°C', 1);
-  }
-  if (!off.length && !notes.length) return out;
-  const src = `${base.label} 실측 기록 ${base.n.toLocaleString()}건`;
-  if (off.length)
+  chk(`${tpLabel} 시각`, s.tpT, base.tpT, '초');
+  chk(`${tpLabel} 온도`, s.tpBt, base.tpBt, '°C');
+  chk('건조 비율', s.dry, base.dry, '%');
+  chk('마이야르 비율', s.mai, base.mai, '%');
+  chk('RoR@200°C', s.ror200, base.ror200, '°C/분', 1);
+  chk('배출온도', d.drop_temp, base.drop, '°C', 1);
+  if (!off.length && !inRange.length) return out;
+  const src = `${base.label} 실측 기록 ${base.n.toLocaleString()}건의 P5~P95`;
+  if (off.length >= 2)
     out.push({type:'warn', icon:'', title:`로스터리 기준 대비 벗어난 항목 ${off.length}개`,
-      text:`${src}의 P10~P90 범위와 비교했습니다. ${off.join(' · ')}. 의도한 변화가 아니라면 해당 구간의 화력·투입온도를 점검하세요.${notes.length ? ' 범위 안: ' + notes.join(', ') + '.' : ''}`});
+      text:`${src} 범위와 비교했습니다. ${off.join(' · ')}. 의도한 변화가 아니라면 해당 구간의 화력·투입온도를 점검하세요.`});
+  else if (off.length === 1)
+    out.push({type:'info', icon:'', title:'로스터리 기준과 대체로 일치',
+      text:`${src} 범위와 비교했을 때 한 항목만 범위 밖입니다: ${off[0]}. 정상 로스팅에서도 흔히 생기는 수준이니, 반복된다면 점검해 보세요.`});
   else
     out.push({type:'good', icon:'', title:'로스터리 기준선과 일치',
-      text:`${src}의 P10~P90 범위 안입니다: ${notes.join(', ')}.`});
-  // 배치·기기별로 실측에서 확인된 특성 안내
+      text:`${src} 범위 안입니다: ${inRange.join(', ')}.`});
   if (base.key === 'drumLarge')
     out.push({type:'info', icon:'', title:'대배치 특성',
-      text:'1kg 이상 배치는 실측에서 터닝포인트가 약 100°C로 500g보다 26°C 낮고 건조가 42%로 깁니다. 투입온도를 높이거나 초반 화력을 보강하면 건조 구간을 줄일 수 있습니다.'});
+      text:'800g 이상 배치는 실측에서 터닝포인트가 약 100°C로 500g급보다 26°C 낮고, 건조가 42%로 깁니다. 투입온도를 높이거나 초반 화력을 보강하면 건조 구간을 줄일 수 있습니다.'});
   if (base.key === 'drumSmall')
     out.push({type:'info', icon:'', title:'소배치 특성',
-      text:'250g 배치는 실측에서 발달이 10% 안팎으로 짧고 배출이 205°C 부근으로 밝게 끝나는 경향입니다. 열이 빨리 올라가므로 1차 크랙 직전 화력을 미리 줄이세요.'});
+      text:'300g 이하 배치는 실측에서 마이야르 비율이 58%로 길고, 200°C 이후 발달은 11% 안팎으로 짧으며, 배출이 206°C 부근으로 밝게 끝나는 경향입니다.'});
   if (base.key === 's7x')
-    out.push({type:'info', icon:'', title:'S7X 제어 패턴(실측)',
-      text:'Boost 기록에서 할로겐은 8에서 시작해 후반 1까지 단계적으로 낮추고(84%), 교반은 7을 유지하다 후반에 8로 올리는 패턴(53%)이 일반적입니다. 배출 IR 온도는 내부 온도보다 약 40°C 높게 나옵니다.'});
+    out.push({type:'info', icon:'', title:'S7X 제어 패턴(실측 342건)',
+      text:'할로겐은 대부분(88%) 후반으로 갈수록 낮추며 절반가량은 0으로 끝냅니다. 교반은 후반에 올리는 경우(49%)와 끝까지 유지하는 경우(46%)가 비슷합니다. 배출 시 원두 표면(IR)은 내부 온도보다 약 40°C(31~51°C) 높게 나옵니다.'});
   return out;
 }
 
@@ -1509,15 +1524,16 @@ function comprehensiveAnalysis(d) {
   const bts = d.bt_series, times = d.time_series, ror = d.ror;
   const base = pickBaseline(d);
 
-  // DTR — 기기·배치 기준선(실측 기록 P10~P90)으로 판정, 일반 권장(15~30%)은 참고로 병기
+  // DTR — 기기·배치별 실측 범위(P5~P95, 하한은 최소 5%)로 판정
   if (dtr!=null) {
-    const [lo, hi] = base.dtr;
+    const [lo, hi] = dtrRange(base);
+    const src = base.n ? `${base.label} 실측 기록` : `${base.label} 일반 권장`;
     if (dtr < lo) items.push({type:'bad',icon:'',title:`DTR ${dtr.toFixed(1)}% — 발달 부족`,
-      text:`${base.label} 실측 기록의 하위 10%(${lo}%)보다 짧습니다. 풋내·신맛(언더디벨롭) 위험이 있으니 1차 크랙 후 발달 시간을 늘리세요. (기준 중앙값 ${base.dtrMed}%)`});
+      text:`${src} 범위(${lo}~${hi}%)보다 짧습니다. 풋내·신맛(언더디벨롭) 위험이 있으니 1차 크랙 후 발달 시간을 늘리세요. (중앙값 ${base.dtr[1]}%)`});
     else if (dtr > hi) items.push({type:'warn',icon:'',title:`DTR ${dtr.toFixed(1)}% — 과발달 경향`,
-      text:`${base.label} 실측 기록의 상위 10%(${hi}%)보다 깁니다. 평탄하거나 쓴맛이 날 수 있으니 라이트~미디엄 목표라면 더 일찍 배출하세요.`});
+      text:`${src} 범위(${lo}~${hi}%)보다 깁니다. 평탄하거나 쓴맛이 날 수 있으니 라이트~미디엄 목표라면 더 일찍 배출하세요.`});
     else items.push({type:'good',icon:'',title:`DTR ${dtr.toFixed(1)}% — ${base.label} 정상 범위`,
-      text:`실측 기록 기준 정상 범위(${lo}~${hi}%, 중앙값 ${base.dtrMed}%) 안입니다.${base.key==='s7x' ? ' S7X는 열풍·할로겐 복합 가열로 발달이 짧은 편이라, 일반 권장(15~30%)보다 낮아도 정상입니다.' : ''}`});
+      text:`${src} 범위(${lo}~${hi}%, 중앙값 ${base.dtr[1]}%) 안입니다.${base.key==='s7x' ? ' S7X는 발달이 짧은 편이라 일반 권장(15~30%)보다 낮아도 정상입니다.' : ''}`});
   } else {
     items.push({type:'info', icon:'', title:'DTR 미계산', _fcsInput: true,
       text:'1차 크랙 시작 시간을 입력하면 DTR을 바로 계산합니다.'});

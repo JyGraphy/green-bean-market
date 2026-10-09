@@ -6,8 +6,8 @@
 
 - heat_source: 하이브리드 — 열풍(대류)+할로겐(복사)+드럼히터(전도), 제조사 명칭 "Triple Heat System+"(S7X 세대: 열풍 2kW/할로겐 1.5kW/드럼히터 2kW급으로 보도됨)
 - temp_probe: BT+ET (원두 표면/내부) + S7X 추가 "X-Lens" 비접촉 센서(측정 원리·응답특성 미확인, 아래 판독 규칙 참고)
-- typical_total_time: 10–16분
-- chart_app: Roastware / Boost web app (dark UI, Korean labels)
+- typical_total_time: 6.7–10.0분 (중앙 7.9분, Boost 실측 11,874건 P5–P95)
+- chart_app: Roastware 기기 화면(어두운 배경) / Boost 웹 상세 페이지(흰 배경, 패널 3단)
 - verified: no — 아래 '모델명 충돌' 참고. 검증 기록에 모델 번호가 없어 어느 기종을 검증했는지 확정할 수 없다.
 
 ## ⚠️ 모델명 충돌 (2026-09-01, 미해결)
@@ -48,33 +48,30 @@ S2 / S7Pro / S7X / S8X / S9X 만 있고 **"S7X Pro" 표기는 없다.**
 
 ## 판독 규칙
 
-- TOP CHART legend reads "■ 원두 표면  ■ 내부":
-  BT = 원두 표면 (bean surface), ET = 내부 (internal drum). Match legend swatch colors.
-  Sanity check only: BT usually finishes HIGHER than ET at drop.
-- BOTTOM CHART (labeled 열원값) has up to four control STEP curves:
-  열풍 (hot air) / 할로겐 (halogen) / 드럼 히터 (drum heater) / 교반 (agitation, 0–10).
-- ⚠️ 할로겐(purple) and 교반(green) are the most commonly CONFUSED pair.
-  Trace ONLY the step line whose color matches the 교반 swatch pixel-for-pixel.
-  BEHAVIOR CUE: 할로겐 usually DECREASES and may step DOWN to 0 near the end;
-  교반 commonly HOLDS a mid value then STEPS UP in the last 1–2 minutes (7→8→9→10).
-  If the traced "교반" is flat throughout or drops to 0, you likely traced 할로겐.
-- Read the ENTIRE 교반 line to DROP — late step-ups are frequently missed.
+- Boost web detail page (white background, "그래프" card + "로스팅 타임라인" panel):
+  BT = 원두 표면 = TEAL, ET = 내부 온도 = DARK BROWN. RED = 열풍 (up to ~420°C) and
+  OLIVE = 드럼 표면 are NOT BT/ET. Faded duplicate lines = 참조 프로파일 → ignore.
+- Roastware machine screen (dark): BT = 원두 표면, ET = 내부 — match legend swatches.
+- 원두 표면 (IR) starts LOW at charge (57–76°C) and rises with no dip. The turning point is
+  read on 내부 온도 (50–70 s, 101–126°C). At drop, IR ≈ 내부 + 40°C (31–51).
+- BOTTOM CHART 열원값 (0–10): 열풍 red · 할로겐 purple · 드럼 히터 pink · 교반 green.
+  Read levels against the 0/5/10 gridlines. 교반 is constant for the whole roast in ~46% of
+  roasts and rises in ~49% — never assume a pattern; record only steps you can see.
+  할로겐 ends lower than it starts in 88% of roasts (about half end at 0).
 - Because this machine mixes three heat sources, ROR behaviour differs from pure drum
   roasters: halogen changes cause faster BT response than a drum-only roaster would show.
-- S7X ALSO markets a bean-surface sensor called "X-Lens" ("pinpoint accuracy of actual bean
-  surface measurement", "increased response time... unmatched by traditional probes"). NO
-  confirmed technical detail (measurement principle, numeric offset vs. the classic BT probe,
-  or whether it changes the post-charge dip shape) was found beyond this marketing description
-  — do NOT invent an offset number or assume it removes the turning point, similar to the
-  caution already applied to Aillio's IBTS in `aillio-bullet-r1.md`. If a curve is labeled
-  "X-Lens" in the legend, read it as an additional/alternative BT-family line and flag any
-  unusual behavior (e.g. no dip) as an open question rather than an error.
-- This document covers the **S7X (150g–850g batch)** specifically. If the user states a different model
-  (plain "S7", "S7 Pro" without X, or the larger "S9X"), do NOT assume the same 4-channel
-  heat-source layout or the same batch size — those are separate machines with their own
-  (currently undocumented) control-curve sets.
+- S7X ALSO markets a bean-surface sensor called "X-Lens". No confirmed technical detail
+  (measurement principle, offset vs. a classic BT probe) — do NOT invent an offset. If a curve
+  is labeled "X-Lens", read it as a BT-family line and flag unusual behavior as an open question.
+- This document covers the **S7X (150g–850g batch)** specifically. For plain S7 / S7 Pro / S9X,
+  do NOT assume the same 4-channel layout or batch size.
 
 ## 근거
+
+- **2026-10-09 실측 검증**: Boost 계정(머신 3대, Boost API `modelName: "S7X"`)의 기록 11,874건과
+  상세 곡선 342건으로 수치 범위를 산출했다. Boost 웹 상세 화면 9건을 캡처해 AI 판독 결과를
+  원본 초 단위 데이터와 비교해 색상·형태 규칙을 확인했다(원두 표면=청록, 내부=진갈색,
+  열풍=빨강, 드럼 표면=올리브, 교반=초록, 할로겐=보라, 드럼 히터=분홍).
 
 - `supabase/functions/analyze-roast/index.ts` 기존 프롬프트 (운영 중 검증된 규칙)
 - 사이트 로스팅 프로파일 기능에서 실제 Boost 차트로 반복 검증됨 — 단, 검증 당시 모델 기록은

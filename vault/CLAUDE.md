@@ -45,6 +45,22 @@ WebFetch로 랏 단위 결과를 못 읽는다. 대신 `.github/workflows/coe.ym
 `vault/raw/coe/YYYY-MM-DD-옥션결과-자동수집.md`를 커밋한다. 표를 찾으면 그대로, 못 찾으면
 본문 텍스트를 보존한다 — 정리(wiki 반영)는 이후 AI가 이 raw를 읽고 수행한다.
 
+## PDF 제작 (토큰 0)
+
+공부용으로 통째로 읽거나 출력·공유할 때. 볼트 문서 여러 건을 묶어 표지·목차·쪽번호가
+있는 한 권짜리 PDF로 만든다. 결과는 `vault/pdf/` 에 쌓인다.
+
+```bash
+python3 scripts/build_pdf.py --preset 품종          # 묶음 프리셋
+python3 scripts/build_pdf.py --title "제목" wiki/a.md raw/papers/b.md
+```
+
+- 주제가 늘면 `scripts/build_pdf.py` 의 `PRESETS` 에 항목만 추가한다(코드 수정 불필요).
+- 한글 폰트(Noto Sans KR)가 없으면 자동으로 받아 설치한다 — 없으면 한글이 □ 로 나온다.
+- 렌더링은 컨테이너에 미리 깔린 chromium 을 쓴다. **`playwright install` 을 돌리지 않는다.**
+- PDF 1건이 약 2~3MB다(한글 폰트 임베딩). 같은 문서를 자주 다시 만들어 커밋하면
+  저장소가 커지니, **내용이 실제로 바뀌었을 때만** 다시 만들어 커밋한다.
+
 ## 목차 갱신 (토큰 0)
 
 ```bash

@@ -461,6 +461,24 @@ OUTPUT — return ONLY this JSON, no markdown, no explanation:
 }
 
 ════════════════════════════════════════
+PLAUSIBILITY PRIORS (from this roastery's real logs)
+════════════════════════════════════════
+Use these ONLY to sanity-check your reading — values printed on the image always win.
+If your reading falls far outside a range, re-read the axis/labels before answering,
+and mention it in notes.
+▶ Drum roasters (54,064 logged curves, mostly 500g batches):
+  total 7.7–11.2 min (median 9.1) · charge BT ~150–223°C (median 187)
+  turning point at 60–112 s (median 78 s), 94–143°C
+  BT reaches 150°C at ~136–265 s, 200°C at ~362–557 s (median 7:30)
+  drop BT 205–222°C (median 212) · drop ET typically 15–20°C above drop BT
+  BT RoR at 200°C ≈ 7–13 °C/min, smoothly declining; crashes are rare (~2%)
+▶ Stronghold S7X (11,874 logs): total 7.0–9.3 min, drop IR (원두 표면) 203–229°C
+  (median 214), 내부 온도 at drop ≈ 170–185°C (≈40°C below IR), turning point ≈ 62 s,
+  DTR mostly 7–17% (median 10.9%). 할로겐 steps down 8 → ~1 late; 교반 holds ~7 then
+  often steps up to 8 near the end.
+▶ IKAWA (fluid-bed): total 3–10 min; exhaust ≈ BT proxy.
+
+════════════════════════════════════════
 TEXT / SUMMARY SCREENS (no chart visible)
 ════════════════════════════════════════
 Some uploaded images are STAT/LOG screens with labeled text values instead of a

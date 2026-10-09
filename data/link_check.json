@@ -1,51 +1,51 @@
 {
-  "checked_at": "2026-10-08T00:45:36Z",
+  "checked_at": "2026-10-09T00:57:46Z",
   "total": 1303,
   "removed": [],
   "held_stores": [],
   "timing": {
-    "elapsed_sec": 547.6,
+    "elapsed_sec": 438.0,
     "requests": 1088,
     "skipped_unknown": 215,
     "slowest_domains": [
       {
         "domain": "comansa.kr",
-        "sec": 547.6,
-        "count": 337
+        "sec": 438.0,
+        "count": 336
       },
       {
         "domain": "www.gsc.coffee",
-        "sec": 201.5,
+        "sec": 160.3,
         "count": 103
       },
       {
         "domain": "www.micoffee.co.kr",
-        "sec": 147.3,
-        "count": 85
+        "sec": 114.8,
+        "count": 84
       },
       {
         "domain": "momos.co.kr",
-        "sec": 120.0,
+        "sec": 114.4,
         "count": 97
       },
       {
         "domain": "www.cobeans.com",
-        "sec": 80.7,
+        "sec": 73.3,
         "count": 95
       },
       {
-        "domain": "wbeans.com",
-        "sec": 70.3,
-        "count": 42
-      },
-      {
         "domain": "www.blessbean.co.kr",
-        "sec": 64.7,
+        "sec": 59.9,
         "count": 94
       },
       {
+        "domain": "wbeans.com",
+        "sec": 57.8,
+        "count": 42
+      },
+      {
         "domain": "coffeeplant.co.kr",
-        "sec": 59.1,
+        "sec": 55.8,
         "count": 48
       }
     ]
@@ -67,9 +67,9 @@
       "ambiguous": 18
     },
     "블레스빈": {
-      "ok": 0,
+      "ok": 94,
       "dead": 0,
-      "ambiguous": 94
+      "ambiguous": 0
     },
     "모모스커피": {
       "ok": 97,
@@ -82,7 +82,7 @@
       "ambiguous": 0
     },
     "엠아이커피": {
-      "ok": 85,
+      "ok": 84,
       "dead": 0,
       "ambiguous": 0
     },
@@ -102,7 +102,7 @@
       "ambiguous": 0
     },
     "커만사": {
-      "ok": 337,
+      "ok": 336,
       "dead": 0,
       "ambiguous": 0
     },
@@ -127,7 +127,7 @@
       "ambiguous": 0
     },
     "팔콘커피": {
-      "ok": 41,
+      "ok": 43,
       "dead": 0,
       "ambiguous": 0
     }

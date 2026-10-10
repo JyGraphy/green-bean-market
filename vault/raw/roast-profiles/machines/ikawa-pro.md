@@ -11,11 +11,14 @@
 - FLUID-BED air roaster — there is NO bean-temperature probe. Never invent a BT probe reading.
 - Temperature curves are setpoint (target) vs actual AIR temperature. If both inlet and exhaust
   are shown, treat EXHAUST as BT and INLET as ET. If only one line, output it as BT.
-- MANUFACTURER COLOUR MAPPING (IKAWA's own Profile Library page, fetched 2026-09-01 — see
-  sources/ikawa-pro-www-ikawacoffee-com-pro-sample-roaster-profiles.md): on IKAWA profile
-  charts the RED line is the EXHAUST profile and the YELLOW line is the INLET profile.
-  Use this only as a FALLBACK when the on-image legend is missing or unreadable — PHASE 0
-  (read the legend) still wins if a legend is present, because users may re-colour exports.
+- COLOUR MAPPING (IKAWA app profile graph — confirmed by the owner using the real app,
+  2026-10-10): the RED line is EXHAUST (→ BT) and the ORANGE line is INLET (→ ET).
+  IKAWA's Profile Library page describes the inlet line as "yellow"; on screen it renders
+  ORANGE / yellow-orange — treat orange and yellow-orange as the same INLET line.
+  The two hues are close, so also use the physics: INLET is the HOTTER line (it measures air
+  entering the chamber, before it passes the beans) and sits ABOVE EXHAUST for most of the
+  roast. If your "BT" line is above your "ET" line through mid-roast, you have swapped them.
+  If an on-image legend is present and says otherwise, the legend wins.
 - BATCH-SIZE CAVEAT (same source, manufacturer statement): exhaust profiles are described as
   compatible across all IKAWA Pro roasters, but INLET profiles "do not translate across
   different batch sizes". So an inlet-temperature value read from a Pro50 chart is NOT
@@ -31,6 +34,8 @@
   roasting.js 의 IKAWA CSV 파서가 이 두 형태를 모두 인식한다.
 
 ## 근거
+
+- 2026-10-10 사장님(실기 사용자) 확인: IKAWA 프로파일 그래프에서 빨강=배기, 주황=인렛.
 
 - supabase/functions/analyze-roast/index.ts 기존 프롬프트 (운영 중 검증된 규칙)
 - roasting.js:489,567,642 — IKAWA CSV 전용 파서 (실제 파일로 검증됨)

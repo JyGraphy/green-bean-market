@@ -785,6 +785,77 @@ function attachAiTrace(result, inputKind) {
   wizardData.ai_machine = m ? m[1].trim() : null;
 }
 
+/* ════════ 하이브리드 판독 보조 ════════ */
+
+/* AI 판독 결과와 사용자가 입력한 로스팅기로 화면 종류·기기를 정한다.
+   screenType은 roast-pixel.js 템플릿 키(boost_web / ikawa_app) 또는 그 밖의 값. */
+function detectMachineFromScan(result, roasterText) {
+  const st = String(result.screen_type || '').toLowerCase();
+  const text = `${roasterText || ''} ${result.notes || ''}`;
+  if (st === 'ikawa_app' || /ikawa|이카와/i.test(text))
+    return { screenType: st || 'ikawa_app', name: 'IKAWA', fluidBed: true };
+  if (st === 'boost_web' || st === 'roastware_device' || /boost|stronghold|s7x|스트롱/i.test(text))
+    return { screenType: st || 'boost_web', name: 'S7X', fluidBed: false };
+  return { screenType: st || 'other', name: null, fluidBed: detectFluidBed(roasterText) === true };
+}
+
+/* 업로드한 사진에서 곡선을 픽셀로 직접 뽑는다(roast-pixel.js). 첫 성공 결과를 돌려준다. */
+async function pixelExtractFromImages(screenType, result, dropT, anchorsBt, anchorsEt) {
+  if (typeof RoastPixel === 'undefined') return null;
+  const colors = result.series_colors || {};
+  if (!RoastPixel.TEMPLATES[screenType] && !RoastPixel.hexToRgb(colors.bt))
+    return { ok: false, reason: '곡선 색 정보 없음' };
+  let last = { ok: false, reason: '이미지 없음' };
+  for (const im of digi.images) {
+    try {
+      const imgData = await imageDataFromUrl(im.dataUrl, 2600);
+      const r = RoastPixel.extract(imgData, { screenType, colors, dropT, anchorsBt, anchorsEt });
+      if (r.ok) return r;
+      last = r;
+    } catch (e) { last = { ok: false, reason: '이미지 처리 실패' }; }
+  }
+  return last;
+}
+
+function imageDataFromUrl(dataUrl, maxSide) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const k = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+      const w = Math.round(img.naturalWidth * k), h = Math.round(img.naturalHeight * k);
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      const cx = c.getContext('2d', { willReadFrequently: true });
+      cx.drawImage(img, 0, 0, w, h);
+      resolve(cx.getImageData(0, 0, w, h));
+    };
+    img.onerror = reject;
+    img.src = dataUrl;
+  });
+}
+
+/* AI가 눈으로 읽은 곡선을 텍스트 앵커(정확한 값)에 맞춘다. 앵커에서의 차이를 앵커 사이에
+   직선으로 이어 곡선 전체를 함께 옮기므로, 앵커 한 점만 끼워 넣을 때 생기던 계단(→ 가짜 RoR
+   크래시·플릭)이 생기지 않는다. 첫 앵커 앞·마지막 앵커 뒤는 그 앵커의 차이를 유지한다. */
+function anchorBlend(pts, anchors) {
+  const curve = (pts || []).filter(p => isFinite(p.t) && isFinite(p.bt)).sort((a, b) => a.t - b.t);
+  const anc = (anchors || []).filter(a => isFinite(a.t) && isFinite(a.T)).sort((a, b) => a.t - b.t);
+  if (curve.length < 2) return anc.map(a => ({ t: a.t, bt: a.T }));
+  if (!anc.length) return curve;
+  const offs = anc.map(a => ({ t: a.t, d: a.T - interp(curve, a.t) }));
+  const offAt = t => {
+    if (t <= offs[0].t) return offs[0].d;
+    if (t >= offs[offs.length - 1].t) return offs[offs.length - 1].d;
+    for (let i = 0; i < offs.length - 1; i++)
+      if (t >= offs[i].t && t <= offs[i + 1].t)
+        return offs[i].d + (offs[i + 1].d - offs[i].d) * (t - offs[i].t) / (offs[i + 1].t - offs[i].t || 1);
+    return 0;
+  };
+  const out = curve.map(p => ({ t: p.t, bt: +(p.bt + offAt(p.t)).toFixed(1) }));
+  for (const a of anc) if (!out.some(p => Math.abs(p.t - a.t) < 0.5)) out.push({ t: a.t, bt: a.T });
+  return out.sort((a, b) => a.t - b.t);
+}
+
 async function autoScan() {
   if (!digi.images.length) { alert('이미지를 먼저 업로드해 주세요.'); return; }
   $('btnAutoScan').disabled = true;
@@ -822,18 +893,28 @@ async function autoScan() {
     const rawEt    = (result.et_curve   || []).map(([t, bt]) => ({ t: +t, bt: +bt }));
     const rawAgit  = (result.agitation  || []).map(([t, v])  => ({ t: +t, v: +v  }));
 
-    // BT: labeled BT points + bt_curve 합쳐 중복 제거
-    const mergedBt = [...labeled, ...rawCurve].sort((a, b) => a.t - b.t);
-    const curve = [];
-    for (const p of mergedBt) {
-      if (!curve.length || Math.abs(p.t - curve[curve.length - 1].t) > 0.4) curve.push(p);
-    }
+    // 화면 종류·기기 판별 (AI 판독 + 사용자가 입력한 로스팅기)
+    const machine = detectMachineFromScan(result, $('fRoaster').value);
 
-    // ET: labeled ET points + et_curve 합쳐 중복 제거
-    const mergedEt = [...labeledEt, ...rawEt].sort((a, b) => a.t - b.t);
-    const etCurve = [];
-    for (const p of mergedEt) {
-      if (!etCurve.length || Math.abs(p.t - etCurve[etCurve.length - 1].t) > 0.4) etCurve.push(p);
+    // 곡선: ① 픽셀 직접 추출(정확) → 실패하면 ② AI 판독 곡선을 앵커에 맞춰 부드럽게 보정
+    const evDrop = result.events && typeof result.events.drop === 'number' ? +result.events.drop
+      : (result.total_time_sec ? +result.total_time_sec : null);
+    const anchorsBt = labeled.map(p => ({ t: p.t, T: p.bt }));
+    if (evDrop && result.drop_temp != null && !anchorsBt.some(a => Math.abs(a.t - evDrop) < 2))
+      anchorsBt.push({ t: evDrop, T: +result.drop_temp });
+    const anchorsEt = labeledEt.map(p => ({ t: p.t, T: p.bt }));
+    const pix = (evDrop && !digi.dataParsed) ? await pixelExtractFromImages(machine.screenType, result, evDrop, anchorsBt, anchorsEt) : null;
+
+    let curve, etCurve, curveSource;
+    if (pix && pix.ok) {
+      curve = pix.btPts;
+      etCurve = pix.etPts.length >= 2 ? pix.etPts : anchorBlend(rawEt, anchorsEt);
+      if (pix.agitSorted && pix.agitSorted.length) rawAgit.splice(0, rawAgit.length, ...pix.agitSorted);
+      curveSource = `픽셀 추출(앵커 ${pix.anchorsUsed}개, 오차 ${pix.maxRes.toFixed(1)}°C)`;
+    } else {
+      curve = anchorBlend(rawCurve, anchorsBt);
+      etCurve = anchorBlend(rawEt, anchorsEt);
+      curveSource = 'AI 판독' + (pix && pix.reason ? `(픽셀 추출 불가: ${pix.reason})` : '');
     }
 
     const hasData = !!digi.dataParsed;
@@ -850,6 +931,12 @@ async function autoScan() {
       if (evRaw[k] != null) evTimes[k] = +evRaw[k];
     });
     evTimes.charge = 0;
+    // 픽셀 곡선이 있으면 터닝포인트는 곡선 최저점(투입 후 150초 안)에서 잡는다.
+    // S7X는 Boost가 내부 온도로 터닝포인트를 정의하고 타임라인 텍스트 값이 정확해 그대로 둔다.
+    if (pix && pix.ok && machine.name !== 'S7X') {
+      const early = curve.filter(p => p.t > 0 && p.t <= 150);
+      if (early.length) evTimes.tp = early.reduce((m, p) => p.bt < m.bt ? p : m).t;
+    }
 
     // 교반: AI step 포인트
     const agitSorted = rawAgit.sort((a, b) => a.t - b.t);
@@ -892,7 +979,8 @@ async function autoScan() {
       const chargeTemp = result.charge_temp != null ? +result.charge_temp : +interp(curve, 0).toFixed(1);
       const dropTemp   = result.drop_temp   != null ? +result.drop_temp   : +interp(curve, dropT).toFixed(1);
       wizardData = buildWizardFromParse(
-        { btPts: curve, etPts: etCurve, evTimes, dropT, title: '', ambient_temp: null, ambient_humidity: null },
+        { btPts: curve, etPts: etCurve, evTimes, dropT, title: '', ambient_temp: null, ambient_humidity: null,
+          fluidBed: machine.fluidBed, machine: machine.name },
         { agitSorted, chargeTemp, dropTemp, targetPts: targetPts.length >= 2 ? targetPts : undefined }
       );
 
@@ -901,7 +989,7 @@ async function autoScan() {
       const conf = result.confidence || 'medium';
       const confTxt = conf === 'high' ? '높음' : conf === 'medium' ? '보통' : '낮음';
       const notes = result.notes ? ` · ${result.notes}` : '';
-      setAiStatus('ok', `분석 완료 (신뢰도: ${confTxt}${notes})`);
+      setAiStatus('ok', `분석 완료 · 곡선=${curveSource}${machine.name ? ' · 기기=' + machine.name : ''} (신뢰도: ${confTxt})`);
     }
 
     showWizardResult();
@@ -1152,7 +1240,7 @@ function computeRoR(times, bts, span=30) {
    현재 8대 중 열풍식으로 확인된 것은 IKAWA 뿐이다.
    (Loring 도 열풍이지만 드럼 안에 원두 프로브가 있어 배출 BT 가 존재한다 — 다른 범주다.)
    모르는 기기는 null(모름)을 돌려준다. 추측해서 false 로 단정하지 않는다. */
-const FLUID_BED_PATTERNS = [/ikawa/i];
+const FLUID_BED_PATTERNS = [/ikawa/i, /이카와/];
 
 function detectFluidBed(roasterText) {
   const s = (roasterText || '').trim();
@@ -1553,8 +1641,12 @@ function comprehensiveAnalysis(d) {
     }
   }
 
-  // ROR 크래시/플릭
-  if (ror && ror.length>=5) {
+  // ROR 크래시/플릭 — 원두 온도 기준 판정이다. 열풍식은 BT 대신 배기 공기 온도이고, 프로파일이
+  // 의도적으로 평탄 구간을 두는 경우가 많아 같은 기준으로 판정하면 오탐이 난다.
+  if (ror && ror.length>=5 && d.fluid_bed) {
+    items.push({type:'info',icon:'',title:'RoR 크래시·플릭 판정 제외 (열풍식)',
+      text:'열풍식의 RoR은 원두가 아닌 배기 공기 온도로 계산되고, 프로파일이 일부러 온도를 유지하는 구간이 있어 드럼 기준의 크래시·플릭 판정을 적용하지 않습니다. 같은 프로파일의 이전 로스팅과 곡선을 비교해 보세요.'});
+  } else if (ror && ror.length>=5) {
     const valid = ror.map((r,i)=>({r,i})).filter(o=>o.r!=null);
     let crash=false, flick=false;
     for (let j=2;j<valid.length-1;j++){
@@ -1639,10 +1731,15 @@ function comprehensiveAnalysis(d) {
       text:'플로럴·산미 보존을 위해 라이트~미디엄, 과한 발달을 피하는 것이 일반적입니다.'});
   else if (/예가체프|yirga|시다모|코케|아리차|에티오피아|ethiopia|케냐|kenya/i.test(name))
     items.push({type:'info',icon:'',title:'아프리카 고지대 추정 — 고밀도',
-      text:'단단한 고밀도 콩은 더 높은 열을 견딥니다. hot drum / low flame로 투입 후 후반 모멘텀을 유지하세요.'});
+      text: d.fluid_bed
+        ? '단단한 고밀도 콩은 더 높은 열을 견딥니다. 열풍식에서는 초반 목표 온도를 충분히 높게 잡아 후반 모멘텀을 유지하세요.'
+        : '단단한 고밀도 콩은 더 높은 열을 견딥니다. hot drum / low flame로 투입 후 후반 모멘텀을 유지하세요.'});
 
-  // 무게 손실률
-  if (d.weight_loss != null) {
+  // 무게 손실률 (드럼 기준 범위 — 열풍식 소배치는 기준 데이터가 없어 판정하지 않고 값만 안내)
+  if (d.weight_loss != null && d.fluid_bed) {
+    items.push({type:'info', icon:'', title:`무게 손실률 ${d.weight_loss.toFixed(1)}%`,
+      text:'열풍식 소배치의 손실률 기준 데이터가 아직 없어 판정하지 않습니다. 같은 프로파일끼리 비교해 일관성을 확인하세요.'});
+  } else if (d.weight_loss != null) {
     if (d.weight_loss < 12)
       items.push({type:'warn', icon:'', title:`무게 손실률 ${d.weight_loss.toFixed(1)}% — 낮음`,
         text:'손실률이 낮으면 수분 제거가 불충분하거나 배출이 너무 빠를 수 있습니다. 라이트 로스팅은 12~14%, 다크는 18~20% 범위가 일반적입니다.'});

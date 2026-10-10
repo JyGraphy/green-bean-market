@@ -24,6 +24,13 @@
   different batch sizes". So an inlet-temperature value read from a Pro50 chart is NOT
   comparable to one from a Pro100/Pro100x. If the user states a batch size or model, do not
   carry inlet-based expectations over from a different size; say so in notes instead.
+- IKAWA app roast-log graph: header "예열 온도 / 배출 온도 / 배출 시간" → charge_temp / drop_temp /
+  events.drop. Dashed markers "CC m:ss T°C" (color change → events.dry) and "1⚡ m:ss T°C"
+  (first crack → events.fcs) print EXHAUST temperatures → labeled_points curve "BT".
+  Y axis 0–300°C (50°C grid). Lines continue after drop (cooling) — stop at drop.
+- SHAPE: exhaust dips right after charge, rises fast to ≈150°C in the first minute, runs almost
+  flat until color change, then rises to drop. Inlet spikes early (≈20 s), falls to a plateau,
+  then rises after color change. Do not draw straight lines between anchors.
 - Fan speed curve (%) has its own axis, usually 60–95%. Report step changes in "agitation"
   as percent ÷ 10 (e.g. 80% → 8).
 - Roasts are SHORT (3–10 min). Do NOT stretch the time axis to drum-roaster lengths —
@@ -34,6 +41,8 @@
   roasting.js 의 IKAWA CSV 파서가 이 두 형태를 모두 인식한다.
 
 ## 근거
+
+- 2026-10-11 실기 화면(에티오피아 반코 워시드 #8) 대조: 사이트 그래프가 배기 중반 10~26°C, 인렛 25~100°C 낮게 그려짐 → 형태·마커 규칙 추가.
 
 - 2026-10-10 사장님(실기 사용자) 확인: IKAWA 프로파일 그래프에서 빨강=배기, 주황=인렛.
 

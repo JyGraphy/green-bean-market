@@ -87,6 +87,19 @@ Identify the app, then map each curve using the legend you read in PHASE 0.
     • Colors on the IKAWA profile graph: RED = EXHAUST (→ BT), ORANGE / yellow-orange =
       INLET (→ ET). The hues are close: INLET is the hotter line and sits ABOVE exhaust for
       most of the roast — if your BT is above your ET mid-roast, you swapped them.
+    • IKAWA app roast-log graph (dark screen): the header prints "예열 온도: X°C · 배출 온도:
+      Y°C" and "배출 시간: M:SS" → charge_temp = X, drop_temp = Y, events.drop = M:SS.
+      Dashed vertical markers carry text: "CC  2:22  161°C" (color change → events.dry) and
+      "1⚡ 5:42  203°C" (first crack → events.fcs). These temperatures are EXHAUST values:
+      put each one in labeled_points with curve "BT" (they anchor the curve exactly).
+      Y axis 0–300°C with gridlines every 50°C; X axis in minutes (1, 2, 3 …).
+      The lines CONTINUE after drop (cooling: both fall steeply) — stop the curves at drop.
+      Shaded areas (dark red under the exhaust, light pink/gray fan area) are not curves.
+    • IKAWA SHAPE (not a drum S-curve): exhaust dips right after charge (turning point
+      ≈10 s), rises fast to ≈150°C within the first minute, then runs almost FLAT until the
+      color change, then rises again to drop. Inlet spikes early (≈20 s) to its highest value,
+      falls back to a plateau, then rises after the color change. Follow these plateaus —
+      do not draw straight lines between anchors.
     • Fan speed curve (%): a separate line/axis, usually 60–95%.
       Report its step changes in "agitation" as percent÷10 (e.g. 80% → 8).
   Roasts are SHORT: total time 3–10 minutes — do not stretch the time axis to
@@ -255,6 +268,13 @@ chart app and total roast time, then apply that entry.
     different batch sizes". So an inlet-temperature value read from a Pro50 chart is NOT
     comparable to one from a Pro100/Pro100x. If the user states a batch size or model, do not
     carry inlet-based expectations over from a different size; say so in notes instead.
+  - IKAWA app roast-log graph: header "예열 온도 / 배출 온도 / 배출 시간" → charge_temp / drop_temp /
+    events.drop. Dashed markers "CC m:ss T°C" (color change → events.dry) and "1⚡ m:ss T°C"
+    (first crack → events.fcs) print EXHAUST temperatures → labeled_points curve "BT".
+    Y axis 0–300°C (50°C grid). Lines continue after drop (cooling) — stop at drop.
+  - SHAPE: exhaust dips right after charge, rises fast to ≈150°C in the first minute, runs almost
+    flat until color change, then rises to drop. Inlet spikes early (≈20 s), falls to a plateau,
+    then rises after color change. Do not draw straight lines between anchors.
   - Fan speed curve (%) has its own axis, usually 60–95%. Report step changes in "agitation"
     as percent ÷ 10 (e.g. 80% → 8).
   - Roasts are SHORT (3–10 min). Do NOT stretch the time axis to drum-roaster lengths —
@@ -426,7 +446,9 @@ PHASE 4 — TRACE CURVES BETWEEN LABELS
 Between labeled points, visually interpolate each curve's shape:
 - Extract 30–50 additional unlabeled data points per curve
 - Keep BT and ET as separate arrays
-- Respect the physical shape: BT has S-curve rise; ET rises more linearly/gradually
+- Respect the physical shape of THIS machine: drum roasters show a smooth S-curve BT rise with ET
+  rising more gradually; fluid-bed roasters (IKAWA) show plateaus (see the IKAWA block) — never
+  force a drum S-curve onto them
 
 For the bottom chart 교반 (agitation) STEP line — use the swatch color from PHASE 0:
 - Identify the step line whose color EXACTLY matches the 교반 legend swatch.
@@ -471,6 +493,8 @@ OUTPUT — return ONLY this JSON, no markdown, no explanation:
     "fce": <seconds or null>,
     "drop": <seconds>
   },
+  "screen_type": "boost_web" | "roastware_device" | "ikawa_app" | "artisan" | "cropster" | "other",
+  "series_colors": { "bt": "#rrggbb", "et": "#rrggbb" },
   "charge_temp": <BT celsius at charge>,
   "drop_temp":   <BT celsius at drop>,
   "total_time_sec": <seconds>,
@@ -527,6 +551,12 @@ bt_curve/events. Instead output them as an extra top-level field:
   }
 Convert MM:SS → seconds. Ignore the 냉각(cooling) section. If the roast's actual
 data comes from another image or file, target_profile simply rides along.
+
+FIELD NOTES:
+- screen_type: which screen this is (Boost web detail page, Roastware machine screen, IKAWA app,
+  Artisan, Cropster, other). series_colors: the on-screen color of the BT and ET lines as hex,
+  sampled from the line pixels. The client uses these to re-trace the curves pixel-by-pixel, so
+  give the real color, not a color name.
 
 CRITICAL RULES:
 - drop is REQUIRED (from the chart or from a stat screen's 배출 시간)

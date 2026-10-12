@@ -1,8 +1,8 @@
 # 📚 생두마켓 세컨드 브레인
 
-_이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0) · 2026-10-09_
+_이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0) · 2026-10-12_
 
-정리된 주제 **6개** · 원본 문서 **155건**
+정리된 주제 **6개** · 원본 문서 **163건**
 
 ---
 
@@ -50,6 +50,9 @@ _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0
 - [[2026-10-05-bop-전체랏]] — BOP (Best of Panama) 옥션 결과 — 전체 랏 수집  ⚠️ _wiki에서 참조되지 않음_
 - [[2026-10-05-coe-전체랏]] — COE (Cup of Excellence) 옥션 결과 — 전체 랏 수집  ⚠️ _wiki에서 참조되지 않음_
 - [[2026-10-05-lamastus-전체랏]] — Lamastus Family Estates 프라이빗 옥션 옥션 결과 — 전체 랏 수집  ⚠️ _wiki에서 참조되지 않음_
+- [[2026-10-12-bop-전체랏]] — BOP (Best of Panama) 옥션 결과 — 전체 랏 수집  ⚠️ _wiki에서 참조되지 않음_
+- [[2026-10-12-coe-전체랏]] — COE (Cup of Excellence) 옥션 결과 — 전체 랏 수집  ⚠️ _wiki에서 참조되지 않음_
+- [[2026-10-12-lamastus-전체랏]] — Lamastus Family Estates 프라이빗 옥션 옥션 결과 — 전체 랏 수집  ⚠️ _wiki에서 참조되지 않음_
 
 ### 🏆 COE 옥션 `raw/coe/`
 
@@ -126,6 +129,9 @@ _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0
 - [[2026-10-07-사이트점검]] — 사이트 자가 점검 — 2026-10-07  ⚠️ _wiki에서 참조되지 않음_
 - [[2026-10-08-사이트점검]] — 사이트 자가 점검 — 2026-10-08  ⚠️ _wiki에서 참조되지 않음_
 - [[2026-10-09-사이트점검]] — 사이트 자가 점검 — 2026-10-09  ⚠️ _wiki에서 참조되지 않음_
+- [[2026-10-10-사이트점검]] — 사이트 자가 점검 — 2026-10-10  ⚠️ _wiki에서 참조되지 않음_
+- [[2026-10-11-사이트점검]] — 사이트 자가 점검 — 2026-10-11  ⚠️ _wiki에서 참조되지 않음_
+- [[2026-10-12-사이트점검]] — 사이트 자가 점검 — 2026-10-12  ⚠️ _wiki에서 참조되지 않음_
 
 ### 🔥 로스팅 프로파일 `raw/roast-profiles/`
 
@@ -147,6 +153,7 @@ _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0
 - [[2026-09-29-AI학습현황]] — 로스팅 AI 학습 현황  ⚠️ _wiki에서 참조되지 않음_
 - [[2026-10-05-AI학습현황]] — 로스팅 AI 학습 현황  ⚠️ _wiki에서 참조되지 않음_
 - [[2026-10-06-AI학습현황]] — 로스팅 AI 학습 현황  ⚠️ _wiki에서 참조되지 않음_
+- [[2026-10-12-AI학습현황]] — 로스팅 AI 학습 현황  ⚠️ _wiki에서 참조되지 않음_
 - [[_수집대기]] — 📥 로스터기 자료 수집 대기열  ⚠️ _wiki에서 참조되지 않음_
 - [[_출처카탈로그]] — 로스팅 프로파일 출처 카탈로그 (SOURCES.md)
 
@@ -159,7 +166,7 @@ _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0
 
 ## ⚠️ 정리 대기
 
-아래 124건은 아직 wiki에 반영되지 않았습니다.
+아래 132건은 아직 wiki에 반영되지 않았습니다.
 정리하려면 Claude에게 다음처럼 지시하세요:
 
 ```
@@ -191,11 +198,15 @@ vault/raw의 아래 문서를 읽고 vault/CLAUDE.md 규칙대로 wiki로 정리
   - raw/auctions/2026-10-05-bop-전체랏.md
   - raw/auctions/2026-10-05-coe-전체랏.md
   - raw/auctions/2026-10-05-lamastus-전체랏.md
+  - raw/auctions/2026-10-12-bop-전체랏.md
+  - raw/auctions/2026-10-12-coe-전체랏.md
+  - raw/auctions/2026-10-12-lamastus-전체랏.md
   - raw/papers/_수집대기.md
   - raw/papers/fulltext/PMC10305520-Chemical-and-Biological-Characterization-of-Green-and-Proces.md
   - raw/papers/fulltext/PMC11002029-The-effect-of-roast-profiles-on-the-dynamics-of-titratable-a.md
   - raw/papers/fulltext/PMC11500665-Contrasted-agronomical-and-physiological-responses-of-five-C.md
   - raw/papers/fulltext/PMC12234775-A-universal-color-curve-for-roasted-arabica-coffee.md
+  - raw/papers/fulltext/PMC13328201-F1-hybrids-in-an-allopolyploid-crop-genomic-architecture-int.md
   - raw/papers/fulltext/PMC6818232-Starmaya-The-First-Arabica-F1-Coffee-Hybrid-Produced-Using-G.md
   - raw/papers/fulltext/PMC8854711-Comparison-of-chemical-compounds-and-their-influence-on-the.md
   - raw/qa/2026-08-21-사이트점검.md
@@ -248,6 +259,9 @@ vault/raw의 아래 문서를 읽고 vault/CLAUDE.md 규칙대로 wiki로 정리
   - raw/qa/2026-10-07-사이트점검.md
   - raw/qa/2026-10-08-사이트점검.md
   - raw/qa/2026-10-09-사이트점검.md
+  - raw/qa/2026-10-10-사이트점검.md
+  - raw/qa/2026-10-11-사이트점검.md
+  - raw/qa/2026-10-12-사이트점검.md
   - raw/roast-profiles/2026-08-05-AI학습현황.md
   - raw/roast-profiles/2026-08-19-AI학습현황.md
   - raw/roast-profiles/2026-08-23-AI학습현황.md
@@ -265,6 +279,7 @@ vault/raw의 아래 문서를 읽고 vault/CLAUDE.md 규칙대로 wiki로 정리
   - raw/roast-profiles/2026-09-29-AI학습현황.md
   - raw/roast-profiles/2026-10-05-AI학습현황.md
   - raw/roast-profiles/2026-10-06-AI학습현황.md
+  - raw/roast-profiles/2026-10-12-AI학습현황.md
   - raw/roast-profiles/_수집대기.md
   - raw/roast-profiles/machines/easyster-800.md
   - raw/roast-profiles/machines/roest.md

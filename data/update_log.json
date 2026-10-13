@@ -1,5 +1,26 @@
 {
-  "updated_at": "2026-10-12T00:19:37Z",
-  "stores": [],
-  "total_new": 0
+  "updated_at": "2026-10-13T02:34:40Z",
+  "stores": [
+    {
+      "name": "블레스빈",
+      "new_count": 1
+    },
+    {
+      "name": "엠아이커피",
+      "new_count": 15
+    },
+    {
+      "name": "지에스씨(GSC)",
+      "new_count": 3
+    },
+    {
+      "name": "커피리브레",
+      "new_count": 1
+    },
+    {
+      "name": "팔콘커피",
+      "new_count": 1
+    }
+  ],
+  "total_new": 21
 }

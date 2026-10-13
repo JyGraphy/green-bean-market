@@ -1,51 +1,51 @@
 {
-  "checked_at": "2026-10-12T00:18:05Z",
-  "total": 1302,
+  "checked_at": "2026-10-13T02:33:08Z",
+  "total": 1328,
   "removed": [],
   "held_stores": [],
   "timing": {
-    "elapsed_sec": 459.7,
-    "requests": 1083,
+    "elapsed_sec": 461.0,
+    "requests": 1109,
     "skipped_unknown": 219,
     "slowest_domains": [
       {
         "domain": "comansa.kr",
-        "sec": 459.7,
-        "count": 336
+        "sec": 461.0,
+        "count": 337
       },
       {
         "domain": "www.gsc.coffee",
-        "sec": 200.6,
-        "count": 103
-      },
-      {
-        "domain": "momos.co.kr",
-        "sec": 116.7,
-        "count": 97
+        "sec": 183.2,
+        "count": 106
       },
       {
         "domain": "www.micoffee.co.kr",
-        "sec": 116.4,
-        "count": 83
+        "sec": 150.4,
+        "count": 98
+      },
+      {
+        "domain": "momos.co.kr",
+        "sec": 115.2,
+        "count": 97
       },
       {
         "domain": "www.blessbean.co.kr",
-        "sec": 90.4,
-        "count": 91
+        "sec": 98.0,
+        "count": 98
       },
       {
         "domain": "www.cobeans.com",
-        "sec": 74.3,
-        "count": 95
+        "sec": 73.6,
+        "count": 94
       },
       {
         "domain": "wbeans.com",
-        "sec": 58.5,
+        "sec": 59.4,
         "count": 42
       },
       {
         "domain": "coffeeplant.co.kr",
-        "sec": 56.7,
+        "sec": 56.4,
         "count": 48
       }
     ]
@@ -72,7 +72,7 @@
       "ambiguous": 0
     },
     "블레스빈": {
-      "ok": 91,
+      "ok": 98,
       "dead": 0,
       "ambiguous": 0
     },
@@ -82,7 +82,7 @@
       "ambiguous": 0
     },
     "엠아이커피": {
-      "ok": 83,
+      "ok": 98,
       "dead": 0,
       "ambiguous": 0
     },
@@ -97,12 +97,12 @@
       "ambiguous": 0
     },
     "지에스씨(GSC)": {
-      "ok": 103,
+      "ok": 106,
       "dead": 0,
       "ambiguous": 0
     },
     "커만사": {
-      "ok": 336,
+      "ok": 337,
       "dead": 0,
       "ambiguous": 0
     },
@@ -122,12 +122,12 @@
       "ambiguous": 0
     },
     "코빈즈커피": {
-      "ok": 95,
+      "ok": 94,
       "dead": 0,
       "ambiguous": 0
     },
     "팔콘커피": {
-      "ok": 42,
+      "ok": 43,
       "dead": 0,
       "ambiguous": 0
     }

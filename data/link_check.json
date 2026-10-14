@@ -1,51 +1,51 @@
 {
-  "checked_at": "2026-10-13T02:33:08Z",
-  "total": 1328,
+  "checked_at": "2026-10-14T00:13:21Z",
+  "total": 1317,
   "removed": [],
   "held_stores": [],
   "timing": {
-    "elapsed_sec": 461.0,
-    "requests": 1109,
-    "skipped_unknown": 219,
+    "elapsed_sec": 498.8,
+    "requests": 1110,
+    "skipped_unknown": 207,
     "slowest_domains": [
       {
         "domain": "comansa.kr",
-        "sec": 461.0,
+        "sec": 498.8,
         "count": 337
       },
       {
         "domain": "www.gsc.coffee",
-        "sec": 183.2,
+        "sec": 193.1,
         "count": 106
       },
       {
         "domain": "www.micoffee.co.kr",
-        "sec": 150.4,
-        "count": 98
-      },
-      {
-        "domain": "momos.co.kr",
-        "sec": 115.2,
+        "sec": 148.6,
         "count": 97
       },
       {
-        "domain": "www.blessbean.co.kr",
-        "sec": 98.0,
-        "count": 98
+        "domain": "momos.co.kr",
+        "sec": 118.7,
+        "count": 97
       },
       {
         "domain": "www.cobeans.com",
-        "sec": 73.6,
+        "sec": 76.6,
         "count": 94
       },
       {
+        "domain": "www.blessbean.co.kr",
+        "sec": 68.5,
+        "count": 102
+      },
+      {
         "domain": "wbeans.com",
-        "sec": 59.4,
+        "sec": 66.4,
         "count": 42
       },
       {
         "domain": "coffeeplant.co.kr",
-        "sec": 56.4,
+        "sec": 59.8,
         "count": 48
       }
     ]
@@ -66,13 +66,13 @@
       "dead": 0,
       "ambiguous": 18
     },
-    "모모스커피": {
-      "ok": 97,
+    "블레스빈": {
+      "ok": 102,
       "dead": 0,
       "ambiguous": 0
     },
-    "블레스빈": {
-      "ok": 98,
+    "모모스커피": {
+      "ok": 97,
       "dead": 0,
       "ambiguous": 0
     },
@@ -82,7 +82,7 @@
       "ambiguous": 0
     },
     "엠아이커피": {
-      "ok": 98,
+      "ok": 97,
       "dead": 0,
       "ambiguous": 0
     },
@@ -107,7 +107,7 @@
       "ambiguous": 0
     },
     "커피리브레": {
-      "ok": 17,
+      "ok": 15,
       "dead": 0,
       "ambiguous": 0
     },

@@ -43,6 +43,20 @@ THUMB_W = 1000
 DELAY = 1.0
 
 # 통과시킬 라이선스. ND·NC 는 2차 문서(PDF)에 싣기 어렵고, 불명은 쓰지 않는다.
+# 검색어만으로는 **피사체가 맞는지 보장되지 않는다.** 2026-10-17 첫 수집에서
+# "Coffea arabica Caturra" 가 바나나 사진(File:Banana_caturra.JPG)과 르네상스
+# 프레스코화를, "Coffea eugenioides" 가 분포 지도를 물어왔다. 라이선스만 보고
+# 통과시키면 그런 것이 문서에 박힌다. 그래서 두 겹을 더 둔다:
+#   ① 파일 제목·설명에 커피를 가리키는 말이 반드시 있어야 한다(기본 coffea|coffee)
+#   ② 사진이 아닌 것(지도·도표·로고·그림)은 제목으로 걸러낸다
+# 그래도 "아라비카를 찾았는데 로부스타가 왔다" 같은 종 오인은 남는다 —
+# 최종 판단은 사람이 눈으로 본다. 이 필터는 명백한 쓰레기를 막는 용도다.
+DEFAULT_REQUIRE = re.compile(r'coffea|coffee|커피', re.I)
+NOT_A_PHOTO = re.compile(
+    r'(distribution\s*map|\bmap\b|chart|diagram|graph|logo|icon|\bseal\b|'
+    r'coat of arms|stamp|banknote|\bcoin\b|fresco|painting|poster|'
+    r'screenshot|infographic)', re.I)
+
 OK_LICENSE = re.compile(
     r'^(cc0|cc[- ]by(-sa)?([- ]\d(\.\d)?)?|public domain|pd-\w+|'
     r'attribution(-sharealike)?)', re.I)
@@ -68,8 +82,8 @@ def search(session, query: str, limit: int) -> list[dict]:
     return r.json().get('query', {}).get('pages', []) or []
 
 
-def usable(page: dict) -> tuple[bool, str, dict]:
-    """자유 라이선스이고 쓸 만한 크기인지. (가능여부, 사유, 정보)."""
+def usable(page: dict, require: re.Pattern) -> tuple[bool, str, dict]:
+    """자유 라이선스이고, 피사체가 맞고, 쓸 만한 크기인지. (가능여부, 사유, 정보)."""
     ii = (page.get('imageinfo') or [{}])[0]
     if not ii:
         return False, '이미지 정보 없음', {}
@@ -91,6 +105,11 @@ def usable(page: dict) -> tuple[bool, str, dict]:
         'thumb_url': ii.get('thumburl') or ii.get('url', ''),
         'width': ii.get('width'), 'height': ii.get('height'),
     }
+    haystack = f"{info['title']} {info['description']}"
+    if NOT_A_PHOTO.search(info['title']):
+        return False, '사진이 아님(지도·도표·그림)', info
+    if not require.search(haystack):
+        return False, '커피 사진인지 확인 안 됨(제목·설명에 근거 없음)', info
     if BAD_LICENSE.search(lic):
         return False, f'제한 라이선스({lic})', info
     if not OK_LICENSE.match(lic):
@@ -112,8 +131,11 @@ def download(session, url: str, dest: pathlib.Path) -> bool:
     return True
 
 
-def fetch_one(session, key: str, query: str, want: int, note: str = '') -> int:
-    print(f'\n[{key}] "{query}" — {want}장 목표')
+def fetch_one(session, key: str, query: str, want: int, note: str = '',
+              require: str = '') -> int:
+    rx = re.compile(require, re.I) if require else DEFAULT_REQUIRE
+    print(f'\n[{key}] "{query}" — {want}장 목표'
+          + (f'  (제목·설명에 /{require}/ 필수)' if require else ''))
     try:
         pages = search(session, query, want * 4)
     except requests.RequestException as e:
@@ -124,7 +146,7 @@ def fetch_one(session, key: str, query: str, want: int, note: str = '') -> int:
     for page in pages:
         if saved >= want:
             break
-        ok, why, info = usable(page)
+        ok, why, info = usable(page, rx)
         if not ok:
             print(f'  – 건너뜀: {page.get("title","?")[:60]} — {why}')
             continue
@@ -149,17 +171,20 @@ def fetch_one(session, key: str, query: str, want: int, note: str = '') -> int:
     return saved
 
 
-QLINE = re.compile(r'^-\s*\[( |x|X)\]\s*(\S+)\s*\|\s*([^|]+?)\s*(?:\|\s*(.*))?$')
+# - [ ] 키 | 검색어 | 메모 | (선택) 제목·설명에 반드시 들어가야 할 정규식
+QLINE = re.compile(r'^-\s*\[( |x|X)\]\s*(\S+)\s*\|\s*([^|]+?)\s*'
+                   r'(?:\|\s*([^|]*?)\s*)?(?:\|\s*(.*?)\s*)?$')
 
 
-def read_queue() -> list[tuple[str, str, str]]:
+def read_queue() -> list[tuple[str, str, str, str]]:
     if not QUEUE.exists():
         return []
     out = []
     for line in QUEUE.read_text(encoding='utf-8').splitlines():
         m = QLINE.match(line.strip())
         if m and m.group(1) == ' ':
-            out.append((m.group(2), m.group(3), (m.group(4) or '').strip()))
+            out.append((m.group(2), m.group(3), (m.group(4) or '').strip(),
+                        (m.group(5) or '').strip()))
     return out
 
 
@@ -217,14 +242,16 @@ def main() -> int:
     ap.add_argument('--key')
     ap.add_argument('--query')
     ap.add_argument('--count', type=int, default=2)
+    ap.add_argument('--require', default='',
+                    help='파일 제목·설명에 반드시 있어야 할 정규식')
     a = ap.parse_args()
 
     IMG_DIR.mkdir(parents=True, exist_ok=True)
     META_DIR.mkdir(parents=True, exist_ok=True)
 
-    jobs: list[tuple[str, str, str]] = []
+    jobs: list[tuple[str, str, str, str]] = []
     if a.key and a.query:
-        jobs.append((a.key, a.query, ''))
+        jobs.append((a.key, a.query, '', a.require))
     if a.queue:
         jobs += read_queue()
     if not jobs:
@@ -235,8 +262,8 @@ def main() -> int:
     session.headers.update({'User-Agent': UA})
 
     done, total = set(), 0
-    for key, query, note in jobs:
-        n = fetch_one(session, key, query, a.count, note)
+    for key, query, note, require in jobs:
+        n = fetch_one(session, key, query, a.count, note, require)
         total += n
         if n:
             done.add(key)

@@ -423,8 +423,84 @@ def fig_f1() -> tuple[str, str]:
         draw(N, E, extras))
 
 
+# ════════════════ ⑥ 생두 크기 비교 (스크린 사이즈) ════════════════
+# 사진 대신 도해를 쓴다. 생두 사진은 축척이 없어서 크기 비교에 못 쓰고,
+# 품종 식별에도 쓸 수 없다(대부분의 품종은 생두만 보면 구별이 안 된다).
+# 스크린 = 1/64 인치 구멍을 통과하는지로 가르는 체 번호 → 지름을 **계산**할 수 있다.
+# 원의 크기는 추정이 아니라 N/64 inch 를 그대로 축척한 값이다.
+
+MM_PER_SCREEN = 25.4 / 64          # 스크린 1 = 1/64 인치 = 0.3969 mm
+PX_PER_MM = 7.6                    # 도면 축척
+
+
+def fig_beansize() -> tuple[str, str]:
+    W, H = 1010, 430
+    screens = [12, 14, 15, 16, 17, 18, 19, 20]
+    x0, baseline = 56, 190
+
+    parts = []
+    xs = {}
+    x = x0
+    for n in screens:
+        mm = n * MM_PER_SCREEN
+        r = mm * PX_PER_MM / 2
+        cx = x + r
+        xs[n] = cx
+        parts.append(f'<circle cx="{cx:.1f}" cy="{baseline}" r="{r:.1f}" '
+                     f'fill="#efe3d4" stroke="#8a6a46" stroke-width="1.6"/>')
+        # 생두 한가운데 센터컷
+        parts.append(f'<path d="M {cx:.1f} {baseline - r + 3:.1f} '
+                     f'Q {cx + 3:.1f} {baseline:.1f} {cx:.1f} {baseline + r - 3:.1f}" '
+                     f'fill="none" stroke="#8a6a46" stroke-width="1.3"/>')
+        parts.append(f'<text x="{cx:.1f}" y="{baseline + r + 19:.1f}" '
+                     f'text-anchor="middle" font-family={FONT!r} font-size="12.5" '
+                     f'font-weight="700" fill="#17202a">{n}</text>')
+        parts.append(f'<text x="{cx:.1f}" y="{baseline + r + 34:.1f}" '
+                     f'text-anchor="middle" font-family={FONT!r} font-size="10.5" '
+                     f'fill="#6b7280">{mm:.1f}mm</text>')
+        x = cx + r + 26
+
+    def bracket(a, b, y, label, color, note=''):
+        x1, x2 = xs[a] - a * MM_PER_SCREEN * PX_PER_MM / 2, \
+                 xs[b] + b * MM_PER_SCREEN * PX_PER_MM / 2
+        out = [f'<path d="M {x1:.1f} {y + 7} V {y} H {x2:.1f} V {y + 7}" fill="none" '
+               f'stroke="{color}" stroke-width="1.6"/>',
+               f'<text x="{(x1 + x2) / 2:.1f}" y="{y - 6}" text-anchor="middle" '
+               f'font-family={FONT!r} font-size="11.5" font-weight="700" '
+               f'fill="{color}">{sx.escape(label)}</text>']
+        if note:
+            out.append(f'<text x="{(x1 + x2) / 2:.1f}" y="{y - 21}" text-anchor="middle" '
+                       f'font-family={FONT!r} font-size="10" fill="#8a9096">'
+                       f'{sx.escape(note)}</text>')
+        return '\n'.join(out)
+
+    parts.append(bracket(15, 18, 138, '대부분의 아라비카가 여기', '#8a6a46'))
+    parts.append(bracket(17, 18, 100, '케냐 AA · 콜롬비아 수프리모', '#0369a1'))
+    parts.append(bracket(19, 20, 310, '마라고지페 · 파카마라', '#7c3aed',
+                         '"코끼리콩" — 눈으로 구별되는 몇 안 되는 품종'))
+    parts.append(bracket(12, 14, 310, '모카 · 라우리나 등 소립종', '#b45309'))
+
+    note = [
+        '스크린 = 체의 구멍 크기를 1/64 인치 단위로 센 번호. 위 원의 지름은 추정이 아니라 '
+        'N × 25.4/64 mm 를 그대로 축척한 값이다.',
+        '크기는 품질이 아니라 열이 들어가는 속도의 변수다 — 한 배치에 크기가 섞이면 '
+        '작은 콩이 먼저 타고 큰 콩은 아직 1차 크랙 전이다.',
+        '품종별 스크린 범위(마라고지페 19+ 등)는 업계 통용값이며 1차 자료로 확인하지 못했다. '
+        '스크린–mm 환산만 계산값이다.',
+    ]
+    for i, t in enumerate(note):
+        parts.append(f'<text x="24" y="{362 + i * 19}" font-family={FONT!r} '
+                     f'font-size="10.8" fill="#5b6166">{t}</text>')
+
+    return 'bean-size.svg', wrap(
+        W, H, '⑥ 생두 크기 — 스크린 사이즈 실축척 비교',
+        '사진은 축척이 없어 크기 비교에 못 쓴다. 체 번호에서 지름을 계산해 실제 비율로 그렸다.',
+        '\n'.join(parts))
+
+
 FIGS = {'종관계도': fig_species, '에티오피아갈래': fig_eth,
-        '본류계보도': fig_main, '내병성계보도': fig_rust, 'F1계보도': fig_f1}
+        '본류계보도': fig_main, '내병성계보도': fig_rust, 'F1계보도': fig_f1,
+        '생두크기': fig_beansize}
 
 
 def main() -> int:

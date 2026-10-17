@@ -18,6 +18,7 @@
 """
 import argparse
 import html
+import json
 import os
 import pathlib
 import re
@@ -51,6 +52,16 @@ PRESETS: dict[str, dict] = {
             ('raw/papers/2026-08-03-wcr-커피잎녹병-품종시험.md',
              '부록 — 29개 품종 × 23개 지역 잎녹병 시험',
              '"저항성 품종" 라벨을 지역 검증 없이 믿으면 안 되는 이유'),
+        ],
+    },
+    '로스팅사전조사': {
+        'title': '로스팅 사전조사',
+        'subtitle': '무엇을 공부할지 먼저 정하는 문서 — 지식 지도와 쟁점 목록',
+        'docs': [
+            ('raw/papers/2026-10-17-로스팅-사전조사.md', '로스팅 사전조사',
+             '제약 → 볼트 인벤토리 → 7개 영역 지도 → 1차 발견 → 쟁점 7건 → 대기열'),
+            ('raw/papers/2026-08-05-기초지식-생두와로스팅.md',
+             '참고 — 생두와 로스팅 기초지식', '기존 종합 정리본(2026-08-05)'),
         ],
     },
     '품종': {
@@ -172,6 +183,66 @@ def toc_worthy(title: str) -> bool:
     return not TOC_SKIP.match(re.sub(r'^[^\w가-힣]+', '', title).strip())
 
 
+PHOTOBLOCK = re.compile(r'^```photos\n(.*?)^```\s*$', re.M | re.S)
+
+
+def _photo_credits(base: pathlib.Path) -> dict[str, dict]:
+    """파일명 → 출처 정보. fetch_photos.py 가 남긴 JSON 을 읽는다."""
+    out: dict[str, dict] = {}
+    for jf in sorted((base / 'raw' / 'photos').glob('*.json')):
+        try:
+            d = json.loads(jf.read_text(encoding='utf-8'))
+        except (ValueError, OSError):
+            continue
+        for im in d.get('images', []):
+            out[pathlib.Path(im.get('file', '')).name] = im
+    return out
+
+
+def inline_photos(md: str, base: pathlib.Path) -> str:
+    """```photos 블록 → 사진 격자.
+
+        ```photos
+        greenbean-1 | 생두 — 로스팅 전의 커피 씨앗
+        ```
+
+    사진은 저작물이다. 캡션 아래에 **저작자·라이선스를 자동으로 박는다** —
+    사람이 손으로 적으면 빠뜨리고, 빠뜨리면 라이선스 위반이다.
+    파일이 없으면 자리를 비우지 않고 "아직 못 받음"을 적는다(조용한 누락 방지).
+    """
+    credits = _photo_credits(base)
+
+    def sub(m: re.Match) -> str:
+        cells = []
+        for line in m.group(1).strip().split('\n'):
+            if not line.strip():
+                continue
+            name, _, cap = line.partition('|')
+            name, cap = name.strip(), cap.strip()
+            fn = name if name.endswith(('.jpg', '.png')) else f'{name}.jpg'
+            path = base / 'assets' / 'photos' / fn
+            if not path.exists():
+                print(f'⚠️  사진 없음: {fn}')
+                cells.append(
+                    f'<figure class="ph ph-missing"><div class="ph-box">'
+                    f'아직 못 받은 사진<br><code>{html.escape(fn)}</code></div>'
+                    f'<figcaption>{html.escape(cap)}</figcaption></figure>')
+                continue
+            c = credits.get(fn, {})
+            src = (f'{html.escape(c.get("author", "미상")[:40])} · '
+                   f'{html.escape(c.get("license", "라이선스 미상"))}'
+                   ) if c else '출처 정보 없음'
+            cells.append(
+                f'<figure class="ph">'
+                f'<img src="{path.resolve().as_uri()}" alt="{html.escape(cap)}">'
+                f'<figcaption>{html.escape(cap)}'
+                f'<span class="cr">{src} / Wikimedia Commons</span>'
+                f'</figcaption></figure>')
+        return f'<div class="ph-row">{"".join(cells)}</div>'
+
+    return PHOTOBLOCK.sub(sub, md)
+
+
 def slugify(text: str, used: set[str]) -> str:
     s = re.sub(r'[^\w가-힣]+', '-', text.strip()).strip('-').lower() or 'sec'
     base, n = s, 2
@@ -186,7 +257,7 @@ def render_doc(md: str, idx: int, used: set[str],
     """마크다운 1건 → (HTML, 목차항목[(레벨, 제목, 앵커)])."""
     import markdown
     body = markdown.markdown(
-        inline_svgs(preprocess(md), base),
+        inline_photos(inline_svgs(preprocess(md), base), base),
         extensions=['tables', 'fenced_code', 'sane_lists', 'nl2br', 'attr_list'],
     )
 
@@ -311,6 +382,20 @@ figure.fig-land{ page:land; page-break-before:always; page-break-after:always;
                  margin:0; width:100%; height:168mm;
                  display:flex; align-items:center; }
 figure.fig-land svg{ width:100%; height:100%; }
+
+/* 사진 */
+.ph-row{ display:flex; gap:4mm; margin:4mm 0 5mm; page-break-inside:avoid; }
+figure.ph{ flex:1 1 0; margin:0; min-width:0; }
+figure.ph img{ width:100%; height:46mm; object-fit:cover; border-radius:3px;
+               border:1px solid var(--line); display:block; }
+figure.ph .ph-box{ width:100%; height:46mm; display:flex; flex-direction:column;
+                   align-items:center; justify-content:center; border-radius:3px;
+                   border:1px dashed var(--line); background:var(--soft);
+                   color:var(--muted); font-size:8.4pt; text-align:center; }
+figure.ph figcaption{ margin-top:1.6mm; font-size:8.4pt; line-height:1.45;
+                      color:var(--ink); }
+figure.ph figcaption .cr{ display:block; margin-top:0.6mm; font-size:7.1pt;
+                          color:var(--muted); }
 
 /* 코드/위키참조 */
 code{ font-family:ui-monospace,"DejaVu Sans Mono",monospace; font-size:8.9pt;

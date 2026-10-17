@@ -2,7 +2,7 @@
 
 _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0) · 2026-10-17_
 
-정리된 주제 **6개** · 원본 문서 **176건**
+정리된 주제 **6개** · 원본 문서 **177건**
 
 ---
 
@@ -74,6 +74,7 @@ _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0
 - [[2026-08-05-기초지식-생두와로스팅]] — 생두와 로스팅 기초지식 종합정리 (초록·업계자료 기반 — 전문 대기 중인 것은 별도 표시)
 - [[2026-10-05-품종-기초이론]] — 커피 품종 기초이론 — 종(species)·계통(lineage)·분류체계 (검색요약 기반)
 - [[2026-10-09-품종도감]] — 커피 품종 도감 — 품종을 처음 보는 사람을 위한 계보와 설명
+- [[2026-10-17-로스팅-사전조사]] — 로스팅 사전조사 — 무엇을 공부할지 먼저 정하는 문서  ⚠️ _wiki에서 참조되지 않음_
 - [[_리딩리스트]] — 커피 논문 리딩 리스트 (본문 접근이 열리면 정독할 후보)
 - [[_수집대기]] — 📥 논문 전문 수집 대기열  ⚠️ _wiki에서 참조되지 않음_
 
@@ -181,7 +182,7 @@ _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0
 
 ## ⚠️ 정리 대기
 
-아래 145건은 아직 wiki에 반영되지 않았습니다.
+아래 146건은 아직 wiki에 반영되지 않았습니다.
 정리하려면 Claude에게 다음처럼 지시하세요:
 
 ```
@@ -219,6 +220,7 @@ vault/raw의 아래 문서를 읽고 vault/CLAUDE.md 규칙대로 wiki로 정리
   - raw/auctions/2026-10-17-bop-전체랏.md
   - raw/auctions/2026-10-17-coe-전체랏.md
   - raw/auctions/2026-10-17-lamastus-전체랏.md
+  - raw/papers/2026-10-17-로스팅-사전조사.md
   - raw/papers/_수집대기.md
   - raw/papers/fulltext/PMC10305520-Chemical-and-Biological-Characterization-of-Green-and-Proces.md
   - raw/papers/fulltext/PMC11002029-The-effect-of-roast-profiles-on-the-dynamics-of-titratable-a.md

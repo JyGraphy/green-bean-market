@@ -1,0 +1,22 @@
+{
+  "key": "typica-plant",
+  "query": "Coffea arabica Typica",
+  "note": "티피카 수형 (새잎 청동색)",
+  "fetched_at": "2026-10-17",
+  "images": [
+    {
+      "title": "File:Amy farms typica hybrid coffee beans.jpg",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0",
+      "author": "Vee Satayamas",
+      "credit": "Own work",
+      "description": "Amy farms typica hybrid coffee beans",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Amy_farms_typica_hybrid_coffee_beans.jpg",
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0a/Amy_farms_typica_hybrid_coffee_beans.jpg/1280px-Amy_farms_typica_hybrid_coffee_beans.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "width": 4483,
+      "height": 2989,
+      "file": "vault/assets/photos/typica-plant-1.jpg",
+      "bytes": 131897
+    }
+  ]
+}

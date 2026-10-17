@@ -1,0 +1,22 @@
+{
+  "key": "bourbon-plant",
+  "query": "Coffea arabica Bourbon variety",
+  "note": "부르봉 수형 (새잎 녹색)",
+  "fetched_at": "2026-10-17",
+  "images": [
+    {
+      "title": "File:Bourbon Coffee.jpg",
+      "license": "CC BY-SA 3.0",
+      "license_url": "http://creativecommons.org/licenses/by-sa/3.0/",
+      "author": "미상",
+      "credit": "",
+      "description": "",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Bourbon_Coffee.jpg",
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3b/Bourbon_Coffee.jpg/1280px-Bourbon_Coffee.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "width": 2048,
+      "height": 1536,
+      "file": "vault/assets/photos/bourbon-plant-1.jpg",
+      "bytes": 252801
+    }
+  ]
+}

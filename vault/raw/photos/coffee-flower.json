@@ -1,0 +1,36 @@
+{
+  "key": "coffee-flower",
+  "query": "Coffea flower blossom",
+  "note": "커피 꽃",
+  "fetched_at": "2026-10-17",
+  "images": [
+    {
+      "title": "File:The blossom and fruit of a coffee tree (Coffea arabica). Pho Wellcome V0044767.jpg",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0",
+      "author": "미상",
+      "credit": "https://wellcomeimages.org/indexplus/obf_images/70/b7/a3c9a68338d05ea8006d25db629a.jpg Gallery: https://wellcomeimages.org/indexplus/image/V0044767.html Wellcome Collection gallery (2018-04-03): https://wellcomecollection.org/works/mfemfhhq CC-BY-4.0",
+      "description": "The blossom and fruit of a coffee tree (Coffea arabica). Photograph. Iconographic Collections Keywords: W.L.H.Skeen &amp; Co..",
+      "page_url": "https://commons.wikimedia.org/wiki/File:The_blossom_and_fruit_of_a_coffee_tree_(Coffea_arabica)._Pho_Wellcome_V0044767.jpg",
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/53/The_blossom_and_fruit_of_a_coffee_tree_%28Coffea_arabica%29._Pho_Wellcome_V0044767.jpg/1280px-The_blossom_and_fruit_of_a_coffee_tree_%28Coffea_arabica%29._Pho_Wellcome_V0044767.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "width": 3156,
+      "height": 2508,
+      "file": "vault/assets/photos/coffee-flower-1.jpg",
+      "bytes": 827759
+    },
+    {
+      "title": "File:The blossom and fruit of a coffee tree (Coffea arabica). Pho Wellcome V0044769.jpg",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0",
+      "author": "미상",
+      "credit": "https://wellcomeimages.org/indexplus/obf_images/98/65/294349434f1af249335ffb57eb18.jpg Gallery: https://wellcomeimages.org/indexplus/image/V0044769.html Wellcome Collection gallery (2018-04-03): https://wellcomecollection.org/works/srknqj4s CC-BY-4.0",
+      "description": "The blossom and fruit of a coffee tree (Coffea arabica). Photograph. Iconographic Collections Keywords: Scowen &amp; co..",
+      "page_url": "https://commons.wikimedia.org/wiki/File:The_blossom_and_fruit_of_a_coffee_tree_(Coffea_arabica)._Pho_Wellcome_V0044769.jpg",
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e3/The_blossom_and_fruit_of_a_coffee_tree_%28Coffea_arabica%29._Pho_Wellcome_V0044769.jpg/1280px-The_blossom_and_fruit_of_a_coffee_tree_%28Coffea_arabica%29._Pho_Wellcome_V0044769.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "width": 3209,
+      "height": 2497,
+      "file": "vault/assets/photos/coffee-flower-2.jpg",
+      "bytes": 769654
+    }
+  ]
+}

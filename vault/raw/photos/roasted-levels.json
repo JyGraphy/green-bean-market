@@ -1,0 +1,22 @@
+{
+  "key": "roasted-levels",
+  "query": "roasted coffee beans roast degree comparison",
+  "note": "로스팅 단계별 색",
+  "fetched_at": "2026-10-17",
+  "images": [
+    {
+      "title": "File:Row of 15 grams of coffee roasted to different degrees.jpg",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0",
+      "author": "Alorin",
+      "credit": "Own work",
+      "description": "15 grams of coffee roasted to different degrees",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Row_of_15_grams_of_coffee_roasted_to_different_degrees.jpg",
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/54/Row_of_15_grams_of_coffee_roasted_to_different_degrees.jpg/1280px-Row_of_15_grams_of_coffee_roasted_to_different_degrees.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "width": 5810,
+      "height": 3878,
+      "file": "vault/assets/photos/roasted-levels-1.jpg",
+      "bytes": 124997
+    }
+  ]
+}

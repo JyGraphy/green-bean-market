@@ -29,6 +29,14 @@ on:
         description: '받아올 로스터기 자료 주소'
         required: false
         default: ''
+      photo_query:
+        description: '사진 검색어 (photo_key 와 함께 쓴다). 비우면 대기열만 처리'
+        required: false
+        default: ''
+      photo_key:
+        description: '사진 키 — 파일명이 된다 (<키>-1.jpg)'
+        required: false
+        default: ''
 
 jobs:
   fetch:
@@ -81,6 +89,19 @@ jobs:
           fi
           python scripts/roast_machine_fetch.py --queue
 
+      # 품종·식물 사진. 세션에서는 commons.wikimedia.org 가 403(프록시 CONNECT 거부)이라
+      # 여기서만 받을 수 있다. 자유 라이선스만 통과하고 저작자 표기는 자동 기록된다.
+      - name: 사진 수집 (위키미디어 공용)
+        id: photos
+        continue-on-error: true
+        run: |
+          if [ -n "${{ github.event.inputs.photo_key }}" ] && [ -n "${{ github.event.inputs.photo_query }}" ]; then
+            python scripts/fetch_photos.py \
+              --key "${{ github.event.inputs.photo_key }}" \
+              --query "${{ github.event.inputs.photo_query }}"
+          fi
+          python scripts/fetch_photos.py --queue
+
       # 수집만으로는 AI가 똑똑해지지 않는다 — 기기 규칙을 프롬프트에 주입해야 학습이다.
       # 여기서 supabase/functions/ 가 바뀌면 deploy-functions.yml 이 이어받아 배포한다.
       # 틀린 기기 지식은 없느니만 못하다 — AI가 확신을 갖고 잘못 읽는다.
@@ -103,7 +124,7 @@ jobs:
         id: check_changes
         if: always()
         run: |
-          git add vault/raw/ vault/wiki/index.md supabase/
+          git add vault/raw/ vault/assets/ vault/wiki/index.md supabase/
           git diff --cached --quiet || echo "changed=true" >> $GITHUB_OUTPUT
 
       - name: 변경사항 커밋 & 푸시
@@ -133,7 +154,8 @@ jobs:
           P="${{ steps.papers.outcome }}"
           M="${{ steps.machines.outcome }}"
           L="${{ steps.learn.outcome }}"
-          echo "옥션: $A / 논문: $P / 로스터기: $M / 학습주입: $L"
+          H="${{ steps.photos.outcome }}"
+          echo "옥션: $A / 논문: $P / 로스터기: $M / 사진: $H / 학습주입: $L"
           if [ "$A" != "success" ] && [ "$P" != "success" ] && [ "$M" != "success" ]; then
             echo "::error::옥션·논문·로스터기 수집이 모두 실패했습니다 — vault/raw/ 최신 보고서를 확인하세요."
             exit 1
@@ -141,6 +163,8 @@ jobs:
           if [ "$A" != "success" ]; then echo "::warning::옥션 수집 실패"; fi
           if [ "$P" != "success" ]; then echo "::warning::논문 수집 실패(대기열이 비어 있으면 정상)"; fi
           if [ "$M" != "success" ]; then echo "::warning::로스터기 자료 수집 실패"; fi
+          # 사진은 '자유 라이선스가 없어서 0장'인 경우가 정상이라 경고까지만 한다.
+          if [ "$H" != "success" ]; then echo "::warning::사진 수집 실패 또는 0장(대기열이 비었거나 자유 라이선스 사진이 없음)"; fi
           # 학습 주입 실패는 조용히 넘기지 않는다 — 여기가 막히면 아무리 모아도 AI는 그대로다.
           if [ "$L" != "success" ]; then
             echo "::error::로스팅 AI 학습 주입 실패 — 기기 규칙이 프롬프트에 반영되지 않았습니다."

@@ -1,0 +1,36 @@
+{
+  "key": "arabica-leaf",
+  "query": "Coffea arabica leaves branch",
+  "note": "잎·가지 구조",
+  "fetched_at": "2026-10-17",
+  "images": [
+    {
+      "title": "File:S795 Branch Nodes.png",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "author": "Michael.C.Wright",
+      "credit": "Own work",
+      "description": "A branch of S795 coffee shrub with well developing nodes. You can also see evidence of nutrition deficiency in the leaves.",
+      "page_url": "https://commons.wikimedia.org/wiki/File:S795_Branch_Nodes.png",
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/eb/S795_Branch_Nodes.png/1280px-S795_Branch_Nodes.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "width": 2448,
+      "height": 3264,
+      "file": "vault/assets/photos/arabica-leaf-1.jpg",
+      "bytes": 3613757
+    },
+    {
+      "title": "File:Coffea arabica elliptic leaves.jpg",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "author": "Willow Coville",
+      "credit": "Own work",
+      "description": "The image features a branch of elliptic, opposite leaves from Coffea arabica.",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Coffea_arabica_elliptic_leaves.jpg",
+      "thumb_url": "https://upload.wikimedia.org/wikipedia/commons/e/e8/Coffea_arabica_elliptic_leaves.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "width": 675,
+      "height": 900,
+      "file": "vault/assets/photos/arabica-leaf-2.jpg",
+      "bytes": 87636
+    }
+  ]
+}

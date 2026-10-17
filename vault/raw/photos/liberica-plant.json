@@ -1,0 +1,36 @@
+{
+  "key": "liberica-plant",
+  "query": "Coffea liberica",
+  "note": "리베리카 — 종 비교용",
+  "fetched_at": "2026-10-17",
+  "images": [
+    {
+      "title": "File:Coffee tree chary.jpg",
+      "license": "CC BY-SA 3.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+      "author": "DXLINH",
+      "credit": "Own work",
+      "description": "Tree of Coffea liberica in Lam Dong, Vietnam",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Coffee_tree_chary.jpg",
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/40/Coffee_tree_chary.jpg/1280px-Coffee_tree_chary.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "width": 1350,
+      "height": 1840,
+      "file": "vault/assets/photos/liberica-plant-1.jpg",
+      "bytes": 420496
+    },
+    {
+      "title": "File:Coffea liberica (5597934575).jpg",
+      "license": "CC BY-SA 2.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/2.0",
+      "author": "Dinesh Valke from Thane, India",
+      "credit": "Coffea liberica",
+      "description": "Rubiaceae (madder, bedstraw, or coffee family) » Coffea liberica KOFF-ee-uh -- from Turkish kahve, in turn from Arabic qahwa ly-BER-ee-kuh -- of or from Liberia (West Africa) commonly known as: coffee, Liberian coffee • Arabic: بن bun, قہوة qahwat • Assamese: কফি kaphi • Bengali: কফি kaphi • Gujarati: કૉફી kophi • Hindi: काफ़ी kafi, कॉफी kophi • Kannada: ಕಾಫಿ kaaphi • Kashmiri: कह्व kahwa • Konkan",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Coffea_liberica_(5597934575).jpg",
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/58/Coffea_liberica_%285597934575%29.jpg/1280px-Coffea_liberica_%285597934575%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "width": 4000,
+      "height": 3000,
+      "file": "vault/assets/photos/liberica-plant-2.jpg",
+      "bytes": 304913
+    }
+  ]
+}

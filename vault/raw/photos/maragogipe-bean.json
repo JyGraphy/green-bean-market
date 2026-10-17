@@ -1,0 +1,36 @@
+{
+  "key": "maragogipe-bean",
+  "query": "Maragogipe coffee bean",
+  "note": "마라고지페 — 대립종, 크기 비교",
+  "fetched_at": "2026-10-17",
+  "images": [
+    {
+      "title": "File:Maragogipe Coffee.jpg",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "author": "Raminagrobis",
+      "credit": "Own work",
+      "description": "Note the large beans",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Maragogipe_Coffee.jpg",
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/43/Maragogipe_Coffee.jpg/1280px-Maragogipe_Coffee.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "width": 3000,
+      "height": 2250,
+      "file": "vault/assets/photos/maragogipe-bean-1.jpg",
+      "bytes": 225260
+    },
+    {
+      "title": "File:Bailies Guatemalan El Limonar COE coffee Maragogipe.jpg",
+      "license": "CC BY 2.0",
+      "license_url": "https://creativecommons.org/licenses/by/2.0",
+      "author": "Bex Walton",
+      "credit": "https://www.flickr.com/photos/bexwalton/47535383522/",
+      "description": "зерна кави марагоджип",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Bailies_Guatemalan_El_Limonar_COE_coffee_Maragogipe.jpg",
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/ff/Bailies_Guatemalan_El_Limonar_COE_coffee_Maragogipe.jpg/1280px-Bailies_Guatemalan_El_Limonar_COE_coffee_Maragogipe.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "width": 3024,
+      "height": 3024,
+      "file": "vault/assets/photos/maragogipe-bean-2.jpg",
+      "bytes": 268458
+    }
+  ]
+}

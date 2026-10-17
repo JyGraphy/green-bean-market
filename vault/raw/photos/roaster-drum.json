@@ -1,0 +1,22 @@
+{
+  "key": "roaster-drum",
+  "query": "coffee roaster drum machine",
+  "note": "드럼 로스터기",
+  "fetched_at": "2026-10-17",
+  "images": [
+    {
+      "title": "File:Last Stand Coffee Roaster (Eugene, Oregon).jpg",
+      "license": "CC BY-SA 3.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+      "author": "Visitor7",
+      "credit": "Own work",
+      "description": "Last Stand Coffee Roaster (Eugene, Oregon)",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Last_Stand_Coffee_Roaster_(Eugene,_Oregon).jpg",
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5e/Last_Stand_Coffee_Roaster_%28Eugene%2C_Oregon%29.jpg/1280px-Last_Stand_Coffee_Roaster_%28Eugene%2C_Oregon%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "width": 2856,
+      "height": 2142,
+      "file": "vault/assets/photos/roaster-drum-1.jpg",
+      "bytes": 353401
+    }
+  ]
+}

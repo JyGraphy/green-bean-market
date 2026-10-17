@@ -1,0 +1,36 @@
+{
+  "key": "bourbon-plant",
+  "query": "Coffea arabica Bourbon plant",
+  "note": "부르봉 수형 (새잎 녹색)",
+  "fetched_at": "2026-10-17",
+  "images": [
+    {
+      "title": "File:Coffea arabica cv. laurina ferme Sliti Saint Paul Réunion.jpg",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "author": "AdrienChatenay",
+      "credit": "Own work",
+      "description": "Gros plan du caféier Coffea arabica var. laurina",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Coffea_arabica_cv._laurina_ferme_Sliti_Saint_Paul_R%C3%A9union.jpg",
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d0/Coffea_arabica_cv._laurina_ferme_Sliti_Saint_Paul_R%C3%A9union.jpg/1280px-Coffea_arabica_cv._laurina_ferme_Sliti_Saint_Paul_R%C3%A9union.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "width": 2446,
+      "height": 2446,
+      "file": "vault/assets/photos/bourbon-plant-1.jpg",
+      "bytes": 518492
+    },
+    {
+      "title": "File:Café Plantage in Armenia 40.jpg",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "author": "Burkhard Mücke",
+      "credit": "Own work",
+      "description": "Kaffeeplantage Morelia im Kaffeedreieck Kolumbiens in der Nähe der Stadt Armenia",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Caf%C3%A9_Plantage_in_Armenia_40.jpg",
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2f/Caf%C3%A9_Plantage_in_Armenia_40.jpg/1280px-Caf%C3%A9_Plantage_in_Armenia_40.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "width": 5472,
+      "height": 3080,
+      "file": "vault/assets/photos/bourbon-plant-2.jpg",
+      "bytes": 586656
+    }
+  ]
+}

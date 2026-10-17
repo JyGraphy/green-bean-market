@@ -1,0 +1,36 @@
+{
+  "key": "leafrust",
+  "query": "Hemileia vastatrix coffee leaf rust",
+  "note": "커피잎녹병 — ④ 계보도 배경",
+  "fetched_at": "2026-10-17",
+  "images": [
+    {
+      "title": "File:Hemileia vastatrix - coffee leaf rust.jpg",
+      "license": "CC BY-SA 3.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+      "author": "Smartse",
+      "credit": "Own work",
+      "description": "A photograph of a coffee leaf infected by Hemileia vastatrix - coffee leaf rust. Some small insects are also visible. Photographed in NW Rwanda in July 2011.",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Hemileia_vastatrix_-_coffee_leaf_rust.jpg",
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3e/Hemileia_vastatrix_-_coffee_leaf_rust.jpg/1280px-Hemileia_vastatrix_-_coffee_leaf_rust.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "width": 3648,
+      "height": 2736,
+      "file": "vault/assets/photos/leafrust-1.jpg",
+      "bytes": 235989
+    },
+    {
+      "title": "File:Hemileia vastatrix.png",
+      "license": "CC BY 2.5",
+      "license_url": "https://creativecommons.org/licenses/by/2.5",
+      "author": "Carvalho et al.",
+      "credit": "Carlos Roberto Carvalho, Ronaldo C. Fernandes, Guilherme Mendes Almeida Carvalho, Robert W. Barreto, Harry C. Evans (2011): Cryptosexuality and the Genetic Diversity Paradox in Coffee Rust, Hemileia vastatrix. PLoS ONE 6(11): e26387. {{doi:10.1371/journal.pone.0026387}}",
+      "description": "(A) Defoliation in a coffee plantation, Coimbra, Minas Gerais, Brazil; (B) Leaf symptoms on abaxial surface (bar = 0.5 cm); (C) Detail of suprastomatal uredinial pustules coalescing over lower leaf surface (bar = 0.5 cm); (D) Uredinium showing arrangement of spores (bar = 20 µm); (E) Urediniospores - showing the thickened, heavily-ornamented or verrucose upper wall – containing carotenoid lipid gu",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Hemileia_vastatrix.png",
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2b/Hemileia_vastatrix.png/1280px-Hemileia_vastatrix.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "width": 2072,
+      "height": 2022,
+      "file": "vault/assets/photos/leafrust-2.jpg",
+      "bytes": 3209709
+    }
+  ]
+}

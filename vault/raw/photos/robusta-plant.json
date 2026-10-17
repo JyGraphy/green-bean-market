@@ -1,0 +1,36 @@
+{
+  "key": "robusta-plant",
+  "query": "Coffea canephora robusta plant",
+  "note": "로부스타 — 종 비교용",
+  "fetched_at": "2026-10-17",
+  "images": [
+    {
+      "title": "File:Coffea canephora berries.JPG",
+      "license": "CC0",
+      "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "author": "Ksd5",
+      "credit": "Own work",
+      "description": "Unripe berries of the species Coffea canephora.",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Coffea_canephora_berries.JPG",
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/Coffea_canephora_berries.JPG/1280px-Coffea_canephora_berries.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "width": 3264,
+      "height": 2448,
+      "file": "vault/assets/photos/robusta-plant-1.jpg",
+      "bytes": 198978
+    },
+    {
+      "title": "File:Coffea canephora W2 IMG 2430.jpg",
+      "license": "CC BY 3.0",
+      "license_url": "https://creativecommons.org/licenses/by/3.0",
+      "author": "J.M.Garg",
+      "credit": "Own work",
+      "description": "Robusta Coffee plant Coffea canephora in Goa, India.",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Coffea_canephora_W2_IMG_2430.jpg",
+      "thumb_url": "https://upload.wikimedia.org/wikipedia/commons/1/18/Coffea_canephora_W2_IMG_2430.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "width": 657,
+      "height": 600,
+      "file": "vault/assets/photos/robusta-plant-2.jpg",
+      "bytes": 183178
+    }
+  ]
+}

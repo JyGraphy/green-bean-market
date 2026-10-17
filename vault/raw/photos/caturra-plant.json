@@ -1,0 +1,36 @@
+{
+  "key": "caturra-plant",
+  "query": "Coffea arabica Caturra",
+  "note": "카투라 — 왜성 수형 비교용",
+  "fetched_at": "2026-10-17",
+  "images": [
+    {
+      "title": "File:Banana caturra.JPG",
+      "license": "Public domain",
+      "license_url": "",
+      "author": "Deyvid Aleksandr Raffo Setti e Eloy Olindo Setti",
+      "credit": "Own work",
+      "description": "Um cacho de banana caturra",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Banana_caturra.JPG",
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d3/Banana_caturra.JPG/1280px-Banana_caturra.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "width": 2048,
+      "height": 1536,
+      "file": "vault/assets/photos/caturra-plant-1.jpg",
+      "bytes": 324748
+    },
+    {
+      "title": "File:Palazzo schifanoia, salone dei mesi, 03 marzo (f. del cossa), borso alla caccia e amministrat. di giustizia 09 caturra anatre.jpg",
+      "license": "CC BY-SA 3.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+      "author": "Sailko",
+      "credit": "Own work",
+      "description": "Palazzo Schifanoia",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Palazzo_schifanoia,_salone_dei_mesi,_03_marzo_(f._del_cossa),_borso_alla_caccia_e_amministrat._di_giustizia_09_caturra_anatre.jpg",
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ee/Palazzo_schifanoia%2C_salone_dei_mesi%2C_03_marzo_%28f._del_cossa%29%2C_borso_alla_caccia_e_amministrat._di_giustizia_09_caturra_anatre.jpg/1280px-Palazzo_schifanoia%2C_salone_dei_mesi%2C_03_marzo_%28f._del_cossa%29%2C_borso_alla_caccia_e_amministrat._di_giustizia_09_caturra_anatre.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "width": 2388,
+      "height": 1944,
+      "file": "vault/assets/photos/caturra-plant-2.jpg",
+      "bytes": 468212
+    }
+  ]
+}

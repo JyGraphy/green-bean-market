@@ -1,0 +1,36 @@
+{
+  "key": "stenophylla",
+  "query": "Coffea stenophylla",
+  "note": "스테노필라 — 재발견 종",
+  "fetched_at": "2026-10-17",
+  "images": [
+    {
+      "title": "File:Coffea stenophylla-Jardin botanique de Berlin (1).jpg",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "author": "Ji-Elle",
+      "credit": "Own work",
+      "description": "Coffea stenophylla. Afrique tropicale de l'Ouest. Jardin botanique de Berlin.",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Coffea_stenophylla-Jardin_botanique_de_Berlin_(1).jpg",
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b9/Coffea_stenophylla-Jardin_botanique_de_Berlin_%281%29.jpg/1280px-Coffea_stenophylla-Jardin_botanique_de_Berlin_%281%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "width": 3648,
+      "height": 5472,
+      "file": "vault/assets/photos/stenophylla-1.jpg",
+      "bytes": 1033426
+    },
+    {
+      "title": "File:Coffea stenophylla-Jardin botanique de Berlin (2).jpg",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "author": "Ji-Elle",
+      "credit": "Own work",
+      "description": "Coffea stenophylla. Afrique tropicale de l'Ouest. Jardin botanique de Berlin.",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Coffea_stenophylla-Jardin_botanique_de_Berlin_(2).jpg",
+      "thumb_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cd/Coffea_stenophylla-Jardin_botanique_de_Berlin_%282%29.jpg/1280px-Coffea_stenophylla-Jardin_botanique_de_Berlin_%282%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "width": 3648,
+      "height": 5472,
+      "file": "vault/assets/photos/stenophylla-2.jpg",
+      "bytes": 1038949
+    }
+  ]
+}

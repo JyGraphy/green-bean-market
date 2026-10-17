@@ -1,0 +1,36 @@
+{
+  "key": "greenbean",
+  "query": "green coffee beans raw unroasted",
+  "note": "생두 일반",
+  "fetched_at": "2026-10-17",
+  "images": [
+    {
+      "title": "File:Raw coffee beans.jpg",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "author": "Kızıldeniz",
+      "credit": "Own work",
+      "description": "Unroasted raw coffee beans (Coffea arabica). Piura, Peru.",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Raw_coffee_beans.jpg",
+      "thumb_url": "https://upload.wikimedia.org/wikipedia/commons/9/90/Raw_coffee_beans.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "width": 960,
+      "height": 1280,
+      "file": "vault/assets/photos/greenbean-1.jpg",
+      "bytes": 167479
+    },
+    {
+      "title": "File:Raw coffee beans 2.jpg",
+      "license": "CC BY-SA 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+      "author": "Kızıldeniz",
+      "credit": "Own work",
+      "description": "Unroasted raw coffee beans (Coffea arabica). Piura, Peru.",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Raw_coffee_beans_2.jpg",
+      "thumb_url": "https://upload.wikimedia.org/wikipedia/commons/1/18/Raw_coffee_beans_2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "width": 960,
+      "height": 1280,
+      "file": "vault/assets/photos/greenbean-2.jpg",
+      "bytes": 143686
+    }
+  ]
+}

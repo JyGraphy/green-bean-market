@@ -1,54 +1,54 @@
 {
-  "checked_at": "2026-10-18T22:53:59Z",
-  "total": 1337,
+  "checked_at": "2026-10-20T00:16:38Z",
+  "total": 1331,
   "removed": [],
   "held_stores": [
     "커피창고: dead 16/16 (100%) — URL 구조 변경 의심, 제거 보류"
   ],
   "timing": {
-    "elapsed_sec": 451.8,
-    "requests": 1140,
-    "skipped_unknown": 197,
+    "elapsed_sec": 460.5,
+    "requests": 1135,
+    "skipped_unknown": 196,
     "slowest_domains": [
       {
         "domain": "comansa.kr",
-        "sec": 451.8,
-        "count": 338
+        "sec": 460.5,
+        "count": 337
       },
       {
         "domain": "www.gsc.coffee",
-        "sec": 183.5,
-        "count": 117
+        "sec": 178.0,
+        "count": 116
       },
       {
         "domain": "www.micoffee.co.kr",
-        "sec": 156.5,
-        "count": 105
+        "sec": 145.2,
+        "count": 102
       },
       {
         "domain": "momos.co.kr",
-        "sec": 121.8,
+        "sec": 120.6,
         "count": 99
       },
       {
         "domain": "www.blessbean.co.kr",
-        "sec": 98.6,
+        "sec": 99.3,
         "count": 96
       },
       {
         "domain": "www.cobeans.com",
-        "sec": 77.7,
+        "sec": 72.9,
         "count": 93
       },
       {
-        "domain": "coffeeplant.co.kr",
-        "sec": 57.9,
-        "count": 49
+        "domain": "wbeans.com",
+        "sec": 60.0,
+        "count": 42
       },
       {
-        "domain": "wbeans.com",
-        "sec": 57.6,
-        "count": 42
+        "domain": "coffeeplant.co.kr",
+        "sec": 57.3,
+        "count": 49
       }
     ]
   },
@@ -89,7 +89,7 @@
       "ambiguous": 0
     },
     "엠아이커피": {
-      "ok": 105,
+      "ok": 102,
       "dead": 0,
       "ambiguous": 0
     },
@@ -104,12 +104,12 @@
       "ambiguous": 0
     },
     "지에스씨(GSC)": {
-      "ok": 117,
+      "ok": 116,
       "dead": 0,
       "ambiguous": 0
     },
     "커만사": {
-      "ok": 338,
+      "ok": 337,
       "dead": 0,
       "ambiguous": 0
     },

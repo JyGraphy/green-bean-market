@@ -1,18 +1,10 @@
 {
-  "updated_at": "2026-10-22T00:02:53Z",
+  "updated_at": "2026-10-23T00:00:43Z",
   "stores": [
     {
-      "name": "엠아이커피",
-      "new_count": 6
-    },
-    {
-      "name": "지에스씨(GSC)",
-      "new_count": 7
-    },
-    {
       "name": "팔콘커피",
-      "new_count": 1
+      "new_count": 4
     }
   ],
-  "total_new": 14
+  "total_new": 4
 }

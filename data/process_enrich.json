@@ -1,40 +1,40 @@
 {
-  "checked_at": "2026-10-23T00:00:43Z",
-  "targets": 188,
-  "filled": 184,
+  "checked_at": "2026-10-23T23:55:14Z",
+  "targets": 195,
+  "filled": 191,
   "removed_dead": 0,
   "filled_by": {
     "디카페인": 8,
-    "워시드": 97,
+    "무산소발효": 41,
+    "워시드": 98,
+    "웻훌드": 9,
     "펄프드내추럴": 7,
     "내추럴": 24,
-    "웻훌드": 6,
-    "무산소발효": 38,
     "허니": 4
   },
   "held_stores": [],
   "timing": {
-    "elapsed_sec": 106.7,
-    "requests": 188,
+    "elapsed_sec": 100.7,
+    "requests": 195,
     "slowest_domains": [
       {
         "domain": "comansa.kr",
-        "sec": 106.6,
+        "sec": 100.6,
         "count": 56
       },
       {
         "domain": "www.gsc.coffee",
-        "sec": 76.0,
+        "sec": 69.7,
         "count": 36
       },
       {
         "domain": "www.micoffee.co.kr",
-        "sec": 59.3,
+        "sec": 51.9,
         "count": 28
       },
       {
         "domain": "coffeeplant.co.kr",
-        "sec": 30.6,
+        "sec": 27.5,
         "count": 19
       },
       {
@@ -44,17 +44,17 @@
       },
       {
         "domain": "www.cobeans.com",
-        "sec": 18.3,
+        "sec": 17.0,
         "count": 16
       },
       {
-        "domain": "momos.co.kr",
-        "sec": 8.4,
-        "count": 4
+        "domain": "www.blessbean.co.kr",
+        "sec": 10.4,
+        "count": 7
       },
       {
-        "domain": "mayforest.kr",
-        "sec": 5.2,
+        "domain": "momos.co.kr",
+        "sec": 7.3,
         "count": 4
       }
     ]

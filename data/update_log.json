@@ -1,10 +1,14 @@
 {
-  "updated_at": "2026-10-23T00:00:43Z",
+  "updated_at": "2026-10-23T23:55:15Z",
   "stores": [
     {
-      "name": "팔콘커피",
-      "new_count": 4
+      "name": "블레스빈",
+      "new_count": 5
+    },
+    {
+      "name": "엠아이커피",
+      "new_count": 2
     }
   ],
-  "total_new": 4
+  "total_new": 7
 }

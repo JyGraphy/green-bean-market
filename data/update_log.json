@@ -1,14 +1,5 @@
 {
-  "updated_at": "2026-10-23T23:55:15Z",
-  "stores": [
-    {
-      "name": "블레스빈",
-      "new_count": 5
-    },
-    {
-      "name": "엠아이커피",
-      "new_count": 2
-    }
-  ],
-  "total_new": 7
+  "updated_at": "2026-10-24T23:02:29Z",
+  "stores": [],
+  "total_new": 0
 }

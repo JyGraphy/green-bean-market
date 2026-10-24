@@ -1,53 +1,53 @@
 {
-  "checked_at": "2026-10-23T23:53:34Z",
+  "checked_at": "2026-10-24T23:00:57Z",
   "total": 1360,
   "removed": [],
   "held_stores": [
     "커피창고: dead 16/16 (100%) — URL 구조 변경 의심, 제거 보류"
   ],
   "timing": {
-    "elapsed_sec": 494.4,
-    "requests": 1165,
-    "skipped_unknown": 195,
+    "elapsed_sec": 439.4,
+    "requests": 1168,
+    "skipped_unknown": 192,
     "slowest_domains": [
       {
         "domain": "comansa.kr",
-        "sec": 494.4,
+        "sec": 439.4,
         "count": 339
       },
       {
         "domain": "www.gsc.coffee",
-        "sec": 202.4,
+        "sec": 184.6,
         "count": 122
       },
       {
         "domain": "www.micoffee.co.kr",
-        "sec": 170.5,
+        "sec": 158.4,
         "count": 116
       },
       {
         "domain": "momos.co.kr",
-        "sec": 125.2,
+        "sec": 119.5,
         "count": 101
       },
       {
         "domain": "www.blessbean.co.kr",
-        "sec": 104.7,
-        "count": 98
+        "sec": 104.9,
+        "count": 101
       },
       {
         "domain": "www.cobeans.com",
-        "sec": 76.2,
+        "sec": 72.8,
         "count": 93
       },
       {
         "domain": "wbeans.com",
-        "sec": 62.1,
+        "sec": 57.8,
         "count": 42
       },
       {
         "domain": "coffeeplant.co.kr",
-        "sec": 57.3,
+        "sec": 56.9,
         "count": 48
       }
     ]
@@ -79,7 +79,7 @@
       "ambiguous": 0
     },
     "블레스빈": {
-      "ok": 98,
+      "ok": 101,
       "dead": 0,
       "ambiguous": 0
     },

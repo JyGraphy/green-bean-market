@@ -37,6 +37,10 @@ on:
         description: '사진 키 — 파일명이 된다 (<키>-1.jpg)'
         required: false
         default: ''
+      youtube_handle:
+        description: '유튜브 채널 핸들 (@xxx). 비우면 기본 목록을 수집'
+        required: false
+        default: ''
 
 jobs:
   fetch:
@@ -88,6 +92,21 @@ jobs:
               --url "${{ github.event.inputs.machine_url }}"
           fi
           python scripts/roast_machine_fetch.py --queue
+
+      # 유튜브 채널 영상 목록. 세션에서는 www.youtube.com 이 403 이고,
+      # googleapis.com 은 열려 있지만 키가 없다. 여기서 공식 API 로 받는다.
+      # YOUTUBE_API_KEY 가 없으면 스크립트가 조용히 건너뛴다(네이버 오픈API 와 같은 규칙).
+      - name: 유튜브 채널 영상 목록 수집
+        id: youtube
+        continue-on-error: true
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: |
+          if [ -n "${{ github.event.inputs.youtube_handle }}" ]; then
+            python scripts/fetch_youtube.py --handle "${{ github.event.inputs.youtube_handle }}"
+          else
+            python scripts/fetch_youtube.py --handle "@-180boss"
+          fi
 
       # 품종·식물 사진. 세션에서는 commons.wikimedia.org 가 403(프록시 CONNECT 거부)이라
       # 여기서만 받을 수 있다. 자유 라이선스만 통과하고 저작자 표기는 자동 기록된다.
@@ -155,7 +174,8 @@ jobs:
           M="${{ steps.machines.outcome }}"
           L="${{ steps.learn.outcome }}"
           H="${{ steps.photos.outcome }}"
-          echo "옥션: $A / 논문: $P / 로스터기: $M / 사진: $H / 학습주입: $L"
+          Y="${{ steps.youtube.outcome }}"
+          echo "옥션: $A / 논문: $P / 로스터기: $M / 사진: $H / 유튜브: $Y / 학습주입: $L"
           if [ "$A" != "success" ] && [ "$P" != "success" ] && [ "$M" != "success" ]; then
             echo "::error::옥션·논문·로스터기 수집이 모두 실패했습니다 — vault/raw/ 최신 보고서를 확인하세요."
             exit 1
@@ -165,6 +185,8 @@ jobs:
           if [ "$M" != "success" ]; then echo "::warning::로스터기 자료 수집 실패"; fi
           # 사진은 '자유 라이선스가 없어서 0장'인 경우가 정상이라 경고까지만 한다.
           if [ "$H" != "success" ]; then echo "::warning::사진 수집 실패 또는 0장(대기열이 비었거나 자유 라이선스 사진이 없음)"; fi
+          # 키 미등록은 '건너뜀'이라 success 로 끝난다 — 실패는 진짜 오류일 때만 뜬다.
+          if [ "$Y" != "success" ]; then echo "::warning::유튜브 수집 실패 — API 키·쿼터를 확인하세요"; fi
           # 학습 주입 실패는 조용히 넘기지 않는다 — 여기가 막히면 아무리 모아도 AI는 그대로다.
           if [ "$L" != "success" ]; then
             echo "::error::로스팅 AI 학습 주입 실패 — 기기 규칙이 프롬프트에 반영되지 않았습니다."

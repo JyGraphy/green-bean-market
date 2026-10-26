@@ -57,12 +57,22 @@ jobs:
         continue-on-error: true
         run: python scripts/validate_data.py
 
+      # 품절·신상의 '조용한 오작동' 감지 (재발 방지): 전량 품절(오버레이 템플릿 오탐),
+      # 품절 감지 중단, 품절률 급등, 신상 정체. 심각 항목이 있으면 아래 '표면화'가
+      # 잡을 실패로 올린다. 커밋은 막지 않는다(알림용). data/soldout_history.json 에
+      # 과거값을 남겨 다음 실행이 '어제 대비'를 비교한다.
+      - name: 품절·신상 이상 감지
+        id: anomaly
+        if: always()
+        continue-on-error: true
+        run: python scripts/anomaly_check.py
+
       - name: 변경사항 확인
         id: check_changes
         if: always()
         run: |
           git add -A vault/raw/qa/
-          git diff --quiet data/products.json database.sql data/product_dates.json data/update_log.json data/products_web.json data/link_check.json data/process_enrich.json || echo "changed=true" >> $GITHUB_OUTPUT
+          git diff --quiet data/products.json database.sql data/product_dates.json data/update_log.json data/products_web.json data/link_check.json data/process_enrich.json data/soldout_history.json || echo "changed=true" >> $GITHUB_OUTPUT
           git diff --cached --quiet vault/raw/qa/ || echo "changed=true" >> $GITHUB_OUTPUT
 
       # 커밋은 '검증 통과 + 변경 있음'일 때만. 검증 실패 시 망가진 데이터가 커밋되지 않음.
@@ -71,7 +81,7 @@ jobs:
         run: |
           git config user.name "GreenBeanBot"
           git config user.email "bot@green-bean-market"
-          git add data/products.json database.sql data/product_dates.json data/update_log.json data/products_web.json data/link_check.json data/process_enrich.json vault/raw/qa/
+          git add data/products.json database.sql data/product_dates.json data/update_log.json data/products_web.json data/link_check.json data/process_enrich.json data/soldout_history.json vault/raw/qa/
           git commit -m "자동 갱신: $(date '+%Y-%m-%d') 생두 데이터 업데이트"
 
           # 수집에 15분 남짓 걸리는 동안 다른 작업이 main 을 앞서 나가면 push 가
@@ -121,6 +131,16 @@ jobs:
         run: |
           echo "⚠️ 일부 스크래퍼가 실패했습니다. 위 '스크래퍼 실행' 로그에서 실패한 사이트를 확인하세요."
           echo "실패한 사이트의 기존 데이터는 보존되었으며, 성공한 사이트는 정상 갱신·커밋되었습니다."
+          exit 1
+
+      # 품절·신상 이상(전량 품절 오탐·품절감지 중단 등)이 있으면 빨간 X → 알림 메일.
+      # 데이터는 이미 커밋됐고, 이건 '사람이 확인해야 할 일이 생겼다'는 신호다.
+      - name: 품절·신상 이상 표면화
+        if: always() && steps.anomaly.outcome == 'failure'
+        run: |
+          echo "❌ 품절·신상 이상 감지 — 위 '품절·신상 이상 감지' 로그를 확인하세요."
+          echo "전량 품절(오버레이 템플릿 오탐)/품절 감지 중단/품절률 급등/신상 정체가 의심됩니다."
+          echo "조치: Actions → 공급사 링크 진단 → 해당 공급사로 Run workflow (상세 availability 교차검증)"
           exit 1
 
       # 링크가 통째로 깨진 공급사가 있으면 여기서 빨간 X → 알림 메일.

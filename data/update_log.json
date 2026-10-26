@@ -1,5 +1,10 @@
 {
-  "updated_at": "2026-10-26T14:48:34Z",
-  "stores": [],
-  "total_new": 0
+  "updated_at": "2026-10-26T15:07:06Z",
+  "stores": [
+    {
+      "name": "커피플랜트",
+      "new_count": 1
+    }
+  ],
+  "total_new": 1
 }

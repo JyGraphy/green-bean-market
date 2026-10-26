@@ -1,38 +1,36 @@
 {
-  "checked_at": "2026-10-26T04:44:44Z",
-  "total": 1361,
+  "checked_at": "2026-10-26T15:05:25Z",
+  "total": 1349,
   "removed": [],
-  "held_stores": [
-    "커피창고: dead 16/16 (100%) — URL 구조 변경 의심, 제거 보류"
-  ],
+  "held_stores": [],
   "timing": {
-    "elapsed_sec": 523.8,
-    "requests": 1163,
-    "skipped_unknown": 198,
+    "elapsed_sec": 511.8,
+    "requests": 1150,
+    "skipped_unknown": 199,
     "slowest_domains": [
       {
         "domain": "comansa.kr",
-        "sec": 523.8,
+        "sec": 511.8,
         "count": 339
       },
       {
         "domain": "www.gsc.coffee",
-        "sec": 199.0,
+        "sec": 187.3,
         "count": 118
       },
       {
         "domain": "www.micoffee.co.kr",
-        "sec": 185.2,
-        "count": 114
+        "sec": 172.7,
+        "count": 116
       },
       {
         "domain": "momos.co.kr",
-        "sec": 127.6,
+        "sec": 126.8,
         "count": 101
       },
       {
         "domain": "www.cobeans.com",
-        "sec": 76.0,
+        "sec": 75.1,
         "count": 93
       },
       {
@@ -42,13 +40,13 @@
       },
       {
         "domain": "wbeans.com",
-        "sec": 65.5,
+        "sec": 63.0,
         "count": 42
       },
       {
         "domain": "coffeeplant.co.kr",
-        "sec": 58.7,
-        "count": 48
+        "sec": 62.4,
+        "count": 51
       }
     ]
   },
@@ -68,11 +66,6 @@
       "dead": 0,
       "ambiguous": 18
     },
-    "커피창고": {
-      "ok": 0,
-      "dead": 16,
-      "ambiguous": 0
-    },
     "블레스빈": {
       "ok": 105,
       "dead": 0,
@@ -89,7 +82,7 @@
       "ambiguous": 0
     },
     "엠아이커피": {
-      "ok": 114,
+      "ok": 116,
       "dead": 0,
       "ambiguous": 0
     },
@@ -119,7 +112,7 @@
       "ambiguous": 0
     },
     "커피플랜트": {
-      "ok": 48,
+      "ok": 51,
       "dead": 0,
       "ambiguous": 0
     },
@@ -129,7 +122,7 @@
       "ambiguous": 0
     },
     "팔콘커피": {
-      "ok": 46,
+      "ok": 44,
       "dead": 0,
       "ambiguous": 0
     }

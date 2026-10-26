@@ -42,7 +42,21 @@ HEADERS = {
 LISTING = {
     '모모스커피': 'https://momos.co.kr/product/list.html?cate_no=64',
     '커피리브레': 'https://coffeelibre.kr/product/list.html?cate_no=45',
+    '오월의숲': 'https://mayforest.kr/product/list.html?cate_no=50&page=1',
 }
+
+# 품절 신호 진단용 — store별 목록 상품 li 셀렉터 (스크래퍼와 동일해야 함).
+# 품절이 전 상품에 100%로 뜨면 '품절 오버레이가 템플릿으로 전 상품에 깔린' 오탐
+# (모모스 .prod_icon.sold_out 사건과 같은 유형)일 가능성이 높다. 이 진단은 목록의
+# 오버레이 비율과 상세페이지의 권위 신호(schema.org availability)를 함께 보여줘
+# '진짜 전부 품절'과 '오탐'을 구분하게 돕는다.
+LI_SELECTOR = {
+    '오월의숲': '.xans-product-listnormal ul.prdList > li',
+    '커피리브레': '.xans-product-listnormal ul.prdList > li',
+}
+# 목록 썸네일 위 품절 이미지 오버레이 (common.is_soldout_block 과 동일 기준)
+SOLDOUT_IMG_SEL = ('img[alt*="품절"], img[alt*="SOLD OUT"], img[alt*="Sold out"], '
+                   'img[src*="soldout"], img[src*="sold_out"], img[src*="icon_soldout"]')
 
 
 def load_urls(store: str) -> list[dict]:
@@ -76,6 +90,73 @@ def shape(url: str) -> str:
     return '/' + '/'.join(out) + (f'?{p.query.split("=")[0]}=…' if p.query else '')
 
 
+AVAIL_RE = re.compile(r'"availability"\s*:\s*"?(?:https?://schema\.org/)?'
+                      r'(InStock|OutOfStock|SoldOut|BackOrder|PreOrder)', re.I)
+
+
+def diagnose_soldout(store: str, listing: str, sample: int):
+    """목록의 품절 오버레이 비율 + 상세페이지 권위 신호(schema availability)를 본다.
+
+    '어떤 store가 100% 품절'은 거의 항상 오버레이 템플릿 오탐이다. 목록 비율이
+    수상하면 상세페이지의 schema.org availability 로 교차검증한다.
+    """
+    sel = LI_SELECTOR.get(store)
+    if not sel:
+        return
+    print(f'\n④ 품절 신호 진단 ({store})')
+    try:
+        r = requests.get(listing, headers=HEADERS, timeout=20)
+        soup = BeautifulSoup(r.text, 'lxml')
+    except requests.RequestException as e:
+        print(f'   ✗ 목록 재요청 실패: {e}')
+        return
+    lis = soup.select(sel)
+    overlay, detail_links = 0, []
+    samples = []
+    for li in lis:
+        img = li.select_one(SOLDOUT_IMG_SEL)
+        if img:
+            overlay += 1
+            if len(samples) < 3:
+                samples.append(str(img)[:140])
+        a_tag = li.select_one('a[href*="/product/"]')
+        if a_tag and a_tag.get('href') and 'list.html' not in a_tag['href']:
+            detail_links.append(a_tag['href'])
+    n = len(lis)
+    print(f'   목록 상품 {n}개 중 품절 오버레이 있는 것: {overlay}개'
+          + (f' ({overlay/n*100:.0f}%)' if n else ''))
+    if n and overlay == n:
+        print('   🔴 전 상품(100%)이 오버레이 보유 → 품절 이미지가 템플릿으로 전 상품에 '
+              '깔렸을 가능성이 매우 높음(오탐). 상세페이지 권위 신호로 교차검증한다.')
+    for s in samples:
+        print(f'      오버레이 예: {s}')
+
+    # 상세페이지 schema.org availability 로 교차검증 (JS 없이 서버 HTML 에 나옴)
+    from urllib.parse import urljoin
+    base = f'{urlparse(listing).scheme}://{urlparse(listing).netloc}'
+    uniq = list(dict.fromkeys(detail_links))[:sample]
+    print(f'   상세페이지 {len(uniq)}개 availability 교차검증:')
+    avails = {}
+    for h in uniq:
+        full = urljoin(base + '/', h)
+        try:
+            rr = requests.get(full, headers=HEADERS, timeout=20)
+            m = AVAIL_RE.search(rr.text)
+            av = m.group(1) if m else '(availability 없음)'
+            # 보조 신호: 상세페이지에 품절 오버레이/텍스트가 실제로 있는지
+            dsoup = BeautifulSoup(rr.text, 'lxml')
+            dimg = bool(dsoup.select_one(SOLDOUT_IMG_SEL))
+        except requests.RequestException as e:
+            av, dimg = f'요청실패 {type(e).__name__}', False
+        avails[av] = avails.get(av, 0) + 1
+        print(f'      availability={av:28} 품절이미지={dimg}  {full[:80]}')
+    print(f'   요약: {avails}')
+    instock = avails.get('InStock', 0)
+    if n and overlay == n and instock:
+        print(f'   ✅ 판정: 목록은 100% 품절로 보이지만 상세 availability 에 InStock 이 '
+              f'{instock}개 → 목록 오버레이는 오탐. 스크래퍼를 상세 availability 기준으로 고쳐야 함.')
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--store', required=True)
@@ -88,6 +169,13 @@ def main():
         sys.exit(1)
 
     print(f'=== {a.store} · 저장된 상품 {len(prods)}개 ===\n')
+
+    # 품절 신호 진단을 먼저 실행한다 — 아래 링크 형태 진단은 중간 return 이 많아
+    # 여기서 호출해야 어떤 경로로도 실행이 보장된다.
+    _listing = LISTING.get(a.store)
+    if _listing and a.store in LI_SELECTOR:
+        diagnose_soldout(a.store, _listing, a.sample)
+        print()
 
     # ① 저장된 URL 상태 확인
     print(f'① 저장된 URL {a.sample}개 확인')

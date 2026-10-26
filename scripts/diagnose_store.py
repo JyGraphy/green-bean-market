@@ -23,7 +23,7 @@ import json
 import pathlib
 import re
 import sys
-from urllib.parse import unquote, urlparse
+from urllib.parse import unquote, urljoin, urlparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -43,7 +43,14 @@ LISTING = {
     '모모스커피': 'https://momos.co.kr/product/list.html?cate_no=64',
     '커피리브레': 'https://coffeelibre.kr/product/list.html?cate_no=45',
     '오월의숲': 'https://mayforest.kr/product/list.html?cate_no=50&page=1',
+    '커피창고': 'https://www.coffeecg.com/product/list.html?cate_no=802&page=1',
 }
+
+# Cafe24 정규 상품 URL 테스트용 — 저장된 SEO 슬러그 URL 이 404 일 때, product_no 만으로
+# detail.html?product_no=<no> 가 열리는지 확인한다(슬러그 불일치로 404 나는 전형 대응).
+CAFE24_STORES = {'커피창고', '오월의숲'}
+PRODUCT_NO_RE = re.compile(r'/product/[^/]+/(\d+)/')
+CATE_RE = re.compile(r'/category/(\d+)/')
 
 # 품절 신호 진단용 — store별 목록 상품 li 셀렉터 (스크래퍼와 동일해야 함).
 # 품절이 전 상품에 100%로 뜨면 '품절 오버레이가 템플릿으로 전 상품에 깔린' 오탐
@@ -132,7 +139,6 @@ def diagnose_soldout(store: str, listing: str, sample: int):
         print(f'      오버레이 예: {s}')
 
     # 상세페이지 schema.org availability 로 교차검증 (JS 없이 서버 HTML 에 나옴)
-    from urllib.parse import urljoin
     base = f'{urlparse(listing).scheme}://{urlparse(listing).netloc}'
     uniq = list(dict.fromkeys(detail_links))[:sample]
     print(f'   상세페이지 {len(uniq)}개 availability 교차검증:')
@@ -180,13 +186,33 @@ def main():
     # ① 저장된 URL 상태 확인
     print(f'① 저장된 URL {a.sample}개 확인')
     codes = {}
+    cafe24 = a.store in CAFE24_STORES
+    canon_codes = {}
     for p in prods[:a.sample]:
         code, final = probe(p['url'])
         codes[code] = codes.get(code, 0) + 1
         print(f'   [{code}] {p["url"][:95]}')
         if code and code != 404 and final != p['url']:
             print(f'         → 리다이렉트: {final[:95]}')
-    print(f'   요약: {codes}\n')
+        # Cafe24: 슬러그 없는 정규 URL 이 열리는지 교차 확인
+        if cafe24 and code == 404:
+            mno = PRODUCT_NO_RE.search(p['url'])
+            mca = CATE_RE.search(p['url'])
+            if mno:
+                base = f'{urlparse(p["url"]).scheme}://{urlparse(p["url"]).netloc}'
+                canon = f'{base}/product/detail.html?product_no={mno.group(1)}'
+                if mca:
+                    canon += f'&cate_no={mca.group(1)}'
+                c2, _ = probe(canon)
+                canon_codes[c2] = canon_codes.get(c2, 0) + 1
+                print(f'         ↳ 정규형 [{c2}] {canon[:90]}')
+    print(f'   요약: {codes}')
+    if cafe24 and canon_codes:
+        print(f'   정규형(detail.html?product_no=) 요약: {canon_codes}')
+        if canon_codes.get(200):
+            print('   ✅ 슬러그 URL 은 404 지만 정규형은 열림 → 스크래퍼가 정규형으로 '
+                  'URL 을 저장하도록 고치면 해결(슬러그 불일치가 원인).')
+    print()
     print(f'   저장된 URL 형태: {shape(prods[0]["url"])}\n')
 
     # ② 쇼핑몰 목록 페이지에서 현재 href 를 새로 수집
@@ -238,14 +264,64 @@ def main():
             print(f'      {c:>4}개  {k}')
         if not pats:
             print('      (링크가 하나도 없음 — 서버가 빈 껍데기 HTML을 주는 상태)')
-        # 카테고리 번호가 바뀌었는지 단서 찾기
+
+        # 상품 후보(경로가 숫자로 끝나는 링크) 리터럴 href + 컨테이너 구조 덤프.
+        # 스크래퍼를 한 번에 다시 쓰려면 셀렉터와 실제 URL 형태를 봐야 한다.
+        print('   상품 후보 링크(경로가 숫자로 끝남) 리터럴 덤프:')
+        shown = 0
+        for a_tag in all_a:
+            h = a_tag.get('href', '')
+            if not h or h.startswith(('#', 'javascript:', 'mailto:')):
+                continue
+            path = urlparse(h).path if h.startswith('http') else h.split('?')[0]
+            if not re.search(r'/\d+/?$', path):
+                continue
+            txt = a_tag.get_text(' ', strip=True)[:30]
+            # 컨테이너(li/div) 태그·클래스
+            parent = a_tag.find_parent(['li', 'div'])
+            pcls = '.'.join(parent.get('class', [])) if parent else ''
+            ptag = parent.name if parent else '-'
+            full = urljoin(base + '/', h)
+            c, _ = probe(full)
+            print(f'      [{c}] {h[:70]}')
+            print(f'            텍스트="{txt}"  컨테이너=<{ptag} class="{pcls[:50]}">')
+            shown += 1
+            if shown >= 6:
+                break
+        if shown == 0:
+            print('      (경로가 숫자로 끝나는 링크 없음 — 상품 링크 형태가 더 특이함)')
+
+        # 모든 카테고리 링크(/category/<이름>/<번호>/)를 이름과 함께 덤프 —
+        # 생두 카테고리의 현재 번호를 찾는다.
+        print('   카테고리 링크(/category/<이름>/<번호>):')
+        cat_seen = set()
+        for a_tag in all_a:
+            h = a_tag.get('href', '')
+            mc = re.search(r'/category/([^/]+)/(\d+)/?', h)
+            if not mc:
+                continue
+            nm = unquote(mc.group(1)); no = mc.group(2)
+            if no in cat_seen:
+                continue
+            cat_seen.add(no)
+            txt = a_tag.get_text(' ', strip=True)[:20]
+            mark = ' ★생두?' if ('생두' in nm or '생두' in txt) else ''
+            print(f'      cate_no={no:>5}  {nm[:24]:24} "{txt}"{mark}')
+
+        # 상품이 JS 로 렌더되는지 — 서버 HTML 에 product_no/detail.html 흔적이 있나
+        pno = len(re.findall(r'product_no=\d+', r.text))
+        det = len(re.findall(r'/product/detail\.html', r.text))
+        pxans = len(re.findall(r'xans-record-', r.text))
+        print(f'   서버HTML 흔적: product_no={pno}개 · detail.html={det}개 · xans-record-={pxans}개')
+        if pno == 0 and det == 0:
+            print('   ⚠️ 서버 HTML 에 상품 흔적이 전혀 없음 — 상품이 JS/AJAX 로 렌더되거나 '
+                  '이 카테고리에 상품이 없음(다른 cate_no 로 이동 가능성).')
+
         cats = sorted(set(re.findall(r'cate_no=(\d+)', r.text)))
         if cats:
             print(f'   페이지에 등장하는 cate_no 값: {cats[:20]}')
-            print('   → 생두 카테고리 번호가 바뀌었을 수 있습니다(현재 스크래퍼는 64 사용).')
         return
 
-    from urllib.parse import urljoin
     base = f'{urlparse(listing).scheme}://{urlparse(listing).netloc}'
     for h in hrefs[:a.sample]:
         full = urljoin(base + '/', h)

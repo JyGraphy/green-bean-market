@@ -1,4 +1,15 @@
-"""커피창고 생두 스크래퍼 — Cafe24 cate_no=802"""
+"""커피창고 생두 스크래퍼 — Cafe24 cate_no=802
+
+⚠️ 2026-10-26 재작성 필요 (현재 0개 수집)
+쇼핑몰이 cate_no=802(생두) 목록을 서버에서 그리지 않게 바뀌었다. 목록 페이지는
+200 이지만 서버 HTML 에 상품이 0개(product_no 흔적 0, /product/ 링크 0)라 아래
+`a[href*="/product/"]` 셀렉터가 아무것도 못 잡는다. 저장돼 있던 16개 링크도 전부
+404 라(상품번호 소멸) 2026-10-26 에 제거했고, 그래서 healthcheck/validate 의
+'커피창고' 기대 목록에서도 한시 제외했다.
+생두 카테고리 자체는 여전히 cate_no=802 다. 상품이 JS/AJAX 로 렌더되는지(=브라우저
+스크래퍼 필요) 아니면 실제로 비어 있는지 확인한 뒤, 새 구조에 맞게 재작성하고
+healthcheck.EXPECTED_STORES 에 '커피창고' 를 되돌려야 한다.
+"""
 import re, time, sys
 sys.path.insert(0, __file__.rsplit('/', 1)[0])
 from common import *

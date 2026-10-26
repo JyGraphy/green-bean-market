@@ -1,5 +1,10 @@
 {
-  "updated_at": "2026-10-25T23:10:53Z",
-  "stores": [],
-  "total_new": 0
+  "updated_at": "2026-10-26T04:46:27Z",
+  "stores": [
+    {
+      "name": "엠아이커피",
+      "new_count": 3
+    }
+  ],
+  "total_new": 3
 }

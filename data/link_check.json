@@ -1,53 +1,53 @@
 {
-  "checked_at": "2026-10-25T23:09:24Z",
-  "total": 1356,
+  "checked_at": "2026-10-26T04:44:44Z",
+  "total": 1361,
   "removed": [],
   "held_stores": [
     "커피창고: dead 16/16 (100%) — URL 구조 변경 의심, 제거 보류"
   ],
   "timing": {
-    "elapsed_sec": 474.6,
-    "requests": 1164,
-    "skipped_unknown": 192,
+    "elapsed_sec": 523.8,
+    "requests": 1163,
+    "skipped_unknown": 198,
     "slowest_domains": [
       {
         "domain": "comansa.kr",
-        "sec": 474.6,
+        "sec": 523.8,
         "count": 339
       },
       {
         "domain": "www.gsc.coffee",
-        "sec": 203.5,
-        "count": 122
+        "sec": 199.0,
+        "count": 118
       },
       {
         "domain": "www.micoffee.co.kr",
-        "sec": 164.5,
-        "count": 115
+        "sec": 185.2,
+        "count": 114
       },
       {
         "domain": "momos.co.kr",
-        "sec": 127.3,
-        "count": 101
-      },
-      {
-        "domain": "www.blessbean.co.kr",
-        "sec": 107.1,
+        "sec": 127.6,
         "count": 101
       },
       {
         "domain": "www.cobeans.com",
-        "sec": 74.2,
+        "sec": 76.0,
         "count": 93
       },
       {
+        "domain": "www.blessbean.co.kr",
+        "sec": 72.7,
+        "count": 105
+      },
+      {
         "domain": "wbeans.com",
-        "sec": 61.7,
+        "sec": 65.5,
         "count": 42
       },
       {
         "domain": "coffeeplant.co.kr",
-        "sec": 60.8,
+        "sec": 58.7,
         "count": 48
       }
     ]
@@ -73,12 +73,12 @@
       "dead": 16,
       "ambiguous": 0
     },
-    "모모스커피": {
-      "ok": 101,
+    "블레스빈": {
+      "ok": 105,
       "dead": 0,
       "ambiguous": 0
     },
-    "블레스빈": {
+    "모모스커피": {
       "ok": 101,
       "dead": 0,
       "ambiguous": 0
@@ -89,7 +89,7 @@
       "ambiguous": 0
     },
     "엠아이커피": {
-      "ok": 115,
+      "ok": 114,
       "dead": 0,
       "ambiguous": 0
     },
@@ -104,7 +104,7 @@
       "ambiguous": 0
     },
     "지에스씨(GSC)": {
-      "ok": 122,
+      "ok": 118,
       "dead": 0,
       "ambiguous": 0
     },

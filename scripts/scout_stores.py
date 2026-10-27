@@ -35,9 +35,18 @@ CROP_NOW = 26          # 현재 뉴크롭 연도 두 자리 — 해마다 올린
 
 # ── 크롭 표기 판정 ───────────────────────────────────────────────
 OLD_WORD = re.compile(r'(올드\s*크롭|old\s*crop|past\s*crop|패스트\s*크롭|지난\s*크롭)', re.I)
-# "CROP24", "24CROP", "2024", "2024/25", "CROP 2025" 등에서 **시작 연도**를 뽑는다
-YEAR = re.compile(r'(?:crop\s*|)(20(\d{2}))(?:\s*[/~-]\s*(?:20)?\d{2})?|'
-                  r'\b(\d{2})\s*crop\b|\bcrop\s*(\d{2})\b', re.I)
+# 연도는 **크롭 문맥 안에 있을 때만** 센다.
+# 2026-10-27 실측: 문맥 없이 연도만 잡았더니 푸터의 저작권 연도(ⓒ2020·2023)와
+# 통신판매업 신고연도를 전부 '올드크롭'으로 읽었다 — "회사소개"·"과일청" 페이지까지
+# 올드크롭으로 찍혔다. 그래서 '크롭/crop/수확/harvest' 가 연도 근처에 있어야 한다.
+# 재현율은 떨어지지만(연도만 적는 곳은 놓친다), **멀쩡한 공급사를 탈락시키는 쪽이
+# 훨씬 큰 손해**라 정밀도를 택한다.
+_CW = r'(?:크롭|crop|수확|harvest|하베스트)'
+YEAR = re.compile(
+    # 크롭 단어와 연도 사이에 '시기:', '연도 :' 같은 말이 끼는 경우가 있어
+    # 숫자 아닌 문자 8자까지 허용한다("수확시기: 2024-2025").
+    rf'{_CW}[^0-9]{{0,8}}(?:20)?(\d{{2}})(?:\s*[/~\-]\s*(?:20)?(\d{{2}}))?'
+    rf'|(?:20)?(\d{{2}})(?:\s*[/~\-]\s*(?:20)?(\d{{2}}))?[^0-9]{{0,4}}{_CW}', re.I)
 NEW_WORD = re.compile(r'(뉴\s*크롭|new\s*crop)', re.I)
 
 
@@ -47,9 +56,9 @@ def crop_verdict(text: str) -> tuple[str, str]:
         return 'old', OLD_WORD.search(text).group(0)
     years = []
     for m in YEAR.finditer(text):
-        y = m.group(2) or m.group(3) or m.group(4)
-        if y and 18 <= int(y) <= CROP_NOW + 1:      # 터무니없는 숫자 제외
-            years.append(int(y))
+        for g in m.groups():
+            if g and 18 <= int(g) <= CROP_NOW + 1:  # 터무니없는 숫자 제외
+                years.append(int(g))
     if years:
         # 범위 표기(2024/25)는 **뒷 연도**가 실제 수확이므로 최대값을 본다
         y = max(years)
@@ -200,7 +209,12 @@ def scan_details(session, links: list[str]) -> dict:
         res['checked'] += 1
         res[v] += 1
         if v in ('old', 'past', 'new'):
-            res['hits'].append(f'{v.upper()} {ev} — {title}')
+            # 적중 문구의 앞뒤를 같이 남긴다 — 오탐인지 사람이 바로 판단할 수 있게
+            ctx = ''
+            m = _re.search(r'.{0,45}' + _re.escape(ev) + r'.{0,45}', text)
+            if m:
+                ctx = m.group(0).strip()
+            res['hits'].append(f'{v.upper()} {ev} — {title} … 「{ctx}」')
         time.sleep(1.0)
     return res
 

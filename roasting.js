@@ -735,6 +735,56 @@ function showWizardResult() {
   showStep(3);
 }
 
+/* ════════ 누적 학습 기록 ════════
+   분석할 때마다(저장 여부와 무관) roast-learn 함수로 비공개 스토리지에 기록한다.
+   매주 roast-learning.yml 이 이 기록으로 기준값 재계산·판독 정확도 재측정·규칙 갱신을 한다.
+   데이터 파일을 함께 올린 판독은 그 곡선이 정답이라 자동으로 검증 사례가 된다.
+   실패해도 사용자 흐름은 막지 않는다. */
+const LEARN_APP_VERSION = '2026-10-27';
+
+function resampleForLog(pts, endT) {
+  if (!pts || pts.length < 2 || !(endT > 0)) return null;
+  return resample(pts, 5, endT).map(p => [p.t, p.bt]);
+}
+
+function logReading(kind, info) {
+  try {
+    const consent = !!($('learnConsent') && $('learnConsent').checked);
+    const d = wizardData || {};
+    const dp = digi.dataParsed;
+    const reading = {
+      app_version: LEARN_APP_VERSION,
+      input_kind: kind,                                   // photo | photo+datafile | datafile
+      screen_type: info.screenType || null,
+      machine: info.machine || null,
+      roaster_input: $('fRoaster').value.trim() || null,
+      charge_weight: d.charge_weight ?? null,
+      curve_source: info.curveSource || null,
+      pixel: info.pix ? { ok: !!info.pix.ok, reason: info.pix.reason || null, max_res: info.pix.maxRes ?? null,
+                          anchors: info.pix.anchorsUsed ?? null, time_ref: info.pix.timeRef || null } : null,
+      ai_raw: info.result || null,
+      result: { total_time: d.total_time, dtr: d.dtr, charge_temp: d.charge_temp, drop_temp: d.drop_temp,
+                events: d.events, time_series: d.time_series, bt_series: d.bt_series, et_series: d.et_series,
+                agitation_series: d.agitation_series, fluid_bed: !!d.fluid_bed },
+      // 정답: 데이터 파일에서 읽은 곡선 (사진과 함께 올린 경우 그 사진의 판독 정답이 된다)
+      truth: dp ? { source: dp.machine || 'datafile', bt: resampleForLog(dp.btPts, dp.dropT), et: resampleForLog(dp.etPts, dp.dropT),
+                    agitation: dp.agitSorted ? dp.agitSorted.map(p => [p.t, p.v]) : null, events: dp.evTimes, drop_t: dp.dropT } : null,
+    };
+    // 사진은 동의했을 때만, 최대 2장·합계 약 6MB 이내로 보낸다
+    let images = [];
+    if (consent && kind !== 'datafile') {
+      let total = 0;
+      for (const im of digi.images.slice(0, 2)) {
+        if (total + im.base64.length > 8_000_000) break;
+        images.push({ base64: im.base64, media_type: im.mediaType }); total += im.base64.length;
+      }
+    }
+    sb.functions.invoke('roast-learn', { body: { action: 'log', consent, reading, images } })
+      .then(({ error }) => { if (error) console.warn('학습 기록 실패:', error.message || error); })
+      .catch(e => console.warn('학습 기록 실패:', e));
+  } catch (e) { console.warn('학습 기록 준비 실패:', e); }
+}
+
 /* 데이터 파일 단독 업로드 → 바로 결과 */
 function applyParsedData(parse) {
   wizardData = buildWizardFromParse(parse);
@@ -743,6 +793,7 @@ function applyParsedData(parse) {
   $('aiPanel').style.display = 'none';
   digitizer.style.display = 'none';
   showWizardResult();
+  logReading('datafile', { machine: parse.machine || null, screenType: null, curveSource: 'datafile' });
 }
 
 /* ════════ AI 자동 분석 ════════ */
@@ -834,6 +885,26 @@ function imageDataFromUrl(dataUrl, maxSide) {
   });
 }
 
+/* AI 판독 결과에서 곡선과 텍스트 앵커(화면에 적힌 정확한 값)를 꺼낸다.
+   labeled_points: 새 포맷 { time_sec, temp_celsius, curve } 또는 구 배열 포맷 모두 허용.
+   scripts/roast_pixel_eval.js 가 판독 벤치마크에서 같은 함수를 쓴다. */
+function aiAnchors(result) {
+  const lp = result.labeled_points || [];
+  const anchorsBt = lp.filter(p => p.curve === 'BT' || Array.isArray(p))   // BT 레이블만 BT 곡선에 반영
+    .map(p => Array.isArray(p) ? { t: +p[0], T: +p[1] } : { t: +p.time_sec, T: +p.temp_celsius });
+  const anchorsEt = lp.filter(p => !Array.isArray(p) && p.curve === 'ET')
+    .map(p => ({ t: +p.time_sec, T: +p.temp_celsius }));
+  const evDrop = result.events && typeof result.events.drop === 'number' ? +result.events.drop
+    : (result.total_time_sec ? +result.total_time_sec : null);
+  if (evDrop && result.drop_temp != null && !anchorsBt.some(a => Math.abs(a.t - evDrop) < 2))
+    anchorsBt.push({ t: evDrop, T: +result.drop_temp });
+  return {
+    rawCurve: (result.bt_curve || []).map(([t, bt]) => ({ t: +t, bt: +bt })),
+    rawEt: (result.et_curve || []).map(([t, bt]) => ({ t: +t, bt: +bt })),
+    evDrop, anchorsBt, anchorsEt,
+  };
+}
+
 /* AI가 눈으로 읽은 곡선을 텍스트 앵커(정확한 값)에 맞춘다. 앵커에서의 차이를 앵커 사이에
    직선으로 이어 곡선 전체를 함께 옮기므로, 앵커 한 점만 끼워 넣을 때 생기던 계단(→ 가짜 RoR
    크래시·플릭)이 생기지 않는다. 첫 앵커 앞·마지막 앵커 뒤는 그 앵커의 차이를 유지한다. */
@@ -882,28 +953,14 @@ async function autoScan() {
     const result = data;
 
     // AI 결과 → wizardData 구성
-    // labeled_points: 새 포맷 { time_sec, temp_celsius, curve } 또는 구 배열 포맷 모두 허용
-    const labeled = (result.labeled_points || [])
-      .filter(p => (p.curve === 'BT' || Array.isArray(p)))  // BT 레이블만 BT 곡선에 반영
-      .map(p => Array.isArray(p) ? { t: +p[0], bt: +p[1] } : { t: +p.time_sec, bt: +p.temp_celsius });
-    const labeledEt = (result.labeled_points || [])
-      .filter(p => !Array.isArray(p) && p.curve === 'ET')
-      .map(p => ({ t: +p.time_sec, bt: +p.temp_celsius }));
-    const rawCurve = (result.bt_curve || []).map(([t, bt]) => ({ t: +t, bt: +bt }));
-    const rawEt    = (result.et_curve   || []).map(([t, bt]) => ({ t: +t, bt: +bt }));
+    const { rawCurve, rawEt, evDrop, anchorsBt, anchorsEt } = aiAnchors(result);
     const rawAgit  = (result.agitation  || []).map(([t, v])  => ({ t: +t, v: +v  }));
 
     // 화면 종류·기기 판별 (AI 판독 + 사용자가 입력한 로스팅기)
     const machine = detectMachineFromScan(result, $('fRoaster').value);
 
     // 곡선: ① 픽셀 직접 추출(정확) → 실패하면 ② AI 판독 곡선을 앵커에 맞춰 부드럽게 보정
-    const evDrop = result.events && typeof result.events.drop === 'number' ? +result.events.drop
-      : (result.total_time_sec ? +result.total_time_sec : null);
-    const anchorsBt = labeled.map(p => ({ t: p.t, T: p.bt }));
-    if (evDrop && result.drop_temp != null && !anchorsBt.some(a => Math.abs(a.t - evDrop) < 2))
-      anchorsBt.push({ t: evDrop, T: +result.drop_temp });
-    const anchorsEt = labeledEt.map(p => ({ t: p.t, T: p.bt }));
-    const pix = (evDrop && !digi.dataParsed) ? await pixelExtractFromImages(machine.screenType, result, evDrop, anchorsBt, anchorsEt) : null;
+    const pix =(evDrop && !digi.dataParsed) ? await pixelExtractFromImages(machine.screenType, result, evDrop, anchorsBt, anchorsEt) : null;
 
     let curve, etCurve, curveSource;
     if (pix && pix.ok) {
@@ -993,6 +1050,8 @@ async function autoScan() {
     }
 
     showWizardResult();
+    logReading(digi.dataParsed ? 'photo+datafile' : 'photo',
+      { result, pix, machine: machine.name, screenType: machine.screenType, curveSource });
 
   } catch (err) {
     console.error('AI scan error:', err);
@@ -1510,7 +1569,9 @@ function pointChangeGuide(d, targetKey) {
      원두 표면(IR)은 투입 시 낮게 시작해 꺾이지 않으므로 터닝포인트는 내부 온도로 잰다.
    - ikawa: 열풍식 표본이 없어 일반 권장 범위를 쓰고 곡선 비교는 하지 않는다.
    검증: 학습에 쓰지 않은 기록에서 'P5~P95를 2개 이상 벗어나면 경고' 규칙의
-   정상 로스팅 경고율이 drum 19% · drumSmall 19% · drumLarge 17% · s7x 16%. */
+   정상 로스팅 경고율이 drum 19% · drumSmall 19% · drumLarge 17% · s7x 16%.
+   아래 값은 기본값이다. 주간 학습(scripts/roast_baselines.py)이 누적 기록으로 다시 계산한
+   data/roast-baselines.json 을 불러오면 그 값으로 덮어쓴다 (loadLearnedBaselines). */
 const ROAST_BASELINES = {
   drum:      { label:'드럼 로스터(500g급)', n:35446, tpOn:'bt',
                total:[7.2,9.0,11.8], tpT:[59,78,130], tpBt:[103.7,125.5,149.6], dry:[23.1,34.5,45.2],
@@ -1528,6 +1589,26 @@ const ROAST_BASELINES = {
 };
 // 발달이 이보다 짧으면 기기와 무관하게 언더디벨롭 위험으로 본다 (소배치 P5가 1.2%라 하한이 필요)
 const DTR_ABS_MIN = 5;
+
+/* 누적 학습 기준선 불러오기. 파일이 없거나 값이 이상하면 위 기본값을 그대로 쓴다. */
+const BASELINE_METRICS = ['total', 'tpT', 'tpBt', 'dry', 'mai', 'ror200', 'drop', 'dtr'];
+(async function loadLearnedBaselines() {
+  try {
+    const v = new Date().toISOString().slice(0, 10);
+    const res = await fetch(`data/roast-baselines.json?v=${v}`, { cache: 'no-cache' });
+    if (!res.ok) return;
+    const j = await res.json();
+    for (const [key, g] of Object.entries(j.groups || {})) {
+      const base = ROAST_BASELINES[key];
+      if (!base || !(g.n >= 30)) continue;
+      for (const m of BASELINE_METRICS) {
+        const r = g[m];
+        if (Array.isArray(r) && r.length === 3 && r.every(Number.isFinite) && r[0] <= r[1] && r[1] <= r[2]) base[m] = r;
+      }
+      base.n = g.n;
+    }
+  } catch (e) { console.warn('기준선 파일을 못 읽어 기본값 사용', e); }
+})();
 
 function pickBaseline(d) {
   if (d.fluid_bed) return Object.assign({ key:'ikawa' }, ROAST_BASELINES.ikawa);

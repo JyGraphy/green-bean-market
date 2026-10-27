@@ -84,6 +84,20 @@ def ev(d, k):
     return float(v) if isinstance(v, (int, float)) else None
 
 
+MACHINE_ALIASES = {'스트롱홀드': 'stronghold', '이카와': 'ikawa', '기센': 'giesen', '프로밧': 'probat',
+                   '디드릭': 'diedrich', '로링': 'loring', '태환': 'taehwan', '이지스터': 'easyster',
+                   '아일휘트': 'aillio', '알리오': 'aillio', '휴키': 'huky', '빈크레프트': 'beancraft'}
+GENERIC_TOKENS = {'pro', 'roaster', 'roasting', 'machine', 'web', 'app', 'page', 'detail', 'hybrid',
+                  'boost', 'the', 'and', '로스터', '로스터기'}
+
+
+def machine_tokens(name: str) -> set[str]:
+    s = name.lower()
+    for ko, en in MACHINE_ALIASES.items():
+        s = s.replace(ko, f' {en} ')
+    return {t for t in re.findall(r'[a-z0-9가-힣]+', s) if len(t) >= 2 and t not in GENERIC_TOKENS}
+
+
 def diff_row(row: dict) -> dict | None:
     """한 건에서 'AI 판독 vs 최종 저장' 차이를 뽑는다."""
     ai = row.get('ai_raw')
@@ -97,10 +111,10 @@ def diff_row(row: dict) -> dict | None:
            'confidence': row.get('ai_confidence') or 'medium',
            'input_kind': row.get('ai_input_kind') or 'photo'}
 
-    # 1) 기기 오인 — 사용자가 고른 로스터기와 AI 판독이 다름
+    # 1) 기기 오인 — 사용자가 고른 로스터기와 AI 판독이 다름 (한글·영문 표기 차이는 같은 기기로 본다)
     if out['declared'] and out['detected']:
-        a, b = out['declared'].lower(), out['detected'].lower()
-        if a not in b and b not in a:
+        a, b = machine_tokens(out['declared']), machine_tokens(out['detected'])
+        if a and b and not (a & b):
             out['issues'].append(('machine_mismatch',
                                   f'이 기기를 "{out["detected"]}"(으)로 오인'))
 
@@ -274,7 +288,8 @@ def write_report(agg: dict, rows: list[dict], touched: list[str]) -> pathlib.Pat
           '## 개인정보', '',
           'user_id·생두명·메모 등은 조회하지 않는다. 판독 정확도 집계에 필요한 컬럼만 읽는다.',
           '',
-          '## 출처', '', '- Supabase `public.roasting_profiles` — 1차 (실사용 데이터 직접 집계)', '']
+          '## 출처', '', '- Supabase `public.roasting_profiles` — 1차 (실사용 데이터 직접 집계)',
+          '- 비공개 버킷 `roast-learning/readings` 중 사진+데이터 파일 사례 — 1차 (데이터 파일 = 정답)', '']
 
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     out = REPORT_DIR / f'{today}-실사용피드백.md'
@@ -286,9 +301,15 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--dry-run', action='store_true')
     ap.add_argument('--limit', type=int, default=1000)
+    ap.add_argument('--extra', help='같은 모양의 행을 더할 JSON 파일 (roast_benchmark.py --feedback-out: '
+                                    '사진+데이터 파일 사례의 AI 판독 vs 데이터 파일 정답)')
     a = ap.parse_args()
 
     rows = fetch_rows(a.limit)
+    if a.extra and pathlib.Path(a.extra).exists():
+        extra = json.loads(pathlib.Path(a.extra).read_text(encoding='utf-8'))
+        print(f'정답 데이터가 있는 판독 사례 {len(extra)}건 추가')
+        rows += extra
     if not rows:
         print('분석할 데이터가 없습니다 (자격증명 미설정이거나 업로드가 아직 없음). 정상 종료.')
         return

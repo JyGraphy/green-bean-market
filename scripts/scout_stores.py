@@ -56,6 +56,16 @@ NEW_WORD = re.compile(r'(뉴\s*크롭|new\s*crop)', re.I)
 # 그래서 두 모드를 둔다 — strict=True 는 크롭 문맥을 요구한다.
 BARE_YEAR = re.compile(r'\b(?:20)?(\d{2})\s*[/~-]\s*(?:20)?(\d{2})\b|\b20(\d{2})\b')
 
+# 생두 상품명에는 **연도처럼 보이는 숫자가 널려 있다.** 2026-10-27 실측:
+#   "브라질 산토스 파인컵 NY2 Scr 17/18 내츄럴" → 17/18 은 스크린 사이즈인데
+#   2017/2018 크롭으로 읽혀 소펙스코리아가 '올드크롭 있음'으로 잘못 찍혔다.
+# 스크린·등급·용량 표기를 먼저 지우고 연도를 찾는다.
+NOISE = re.compile(
+    r'(?:scr(?:een)?|스크린|sc)\s*\.?\s*\d{1,2}\s*(?:[/~-]\s*\d{1,2})?(?:\s*up)?'
+    r'|\bny\s*\d(?:\s*[/~-]\s*\d)?'
+    r'|\b\d{1,2}\s*[/~-]\s*\d{1,2}\s*(?:목|메쉬|mesh)'
+    r'|\b\d+\s*(?:kg|g|ml|개|포)\b', re.I)
+
 
 def crop_verdict(text: str, strict: bool = False) -> tuple[str, str]:
     """(판정, 근거). 판정 = new | past | old | none.
@@ -72,7 +82,7 @@ def crop_verdict(text: str, strict: bool = False) -> tuple[str, str]:
             if g and 18 <= int(g) <= CROP_NOW + 1:  # 터무니없는 숫자 제외
                 years.append(int(g))
     if not years and not strict:
-        for m in BARE_YEAR.finditer(text):
+        for m in BARE_YEAR.finditer(NOISE.sub(' ', text)):
             for g in m.groups():
                 if g and 18 <= int(g) <= CROP_NOW + 1:
                     years.append(int(g))

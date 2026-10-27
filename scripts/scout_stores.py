@@ -66,7 +66,10 @@ def crop_verdict(text: str) -> tuple[str, str]:
 
 def classify(names: list[str]) -> dict:
     out = {'n': len(names), 'new': 0, 'past': 0, 'old': 0, 'none': 0,
-           'old_items': [], 'past_items': []}
+           'old_items': [], 'past_items': [],
+           # 긁은 것이 진짜 상품명인지 사람이 확인할 표본. 사진 수집에서
+           # "검색어만 믿으면 바나나가 온다"를 겪었다 — 같은 실수를 막는다.
+           'samples': [n[:70] for n in names[:12]]}
     for nm in names:
         v, ev = crop_verdict(nm)
         out[v] += 1
@@ -216,6 +219,15 @@ def write_report(rows: list[dict], title: str, kind: str) -> None:
             verdict = '🟢 올드 표기 없음'
         L.append(f"| {r['store']} | {r['n']} | {r['new']} | {r['past']} | {r['old']} | "
                  f"{r['label_rate']:.0%} | {verdict} |")
+    L += ['', '## 긁어온 상품명 표본 (스크래퍼가 제대로 읽었는지 사람이 확인)', '']
+    for r in rows:
+        L.append(f"**{r['store']}** — {r.get('how', '')} · {r['n']}개")
+        if r.get('samples'):
+            for s0 in r['samples']:
+                L.append(f'- {s0}')
+        else:
+            L.append('- (없음)')
+        L.append('')
     for r in rows:
         if r['old_items'] or r['past_items']:
             L += ['', f"### {r['store']}"]

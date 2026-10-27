@@ -46,12 +46,24 @@ YEAR = re.compile(
     # 크롭 단어와 연도 사이에 '시기:', '연도 :' 같은 말이 끼는 경우가 있어
     # 숫자 아닌 문자 8자까지 허용한다("수확시기: 2024-2025").
     rf'{_CW}[^0-9]{{0,8}}(?:20)?(\d{{2}})(?:\s*[/~\-]\s*(?:20)?(\d{{2}}))?'
-    rf'|(?:20)?(\d{{2}})(?:\s*[/~\-]\s*(?:20)?(\d{{2}}))?[^0-9]{{0,4}}{_CW}', re.I)
+    rf'|(?:20)?(\d{{2}})(?:\s*[/~\-]\s*(?:20)?(\d{{2}}))?[\s\-]{{0,2}}{_CW}', re.I)
 NEW_WORD = re.compile(r'(뉴\s*크롭|new\s*crop)', re.I)
 
 
-def crop_verdict(text: str) -> tuple[str, str]:
-    """(판정, 근거). 판정 = new | past | old | none."""
+# 상품명처럼 **짧고 선별된 글**에서는 맨 연도도 크롭을 뜻한다
+# ("파나마 보케테 팔미라 워시드 2024/2025"). 반대로 상세페이지 **본문 전체**에는
+# 저작권·사업자 연도가 섞여 있어 맨 연도를 믿으면 안 된다.
+# 그래서 두 모드를 둔다 — strict=True 는 크롭 문맥을 요구한다.
+BARE_YEAR = re.compile(r'\b(?:20)?(\d{2})\s*[/~-]\s*(?:20)?(\d{2})\b|\b20(\d{2})\b')
+
+
+def crop_verdict(text: str, strict: bool = False) -> tuple[str, str]:
+    """(판정, 근거). 판정 = new | past | old | none.
+
+    strict=True  : 연도가 '크롭/수확/crop/harvest' 문맥 안에 있을 때만 센다.
+                   상세페이지 본문처럼 저작권 연도가 섞인 긴 글에 쓴다.
+    strict=False : 맨 연도도 크롭으로 본다. 상품명처럼 짧은 글에 쓴다.
+    """
     if OLD_WORD.search(text):
         return 'old', OLD_WORD.search(text).group(0)
     years = []
@@ -59,6 +71,11 @@ def crop_verdict(text: str) -> tuple[str, str]:
         for g in m.groups():
             if g and 18 <= int(g) <= CROP_NOW + 1:  # 터무니없는 숫자 제외
                 years.append(int(g))
+    if not years and not strict:
+        for m in BARE_YEAR.finditer(text):
+            for g in m.groups():
+                if g and 18 <= int(g) <= CROP_NOW + 1:
+                    years.append(int(g))
     if years:
         # 범위 표기(2024/25)는 **뒷 연도**가 실제 수확이므로 최대값을 본다
         y = max(years)
@@ -205,7 +222,7 @@ def scan_details(session, links: list[str]) -> dict:
             t.decompose()
         text = _re.sub(r'\s+', ' ', soup.get_text(' ', strip=True))[:20000]
         title = (soup.title.get_text(strip=True) if soup.title else url)[:60]
-        v, ev = crop_verdict(text)
+        v, ev = crop_verdict(text, strict=True)   # 본문 전체 → 엄격 모드
         res['checked'] += 1
         res[v] += 1
         if v in ('old', 'past', 'new'):

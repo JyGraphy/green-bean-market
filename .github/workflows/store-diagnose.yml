@@ -10,8 +10,12 @@ on:
     inputs:
       store:
         description: '진단할 공급사명 (예: 모모스커피)'
-        required: true
+        required: false
         default: '모모스커피'
+      scout:
+        description: '신규 공급사 후보의 크롭(수확연도) 표기 조사 (true/false)'
+        required: false
+        default: 'false'
       sample:
         description: '확인할 URL 개수'
         required: false
@@ -47,7 +51,33 @@ jobs:
       - name: 의존성 설치
         run: pip install requests beautifulsoup4 lxml
 
+      # 신규 후보 조사 — 사장님 기준 "올드크롭이 있으면 안 된다" 를 실제로 확인한다.
+      # 세션에서는 쇼핑몰이 전부 403 이라 여기서만 볼 수 있다.
+      - name: 신규 공급사 후보 크롭 조사
+        if: github.event.inputs.scout == 'true'
+        run: python scripts/scout_stores.py --candidates
+
+      - name: 우리 데이터 크롭 전수조사
+        if: github.event.inputs.scout == 'true'
+        run: python scripts/scout_stores.py --audit-existing
+
+      - name: 조사 결과 커밋
+        if: github.event.inputs.scout == 'true'
+        run: |
+          git config user.name "GreenBeanBot"
+          git config user.email "bot@green-bean-market"
+          git add vault/raw/stores/ || true
+          if ! git diff --cached --quiet; then
+            git commit -m "공급사 크롭 조사: $(date '+%Y-%m-%d')"
+            for i in 1 2 3; do
+              git pull --rebase origin main && git push && exit 0
+              sleep $((i * 5))
+            done
+            echo "::error::푸시 실패"; exit 1
+          fi
+
       - name: 링크 진단
+        if: github.event.inputs.scout != 'true'
         run: |
           python scripts/diagnose_store.py \
             --store "${{ github.event.inputs.store }}" \

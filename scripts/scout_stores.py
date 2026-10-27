@@ -135,10 +135,11 @@ NAME_SELECTORS = [
 ]
 
 
-def scrape_names(session, urls: list[str]) -> tuple[list[str], str]:
-    """상품명 후보를 긁는다. 플랫폼이 제각각이라 여러 셀렉터를 시도한다."""
+def scrape_names(session, urls: list[str]) -> tuple[list[str], str, list[str]]:
+    """상품명과 상세페이지 링크를 긁는다. 플랫폼이 제각각이라 여러 셀렉터를 시도한다."""
     from bs4 import BeautifulSoup
-    names, how = [], ''
+    from urllib.parse import urljoin
+    names, how, links = [], '', []
     for url in urls:
         try:
             r = session.get(url, timeout=30)
@@ -147,6 +148,11 @@ def scrape_names(session, urls: list[str]) -> tuple[list[str], str]:
             print(f'    ✗ {url} — {type(e).__name__}: {e}')
             continue
         soup = BeautifulSoup(r.text, 'html.parser')
+        for a in soup.select('a[href*="product_no"], a[href*="goods_view"], '
+                             'a[href*="/product/"]'):
+            href = a.get('href') or ''
+            if href and 'javascript' not in href:
+                links.append(urljoin(url, href))
         for sel in NAME_SELECTORS:
             got = [el.get_text(' ', strip=True) for el in soup.select(sel)]
             got = [g for g in got if 6 <= len(g) <= 120]
@@ -161,7 +167,42 @@ def scrape_names(session, urls: list[str]) -> tuple[list[str], str]:
         if n not in seen:
             seen.add(n)
             uniq.append(n)
-    return uniq, how
+    seen2, ulinks = set(), []
+    for l in links:
+        if l not in seen2:
+            seen2.add(l)
+            ulinks.append(l)
+    return uniq, how, ulinks
+
+
+# 크롭 연도는 목록 페이지 상품명이 아니라 **상세페이지**(요약정보·상세설명)에
+# 적히는 경우가 대부분이다(2026-10-27 실측: 목록 기준 표기율 0~8%).
+# 그래서 상세페이지를 표본으로 열어 본문 전체에서 크롭 표기를 찾는다.
+DETAIL_SAMPLE = 10
+
+
+def scan_details(session, links: list[str]) -> dict:
+    import re as _re
+    from bs4 import BeautifulSoup
+    res = {'checked': 0, 'new': 0, 'past': 0, 'old': 0, 'none': 0, 'hits': []}
+    for url in links[:DETAIL_SAMPLE]:
+        try:
+            r = session.get(url, timeout=30)
+            r.raise_for_status()
+        except Exception:                            # noqa: BLE001
+            continue
+        soup = BeautifulSoup(r.text, 'html.parser')
+        for t in soup(['script', 'style']):
+            t.decompose()
+        text = _re.sub(r'\s+', ' ', soup.get_text(' ', strip=True))[:20000]
+        title = (soup.title.get_text(strip=True) if soup.title else url)[:60]
+        v, ev = crop_verdict(text)
+        res['checked'] += 1
+        res[v] += 1
+        if v in ('old', 'past', 'new'):
+            res['hits'].append(f'{v.upper()} {ev} — {title}')
+        time.sleep(1.0)
+    return res
 
 
 def scout() -> int:
@@ -174,7 +215,7 @@ def scout() -> int:
     rows = []
     for c in CANDIDATES:
         print(f"\n▶ {c['name']} ({c['domain']})")
-        names, how = scrape_names(session, c['urls'])
+        names, how, links = scrape_names(session, c['urls'])
         if not names:
             print('    상품명을 못 긁음 — 클라이언트 렌더링이거나 차단')
             rows.append({'store': c['name'], 'domain': c['domain'], 'note': c['note'],
@@ -184,6 +225,8 @@ def scout() -> int:
             continue
         r = classify(names)
         r.update(store=c['name'], domain=c['domain'], note=c['note'], how=how)
+        print(f'    상세페이지 표본 {min(len(links), DETAIL_SAMPLE)}개 확인 중…')
+        r['detail'] = scan_details(session, links)
         rows.append(r)
         print(f"    상품명 {r['n']}개 · 뉴 {r['new']} / 지난 {r['past']} / "
               f"올드 {r['old']} · 표기율 {r['label_rate']:.0%}")
@@ -219,6 +262,21 @@ def write_report(rows: list[dict], title: str, kind: str) -> None:
             verdict = '🟢 올드 표기 없음'
         L.append(f"| {r['store']} | {r['n']} | {r['new']} | {r['past']} | {r['old']} | "
                  f"{r['label_rate']:.0%} | {verdict} |")
+    L += ['', '## 상세페이지 크롭 표본 조사', '',
+          '목록 페이지 상품명에는 크롭이 거의 안 적힌다. 상세페이지 본문을 표본으로 열어 확인했다.', '',
+          '| 공급사 | 확인 | 뉴 | 지난 | 올드 | 표기 없음 |', '|---|---|---|---|---|---|']
+    for r in rows:
+        d = r.get('detail') or {}
+        if d.get('checked'):
+            L.append(f"| {r['store']} | {d['checked']} | {d['new']} | {d['past']} | "
+                     f"{d['old']} | {d['none']} |")
+    for r in rows:
+        d = r.get('detail') or {}
+        if d.get('hits'):
+            L += ['', f"**{r['store']}** 상세페이지 적중"]
+            for h in d['hits']:
+                L.append(f'- {h}')
+
     L += ['', '## 긁어온 상품명 표본 (스크래퍼가 제대로 읽었는지 사람이 확인)', '']
     for r in rows:
         L.append(f"**{r['store']}** — {r.get('how', '')} · {r['n']}개")

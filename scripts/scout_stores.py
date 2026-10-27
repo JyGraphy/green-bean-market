@@ -82,9 +82,13 @@ def crop_verdict(text: str, strict: bool = False) -> tuple[str, str]:
             if g and 18 <= int(g) <= CROP_NOW + 1:  # 터무니없는 숫자 제외
                 years.append(int(g))
     if not years and not strict:
+        # 맨 연도는 **20 이상만** 인정한다. 스크린 사이즈는 12~19, 현재 통용 크롭은
+        # 23~27 이라 이 선에서 깔끔히 갈린다. NOISE 로 'Scr 17/18' 은 지우지만
+        # '브라질 NY2 FC 17/18' 처럼 Scr 없이 쓰는 표기가 많아 범위로 한 번 더 막는다
+        # (2026-10-27 실측: 이 표기 때문에 GSC·커만사가 올드크롭으로 잘못 찍혔다).
         for m in BARE_YEAR.finditer(NOISE.sub(' ', text)):
             for g in m.groups():
-                if g and 18 <= int(g) <= CROP_NOW + 1:
+                if g and 20 <= int(g) <= CROP_NOW + 1:
                     years.append(int(g))
     if years:
         # 범위 표기(2024/25)는 **뒷 연도**가 실제 수확이므로 최대값을 본다

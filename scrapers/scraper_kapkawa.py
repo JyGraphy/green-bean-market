@@ -42,7 +42,10 @@ G = re.compile(r'(\d{3,4})\s*g\b', re.I)
 NEWCROP = re.compile(r'\[\s*(\d{2})\s*new\s*crop\s*\]', re.I)
 # 상품명이 "캅카와 에티오피아 ... 생두커피 1kg" 꼴이라 접두/접미를 떼야 읽힌다
 PREFIX = re.compile(r'^\s*캅카와\s*')
-SUFFIX = re.compile(r'\s*생두\s*커피\s*$')
+# 같은 쇼핑몰 안에서 '생두커피' 와 '커피생두' 어순이 둘 다 쓰인다
+# (2026-10-29 실측: '…기고마 AA FAQ 생두커피 1kg' vs '…기고마 AA FAQ 커피생두 10kg').
+# 접미로만 떼면 같은 콩이 두 상품으로 갈려 가격 비교가 깨진다 → 위치 무관하게 제거.
+SUFFIX = re.compile(r'\s*(?:생두\s*커피|커피\s*생두)\s*')
 
 
 def pack_kg(name: str) -> float | None:
@@ -106,7 +109,7 @@ def bean_key(name: str) -> str:
     s = KG.sub('', s)
     s = G.sub('', s)
     s = PREFIX.sub('', s)
-    s = SUFFIX.sub('', s)
+    s = SUFFIX.sub(' ', s)
     return re.sub(r'[\s·,\-]+', '', s).lower()
 
 
@@ -140,7 +143,7 @@ def normalize(raw: list[dict]) -> tuple[list[dict], dict]:
         nm = PREFIX.sub('', nm.lstrip())
         nm = KG.sub('', nm)
         nm = G.sub('', nm)
-        nm = SUFFIX.sub('', nm).strip(' ·,-')
+        nm = SUFFIX.sub(' ', nm).strip(' ·,-')
         nm = clean_name(re.sub(r'\s{2,}', ' ', nm))
         crop = NEWCROP.search(rep['raw_name'])
         products.append({

@@ -10,7 +10,7 @@
       "10kg": 13,
       "5kg": 15
     },
-    "grouped": 17
+    "grouped": 16
   },
   "products": [
     {
@@ -86,21 +86,12 @@
       "_raw": "캅카와 카메룬 동가 티피카 내추럴  생두커피 1kg"
     },
     {
-      "name": "탄자니아 기고마 AA FAQ 커피생두",
-      "price": 16900,
-      "url": "https://kapkawa.com/product/캅카와-탄자니아-기고마-aa-faq-커피생두-10kg/944/category/25/display/1/",
-      "isNew": false,
-      "_kg": 10.0,
-      "_variants": 1,
-      "_raw": "캅카와 탄자니아 기고마 AA FAQ 커피생두 10kg"
-    },
-    {
       "name": "탄자니아 기고마 AA FAQ",
       "price": 17800,
       "url": "https://kapkawa.com/product/캅카와-탄자니아-기고마-aa-faq-생두커피-1kg/942/category/25/display/1/",
       "isNew": false,
       "_kg": 1.0,
-      "_variants": 2,
+      "_variants": 3,
       "_raw": "캅카와 탄자니아 기고마 AA FAQ 생두커피 1kg"
     },
     {
@@ -140,7 +131,7 @@
       "_raw": "캅카와 브라질 세하도 NY2 14/16 생두커피 1kg"
     },
     {
-      "name": "커피생두 탄자니아 모시 피베리 진주 저온숙성발효 라즈베리",
+      "name": "탄자니아 모시 피베리 진주 저온숙성발효 라즈베리",
       "price": 43400,
       "url": "https://kapkawa.com/product/캅카와-커피생두-탄자니아-모시-피베리-진주-저온숙성발효-라즈베리/768/category/25/display/1/",
       "isNew": false,

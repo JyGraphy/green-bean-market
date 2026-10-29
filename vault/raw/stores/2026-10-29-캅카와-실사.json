@@ -1,0 +1,170 @@
+{
+  "store": "캅카와",
+  "fetched_at": "2026-10-29",
+  "stat": {
+    "raw": 44,
+    "no_kg": 1,
+    "non_bean": 0,
+    "packs": {
+      "1kg": 16,
+      "10kg": 13,
+      "5kg": 15
+    },
+    "grouped": 17
+  },
+  "products": [
+    {
+      "name": "에티오피아 구지 우라가",
+      "price": 20200,
+      "url": "https://kapkawa.com/product/캅카와-에티오피아-구지-우라가-생두커피-1kg/863/category/25/display/1/",
+      "isNew": false,
+      "_kg": 1.0,
+      "_variants": 3,
+      "_raw": "캅카와 에티오피아 구지 우라가 생두커피 1kg"
+    },
+    {
+      "name": "에티오피아 아바야 게이샤 G1 내추럴",
+      "price": 26100,
+      "url": "https://kapkawa.com/product/26-new-crop-캅카와-에티오피아-아바야-게이샤-g1-내추럴-생두커피-1kg/139/category/25/display/1/",
+      "isNew": true,
+      "_kg": 1.0,
+      "_variants": 3,
+      "_raw": "[26 New Crop] 캅카와 에티오피아 아바야 게이샤 G1 내추럴 생두커피 1kg"
+    },
+    {
+      "name": "에티오피아 아바야 게이샤 G1 허니골드",
+      "price": 28500,
+      "url": "https://kapkawa.com/product/캅카와-에티오피아-아바야-게이샤-g1-허니골드-생두커피-1kg/152/category/25/display/1/",
+      "isNew": false,
+      "_kg": 1.0,
+      "_variants": 3,
+      "_raw": "캅카와 에티오피아 아바야 게이샤 G1 허니골드 생두커피 1kg"
+    },
+    {
+      "name": "콜롬비아 수프리모",
+      "price": 17700,
+      "url": "https://kapkawa.com/product/캅카와-콜롬비아-수프리모-생두커피-1kg/142/category/25/display/1/",
+      "isNew": false,
+      "_kg": 1.0,
+      "_variants": 3,
+      "_raw": "캅카와 콜롬비아 수프리모 생두커피 1kg"
+    },
+    {
+      "name": "에티오피아 레켐티 G4 내추럴",
+      "price": 14000,
+      "url": "https://kapkawa.com/product/캅카와-에티오피아-레켐티-g4-내추럴-생두커피-1kg/1113/category/25/display/1/",
+      "isNew": false,
+      "_kg": 1.0,
+      "_variants": 3,
+      "_raw": "캅카와 에티오피아 레켐티 G4 내추럴 생두커피 1kg"
+    },
+    {
+      "name": "에티오피아 아리차 G1 내추럴",
+      "price": 26800,
+      "url": "https://kapkawa.com/product/캅카와-에티오피아-아리차-g1-내추럴-생두커피-1kg/1107/category/25/display/1/",
+      "isNew": false,
+      "_kg": 1.0,
+      "_variants": 3,
+      "_raw": "캅카와 에티오피아 아리차 G1 내추럴 생두커피 1kg"
+    },
+    {
+      "name": "동티모르 메르투투 공정무역",
+      "price": 24900,
+      "url": "https://kapkawa.com/product/캅카와-동티모르-메르투투-공정무역-생두커피-1kg/906/category/25/display/1/",
+      "isNew": false,
+      "_kg": 1.0,
+      "_variants": 3,
+      "_raw": "캅카와 동티모르 메르투투 공정무역 생두커피 1kg"
+    },
+    {
+      "name": "카메룬 동가 티피카 내추럴",
+      "price": 43000,
+      "url": "https://kapkawa.com/product/캅카와-카메룬-동가-티피카-내추럴-생두커피-1kg/1034/category/25/display/1/",
+      "isNew": false,
+      "_kg": 1.0,
+      "_variants": 3,
+      "_raw": "캅카와 카메룬 동가 티피카 내추럴  생두커피 1kg"
+    },
+    {
+      "name": "탄자니아 기고마 AA FAQ 커피생두",
+      "price": 16900,
+      "url": "https://kapkawa.com/product/캅카와-탄자니아-기고마-aa-faq-커피생두-10kg/944/category/25/display/1/",
+      "isNew": false,
+      "_kg": 10.0,
+      "_variants": 1,
+      "_raw": "캅카와 탄자니아 기고마 AA FAQ 커피생두 10kg"
+    },
+    {
+      "name": "탄자니아 기고마 AA FAQ",
+      "price": 17800,
+      "url": "https://kapkawa.com/product/캅카와-탄자니아-기고마-aa-faq-생두커피-1kg/942/category/25/display/1/",
+      "isNew": false,
+      "_kg": 1.0,
+      "_variants": 2,
+      "_raw": "캅카와 탄자니아 기고마 AA FAQ 생두커피 1kg"
+    },
+    {
+      "name": "탄자니아 부코바 하이랜드 로부스타",
+      "price": 11200,
+      "url": "https://kapkawa.com/product/캅카와-탄자니아-부코바-하이랜드-로부스타-생두커피-1kg/653/category/25/display/1/",
+      "isNew": false,
+      "_kg": 1.0,
+      "_variants": 3,
+      "_raw": "캅카와 탄자니아 부코바 하이랜드 로부스타 생두커피 1kg"
+    },
+    {
+      "name": "케냐 니에리 AB FAQ",
+      "price": 19100,
+      "url": "https://kapkawa.com/product/캅카와-케냐-니에리-ab-faq-생두커피-1kg/549/category/25/display/1/",
+      "isNew": false,
+      "_kg": 1.0,
+      "_variants": 2,
+      "_raw": "캅카와 케냐 니에리 AB FAQ 생두커피 1kg"
+    },
+    {
+      "name": "베트남 달랏 로부스타 G1",
+      "price": 9500,
+      "url": "https://kapkawa.com/product/캅카와-베트남-달랏-로부스타-g1-생두커피-1kg/150/category/25/display/1/",
+      "isNew": false,
+      "_kg": 1.0,
+      "_variants": 3,
+      "_raw": "캅카와 베트남 달랏 로부스타 G1 생두커피 1kg"
+    },
+    {
+      "name": "브라질 세하도 NY2 14/16",
+      "price": 16100,
+      "url": "https://kapkawa.com/product/캅카와-브라질-세하도-ny2-1416-생두커피-1kg/144/category/25/display/1/",
+      "isNew": false,
+      "_kg": 1.0,
+      "_variants": 3,
+      "_raw": "캅카와 브라질 세하도 NY2 14/16 생두커피 1kg"
+    },
+    {
+      "name": "커피생두 탄자니아 모시 피베리 진주 저온숙성발효 라즈베리",
+      "price": 43400,
+      "url": "https://kapkawa.com/product/캅카와-커피생두-탄자니아-모시-피베리-진주-저온숙성발효-라즈베리/768/category/25/display/1/",
+      "isNew": false,
+      "_kg": 1.0,
+      "_variants": 1,
+      "_raw": "캅카와 커피생두 탄자니아 모시 피베리 진주 저온숙성발효 라즈베리"
+    },
+    {
+      "name": "콜롬비아 디카페인 슈가케인",
+      "price": 24900,
+      "url": "https://kapkawa.com/product/캅카와-콜롬비아-디카페인-슈가케인-생두커피-1kg/143/category/25/display/1/",
+      "isNew": false,
+      "_kg": 1.0,
+      "_variants": 3,
+      "_raw": "캅카와 콜롬비아 디카페인 슈가케인 생두커피 1kg"
+    },
+    {
+      "name": "케냐 카라티나 AA TOP",
+      "price": 20300,
+      "url": "https://kapkawa.com/product/캅카와-케냐-카라티나-aa-top-생두커피-1kg/132/category/25/display/1/",
+      "isNew": false,
+      "_kg": 1.0,
+      "_variants": 2,
+      "_raw": "캅카와 케냐 카라티나 AA TOP 생두커피 1kg"
+    }
+  ]
+}

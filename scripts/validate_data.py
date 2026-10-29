@@ -127,6 +127,30 @@ def check_web_consistency(current):
         errors.append(f"파생 파일 불일치: products.json {len(current)}개 vs products_web.json {len(web)}개")
 
 
+def check_flag_coverage(products):
+    """원산지가 data.js 의 FLAG 에 다 있는지. 없으면 국기 없이 표시된다.
+
+    2026-10-29 실측: 라오스 15·동티모르 8·태국 8, 총 31개 상품이 FLAG 에 없어
+    라이브 사이트에서 국기 없이 나가고 있었다. 에러가 안 나서 아무도 몰랐다.
+    새 산지가 들어오는 건 정상이므로 커밋은 막지 않고 **경고**만 띄운다.
+    """
+    js = os.path.join(ROOT, 'data.js')
+    if not os.path.exists(js):
+        return
+    with open(js, encoding='utf-8') as f:
+        m = re.search(r'const FLAG\s*=\s*\{(.*?)\n\};', f.read(), re.S)
+    if not m:
+        warns.append('data.js 에서 FLAG 블록을 찾지 못했습니다 — 국기 검사를 건너뜁니다')
+        return
+    have = set(re.findall(r"'([^']+)'\s*:", m.group(1)))
+    miss = Counter(p.get('origin') for p in products
+                   if p.get('origin') and p['origin'] not in have
+                   and p['origin'] != '알수없음')
+    if miss:
+        warns.append('FLAG 에 없는 원산지(국기 없이 표시됨): '
+                     + ', '.join(f'{k}×{v}' for k, v in miss.most_common()))
+
+
 def main():
     print("=" * 55)
     print("🔍 데이터 무결성 검증" + ("  (FORCE 모드: 급감 검사 경고로 강등)" if FORCE else ""))
@@ -140,6 +164,7 @@ def main():
         check_against_head(current, head)
 
     check_web_consistency(current)
+    check_flag_coverage(current)
 
     if warns:
         print("\n⚠️  경고:")

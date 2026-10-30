@@ -127,6 +127,7 @@ jobs:
           case "${{ github.event.inputs.store }}" in
             "모모스커피") S=scrapers/scraper_momos.py ;;
             "커피리브레") S=scrapers/scraper_coffeelibre.py ;;
+            "캅카와") S=scrapers/scraper_kapkawa.py ;;
             *) echo "::error::재실행 대상 스크래퍼가 매핑돼 있지 않습니다"; exit 1 ;;
           esac
           echo "재실행: $S"
@@ -151,7 +152,7 @@ jobs:
           git config user.email "bot@green-bean-market"
           git add data/ database.sql
           if ! git diff --cached --quiet; then
-            git commit -m "${{ github.event.inputs.store }} 링크 재수집 (죽은 링크 교체)"
+            git commit -m "${{ github.event.inputs.store }} 스크래퍼 재실행 — 데이터 갱신"
             # main 이 앞서 나갔을 때 push 가 거부돼 작업분이 버려지는 것을 막는다
             # (2026-08-20 갱신 잡에서 실제 발생). rebase 후 최대 3회 재시도.
             for i in 1 2 3; do

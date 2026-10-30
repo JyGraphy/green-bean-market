@@ -1,4 +1,4 @@
--- 자동 생성: 2026-10-30T01:04:47Z
+-- 자동 생성: 2026-10-30T16:15:19Z
 CREATE TABLE IF NOT EXISTS products (
   id INTEGER PRIMARY KEY,
   store TEXT NOT NULL,
@@ -1375,4 +1375,20 @@ INSERT INTO products (id,store,name,price,origin,region,process,notes,url,isNew,
   (981,'팔콘커피','Kathima AB, Kathima AB, Kenya |  Washed FSK-0095',22680,'케냐','아프리카','워시드','','https://korea.falcon-micro.com/products/kathima-ab-kathima-ab-kenya-washed-fsk-0095',0,0,0,0,'2026-10-23'),
   (982,'팔콘커피','Gititu AB, Gititu AB, Kenya |  Washed FSK-0092',23540,'케냐','아프리카','워시드','','https://korea.falcon-micro.com/products/gititu-ab-gititu-ab-kenya-washed-fsk-0092',0,0,0,0,'2026-10-23'),
   (983,'팔콘커피','Tegu AB, Tegu AB, Kenya |  Washed FSK-0089',24180,'케냐','아프리카','워시드','','https://korea.falcon-micro.com/products/tegu-ab-tegu-ab-kenya-washed-fsk-0089',0,0,0,0,'2026-10-23'),
-  (984,'팔콘커피','Mokonisa, G Broad, Ethiopia |  Washed FSK-0118',29000,'에티오피아','아프리카','워시드','','https://korea.falcon-micro.com/products/mokonisa-g-broad-ethiopia-washed-fsk-0118',0,0,0,0,'2026-10-23');
+  (984,'팔콘커피','Mokonisa, G Broad, Ethiopia |  Washed FSK-0118',29000,'에티오피아','아프리카','워시드','','https://korea.falcon-micro.com/products/mokonisa-g-broad-ethiopia-washed-fsk-0118',0,0,0,0,'2026-10-23'),
+  (1405,'캅카와','에티오피아 아바야 게이샤 G1 허니골드',28500,'에티오피아','아프리카','허니','','https://kapkawa.com/product/캅카와-에티오피아-아바야-게이샤-g1-허니골드-생두커피-1kg/152/category/25/display/1/',0,0,1,0,NULL),
+  (1406,'캅카와','에티오피아 구지 우라가',20200,'에티오피아','아프리카','알수없음','','https://kapkawa.com/product/캅카와-에티오피아-구지-우라가-생두커피-1kg/863/category/25/display/1/',0,0,0,0,NULL),
+  (1407,'캅카와','에티오피아 아바야 게이샤 G1 내추럴',26100,'에티오피아','아프리카','내추럴','','https://kapkawa.com/product/26-new-crop-캅카와-에티오피아-아바야-게이샤-g1-내추럴-생두커피-1kg/139/category/25/display/1/',0,0,1,0,NULL),
+  (1408,'캅카와','콜롬비아 수프리모',17700,'콜롬비아','중남미','알수없음','','https://kapkawa.com/product/캅카와-콜롬비아-수프리모-생두커피-1kg/142/category/25/display/1/',0,0,0,0,NULL),
+  (1409,'캅카와','에티오피아 레켐티 G4 내추럴',14000,'에티오피아','아프리카','내추럴','','https://kapkawa.com/product/캅카와-에티오피아-레켐티-g4-내추럴-생두커피-1kg/1113/category/25/display/1/',0,0,0,0,NULL),
+  (1410,'캅카와','에티오피아 아리차 G1 내추럴',26800,'에티오피아','아프리카','내추럴','','https://kapkawa.com/product/캅카와-에티오피아-아리차-g1-내추럴-생두커피-1kg/1107/category/25/display/1/',0,0,0,0,NULL),
+  (1411,'캅카와','동티모르 메르투투 공정무역',24900,'동티모르','아시아/태평양','알수없음','','https://kapkawa.com/product/캅카와-동티모르-메르투투-공정무역-생두커피-1kg/906/category/25/display/1/',0,0,0,0,NULL),
+  (1412,'캅카와','카메룬 동가 티피카 내추럴',43000,'카메룬','아프리카','내추럴','','https://kapkawa.com/product/캅카와-카메룬-동가-티피카-내추럴-생두커피-1kg/1034/category/25/display/1/',0,0,0,0,'2026-06-23'),
+  (1413,'캅카와','탄자니아 기고마 AA FAQ',17800,'탄자니아','아프리카','알수없음','','https://kapkawa.com/product/캅카와-탄자니아-기고마-aa-faq-생두커피-1kg/942/category/25/display/1/',0,0,0,0,'2026-06-23'),
+  (1414,'캅카와','탄자니아 부코바 하이랜드 로부스타',11200,'탄자니아','아프리카','알수없음','','https://kapkawa.com/product/캅카와-탄자니아-부코바-하이랜드-로부스타-생두커피-1kg/653/category/25/display/1/',0,0,0,0,'2026-06-24'),
+  (1415,'캅카와','케냐 니에리 AB FAQ',19100,'케냐','아프리카','알수없음','','https://kapkawa.com/product/캅카와-케냐-니에리-ab-faq-생두커피-1kg/549/category/25/display/1/',0,0,0,0,'2026-06-24'),
+  (1416,'캅카와','베트남 달랏 로부스타 G1',9500,'베트남','아시아/태평양','알수없음','','https://kapkawa.com/product/캅카와-베트남-달랏-로부스타-g1-생두커피-1kg/150/category/25/display/1/',0,0,0,0,'2026-06-24'),
+  (1417,'캅카와','브라질 세하도 NY2 14/16',16100,'브라질','중남미','알수없음','','https://kapkawa.com/product/캅카와-브라질-세하도-ny2-1416-생두커피-1kg/144/category/25/display/1/',0,0,0,0,'2026-06-25'),
+  (1418,'캅카와','탄자니아 모시 피베리 진주 저온숙성발효 라즈베리',43400,'탄자니아','아프리카','알수없음','','https://kapkawa.com/product/캅카와-커피생두-탄자니아-모시-피베리-진주-저온숙성발효-라즈베리/768/category/25/display/1/',0,0,0,0,'2026-06-26'),
+  (1419,'캅카와','콜롬비아 디카페인 슈가케인',24900,'콜롬비아','중남미','디카페인','','https://kapkawa.com/product/캅카와-콜롬비아-디카페인-슈가케인-생두커피-1kg/143/category/25/display/1/',0,1,0,0,'2026-06-26'),
+  (1420,'캅카와','케냐 카라티나 AA TOP',20300,'케냐','아프리카','알수없음','','https://kapkawa.com/product/캅카와-케냐-카라티나-aa-top-생두커피-1kg/132/category/25/display/1/',0,0,0,0,'2026-06-26');

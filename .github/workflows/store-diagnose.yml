@@ -102,7 +102,12 @@ jobs:
             echo "::error::푸시 실패"; exit 1
           fi
 
+      # 진단은 정보 제공용이다. 신규 공급사는 아직 data 에 상품이 0개라
+      # diagnose_store.py 가 종료코드 1로 끝나는데, 그것 때문에 뒤의 **재수집이
+      # 통째로 막혔다**(2026-10-30 캅카와 첫 등록에서 실제 발생).
+      # 진짜 게이트는 뒤의 validate_data.py 다.
       - name: 링크 진단
+        continue-on-error: true
         if: github.event.inputs.scout != 'true' && github.event.inputs.dryrun_scraper == ''
         run: |
           python scripts/diagnose_store.py \

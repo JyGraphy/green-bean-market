@@ -41,7 +41,7 @@ coffeebeanweb/
 - 가격이 50,000원/kg 이상인 고가 상품
 - 상품명이나 노트에 "게이샤", "파카마라", "에스메랄다" 등 포함
 
-## 공급사 현황 (17곳 등록)
+## 공급사 현황 (18곳 등록)
 
 > **상품 수는 매일 바뀐다.** 아래 숫자는 2026-08-20 기준 스냅샷이며, 정확한 현재값은
 > `data/products.json` 이 유일한 진실이다. 이 표는 **공급사·CSS 클래스·도메인 대응표**로 쓴다.
@@ -68,6 +68,7 @@ coffeebeanweb/
 | 커피창고 | sp-cg | #16a34a | 16 | coffeecg.com |
 | 오로미아코리아 | sp-oromia | #b45309 | 7 | oromia.kr |
 | 루베르로스터리 | sp-ruber | #881337 | 0 | smartstore.naver.com |
+| 캅카와 | sp-kapkawa | #65a30d | 16 | kapkawa.com |
 
 **총 1,172개 상품, ID 범위 1~1375** (2026-08-20)
 
@@ -154,6 +155,10 @@ coffeebeanweb/
 | 네이버 스마트스토어 (아마티보, 루베르로스터리) | **데이터센터 IP 차단 잦음** — requests는 429, 실브라우저(Playwright)도 로그인 월로 리다이렉트 (GH Actions에서 실측 확인). CI 자동화는 3단 구조: ① 직접 접근 시도 → ② 차단 시 **공식 오픈API 폴백**(`scrapers/naver_openapi.py`, 리포 시크릿 `NAVER_CLIENT_ID`/`NAVER_CLIENT_SECRET` 필요) → ③ 키 미설정이면 스킵(기존 데이터 보존, 잡은 초록 유지). 가정용 IP에서는 직접 접근이 되므로 로컬 수동 실행(`scripts/update_smartstore_local.py`)으로 정밀 수집 가능. 내부 API 문서는 `scrapers/naver_smartstore.py` 참고 |
 
 - 콤파스커피 Sixshop store ID: `224244`
+- **캅카와(kapkawa.com)는 같은 생두를 1kg/5kg/10kg 세 상품으로 따로 올린다.** 그대로 넣으면
+  같은 콩이 3번 뜨고 가격 비교가 깨진다. `scraper_kapkawa.py` 가 같은 콩을 묶어 **kg당 단가**로
+  환산한다(우리 `price` 는 1kg 기준). 1kg 상품이 있으면 그 가격을 그대로 쓴다.
+  상품명에 `생두커피` 와 `커피생두` **어순이 섞여** 쓰이므로 위치 무관하게 제거해야 병합된다.
 - 모모스커피는 2026년 cafe24 → 아임웹으로 이전했다. 옛 URL
   `/product/<슬러그>/<id>/category/64/...` 는 전부 404이고, 현재는
   목록 `/Product_GreenBean`, 상품 `/Product_GreenBean/?idx=<숫자>` 다.
@@ -168,6 +173,7 @@ coffeebeanweb/
 
 조사가 필요한 생두 전문 쇼핑몰 목록 (아직 미추가):
 - ~~wbeans.com~~ → **더블유빈으로 추가 완료** (42개)
+- ~~kapkawa.com~~ → **캅카와로 추가 완료** (16종, 2026-10-30)
 - 커피시스 cgbeans.com — 조사 완료(47개, 1kg/20kg, 7,400~38,000원/kg, cafe24).
   **사장님 컨펌 대기 중.** 승인 전까지 추가하지 않는다.
 - 추가 조사 필요 업체들은 별도 확인 후 추가

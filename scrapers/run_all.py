@@ -87,6 +87,7 @@ SCRAPERS = [
     ('scraper_oromia.py',      '오로미아코리아'),
     ('scraper_mayforest.py',   '오월의숲'),
     ('scraper_gsc.py',         '지에스씨(GSC)'),
+    ('scraper_kapkawa.py',     '캅카와'),
     ('scraper_comansa.py',     '커만사'),
     ('scraper_coffeelibre.py', '커피리브레'),
     ('scraper_coffeehouse.py', '커피창고'),

@@ -6,9 +6,10 @@
   seed/benchmark/manifest.json   처음 만든 검증 사례 (Boost 화면 + Boost 초 단위 데이터, IKAWA 화면 표시값)
   readings/**.json               사이트에서 사진과 데이터 파일을 함께 올린 분석 (데이터 파일 = 정답, 사진 동의 시)
 
-  --reanalyze N   사례 N건까지는 analyze-roast(현재 프롬프트)로 AI 판독도 새로 받는다.
+  --reanalyze N   현재 프롬프트로 아직 판독하지 않은 사례를 N건까지 analyze-roast 로 새로 판독한다.
                   규칙을 고친 효과가 실제 AI 판독에 나타났는지 이것으로 확인한다.
-                  새 판독 결과는 버킷 benchmark/runs/<날짜>/ 에 쌓는다.
+                  판독 결과는 버킷 benchmark/ai/<프롬프트 버전>/ 에 저장하고 다시 쓴다 —
+                  프롬프트(analyze-roast 소스)가 바뀌지 않은 주에는 AI 호출이 0건이다.
 
 출력 (공개 저장소에는 집계만):
   data/roast-benchmark-history.json                 주차별 정확도 추이
@@ -24,6 +25,7 @@ from __future__ import annotations
 import argparse
 import base64
 import datetime
+import hashlib
 import io
 import json
 import os
@@ -42,10 +44,20 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 HISTORY = ROOT / 'data' / 'roast-benchmark-history.json'
 REPORT_DIR = ROOT / 'vault' / 'raw' / 'roast-profiles'
 EVAL_JS = ROOT / 'scripts' / 'roast_pixel_eval.js'
+ANALYZE_FN = ROOT / 'supabase' / 'functions' / 'analyze-roast' / 'index.ts'
 MAX_SIDE = 2600            # roasting.js imageDataFromUrl 과 같은 축소 기준
 SUPABASE_URL = os.environ.get('SUPABASE_URL') or 'https://txnpbzukavajwbmggpfk.supabase.co'
 SUPABASE_ANON = 'sb_publishable_KeqUfylPUoX8YSCbKGjqEQ_pQCzFFBF'   # 공개 키 (supabase.config.js 와 같음)
 TODAY = datetime.date.today().isoformat()
+
+
+def prompt_version() -> str:
+    """analyze-roast 소스(프롬프트·모델 포함)의 해시. 이게 같으면 AI 판독도 같으므로 다시 부르지 않는다."""
+    return hashlib.sha256(ANALYZE_FN.read_bytes()).hexdigest()[:12]
+
+
+def case_key(case_id: str) -> str:
+    return re.sub(r'[^0-9A-Za-z_-]+', '_', case_id)
 
 
 def media_type(path: str) -> str:
@@ -76,7 +88,7 @@ def load_cases(store: Store) -> list[dict]:
     return cases
 
 
-def reanalyze(store: Store, case: dict, img: bytes) -> dict | None:
+def reanalyze(store: Store, case: dict, img: bytes, ver: str) -> dict | None:
     body = json.dumps({'images': [{'base64': base64.b64encode(img).decode(),
                                    'media_type': media_type(case['image'])}]}).encode()
     req = urllib.request.Request(f'{SUPABASE_URL.rstrip("/")}/functions/v1/analyze-roast', data=body, method='POST',
@@ -91,8 +103,7 @@ def reanalyze(store: Store, case: dict, img: bytes) -> dict | None:
     if ai.get('error'):
         print(f'  ⚠️ 재판독 오류 {case["id"]}: {ai["error"]}')
         return None
-    safe = re.sub(r'[^0-9A-Za-z_-]+', '_', case['id'])
-    store.put(f'benchmark/runs/{TODAY}/{safe}.ai.json', json.dumps(ai, ensure_ascii=False).encode('utf-8'))
+    store.put(f'benchmark/ai/{ver}/{case_key(case["id"])}.ai.json', json.dumps(ai, ensure_ascii=False).encode('utf-8'))
     return ai
 
 
@@ -193,7 +204,7 @@ def fmt(v, unit=''):
     return '—' if v is None else f'{v}{unit}'
 
 
-def write_report(summary: dict, prev_run: dict | None, results: list[dict], regs: list[str], n_reanalyzed: int):
+def write_report(summary: dict, prev_run: dict | None, results: list[dict], regs: list[str], ai_stat: dict):
     names = {'tuned:boost_web': 'Boost 웹 · 조정용', 'holdout:boost_web': 'Boost 웹 · 미사용(holdout)',
              'tuned:ikawa_app': 'IKAWA 앱 · 조정용', 'site:boost_web': 'Boost 웹 · 사이트 실사용',
              'site:ikawa_app': 'IKAWA 앱 · 사이트 실사용'}
@@ -220,7 +231,8 @@ def write_report(summary: dict, prev_run: dict | None, results: list[dict], regs
           '- **BT/ET 오차**: 정답 곡선과 5초 간격 평균 절대 오차. **RoR 오차**: 30초 창 RoR, 투입 90초 이후.',
           '- **앵커 오차**: 곡선 정답이 없는 사례(IKAWA 화면)에서 화면에 적힌 값과의 차이.',
           '- **AI 곡선만**: 픽셀 추출을 쓰지 않았을 때(예전 방식)의 오차 — 하이브리드 판독의 효과 비교용.',
-          f'- AI 판독: {"이번에 현재 프롬프트로 " + str(n_reanalyzed) + "건 새로 받음" if n_reanalyzed else "저장된 판독 결과 사용 (재판독 없음)"}.',
+          f'- AI 판독 (프롬프트 버전 `{ai_stat["prompt"]}`): 이 버전으로 저장해 둔 판독 재사용 {ai_stat["cached"]}건 · '
+          f'새로 판독 {ai_stat["new"]}건 · 예전 판독 사용 {ai_stat["old"]}건. 프롬프트가 바뀌지 않으면 AI를 다시 부르지 않는다.',
           '']
     if prev_run:
         L += [f'## 지난번({prev_run["date"]}) 대비', '', '| 구분 | 지표 | 지난번 | 이번 |', '|---|---|---|---|']
@@ -260,7 +272,9 @@ def main():
 
     cases = load_cases(store)
     print(f'판독 사례 {len(cases)}건 (사이트 {sum(1 for c in cases if c["set"] == "site")}건)')
-    n_re = 0
+    ver = prompt_version()
+    stored = {pathlib.Path(p).name for p in store.list(f'benchmark/ai/{ver}')}
+    n_re = n_cached = 0
     with tempfile.TemporaryDirectory() as tmp:
         tmp = pathlib.Path(tmp)
         jobs = []
@@ -268,8 +282,12 @@ def main():
             job = {k: c[k] for k in ('id', 'set', 'screen_type', 'roaster', 'ai', 'truth')}
             try:
                 img = store.get(c['image'])
-                if n_re < args.reanalyze:
-                    ai = reanalyze(store, c, img)
+                name = f'{case_key(c["id"])}.ai.json'
+                if name in stored:
+                    job['ai'] = c['ai'] = store.get_json(f'benchmark/ai/{ver}/{name}')
+                    n_cached += 1
+                elif n_re < args.reanalyze:
+                    ai = reanalyze(store, c, img, ver)
                     if ai:
                         job['ai'] = c['ai'] = ai
                         n_re += 1
@@ -289,11 +307,14 @@ def main():
     prev = next((r for r in reversed(hist['runs']) if r['date'] != TODAY), None)
     regs = regressions(summary, (prev or {}).get('groups') or {})
     hist['runs'] = [r for r in hist['runs'] if r['date'] != TODAY] + [
-        {'date': TODAY, 'code': git_rev(), 'cases': len(results), 'reanalyzed': n_re, 'groups': summary}]
+        {'date': TODAY, 'code': git_rev(), 'prompt': ver, 'cases': len(results), 'reanalyzed': n_re,
+         'ai_cached': n_cached, 'groups': summary}]
     hist['runs'] = hist['runs'][-200:]
     HISTORY.parent.mkdir(exist_ok=True)
     HISTORY.write_text(json.dumps(hist, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
-    report = write_report(summary, prev, results, regs, n_re)
+    ai_stat = {'prompt': ver, 'cached': n_cached, 'new': n_re, 'old': len(cases) - n_cached - n_re}
+    report = write_report(summary, prev, results, regs, ai_stat)
+    print(f'AI 판독: 프롬프트 {ver} · 재사용 {n_cached} · 새로 {n_re} · 예전 판독 {ai_stat["old"]}')
 
     for k, g in summary.items():
         print(f'  · {k:18s} n={g["n"]:<3} 픽셀 {g["pixel_ok"]}/{g["n"]}  BT {fmt(g["bt_mae"])}  ET {fmt(g["et_mae"])}  '

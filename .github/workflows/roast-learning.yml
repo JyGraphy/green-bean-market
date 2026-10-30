@@ -25,7 +25,7 @@ on:
         required: false
         default: 'false'
       reanalyze:
-        description: '판독 재측정 때 현재 AI 프롬프트로 다시 판독할 사례 수 (0 = 저장된 판독 사용, 비용 없음)'
+        description: '현재 AI 프롬프트로 아직 판독하지 않은 사례를 최대 몇 건 새로 판독할지 (판독 결과는 저장해 재사용 — 프롬프트가 안 바뀐 주는 호출 0건. 0 = 새로 판독 안 함)'
         required: false
         default: '20'
 

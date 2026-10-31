@@ -122,7 +122,23 @@ def fetch_products_browser(store_id, category='ALL', landing_url=None, headless=
         # 영속 프로필 — 한 번 로그인하면 쿠키가 남아 다음부터 자동 통과.
         ctx = p.chromium.launch_persistent_context(
             PROFILE_DIR, headless=headless, locale='ko-KR', user_agent=UA,
-            viewport={'width': 1280, 'height': 900})
+            timezone_id='Asia/Seoul', viewport={'width': 1280, 'height': 900},
+            # 자동화 탐지 회피 1: AutomationControlled 플래그 끄기
+            args=['--disable-blink-features=AutomationControlled',
+                  '--no-sandbox', '--disable-dev-shm-usage'])
+        # 자동화 탐지 회피 2: navigator.webdriver 등 봇 지문 제거(스텔스).
+        # 네이버가 이 지문으로 자동 브라우저를 로그인 창으로 튕긴다 — 사람처럼 위장한다.
+        ctx.add_init_script("""
+            Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
+            Object.defineProperty(navigator, 'languages', {get: () => ['ko-KR','ko']});
+            Object.defineProperty(navigator, 'plugins', {get: () => [1,2,3,4,5]});
+            window.chrome = window.chrome || {runtime: {}};
+            const _q = window.navigator.permissions && window.navigator.permissions.query;
+            if (_q) window.navigator.permissions.query = (p) =>
+                p && p.name === 'notifications'
+                    ? Promise.resolve({state: Notification.permission})
+                    : _q(p);
+        """)
         page = ctx.pages[0] if ctx.pages else ctx.new_page()
         page.goto(landing, wait_until='domcontentloaded', timeout=60000)
         page.wait_for_timeout(1500)

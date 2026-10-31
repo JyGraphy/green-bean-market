@@ -5,6 +5,8 @@
 //   - AI 원본 판독, 픽셀 추출 결과, 화면 종류·기기
 //   - 데이터 파일을 함께 올린 경우 그 곡선(= 정답) → 자동으로 검증 사례가 된다
 //   - 사용자가 동의한 경우에만 사진 원본
+//   - 커핑 결과(맛 평가): 프로파일마다 사용자가 남긴 정해진 형식의 평가 + 그 시점 프로파일 곡선
+//     → 로스팅 판단 두뇌(scripts/roast_brain.py)의 학습 정답
 //
 // 저장 위치: Storage 버킷 'roast-learning' (비공개). 공개 저장소(GitHub)에는 원본을 두지 않는다.
 // 인증: 로그인한 사용자 토큰만 받는다(익명 키 거부).
@@ -19,6 +21,9 @@ const BUCKET = 'roast-learning'
 const MAX_IMAGES = 4
 const MAX_IMAGE_BYTES = 6 * 1024 * 1024
 const MAX_READING_BYTES = 2 * 1024 * 1024   // 판독 기록(JSON) 상한 — 5초 곡선 수백 점 + AI 원본이면 수십 KB
+const CUPPING_FLAGS = ['under', 'over', 'baked', 'astringent', 'sour'] as const
+const PROFILE_COLS = 'id,bean_name,roaster,roast_date,created_at,charge_weight,drop_weight,weight_loss,' +
+  'charge_temp,drop_temp,total_time,dtr,events,time_series,bt_series,et_series'
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...cors, 'Content-Type': 'application/json' } })
@@ -39,13 +44,17 @@ serve(async (req: Request) => {
 
   let body: any
   try { body = await req.json() } catch { return json({ error: 'JSON 본문이 필요합니다.' }, 400) }
-  if (body?.action !== 'log' || !body.reading || typeof body.reading !== 'object') return json({ error: '잘못된 요청' }, 400)
-  const readingText = JSON.stringify(body.reading)
-  if (readingText.length > MAX_READING_BYTES) return json({ error: '기록이 너무 큽니다.' }, 413)
 
   // 버킷이 없으면 만든다 (비공개)
   const { error: bErr } = await admin.storage.getBucket(BUCKET)
   if (bErr) await admin.storage.createBucket(BUCKET, { public: false })
+
+  if (body?.action === 'cupping_save' || body?.action === 'cupping_delete' || body?.action === 'cupping_list')
+    return cupping(admin, user.id, body)
+
+  if (body?.action !== 'log' || !body.reading || typeof body.reading !== 'object') return json({ error: '잘못된 요청' }, 400)
+  const readingText = JSON.stringify(body.reading)
+  if (readingText.length > MAX_READING_BYTES) return json({ error: '기록이 너무 큽니다.' }, 413)
 
   const now = new Date()
   const month = now.toISOString().slice(0, 7)
@@ -78,3 +87,56 @@ serve(async (req: Request) => {
   if (error) return json({ error: `기록 저장 실패: ${error.message}` }, 500)
   return json({ ok: true, id, images: images.length })
 })
+
+// ── 커핑 결과 ─────────────────────────────────────────────────────────
+// 사용자마다 파일 하나(cupping/<user_id>.json)에 { 프로파일 id: 평가 + 프로파일 곡선 } 으로 둔다.
+// 곡선은 클라이언트가 아니라 DB의 본인 프로파일에서 직접 읽어 붙인다.
+async function cupping(admin: any, userId: string, body: any) {
+  const path = `cupping/${userId}.json`
+  const read = async () => {
+    const { data } = await admin.storage.from(BUCKET).download(path)
+    if (!data) return { user_id: userId, items: {} as Record<string, any> }
+    try { return JSON.parse(await data.text()) } catch { return { user_id: userId, items: {} } }
+  }
+  const write = async (doc: any) => {
+    doc.updated_at = new Date().toISOString()
+    const { error } = await admin.storage.from(BUCKET)
+      .upload(path, new TextEncoder().encode(JSON.stringify(doc)), { contentType: 'application/json', upsert: true })
+    return error
+  }
+
+  if (body.action === 'cupping_list') {
+    const doc = await read()
+    const items: Record<string, unknown> = {}
+    for (const [id, it] of Object.entries<any>(doc.items || {})) items[id] = { ...it.cupping, saved_at: it.saved_at }
+    return json({ items })
+  }
+
+  const pid = Number(body.profile_id)
+  if (!Number.isInteger(pid) || pid <= 0) return json({ error: '프로파일 id가 필요합니다.' }, 400)
+  const doc = await read()
+
+  if (body.action === 'cupping_delete') {
+    delete doc.items[String(pid)]
+    const error = await write(doc)
+    return error ? json({ error: error.message }, 500) : json({ ok: true })
+  }
+
+  // cupping_save — 값 검증 (정해진 형식만 받는다)
+  const c = body.cupping || {}
+  const clean: Record<string, unknown> = {}
+  for (const f of CUPPING_FLAGS) clean[f] = c[f] === true
+  const overall = Number(c.overall)
+  clean.overall = Number.isInteger(overall) && overall >= 1 && overall <= 5 ? overall : null
+  const agtron = Number(c.agtron)
+  clean.agtron = c.agtron != null && c.agtron !== '' && isFinite(agtron) && agtron > 0 && agtron < 150 ? agtron : null
+  if (clean.overall == null && !CUPPING_FLAGS.some(f => clean[f])) return json({ error: '평가를 하나 이상 선택하세요.' }, 400)
+
+  const { data: profile, error: pErr } = await admin.from('roasting_profiles')
+    .select(PROFILE_COLS).eq('id', pid).eq('user_id', userId).maybeSingle()
+  if (pErr || !profile) return json({ error: '본인 프로파일만 평가할 수 있습니다.' }, 403)
+
+  doc.items[String(pid)] = { saved_at: new Date().toISOString(), cupping: clean, profile }
+  const error = await write(doc)
+  return error ? json({ error: error.message }, 500) : json({ ok: true, cupping: clean })
+}

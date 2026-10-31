@@ -310,6 +310,31 @@
         </div>
         <div class="rp-chart-box"><canvas id="detailChart"></canvas></div>
       </div>
+      <div class="rp-target-card rp-cup-card" id="cupCard">
+        <div class="rp-card-title">커핑 결과 <span class="rp-cup-saved" id="cupSaved"></span></div>
+        <p class="rp-cup-help">커핑 후 기록하면 같은 생두의 다음 배치 피드백에 쓰이고, 로스팅 AI가 매주 이 평가로 다시 학습합니다.</p>
+        <div class="rp-cup-flags" id="cupFlags">
+          <label><input type="checkbox" data-flag="under"> 언더·풋맛</label>
+          <label><input type="checkbox" data-flag="over"> 오버·탄맛</label>
+          <label><input type="checkbox" data-flag="baked"> 베이크드·플랫</label>
+          <label><input type="checkbox" data-flag="astringent"> 떫은맛</label>
+          <label><input type="checkbox" data-flag="sour"> 튀는 산미</label>
+        </div>
+        <div class="rp-cup-overall" id="cupOverall">
+          <span class="rp-cup-label">전체 평가</span>
+          <button type="button" data-v="1">1 나쁨</button>
+          <button type="button" data-v="2">2</button>
+          <button type="button" data-v="3">3 보통</button>
+          <button type="button" data-v="4">4</button>
+          <button type="button" data-v="5">5 아주 좋음</button>
+        </div>
+        <div class="rp-cup-row">
+          <label>1차 크랙 시작 <input id="cupFcs" placeholder="예: 8:30" inputmode="numeric"></label>
+          <label>원두색 Agtron (선택) <input id="cupAgtron" type="number" min="1" max="149" step="0.1"></label>
+          <button class="rp-btn-primary" id="btnCupSave" type="button">커핑 결과 저장</button>
+        </div>
+        <p class="rp-cup-msg" id="cupMsg"></p>
+      </div>
       <div class="rp-target-card">
         <div class="rp-card-title">다른 로스팅 포인트로 바꾼다면?</div>
         <div class="rp-target-btns" id="detailTargetBtns"></div>
@@ -337,6 +362,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="supabase.config.js"></script>
 <script src="roast-pixel.js"></script>
+<script src="roast-brain.js"></script>
 <script src="roasting.js"></script>
 </body>
 </html>

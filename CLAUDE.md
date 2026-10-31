@@ -169,6 +169,18 @@ coffeebeanweb/
 워크플로(`store-diagnose.yml`)로 조사·재수집한다. 취급 품목이 실제로 줄어
 급감 가드에 걸리면, **감소가 사실임을 확인한 뒤에만** `force=true` 로 우회한다.
 
+## 로스팅 AI 누적 학습 (roasting.html)
+
+- **학습 자료는 공개 저장소가 아니라 Supabase 비공개 버킷 `roast-learning`** 에 쌓는다. 공개 저장소에는 집계만 커밋한다.
+  - `seed/` 초기 자료(Firescope 곡선·메모 맛 평가, Boost 기록, 판독 검증 사례) · `readings/` 사이트 판독 기록
+  - `cupping/<user_id>.json` 사이트 커핑 결과(정해진 형식) + 그 프로파일 곡선 — `roast-learn` 함수가 저장
+    (DB 컬럼을 추가할 권한이 없어 Storage 에 둔다. 프로파일 삭제 시 함께 지운다)
+- 매주 `roast-learning.yml`: Boost 동기화 → 기준선(`data/roast-baselines.json`) → 판독 벤치마크 →
+  **판단 두뇌**(`scripts/roast_brain.py` → `data/roast-brain.json`) → 기기 규칙 → 프롬프트 주입.
+- 판단 두뇌의 예측 모델은 학습에 안 쓴 기록 기준 **AUC 0.70 이상인 것만** 사이트에 내보낸다(현재 없음 — 메모 평가로는 0.52~0.60).
+  지금 사이트에 쓰는 것은 "같은 생두를 같은 날 볶아 결과가 갈린 배치" 규칙과 사용자 본인의 같은 생두 이전 배치 비교다.
+- 곡선 특징값 정의는 `roast-brain.js` · `scripts/roast_brain.py` · Firescope `features30` 이 같다 (1초 보간, RoR 30초 창). 하나를 바꾸면 셋 다 바꾼다.
+
 ## 향후 추가 가능 공급사
 
 조사가 필요한 생두 전문 쇼핑몰 목록 (아직 미추가):

@@ -401,3 +401,19 @@ code { background: var(--cream2); padding: 1px 5px; border-radius: 4px; font-siz
 /* AI 학습 동의 */
 .rp-learn-consent { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text3); margin: 0 0 10px; cursor: pointer; }
 .rp-learn-consent input { width: 14px; height: 14px; accent-color: var(--fire); }
+
+/* 커핑 결과 (로스팅 판단 두뇌의 학습 정답) */
+.rp-cup-help { font-size: 12.5px; color: var(--text2); margin: -6px 0 12px; line-height: 1.5; }
+.rp-cup-saved { font-weight: 500; font-size: 12px; color: var(--green); margin-left: 6px; }
+.rp-cup-flags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.rp-cup-flags label { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border: 1.5px solid var(--border); border-radius: 16px; background: var(--cream); font-size: 13px; cursor: pointer; }
+.rp-cup-flags label:has(input:checked) { border-color: var(--red); background: #fee2e2; }
+.rp-cup-overall { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 12px; }
+.rp-cup-label { font-size: 13px; font-weight: 600; color: var(--text2); margin-right: 4px; }
+.rp-cup-overall button { padding: 7px 12px; border: 1.5px solid var(--border); border-radius: 16px; background: var(--cream); font-size: 13px; cursor: pointer; }
+.rp-cup-overall button.on { border-color: var(--fire); background: var(--fire); color: var(--white); }
+.rp-cup-row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; }
+.rp-cup-row label { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; color: var(--text2); }
+.rp-cup-row input { width: 130px; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; background: var(--cream); color: var(--text); }
+.rp-cup-msg { font-size: 12.5px; margin: 10px 0 0; min-height: 1em; color: var(--text2); }
+.rp-cup-msg.err { color: var(--red); }

@@ -40,6 +40,9 @@ let detailChartInstance = null;
 let deleteTargetId = null;
 let wizardData = null;      // 생성 중인 프로파일 데이터
 let selectedTarget = null;  // 선택된 타겟 포인트(생성 화면)
+let detailTarget = null;    // 상세 화면에서 선택된 타겟 포인트
+let cuppings = {};          // 프로파일 id → 커핑 결과 (roast-learn 함수가 비공개 저장소에 보관)
+let cupOverall = null;      // 커핑 카드에서 고른 전체 평가 (1~5)
 
 /* 디지타이저 상태 */
 const digi = { img:null, cal:{x1:null,x2:null,y1:null,y2:null}, events:{}, curve:[], mode:null, scale:1, images:[], dataParsed:null };
@@ -66,6 +69,15 @@ const confirmOverlay = $('confirmOverlay');
 
 /* ════════ UI 배선 ════════ */
 function wireUI() {
+  // 커핑 결과 카드
+  $('cupOverall').addEventListener('click', e => {
+    const b = e.target.closest('button[data-v]'); if (!b) return;
+    const v = +b.dataset.v;
+    cupOverall = cupOverall === v ? null : v;
+    markCupOverall();
+  });
+  $('btnCupSave').addEventListener('click', saveCupping);
+
   $('btnNewProfile').addEventListener('click', openWizard);
   $('btnWelcomeNew').addEventListener('click', openWizard);
   $('btnWizCancel1').addEventListener('click', closeWizard);
@@ -130,6 +142,21 @@ async function loadProfiles() {
   if (error) { console.error(error); return; }
   allProfiles = data || [];
   renderList();
+  loadCuppings();
+}
+
+/* 커핑 결과 (로스팅 판단 두뇌의 학습 정답). 실패해도 화면은 그대로 쓴다. */
+async function loadCuppings() {
+  try {
+    const { data, error } = await sb.functions.invoke('roast-learn', { body: { action: 'cupping_list' } });
+    if (error) throw error;
+    cuppings = data?.items || {};
+    const p = allProfiles.find(x => x.id === activeId);
+    if (p && detailView.style.display !== 'none') {
+      fillCupCard(p);
+      renderFeedback($('detailFeedback'), p, detailTarget);
+    }
+  } catch (e) { console.warn('커핑 결과를 불러오지 못했습니다:', e); }
 }
 
 async function saveProfile() {
@@ -182,6 +209,10 @@ async function deleteProfile() {
   if (!deleteTargetId) return;
   const { error } = await sb.from('roasting_profiles').delete().eq('id', deleteTargetId);
   if (error) { alert('삭제 실패: ' + error.message); return; }
+  const removedId = deleteTargetId;
+  delete cuppings[removedId];
+  sb.functions.invoke('roast-learn', { body: { action: 'cupping_delete', profile_id: removedId } })
+    .catch(e => console.warn('커핑 결과 삭제 실패:', e));
   activeId = null; deleteTargetId = null;
   await loadProfiles();
   showView('welcome');
@@ -1468,6 +1499,14 @@ function renderFeedback(el, d, targetKey) {
     item._fcsInput ? renderFcsInlineItem(item) : fbItem(item)
   ).join('')}</div></div>`;
 
+  // 블록 3: 같은 생두 이전 배치 비교 / 블록 4: 학습한 예측 (기준을 넘은 모델이 있을 때만)
+  const same = sameBeanAnalysis(d);
+  if (same.length) html += `<div class="rp-fb-block"><div class="rp-fb-block-title">같은 생두 이전 배치와 비교</div>` +
+    `<div class="rp-fb-list">${same.map(fbItem).join('')}</div></div>`;
+  const pred = brainPredictions(d);
+  if (pred.length) html += `<div class="rp-fb-block"><div class="rp-fb-block-title">로스팅 AI 맛 예측</div>` +
+    `<div class="rp-fb-list">${pred.map(fbItem).join('')}</div></div>`;
+
   el.innerHTML = html;
 
   // DTR 인라인 입력 이벤트 연결 (DTR 미계산일 때만 존재)
@@ -1478,6 +1517,7 @@ function renderFeedback(el, d, targetKey) {
       const sec = parseTimeStr(inp.value.trim());
       if (!sec || sec <= 0 || sec >= d.total_time) { inp.style.borderColor='var(--red)'; return; }
       inp.style.borderColor = '';
+      if (d.id && d !== wizardData) { persistFcs(d, sec); return; }   // 저장된 프로파일은 DB 에도 반영
       d.events = d.events || {};
       d.events.fcs = sec;
       d.dtr = +(((d.total_time - sec) / d.total_time) * 100).toFixed(1);
@@ -1589,6 +1629,16 @@ const ROAST_BASELINES = {
 };
 // 발달이 이보다 짧으면 기기와 무관하게 언더디벨롭 위험으로 본다 (소배치 P5가 1.2%라 하한이 필요)
 const DTR_ABS_MIN = 5;
+
+/* 로스팅 판단 두뇌 (scripts/roast_brain.py 가 매주 갱신). 없으면 관련 피드백만 빠진다. */
+let roastBrain = null;
+(async function loadRoastBrain() {
+  try {
+    const v = new Date().toISOString().slice(0, 10);
+    const res = await fetch(`data/roast-brain.json?v=${v}`, { cache: 'no-cache' });
+    if (res.ok) roastBrain = await res.json();
+  } catch (e) { console.warn('판단 두뇌 파일을 못 읽음', e); }
+})();
 
 /* 누적 학습 기준선 불러오기. 파일이 없거나 값이 이상하면 위 기본값을 그대로 쓴다. */
 const BASELINE_METRICS = ['total', 'tpT', 'tpBt', 'dry', 'mai', 'ror200', 'drop', 'dtr'];
@@ -1847,11 +1897,185 @@ function showDetail(p) {
   renderMetrics($('detailMetrics'), p);
   detailChartInstance = buildChart('detailChart', p.time_series||[], p.bt_series||[], p.et_series||[], p.agitation_series||[], p.ror||computeRoR(p.time_series||[], p.bt_series||[]), p.et_ror||[], p.events||{}, detailChartInstance);
 
-  let sel = p.target_roast_point || null;
-  const render = () => renderTargetButtons($('detailTargetBtns'), p, (key)=>{ sel=key; render(); renderFeedback($('detailFeedback'), p, key); }, sel);
+  detailTarget = p.target_roast_point || null;
+  const render = () => renderTargetButtons($('detailTargetBtns'), p, (key)=>{ detailTarget=key; render(); renderFeedback($('detailFeedback'), p, key); }, detailTarget);
   render();
-  renderFeedback($('detailFeedback'), p, sel);
+  fillCupCard(p);
+  renderFeedback($('detailFeedback'), p, detailTarget);
   showView('detail');
+}
+
+/* ════════ 커핑 결과 ════════ */
+const CUP_FLAGS = { under: '언더·풋맛', over: '오버·탄맛', baked: '베이크드·플랫', astringent: '떫은맛', sour: '튀는 산미' };
+
+function markCupOverall() {
+  document.querySelectorAll('#cupOverall button').forEach(b => b.classList.toggle('on', +b.dataset.v === cupOverall));
+}
+
+function fillCupCard(p) {
+  const c = cuppings[p.id] || {};
+  document.querySelectorAll('#cupFlags input').forEach(i => { i.checked = !!c[i.dataset.flag]; });
+  cupOverall = c.overall ?? null;
+  markCupOverall();
+  $('cupAgtron').value = c.agtron ?? '';
+  $('cupFcs').value = p.events && p.events.fcs != null ? fmtTime(p.events.fcs) : '';
+  $('cupSaved').textContent = c.saved_at ? `저장됨 · ${c.saved_at.slice(0, 10)}` : '';
+  $('cupMsg').textContent = ''; $('cupMsg').className = 'rp-cup-msg';
+}
+
+function cupMessage(text, isErr) {
+  $('cupMsg').textContent = text;
+  $('cupMsg').className = 'rp-cup-msg' + (isErr ? ' err' : '');
+}
+
+/* 저장된 프로파일의 1차 크랙을 DB에 반영하고 DTR·로스팅 포인트를 다시 계산한다 */
+async function persistFcs(p, sec) {
+  const events = Object.assign({}, p.events || {}, { fcs: sec });
+  const dtr = +(((p.total_time - sec) / p.total_time) * 100).toFixed(1);
+  const pt = analyzeCurrentPoint(p.drop_temp, dtr, p.fluid_bed);
+  const upd = { events, dtr, current_roast_point: pt ? pt.key : p.current_roast_point };
+  const { error } = await sb.from('roasting_profiles').update(upd).eq('id', p.id);
+  if (error) { cupMessage('1차 크랙 저장 실패: ' + error.message, true); return false; }
+  Object.assign(p, upd);
+  renderMetrics($('detailMetrics'), p);
+  detailChartInstance = buildChart('detailChart', p.time_series||[], p.bt_series||[], p.et_series||[], p.agitation_series||[],
+    p.ror||computeRoR(p.time_series||[], p.bt_series||[]), p.et_ror||[], p.events||{}, detailChartInstance);
+  renderFeedback($('detailFeedback'), p, detailTarget);
+  return true;
+}
+
+async function saveCupping() {
+  const p = allProfiles.find(x => x.id === activeId);
+  if (!p) return;
+  const cup = { overall: cupOverall };
+  document.querySelectorAll('#cupFlags input').forEach(i => { cup[i.dataset.flag] = i.checked; });
+  const ag = $('cupAgtron').value.trim();
+  cup.agtron = ag ? +ag : null;
+  const hasRating = cup.overall != null || Object.keys(CUP_FLAGS).some(f => cup[f]);
+
+  // 1차 크랙: 바뀌었으면 프로파일에 먼저 저장 (커핑 결과에 바뀐 DTR 이 함께 남도록)
+  const fcsRaw = $('cupFcs').value.trim();
+  let fcsSaved = false;
+  if (fcsRaw) {
+    const sec = parseTimeStr(fcsRaw);
+    if (!sec || sec <= 0 || sec >= p.total_time) { cupMessage('1차 크랙은 배출 시간보다 이른 mm:ss 로 입력하세요 (예: 8:30).', true); return; }
+    if (!p.events || p.events.fcs !== sec) {
+      if (!(await persistFcs(p, sec))) return;
+      fcsSaved = true;
+    }
+  }
+  if (!hasRating) {
+    cupMessage(fcsSaved ? '1차 크랙을 저장했습니다. 커핑 후 맛 평가도 남겨 주세요.' : '맛 평가를 하나 이상 선택하세요.', !fcsSaved);
+    return;
+  }
+  $('btnCupSave').disabled = true;
+  try {
+    const { data, error } = await sb.functions.invoke('roast-learn', { body: { action: 'cupping_save', profile_id: p.id, cupping: cup } });
+    if (error || data?.error) throw new Error(data?.error || error.message || String(error));
+    cuppings[p.id] = Object.assign({}, data.cupping, { saved_at: new Date().toISOString() });
+    fillCupCard(p);
+    renderFeedback($('detailFeedback'), p, detailTarget);
+    cupMessage('저장했습니다. 같은 생두 다음 배치 피드백과 다음 주 AI 학습에 반영됩니다.');
+  } catch (e) {
+    cupMessage('저장 실패: ' + e.message, true);
+  } finally {
+    $('btnCupSave').disabled = false;
+  }
+}
+
+/* ════════ 같은 생두 이전 배치와 비교 (로스팅 판단 두뇌) ════════ */
+function signed(v, nd = 1) { const r = +v.toFixed(nd); return (r > 0 ? '+' : '') + r; }
+
+// 규칙 지표 → 프로파일에서 바로 얻는 값 (단위·표시)
+const RULE_DELTA = {
+  drop_bt:   { unit: '°C', nd: 1, get: (d, ref) => d.drop_temp != null && ref.drop != null ? d.drop_temp - ref.drop : null },
+  dtr:       { unit: '%p', nd: 1, get: (d, ref) => d.dtr != null && ref.dtr != null ? d.dtr - ref.dtr : null },
+  total_min: { unit: '초', nd: 0, scale: 60, get: (d, ref) => d.total_time && ref.time ? (d.total_time - ref.time) / 60 : null },
+};
+
+const RULE_UNITS = { ror200: { unit: '°C/분', nd: 2 }, dry_pct: { unit: '%p', nd: 1 } };
+function isFluidBed(d) { return !!d.fluid_bed || detectFluidBed(d.roaster) === true; }
+
+function ruleSummary(rule) {
+  return Object.entries(rule.metrics).map(([k, m]) => {
+    const u = RULE_DELTA[k] || RULE_UNITS[k] || { unit: '', nd: 1 };
+    return `${m.name} 평균 ${signed(m.mean * (u.scale || 1), u.nd)}${u.unit}(${m.pairs}쌍 중 ${Math.round(m.share * 100)}%)`;
+  }).join(', ');
+}
+
+function sameBeanAnalysis(d) {
+  if (typeof RoastBrain === 'undefined') return [];
+  const prior = RoastBrain.sameBeanHistory(d, allProfiles);
+  if (!prior.length) return [];
+  const items = [];
+  const recent = prior.slice(0, 10);
+  const ref = { drop: RoastBrain.median(recent.map(p => p.drop_temp)), dtr: RoastBrain.median(recent.map(p => p.dtr)),
+                time: RoastBrain.median(recent.map(p => p.total_time)) };
+  const delta = {};
+  for (const [k, r] of Object.entries(RULE_DELTA)) delta[k] = r.get(d, ref);
+  const parts = Object.entries(RULE_DELTA).filter(([k]) => delta[k] != null)
+    .map(([k, r]) => `${{ drop_bt: '배출', dtr: 'DTR', total_min: '총 시간' }[k]} ${signed(delta[k] * (r.scale || 1), r.nd)}${r.unit}`);
+  items.push({ type: 'info', icon: '', title: `같은 생두 이전 ${recent.length}배치와 비교`,
+    text: parts.length ? `이전 배치 중앙값 대비 ${parts.join(' · ')}.` : '비교할 수치가 아직 없습니다.' });
+
+  // 학습한 규칙: 같은 생두를 같은 날 볶아 결과가 갈린 배치 쌍에서 확인된 차이 (드럼 로스터 기록)
+  const rules = (roastBrain && roastBrain.rules) || {};
+  if (!isFluidBed(d)) {
+    for (const rule of Object.values(rules)) {
+      const hits = Object.entries(rule.metrics).filter(([k, m]) => delta[k] != null && delta[k] * Math.sign(m.mean) >= Math.abs(m.mean) * 0.7);
+      if (!hits.length) continue;
+      items.push({ type: 'warn', icon: '', title: `'${rule.label}' 쪽으로 움직였을 수 있습니다`,
+        text: `로스팅 기록 학습 결과, 같은 생두를 같은 날 볶아 '${rule.label}' 평가를 받은 배치는 다른 배치보다 ${ruleSummary(rule)}. ` +
+              `이번 배치도 이전보다 ${hits.map(([k]) => parts.find(s => s.startsWith({ drop_bt: '배출', dtr: 'DTR', total_min: '총 시간' }[k]))).join(' · ')}입니다. 커핑으로 확인해 보세요.` });
+    }
+  }
+
+  // 커핑 결과가 있는 가장 최근 배치와 직접 비교
+  const rated = prior.find(p => cuppings[p.id]);
+  if (!rated) {
+    items.push({ type: 'info', icon: '', title: '이전 배치에 커핑 결과를 남겨 보세요',
+      text: '커핑 결과가 있으면 "지난번 언더 → 이번엔 배출 +1.5°C" 처럼 배치끼리 비교해 조언합니다. 로스팅 AI도 그 평가로 매주 다시 학습합니다.' });
+    return items;
+  }
+  const c = cuppings[rated.id];
+  const when = rated.roast_date || (rated.created_at || '').slice(0, 10);
+  const dd = d.drop_temp != null && rated.drop_temp != null ? d.drop_temp - rated.drop_temp : null;
+  const dt = d.dtr != null && rated.dtr != null ? d.dtr - rated.dtr : null;
+  const dtime = d.total_time && rated.total_time ? d.total_time - rated.total_time : null;
+  const diffTxt = [dd != null ? `배출 ${signed(dd)}°C` : null, dt != null ? `DTR ${signed(dt)}%p` : null,
+                   dtime != null ? `총 시간 ${signed(dtime, 0)}초` : null].filter(Boolean).join(' · ');
+  const flags = Object.keys(CUP_FLAGS).filter(f => c[f]);
+  const label = `${when} 배치(${[...flags.map(f => CUP_FLAGS[f]), c.overall ? `전체 ${c.overall}/5` : null].filter(Boolean).join(', ')})`;
+  const more = (dd != null && dd > 0.3) || (dt != null && dt > 0.5);
+  const less = (dd != null && dd < -0.3) || (dt != null && dt < -0.5);
+  if (c.under) items.push(more
+    ? { type: 'good', icon: '', title: '지난 배치 언더 → 이번엔 발달을 늘렸습니다', text: `${label} 대비 ${diffTxt}. 언더를 줄이는 방향입니다.` }
+    : { type: 'warn', icon: '', title: '지난 배치가 언더였는데 발달이 늘지 않았습니다', text: `${label} 대비 ${diffTxt}. 배출 온도나 발달 시간을 조금 늘려 보세요.` });
+  if (c.over) items.push(less
+    ? { type: 'good', icon: '', title: '지난 배치 오버 → 이번엔 발달을 줄였습니다', text: `${label} 대비 ${diffTxt}. 오버를 줄이는 방향입니다.` }
+    : { type: 'warn', icon: '', title: '지난 배치가 오버였는데 발달이 줄지 않았습니다', text: `${label} 대비 ${diffTxt}. 조금 더 일찍 배출해 보세요.` });
+  if (c.baked) items.push(dtime != null && dtime < -10
+    ? { type: 'good', icon: '', title: '지난 배치 베이크드 → 이번엔 총 시간을 줄였습니다', text: `${label} 대비 ${diffTxt}.` }
+    : { type: 'warn', icon: '', title: '지난 배치가 베이크드였는데 총 시간이 줄지 않았습니다', text: `${label} 대비 ${diffTxt}. 초반 열량을 높여 로스팅을 늘어지지 않게 해 보세요.` });
+  if (!c.under && !c.over && !c.baked) {
+    if (c.overall >= 4) items.push({ type: 'info', icon: '', title: '좋은 평가를 받은 배치와 비교', text: `${label} 대비 ${diffTxt}. 그 맛을 재현하려면 차이를 작게 유지하세요.` });
+    else items.push({ type: 'info', icon: '', title: '최근 커핑 결과가 있는 배치와 비교', text: `${label} 대비 ${diffTxt}.` });
+  }
+  return items;
+}
+
+/* 학습한 예측 모델 — 정확도 기준을 넘은 항목만 data/roast-brain.json 에 들어 있다 (지금은 없을 수 있음) */
+function brainPredictions(d) {
+  const models = roastBrain && roastBrain.models;
+  if (!models || !Object.keys(models).length || typeof RoastBrain === 'undefined' || isFluidBed(d)) return [];
+  const xs = RoastBrain.featureVector(roastBrain, d, RoastBrain.sameBeanHistory(d, allProfiles));
+  if (!xs) return [];
+  return Object.values(models).map(m => {
+    const prob = RoastBrain.predict(m, xs);
+    return { type: prob >= m.rate * 1.5 ? 'warn' : 'info', icon: '',
+      title: `${m.label} 가능성 ${Math.round(prob * 100)}%`,
+      text: `학습한 로스팅 평균은 ${Math.round(m.rate * 100)}%입니다. 학습에 쓰지 않은 기록으로 잰 정확도 AUC ${m.auc}.` };
+  });
 }
 
 /* ════════ 유틸 ════════ */

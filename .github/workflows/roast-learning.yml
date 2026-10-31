@@ -4,8 +4,10 @@ name: 로스팅 AI 자동 학습
 #   ① Boost 신규 로스팅 동기화        scripts/roast_corpus_sync.py  (BOOST_ID/BOOST_PW 없으면 건너뜀)
 #   ② 기기·배치별 기준선 재계산        scripts/roast_baselines.py    → data/roast-baselines.json (사이트가 읽음)
 #   ③ 정답 있는 사례로 판독 정확도 재측정 scripts/roast_benchmark.py    → data/roast-benchmark-history.json + 리포트
-#   ④ 판독 오차 패턴 → 기기 규칙         scripts/roast_feedback.py     (저장된 프로파일의 사용자 수정 + ③의 정답 비교)
-#   ⑤ 규칙을 analyze-roast 프롬프트에 주입 → deploy-functions.yml 이 실서비스에 자동 배포
+#   ④ 로스팅 판단 두뇌 재학습          scripts/roast_brain.py        → data/roast-brain.json (맛 결과 예측·같은 생두 비교 규칙)
+#      학습 정답: Firescope 메모 맛 평가 + 사이트 커핑 기록. 정확도 기준을 넘은 예측만 사이트에 켜진다
+#   ⑤ 판독 오차 패턴 → 기기 규칙         scripts/roast_feedback.py     (저장된 프로파일의 사용자 수정 + ③의 정답 비교)
+#   ⑥ 규칙을 analyze-roast 프롬프트에 주입 → deploy-functions.yml 이 실서비스에 자동 배포
 #
 # 학습 자료(사이트 판독 기록·사진·원천 곡선)는 비공개 Supabase 버킷 roast-learning 에 쌓이고,
 # 공개 저장소에는 집계값만 커밋한다.
@@ -44,8 +46,8 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: 이미지 처리 라이브러리 설치
-        run: pip install pillow
+      - name: 학습용 라이브러리 설치
+        run: pip install pillow scikit-learn numpy requests
 
       # ① 새 원천 데이터 — 시크릿이 없으면 건너뛴다. 실패해도 기존 자료로 나머지를 계속한다.
       - name: Boost 신규 로스팅 동기화
@@ -79,7 +81,21 @@ jobs:
             --reanalyze "${{ github.event.inputs.reanalyze || '20' }}" \
             --feedback-out "$RUNNER_TEMP/benchmark_rows.json"
 
-      # ④ 실사용 피드백 집계 — 자격증명이 없거나 업로드가 없으면 조용히 통과한다.
+      # ④ 판단 두뇌 재학습 — 쌓인 맛 평가 전체로. 정확도 기준 미달 예측은 내보내지 않는다
+      - name: 로스팅 판단 두뇌 재학습
+        id: brain
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            python scripts/roast_brain.py --eval-only
+          else
+            python scripts/roast_brain.py
+          fi
+
+      # ⑤ 실사용 피드백 집계 — 자격증명이 없거나 업로드가 없으면 조용히 통과한다.
       - name: 실사용 피드백 집계 → 기기 규칙 갱신
         id: feedback
         continue-on-error: true
@@ -110,7 +126,8 @@ jobs:
             echo "dry-run — 커밋하지 않음"
             exit 0
           fi
-          git add vault/ supabase/ data/roast-baselines.json data/roast-benchmark-history.json
+          git add vault/ supabase/ data/roast-baselines.json data/roast-benchmark-history.json \
+                  data/roast-brain.json data/roast-brain-history.json
           git diff --cached --quiet || echo "changed=true" >> $GITHUB_OUTPUT
 
       # 커밋이 supabase/functions/ 를 건드리면 deploy-functions.yml 이 이어받아 배포한다.
@@ -119,7 +136,7 @@ jobs:
         run: |
           git config user.name "GreenBeanBot"
           git config user.email "bot@green-bean-market"
-          git commit -m "로스팅 AI 자동 학습: $(date '+%Y-%m-%d') 기준선·판독 정확도·실사용 피드백 반영"
+          git commit -m "로스팅 AI 자동 학습: $(date '+%Y-%m-%d') 기준선·판독 정확도·판단 두뇌·실사용 피드백 반영"
           # main 이 앞서 나갔을 때 push 가 거부돼 작업분이 버려지는 것을 막는다
           # (2026-08-20 갱신 잡에서 실제 발생). rebase 후 최대 3회 재시도.
           for i in 1 2 3; do
@@ -149,6 +166,7 @@ jobs:
           fi
           if [ "${{ steps.baselines.outcome }}" = "failure" ]; then echo "- ⚠️ 기준선 재계산 실패 (기존 기준선 유지)" >> $GITHUB_STEP_SUMMARY; fi
           if [ "${{ steps.benchmark.outcome }}" = "failure" ]; then echo "- ⚠️ 판독 재측정 실패" >> $GITHUB_STEP_SUMMARY; fi
+          if [ "${{ steps.brain.outcome }}" = "failure" ]; then echo "- ⚠️ 판단 두뇌 재학습 실패 (지난 모델 유지)" >> $GITHUB_STEP_SUMMARY; fi
           if [ "${{ steps.feedback.outcome }}" = "failure" ]; then echo "- ⚠️ 피드백 집계 실패" >> $GITHUB_STEP_SUMMARY; fi
           REPORT="vault/raw/roast-profiles/$(date '+%Y-%m-%d')-판독벤치마크.md"
           if [ -f "$REPORT" ]; then

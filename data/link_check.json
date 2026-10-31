@@ -1,51 +1,51 @@
 {
-  "checked_at": "2026-10-30T01:03:05Z",
-  "total": 1359,
+  "checked_at": "2026-10-31T00:25:37Z",
+  "total": 1381,
   "removed": [],
   "held_stores": [],
   "timing": {
-    "elapsed_sec": 1723.6,
-    "requests": 1198,
-    "skipped_unknown": 161,
+    "elapsed_sec": 456.0,
+    "requests": 1194,
+    "skipped_unknown": 187,
     "slowest_domains": [
       {
-        "domain": "www.cobeans.com",
-        "sec": 1723.6,
-        "count": 109
-      },
-      {
         "domain": "comansa.kr",
-        "sec": 482.4,
-        "count": 346
+        "sec": 456.0,
+        "count": 345
       },
       {
         "domain": "www.gsc.coffee",
-        "sec": 187.6,
-        "count": 117
+        "sec": 185.6,
+        "count": 123
       },
       {
         "domain": "www.micoffee.co.kr",
-        "sec": 165.1,
+        "sec": 155.0,
         "count": 114
       },
       {
         "domain": "momos.co.kr",
-        "sec": 124.5,
+        "sec": 118.6,
         "count": 102
       },
       {
+        "domain": "www.cobeans.com",
+        "sec": 73.3,
+        "count": 94
+      },
+      {
         "domain": "www.blessbean.co.kr",
-        "sec": 70.3,
+        "sec": 69.4,
         "count": 105
       },
       {
         "domain": "coffeeplant.co.kr",
-        "sec": 58.7,
+        "sec": 61.1,
         "count": 51
       },
       {
         "domain": "wbeans.com",
-        "sec": 56.6,
+        "sec": 57.4,
         "count": 42
       }
     ]
@@ -76,11 +76,6 @@
       "dead": 0,
       "ambiguous": 0
     },
-    "코빈즈커피": {
-      "ok": 0,
-      "dead": 0,
-      "ambiguous": 109
-    },
     "모모스커피": {
       "ok": 102,
       "dead": 0,
@@ -107,17 +102,27 @@
       "ambiguous": 0
     },
     "지에스씨(GSC)": {
-      "ok": 117,
+      "ok": 123,
+      "dead": 0,
+      "ambiguous": 0
+    },
+    "캅카와": {
+      "ok": 6,
       "dead": 0,
       "ambiguous": 0
     },
     "커만사": {
-      "ok": 346,
+      "ok": 345,
       "dead": 0,
       "ambiguous": 0
     },
     "커피플랜트": {
       "ok": 51,
+      "dead": 0,
+      "ambiguous": 0
+    },
+    "코빈즈커피": {
+      "ok": 94,
       "dead": 0,
       "ambiguous": 0
     },

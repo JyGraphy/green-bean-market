@@ -2,3 +2,4 @@ supabase/.temp/
 .claude/settings.local.json
 __pycache__/
 vault/.obsidian/
+.pw-naver-profile/

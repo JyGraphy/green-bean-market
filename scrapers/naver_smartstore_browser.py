@@ -1,18 +1,21 @@
 """네이버 스마트스토어 — 진짜 브라우저(Playwright) 기반 수집 (가정용 IP 전용).
 
-왜: 네이버 안티봇이 requests 호출을 429 로, 페이지 내 fetch 를 "Failed to fetch"
-(로그인 리다이렉트/CSP)로 막는다(2026-10-31 실측). 그래서 실제 브라우저로:
-  (A) 내부 API 주소로 **직접 이동(navigate)** 해 응답 JSON 을 읽고(페이지 CSP·서비스워커
-      를 안 타고, 실제 쿠키·헤더가 실린다),
-  (B) 그래도 안 되면 렌더된 **카테고리 페이지 DOM** 에서 상품 카드를 긁는다
-      (사람이 보는 화면 그대로라 가장 막기 어렵다).
-둘 다 실패하면 진단 정보(상태코드·최종 URL·본문 일부)를 담아 올린다.
+네이버 차단 양상(2026-10-31 실측):
+  · requests 호출 → 429 (쿠키 워밍업·재시도로도 불가)
+  · 페이지 내 fetch → "Failed to fetch"
+  · 내부 API(/i/v1·/i/v2) 로 직접 이동 → **로그인 창(nid.naver.com)으로 리다이렉트**
+    즉 내부 API 는 이제 로그인 세션을 요구한다.
+그런데 **카테고리 페이지 자체는 사람에게 로그인 없이 상품이 보인다.** 그래서:
+  (1) 로그인 세션을 프로필 폴더에 저장(한 번만 수동 로그인)해 자동화 탐지를 넘고,
+  (2) 렌더된 카테고리 페이지 DOM 에서 상품 카드(이름·가격·품절)를 직접 긁는다.
+내부 API 는 쓰지 않는다(로그인 벽을 띄우는 원인).
 
-CI(데이터센터 IP)는 브라우저로도 로그인 월에 막히므로 로컬 전용.
+로그인 쿠키가 담기는 프로필 폴더(.pw-naver-profile)는 .gitignore 로 커밋 제외한다.
 
+CI(데이터센터 IP)는 브라우저로도 막히므로 로컬 전용.
 준비(1회):  python3 -m pip install playwright && python3 -m playwright install chromium
 """
-import json
+import os
 import re
 import sys
 
@@ -21,74 +24,10 @@ from naver_smartstore import normalize_price_1kg  # noqa: E402
 BASE = 'https://smartstore.naver.com'
 UA = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 '
       '(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36')
-
+PROFILE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                           '.pw-naver-profile')
 _LABELS = ('적립', '리뷰', '구매', '배송', '광고', '쿠폰', '할인', '찜', '관심',
-           '브랜드', '스토어찜', '톡톡', 'BEST', 'NEW')
-
-
-def _nav_json(page, url):
-    """API URL 로 이동해 응답을 (status, json|None, 진단문자열) 로 반환."""
-    try:
-        resp = page.goto(url, wait_until='domcontentloaded', timeout=30000)
-    except Exception as e:
-        return None, None, f'goto 실패: {type(e).__name__}: {e}'
-    status = resp.status if resp else None
-    final = page.url
-    if 'nid.naver.com' in final:
-        return status, None, f'로그인 리다이렉트({final[:60]})'
-    try:
-        return status, resp.json(), ''
-    except Exception:
-        body = (resp.text() if resp else '') or ''
-        return status, None, f'JSON 아님 (status={status}, url={final[:50]}, 본문[:120]={body[:120]!r})'
-
-
-def _collect_via_api(page, store_id, category):
-    """API 직접 이동으로 상품 수집. (raw_products, 진단) 반환."""
-    st, info, diag = _nav_json(page, f'{BASE}/i/v1/smart-stores?url={store_id}')
-    if not isinstance(info, dict) or not info.get('id'):
-        return [], f'채널ID 실패(status={st}): {diag or info}'
-    chid = info['id']
-    ctype = 'STDCATG' if category == 'ALL' else 'DISPCATG'
-    raw, pg, total = [], 1, 0
-    while pg <= 50:
-        url = (f'{BASE}/i/v2/channels/{chid}/categories/{category}/products'
-               f'?categorySearchType={ctype}&sortType=TOTALSALE&page={pg}&pageSize=40')
-        st, data, diag = _nav_json(page, url)
-        if not isinstance(data, dict):
-            return raw, f'상품 조회 실패(page {pg}, status={st}): {diag}'
-        prods = data.get('simpleProducts') or data.get('products') or []
-        total = data.get('totalCount', 0)
-        raw.extend(prods)
-        if pg * 40 >= total or not prods:
-            break
-        pg += 1
-    return raw, f'API 성공 (total {total})'
-
-
-def _map_api(raw, store_id):
-    items, seen = [], set()
-    for pr in raw:
-        name = (pr.get('name') or '').strip()
-        if not name:
-            continue
-        benefits = pr.get('benefitsView') or {}
-        price = benefits.get('discountedSalePrice') or pr.get('salePrice') or 0
-        if not price:
-            continue
-        prod_no = pr.get('id') or pr.get('productNo')
-        url = f'{BASE}/{store_id}/products/{prod_no}'
-        if url in seen:
-            continue
-        seen.add(url)
-        items.append({
-            'name': name,
-            'price': normalize_price_1kg(name, int(price)),
-            'url': url,
-            'is_soldout': pr.get('productStatusType') == 'OUTOFSTOCK',
-        })
-    return items
-
+           '브랜드', '스토어찜', '톡톡', 'BEST', 'NEW', '단독', '기획')
 
 _DOM_JS = r"""
 () => {
@@ -100,7 +39,7 @@ _DOM_JS = r"""
     if (seen.has(id)) return;
     seen.add(id);
     const card = a.closest('li') || a.closest('div') || a;
-    out.push({id, href: a.href, text: (card.innerText || '').trim()});
+    out.push({id, href: a.href.split('?')[0], text: (card.innerText || '').trim()});
   });
   return out;
 }
@@ -131,23 +70,88 @@ def _parse_card(text):
     return name, price, soldout
 
 
-def _collect_via_dom(page, store_id, landing):
-    page.goto(landing, wait_until='domcontentloaded', timeout=60000)
-    try:
-        page.wait_for_selector('a[href*="/products/"]', timeout=15000)
-    except Exception:
-        return [], 'DOM: 상품 링크가 안 나타남'
+def _set_cp(url, cp):
+    if 'cp=' in url:
+        return re.sub(r'cp=\d+', f'cp={cp}', url)
+    return url + ('&' if '?' in url else '?') + f'cp={cp}'
+
+
+def _scroll(page):
     prev = -1
-    for _ in range(25):                 # lazy-load 스크롤
+    for _ in range(25):
         n = page.evaluate("() => document.querySelectorAll('a[href*=\"/products/\"]').length")
         if n == prev:
             break
         prev = n
         page.mouse.wheel(0, 24000)
-        page.wait_for_timeout(700)
-    cards = page.evaluate(_DOM_JS)
+        page.wait_for_timeout(600)
+
+
+def _handle_login(page, landing, headless):
+    """로그인 창이면: headful 은 사용자가 로그인할 때까지 대기 후 복귀, headless 는 안내."""
+    if 'nid.naver.com' not in page.url:
+        return True
+    if headless:
+        raise RuntimeError(
+            '네이버 로그인 창으로 막혔습니다. 최초 1회는 창을 띄워 로그인해야 합니다:\n'
+            '    HEADFUL=1 python3 scripts/update_smartstore_browser_local.py\n'
+            '뜬 크롬 창에서 네이버에 로그인하면 세션이 저장되어, 이후에는 자동으로 됩니다.')
+    print('  🔑 네이버 로그인 창이 떴습니다 — 열린 크롬 창에서 로그인해 주세요. '
+          '(최대 240초 대기, 로그인하면 자동 진행)')
+    page.wait_for_function("() => !location.href.includes('nid.naver.com')", timeout=240000)
+    page.goto(landing, wait_until='domcontentloaded', timeout=60000)
+    return True
+
+
+def fetch_products_browser(store_id, category='ALL', landing_url=None, headless=True):
+    """실제 브라우저로 카테고리 페이지 DOM 을 긁어 상품 수집.
+
+    → [{'name','price','url','is_soldout'}]
+    """
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        raise RuntimeError(
+            'playwright 미설치. 먼저:\n    python3 -m pip install playwright\n'
+            '    python3 -m playwright install chromium')
+
+    landing = landing_url or f'{BASE}/{store_id}'
+    os.makedirs(PROFILE_DIR, exist_ok=True)
+    all_cards = {}
+    with sync_playwright() as p:
+        # 영속 프로필 — 한 번 로그인하면 쿠키가 남아 다음부터 자동 통과.
+        ctx = p.chromium.launch_persistent_context(
+            PROFILE_DIR, headless=headless, locale='ko-KR', user_agent=UA,
+            viewport={'width': 1280, 'height': 900})
+        page = ctx.pages[0] if ctx.pages else ctx.new_page()
+        page.goto(landing, wait_until='domcontentloaded', timeout=60000)
+        page.wait_for_timeout(1500)
+        _handle_login(page, landing, headless)
+
+        for cp in range(1, 11):
+            if cp > 1:
+                page.goto(_set_cp(landing, cp), wait_until='domcontentloaded', timeout=60000)
+                page.wait_for_timeout(1200)
+            if 'nid.naver.com' in page.url:
+                _handle_login(page, _set_cp(landing, cp), headless)
+            try:
+                page.wait_for_selector('a[href*="/products/"]', timeout=12000)
+            except Exception:
+                break
+            _scroll(page)
+            cards = page.evaluate(_DOM_JS)
+            new = 0
+            for c in cards:
+                if c['id'] not in all_cards:
+                    all_cards[c['id']] = c
+                    new += 1
+            print(f'  cp={cp}: 카드 {len(cards)}개 (신규 {new}, 누적 {len(all_cards)})')
+            if new == 0:
+                break
+        ctx.close()
+
     items, seen = [], set()
-    for c in cards:
+    for c in all_cards.values():
         name, price, soldout = _parse_card(c.get('text', ''))
         if not name or not price:
             continue
@@ -157,45 +161,12 @@ def _collect_via_dom(page, store_id, landing):
         seen.add(url)
         items.append({'name': name, 'price': normalize_price_1kg(name, price),
                       'url': url, 'is_soldout': soldout})
-    return items, f'DOM 파싱 {len(items)}개 (카드 {len(cards)}개)'
-
-
-def fetch_products_browser(store_id, category='ALL', landing_url=None, headless=True):
-    """실제 브라우저로 스토어 상품 수집 → [{'name','price','url','is_soldout'}]."""
-    try:
-        from playwright.sync_api import sync_playwright
-    except ImportError:
-        raise RuntimeError(
-            'playwright 미설치. 먼저:\n    python3 -m pip install playwright\n'
-            '    python3 -m playwright install chromium')
-
-    landing = landing_url or f'{BASE}/{store_id}'
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=headless)
-        ctx = browser.new_context(locale='ko-KR', user_agent=UA,
-                                  viewport={'width': 1280, 'height': 900})
-        page = ctx.new_page()
-        # 세션·쿠키 확립
-        page.goto(landing, wait_until='domcontentloaded', timeout=60000)
-        page.wait_for_timeout(2000)
-
-        raw, api_diag = _collect_via_api(page, store_id, category)
-        items = _map_api(raw, store_id)
-        print(f'  [API] {api_diag} → 생두추출 {len(items)}개')
-
-        dom_diag = '(건너뜀)'
-        if not items:
-            items, dom_diag = _collect_via_dom(page, store_id, landing)
-            print(f'  [DOM] {dom_diag}')
-        browser.close()
-
-    if not items:
-        raise RuntimeError(f'{store_id}: 수집 0개 — API:{api_diag} / DOM:{dom_diag}')
+    print(f'  DOM 수집: 상품 {len(items)}개 (카드 {len(all_cards)}개)')
     return items
 
 
 if __name__ == '__main__':
     sid = sys.argv[1] if len(sys.argv) > 1 else 'ruberroastery'
-    cat = sys.argv[2] if len(sys.argv) > 2 else 'ALL'
-    for it in fetch_products_browser(sid, cat, headless=False):
+    land = sys.argv[2] if len(sys.argv) > 2 else None
+    for it in fetch_products_browser(sid, landing_url=land, headless=False):
         print(f"  {it['price']}원 {'[품절]' if it['is_soldout'] else ''} {it['name'][:55]}  {it['url']}")

@@ -8,11 +8,12 @@
     python3 -m pip install playwright
     python3 -m playwright install chromium
 
-실행:
+실행(크롬 창이 뜸 — 최초 1회 네이버 로그인 필요):
     python3 scripts/update_smartstore_browser_local.py
 
-브라우저 창이 떠야 통과가 잘 되면(네이버가 headless 를 막으면):
-    HEADFUL=1 python3 scripts/update_smartstore_browser_local.py
+로그인 세션이 .pw-naver-profile 에 저장되므로, 이후에는 창에서 로그인할 필요가 없다.
+스케줄러 등에서 창 없이 돌리려면(로그인 쿠키가 이미 저장된 뒤에만):
+    HEADLESS=1 python3 scripts/update_smartstore_browser_local.py
 """
 import os
 import subprocess
@@ -25,7 +26,9 @@ sys.path.insert(0, os.path.join(ROOT, 'scrapers'))
 from naver_smartstore import save  # noqa: E402
 from naver_smartstore_browser import fetch_products_browser  # noqa: E402
 
-HEADLESS = os.environ.get('HEADFUL') != '1'
+# 기본은 창 띄움(headful) — 최초 1회 네이버 로그인이 필요하기 때문.
+# 로그인 쿠키가 저장된 뒤 HEADLESS=1 로 창 없이 돌릴 수 있다.
+HEADLESS = os.environ.get('HEADLESS') == '1'
 
 # (STORE, STORE_ID, category, ID_START, landing_url)
 TARGETS = [

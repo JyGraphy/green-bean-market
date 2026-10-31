@@ -1715,6 +1715,12 @@ function turningPoint(d) {
   return null;
 }
 
+/* 예전에 저장된 프로파일은 처음 열 때 그래프에서 찾은 터닝포인트를 프로파일에 한 번 저장한다 */
+async function persistTurningPoint(p) {
+  const { error } = await sb.from('roasting_profiles').update({ events: p.events }).eq('id', p.id);
+  if (error) console.warn('터닝포인트 저장 실패:', error.message);
+}
+
 /* 이벤트에 터닝포인트가 없으면 그래프에서 찾아 채운다 (차트 표시·저장용) */
 function fillTurningPoint(d) {
   if (!d.events) d.events = {};
@@ -1973,7 +1979,9 @@ function showDetail(p) {
   $('detailMeta').textContent = [p.seller, p.roaster, p.roast_date,
     p.ambient_temp!=null?`${p.ambient_temp}°C`:null,
     p.ambient_humidity!=null?`습도 ${p.ambient_humidity}%`:null].filter(Boolean).join(' · ');
+  const hadTp = p.events && p.events.tp != null;
   fillTurningPoint(p);
+  if (!hadTp && p.events.tp != null) persistTurningPoint(p);
   renderMetrics($('detailMetrics'), p);
   detailChartInstance = buildChart('detailChart', p.time_series||[], p.bt_series||[], p.et_series||[], p.agitation_series||[], p.ror||computeRoR(p.time_series||[], p.bt_series||[]), p.et_ror||[], p.events||{}, detailChartInstance);
 

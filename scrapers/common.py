@@ -156,7 +156,7 @@ def guess_process(name):
                             'giling','길링','세미워시','세미 워시','semi washed','semi-washed',
                             'wet polished','wet polish']): return '웻훌드'
     # 내추럴
-    if any(x in n for x in ['natural','내추럴','내츄럴','reposado','레포사도']): return '내추럴'
+    if any(x in n for x in ['natural','내추럴','내츄럴','네추럴','네츄럴','reposado','레포사도']): return '내추럴'
     # 워시드
     if any(x in n for x in ['washed','fully washed','fully-washed','워시드','워시','풀리워시',
                             'double washed','더블워시','수세식','습식']): return '워시드'

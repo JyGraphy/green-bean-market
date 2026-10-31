@@ -1,4 +1,4 @@
--- 자동 생성: 2026-10-31T00:27:07Z
+-- 자동 생성: 2026-10-31T15:56:44Z
 CREATE TABLE IF NOT EXISTS products (
   id INTEGER PRIMARY KEY,
   store TEXT NOT NULL,
@@ -1397,4 +1397,17 @@ INSERT INTO products (id,store,name,price,origin,region,process,notes,url,isNew,
   (981,'팔콘커피','Niguse Nare Murago, Niguse Nare Murago, Ethiopia |  Natural FSK-0103',33700,'에티오피아','아프리카','내추럴','','https://korea.falcon-micro.com/products/niguse-nare-murago-niguse-nare-murago-ethiopia-natural-fsk-0103',0,0,0,0,'2026-10-23'),
   (982,'팔콘커피','Kathima AB, Kathima AB, Kenya |  Washed FSK-0095',22680,'케냐','아프리카','워시드','','https://korea.falcon-micro.com/products/kathima-ab-kathima-ab-kenya-washed-fsk-0095',0,0,0,0,'2026-10-23'),
   (983,'팔콘커피','Gititu AB, Gititu AB, Kenya |  Washed FSK-0092',23540,'케냐','아프리카','워시드','','https://korea.falcon-micro.com/products/gititu-ab-gititu-ab-kenya-washed-fsk-0092',0,0,0,0,'2026-10-23'),
-  (984,'팔콘커피','Tegu AB, Tegu AB, Kenya |  Washed FSK-0089',24180,'케냐','아프리카','워시드','','https://korea.falcon-micro.com/products/tegu-ab-tegu-ab-kenya-washed-fsk-0089',0,0,0,0,'2026-10-23');
+  (984,'팔콘커피','Tegu AB, Tegu AB, Kenya |  Washed FSK-0089',24180,'케냐','아프리카','워시드','','https://korea.falcon-micro.com/products/tegu-ab-tegu-ab-kenya-washed-fsk-0089',0,0,0,0,'2026-10-23'),
+  (993,'루베르로스터리','[2026] 파나마 아시엔다 라 에스메랄다 SL-34 1NB (1KG)',230000,'파나마','중남미','알수없음','','https://smartstore.naver.com/ruberroastery/products/13703158960',1,0,1,1,'2026-10-31'),
+  (994,'루베르로스터리','[2026] 파나마 아시엔다 라 에스메랄다 푼다도르 게이샤 3NB (1KG)',480000,'파나마','중남미','알수없음','','https://smartstore.naver.com/ruberroastery/products/13703138936',1,0,1,0,'2026-10-31'),
+  (995,'루베르로스터리','[2026] 파나마 아시엔다 라 에스메랄다 아길라 게이샤 3FC (1KG)',530000,'파나마','중남미','알수없음','','https://smartstore.naver.com/ruberroastery/products/13703125295',1,0,1,0,'2026-10-31'),
+  (996,'루베르로스터리','[2026 뉴크롭 생두] 파나마 엘리다 로마 아리바 게이샤 DRD 네추럴 (1KG)',338000,'파나마','중남미','내추럴','','https://smartstore.naver.com/ruberroastery/products/13640309180',1,0,1,1,'2026-10-31'),
+  (997,'루베르로스터리','파나마 로스트 오리진 핀카 마야 게이샤 네추럴 193-345 (1KG)',630000,'파나마','중남미','내추럴','','https://smartstore.naver.com/ruberroastery/products/13566097605',0,0,1,1,'2026-10-31'),
+  (998,'루베르로스터리','파나마 로스트 오리진 갈레스 게이샤 게이샤 네추럴 197-349 (1KG)',630000,'파나마','중남미','내추럴','','https://smartstore.naver.com/ruberroastery/products/13566035838',0,0,1,1,'2026-10-31'),
+  (999,'루베르로스터리','파나마 로스트 오리진 갈레스 게이샤 게이샤 디펄프드 209-373 (1KG)',480000,'파나마','중남미','펄프드내추럴','','https://smartstore.naver.com/ruberroastery/products/13566020149',0,0,1,1,'2026-10-31'),
+  (1000,'루베르로스터리','파나마 로스트 오리진 갈레스 게이샤 게이샤 디펄프드 209-370 (1KG)',480000,'파나마','중남미','펄프드내추럴','','https://smartstore.naver.com/ruberroastery/products/13566002919',0,0,1,1,'2026-10-31'),
+  (1404,'루베르로스터리','파나마 로스트 오리진 부락 게이샤 네추럴 199-357 (1KG)',460000,'파나마','중남미','내추럴','','https://smartstore.naver.com/ruberroastery/products/13565979947',0,0,1,1,NULL),
+  (1421,'루베르로스터리','[2026] 파나마 에일라 365 게이샤 CRD 워시드 미라플로레스 015 생두 (1KG)',350000,'파나마','중남미','워시드','','https://smartstore.naver.com/ruberroastery/products/13432171936',1,0,1,1,'2026-06-26'),
+  (1422,'루베르로스터리','[2026] 파나마 에일라 365 게이샤 CRD 네추럴 미라플로레스 10 (1KG)',350000,'파나마','중남미','내추럴','','https://smartstore.naver.com/ruberroastery/products/13431758355',1,0,1,1,NULL),
+  (1423,'루베르로스터리','[2026] 파나마 마운틴 토투마스 카투아이 밀키웨이 Lot 18 (1KG)',120000,'파나마','중남미','알수없음','','https://smartstore.naver.com/ruberroastery/products/13408722175',1,0,1,1,NULL),
+  (1424,'루베르로스터리','[2026] 파나마 엘리다 아구아카테 센트로 게이샤 DRD 워시드 (1KG)',420000,'파나마','중남미','워시드','','https://smartstore.naver.com/ruberroastery/products/13403516597',1,0,1,1,NULL);

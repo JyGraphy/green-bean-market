@@ -29,22 +29,6 @@ PROFILE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 _LABELS = ('적립', '리뷰', '구매', '배송', '광고', '쿠폰', '할인', '찜', '관심',
            '브랜드', '스토어찜', '톡톡', 'BEST', 'NEW', '단독', '기획')
 
-_DOM_JS = r"""
-() => {
-  const out = [], seen = new Set();
-  document.querySelectorAll('a[href*="/products/"]').forEach(a => {
-    const m = (a.getAttribute('href') || '').match(/\/products\/(\d+)/);
-    if (!m) return;
-    const id = m[1];
-    if (seen.has(id)) return;
-    seen.add(id);
-    const card = a.closest('li') || a.closest('div') || a;
-    out.push({id, href: a.href.split('?')[0], text: (card.innerText || '').trim()});
-  });
-  return out;
-}
-"""
-
 
 def _parse_card(text):
     lines = [x.strip() for x in text.split('\n') if x.strip()]
@@ -76,10 +60,18 @@ def _set_cp(url, cp):
     return url + ('&' if '?' in url else '?') + f'cp={cp}'
 
 
+def _count_products(page):
+    """상품 링크 개수 — 로케이터 사용(eval 안 씀 → CSP 안전)."""
+    try:
+        return page.locator('a[href*="/products/"]').count()
+    except Exception:
+        return 0
+
+
 def _scroll(page):
     prev = -1
     for _ in range(25):
-        n = page.evaluate("() => document.querySelectorAll('a[href*=\"/products/\"]').length")
+        n = _count_products(page)
         if n == prev:
             break
         prev = n
@@ -87,19 +79,61 @@ def _scroll(page):
         page.wait_for_timeout(600)
 
 
-def _handle_login(page, landing, headless):
-    """로그인 창이면: headful 은 사용자가 로그인할 때까지 대기 후 복귀, headless 는 안내."""
+def _collect_cards(page):
+    """상품 카드를 로케이터로 수집 → [{id, href, text}]. page.evaluate(eval) 미사용.
+
+    네이버 일부 페이지는 CSP 로 unsafe-eval 을 막아 page.evaluate/wait_for_function 이
+    터진다. 그래서 selector 엔진·inner_text(프로토콜 기반, CSP 무관)만 쓴다.
+    """
+    anchors = page.locator('a[href*="/products/"]')
+    out, seen = [], set()
+    for i in range(anchors.count()):
+        a = anchors.nth(i)
+        href = a.get_attribute('href') or ''
+        m = re.search(r'/products/(\d+)', href)
+        if not m or m.group(1) in seen:
+            continue
+        pid = m.group(1)
+        seen.add(pid)
+        text = ''
+        for sel in ('xpath=ancestor::li[1]', 'xpath=ancestor::div[2]'):
+            try:
+                t = a.locator(sel).first.inner_text(timeout=800)
+                if t and t.strip():
+                    text = t.strip()
+                    break
+            except Exception:
+                pass
+        if not text:
+            try:
+                text = (a.inner_text(timeout=800) or '').strip()
+            except Exception:
+                text = ''
+        out.append({'id': pid, 'href': href.split('?')[0], 'text': text})
+    return out
+
+
+def _wait_leave_login(page, landing, headless):
+    """로그인 창이면 사용자가 로그인할 때까지 URL 을 폴링(wait_for_function 금지 — 로그인
+    페이지 CSP 가 eval 을 막아 터진다). headless 는 안내 후 중단."""
+    import time
     if 'nid.naver.com' not in page.url:
         return True
     if headless:
         raise RuntimeError(
             '네이버 로그인 창으로 막혔습니다. 최초 1회는 창을 띄워 로그인해야 합니다:\n'
-            '    HEADFUL=1 python3 scripts/update_smartstore_browser_local.py\n'
-            '뜬 크롬 창에서 네이버에 로그인하면 세션이 저장되어, 이후에는 자동으로 됩니다.')
-    print('  🔑 네이버 로그인 창이 떴습니다 — 열린 크롬 창에서 로그인해 주세요. '
-          '(최대 240초 대기, 로그인하면 자동 진행)')
-    page.wait_for_function("() => !location.href.includes('nid.naver.com')", timeout=240000)
+            '    python3 scripts/update_smartstore_browser_local.py  (창 모드)\n'
+            '뜬 크롬 창에서 네이버에 로그인하면 세션이 .pw-naver-profile 에 저장되어, '
+            '이후 자동 실행에서는 로그인이 필요 없습니다.')
+    print('  🔑 네이버 로그인 창이 떴습니다 — 열린 크롬 창에서 직접 로그인해 주세요. '
+          '(최대 300초 대기, 로그인되면 자동으로 이어집니다)')
+    start = time.monotonic()
+    while 'nid.naver.com' in page.url:
+        if time.monotonic() - start > 300:
+            raise RuntimeError('로그인 대기 300초 초과 — 로그인이 완료되지 않았습니다.')
+        page.wait_for_timeout(1500)
     page.goto(landing, wait_until='domcontentloaded', timeout=60000)
+    page.wait_for_timeout(1500)
     return True
 
 
@@ -142,20 +176,20 @@ def fetch_products_browser(store_id, category='ALL', landing_url=None, headless=
         page = ctx.pages[0] if ctx.pages else ctx.new_page()
         page.goto(landing, wait_until='domcontentloaded', timeout=60000)
         page.wait_for_timeout(1500)
-        _handle_login(page, landing, headless)
+        _wait_leave_login(page, landing, headless)
 
         for cp in range(1, 11):
             if cp > 1:
                 page.goto(_set_cp(landing, cp), wait_until='domcontentloaded', timeout=60000)
                 page.wait_for_timeout(1200)
             if 'nid.naver.com' in page.url:
-                _handle_login(page, _set_cp(landing, cp), headless)
+                _wait_leave_login(page, _set_cp(landing, cp), headless)
             try:
                 page.wait_for_selector('a[href*="/products/"]', timeout=12000)
             except Exception:
                 break
             _scroll(page)
-            cards = page.evaluate(_DOM_JS)
+            cards = _collect_cards(page)
             new = 0
             for c in cards:
                 if c['id'] not in all_cards:

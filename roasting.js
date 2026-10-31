@@ -729,7 +729,7 @@ function buildWizardFromParse(parse, extra) {
   const dtr = evTimes.fcs != null ? +(((dropT - evTimes.fcs) / dropT) * 100).toFixed(1) : null;
   const current = analyzeCurrentPoint(dropTemp, dtr, !!parse.fluidBed);
 
-  return {
+  return fillTurningPoint({
     bean_name:        $('fBeanName').value.trim() || parse.title || '',
     seller:           $('fSeller').value.trim(),
     roaster:          $('fRoaster').value.trim() || null,
@@ -744,7 +744,7 @@ function buildWizardFromParse(parse, extra) {
     events: evTimes,
     fluid_bed: !!parse.fluidBed, machine: parse.machine || null,
     target_series: targets,
-  };
+  });
 }
 
 /* wizardData → STEP 3 화면 렌더 (지표·차트·타겟·피드백) */
@@ -1268,6 +1268,7 @@ function generateProfile() {
     charge_weight: chargeWeight, drop_weight: dropWeight, weight_loss: weightLoss,
     events: evTimes,
   };
+  fillTurningPoint(wizardData);   // evTimes 와 같은 객체라 아래 차트에도 표시된다
 
   // 6) STEP 3 렌더
   renderMetrics($('metricsRow'), wizardData);
@@ -1363,6 +1364,8 @@ function analyzeCurrentPoint(dropTemp, dtr, fluidBed) {
 
 /* ════════ 지표 렌더 ════════ */
 function renderMetrics(el, d) {
+  const tp = turningPoint(d);
+  const tpCmp = tp && tpVersusBaseline(tp, d);
   const cards = [
     { label:'총 시간', value: fmtTime(d.total_time), unit:'',
       cls: d.fluid_bed
@@ -1371,6 +1374,8 @@ function renderMetrics(el, d) {
     { label:'DTR', value: d.dtr!=null? d.dtr.toFixed(1):'—', unit:'%',
       cls: d.dtr==null?'':d.dtr<dtrRange(pickBaseline(d))[0]?'bad':d.dtr>dtrRange(pickBaseline(d))[1]?'warn':'good' },
     { label:'투입온도', value: d.charge_temp ?? '—', unit:'°C', cls:'' },
+    ...(tp ? [{ label: tpLabel(tp), value: fmtTime(tp.t), unit: `${tp.temp.toFixed(1)}°C`,
+                cls: tpCmp ? (tpCmp.inRange ? 'good' : 'warn') : '' }] : []),
     { label: d.fluid_bed ? '배출(배기)' : '배출(BT)', value: d.drop_temp ?? '—', unit:'°C', cls:'' },
     ...(d.et_drop_temp != null ? [{ label:'배출(ET)', value: d.et_drop_temp, unit:'°C', cls:'' }] : []),
     ...(d.weight_loss != null ? [{ label:'무게 손실률', value: d.weight_loss.toFixed(1), unit:'%',
@@ -1689,6 +1694,48 @@ function curveShape(d, base) {
   };
 }
 
+/* 터닝포인트: 투입 후 150초 안에서 온도가 가장 낮은 지점 (기준선 curveShape 와 같은 정의).
+   S7X 는 원두 표면(IR)이 투입 직후 꺾이지 않아 내부 온도로 잰다.
+   데이터 파일·앱 화면에 표시된 TP 가 있으면 그 시각을 쓰고, 없으면 그래프에서 찾는다.
+   그래프가 투입 뒤부터 시작해 꺾임이 안 보이면(투입 시점보다 1°C 이상 낮아지지 않으면) 없음. */
+function turningPoint(d) {
+  const t = d.time_series || [], bt = d.bt_series || [];
+  if (bt.length < 5) return null;
+  const base = pickBaseline(d);
+  const onEt = base.tpOn === 'et' && (d.et_series || []).length === bt.length;
+  const src = onEt ? d.et_series : bt;
+  const end = d.total_time || t[t.length - 1];
+  const marked = d.events && d.events.tp != null ? +d.events.tp : null;
+  if (marked > 0 && marked < end) {
+    const temp = interp(t.map((x, i) => ({ t: x, bt: src[i] })), marked);
+    return { t: marked, temp: +temp.toFixed(1), onEt, base, from: 'marker' };
+  }
+  const s = curveShape(d, base);
+  if (s && s.tpT > 0 && src[0] - s.tpBt >= 1) return { t: s.tpT, temp: +(+s.tpBt).toFixed(1), onEt, base, from: 'curve' };
+  return null;
+}
+
+/* 이벤트에 터닝포인트가 없으면 그래프에서 찾아 채운다 (차트 표시·저장용) */
+function fillTurningPoint(d) {
+  if (!d.events) d.events = {};
+  if (d.events.tp == null) {
+    const tp = turningPoint(d);
+    if (tp) d.events.tp = tp.t;
+  }
+  return d;
+}
+
+function tpLabel(tp) { return tp.onEt ? '터닝포인트(내부)' : '터닝포인트'; }
+
+/* 기기·배치별 실측 범위(P5~P95)와 비교: { inRange, late, early, low, high } — 기준이 없으면 null */
+function tpVersusBaseline(tp, d) {
+  const b = tp.base;
+  if (!b.n || !b.tpT || !b.tpBt || d.fluid_bed) return null;
+  const r = { late: tp.t > b.tpT[2], early: tp.t < b.tpT[0], low: tp.temp < b.tpBt[0], high: tp.temp > b.tpBt[2] };
+  r.inRange = !r.late && !r.early && !r.low && !r.high;
+  return r;
+}
+
 function dtrRange(base) {
   return [Math.max(base.dtr[0], DTR_ABS_MIN), base.dtr[2]];
 }
@@ -1756,6 +1803,38 @@ function comprehensiveAnalysis(d) {
   } else {
     items.push({type:'info', icon:'', title:'DTR 미계산', _fcsInput: true,
       text:'1차 크랙 시작 시간을 입력하면 DTR을 바로 계산합니다.'});
+  }
+
+  // 터닝포인트 — 그래프에서 찾은 최저점을 기기·배치별 실측 범위와 비교
+  const tp = turningPoint(d);
+  if (tp) {
+    const cmp = tpVersusBaseline(tp, d);
+    const title = `${tpLabel(tp)} ${fmtTime(tp.t)} · ${tp.temp.toFixed(1)}°C`;
+    const how = tp.onEt ? ' 원두 표면(IR)은 투입 직후 꺾이지 않아 내부 온도로 잽니다.' : '';
+    if (!cmp) {
+      items.push({ type:'info', icon:'', title,
+        text:`투입 후 온도가 가장 낮아진 지점입니다.${how} ${d.fluid_bed ? '열풍식은 실측 기준이 아직 없어 판정하지 않습니다. 같은 프로파일끼리 비교해 투입 조건이 일정한지 확인하세요.' : ''}` });
+    } else {
+      const b = tp.base;
+      const rng = `${b.label} 실측 범위(시각 ${fmtTime(b.tpT[0])}~${fmtTime(b.tpT[2])}, 온도 ${b.tpBt[0]}~${b.tpBt[2]}°C)`;
+      const offs = [cmp.late && '시각이 늦음', cmp.early && '시각이 이름', cmp.low && '온도가 낮음', cmp.high && '온도가 높음'].filter(Boolean);
+      const tw = cmp.late ? ['늦고', '늦습니다'] : cmp.early ? ['이르고', '이릅니다'] : null;
+      const vw = cmp.low ? '낮습니다' : cmp.high ? '높습니다' : null;
+      const said = tw && vw ? `시각이 ${tw[0]} 온도가 ${vw}` : tw ? `시각이 ${tw[1]}` : `온도가 ${vw}`;
+      const slow = cmp.late || cmp.low, fast = cmp.early || cmp.high;
+      if (cmp.inRange)
+        items.push({ type:'good', icon:'', title: `${title} — 정상 범위`,
+          text:`${rng} 안입니다 (중앙값 ${fmtTime(b.tpT[1])} · ${b.tpBt[1]}°C).${how}` });
+      else if (slow && !fast)
+        items.push({ type:'warn', icon:'', title: `${title} — ${offs.join(', ')}`,
+          text:`${rng}보다 ${said}. 투입온도가 낮거나 배치가 커서 콩이 초반 열을 늦게 받았을 수 있습니다. 건조 구간이 길어지기 쉬우니 투입온도나 초반 화력을 점검하세요.${how}` });
+      else if (fast && !slow)
+        items.push({ type:'warn', icon:'', title: `${title} — ${offs.join(', ')}`,
+          text:`${rng}보다 ${said}. 투입온도가 높거나 배치가 작아 콩이 빠르게 열을 받았습니다. 초반 표면 그을림(티핑)과 과한 승온에 주의하세요.${how}` });
+      else
+        items.push({ type:'info', icon:'', title: `${title} — ${offs.join(', ')}`,
+          text:`${rng}과 비교해 ${said}. 시각과 온도가 서로 반대 방향으로 벗어나 프로브 위치나 배치 크기가 기준과 다를 수 있습니다. 같은 로스터의 이전 배치와 비교해 보세요.${how}` });
+    }
   }
 
   // 페이즈 비율
@@ -1894,6 +1973,7 @@ function showDetail(p) {
   $('detailMeta').textContent = [p.seller, p.roaster, p.roast_date,
     p.ambient_temp!=null?`${p.ambient_temp}°C`:null,
     p.ambient_humidity!=null?`습도 ${p.ambient_humidity}%`:null].filter(Boolean).join(' · ');
+  fillTurningPoint(p);
   renderMetrics($('detailMetrics'), p);
   detailChartInstance = buildChart('detailChart', p.time_series||[], p.bt_series||[], p.et_series||[], p.agitation_series||[], p.ror||computeRoR(p.time_series||[], p.bt_series||[]), p.et_ror||[], p.events||{}, detailChartInstance);
 
@@ -2015,6 +2095,12 @@ function sameBeanAnalysis(d) {
   for (const [k, r] of Object.entries(RULE_DELTA)) delta[k] = r.get(d, ref);
   const parts = Object.entries(RULE_DELTA).filter(([k]) => delta[k] != null)
     .map(([k, r]) => `${{ drop_bt: '배출', dtr: 'DTR', total_min: '총 시간' }[k]} ${signed(delta[k] * (r.scale || 1), r.nd)}${r.unit}`);
+  const tpNow = turningPoint(d);
+  const tpPrev = recent.map(turningPoint).filter(Boolean);
+  if (tpNow && tpPrev.length) {
+    const mt = RoastBrain.median(tpPrev.map(x => x.t)), mT = RoastBrain.median(tpPrev.map(x => x.temp));
+    parts.push(`터닝포인트 ${signed(tpNow.t - mt, 0)}초 · ${signed(tpNow.temp - mT)}°C`);
+  }
   items.push({ type: 'info', icon: '', title: `같은 생두 이전 ${recent.length}배치와 비교`,
     text: parts.length ? `이전 배치 중앙값 대비 ${parts.join(' · ')}.` : '비교할 수치가 아직 없습니다.' });
 

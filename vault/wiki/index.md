@@ -2,7 +2,7 @@
 
 _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0) · 2026-10-31_
 
-정리된 주제 **6개** · 원본 문서 **223건**
+정리된 주제 **6개** · 원본 문서 **227건**
 
 ---
 
@@ -96,6 +96,7 @@ _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0
 - [[2026-10-05-품종-기초이론]] — 커피 품종 기초이론 — 종(species)·계통(lineage)·분류체계 (검색요약 기반)
 - [[2026-10-09-품종도감]] — 커피 품종 도감 — 품종을 처음 보는 사람을 위한 계보와 설명
 - [[2026-10-17-로스팅-사전조사]] — 로스팅 사전조사 — 무엇을 공부할지 먼저 정하는 문서  ⚠️ _wiki에서 참조되지 않음_
+- [[2026-10-31-블렌딩-리서치]] — 블렌딩 리서치 — 로스터는 무엇을 가장 신경 쓰고, 어떤 배합을 쓰나  ⚠️ _wiki에서 참조되지 않음_
 - [[_리딩리스트]] — 커피 논문 리딩 리스트 (본문 접근이 열리면 정독할 후보)
 - [[_수집대기]] — 📥 논문 전문 수집 대기열  ⚠️ _wiki에서 참조되지 않음_
 
@@ -209,10 +210,13 @@ _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0
 - [[2026-10-20-AI학습현황]] — 로스팅 AI 학습 현황  ⚠️ _wiki에서 참조되지 않음_
 - [[2026-10-26-AI학습현황]] — 로스팅 AI 학습 현황  ⚠️ _wiki에서 참조되지 않음_
 - [[2026-10-27-AI학습현황]] — 로스팅 AI 학습 현황  ⚠️ _wiki에서 참조되지 않음_
+- [[2026-10-27-판독벤치마크]] — 로스팅 AI 판독 벤치마크  ⚠️ _wiki에서 참조되지 않음_
 - [[2026-10-28-AI학습현황]] — 로스팅 AI 학습 현황  ⚠️ _wiki에서 참조되지 않음_
 - [[2026-10-29-AI학습현황]] — 로스팅 AI 학습 현황  ⚠️ _wiki에서 참조되지 않음_
 - [[2026-10-30-AI학습현황]] — 로스팅 AI 학습 현황  ⚠️ _wiki에서 참조되지 않음_
+- [[2026-10-30-판단두뇌-실험]] — 로스팅 판단 두뇌(자체 모델) 첫 실험  ⚠️ _wiki에서 참조되지 않음_
 - [[2026-10-31-AI학습현황]] — 로스팅 AI 학습 현황  ⚠️ _wiki에서 참조되지 않음_
+- [[2026-10-31-판단두뇌]] — 로스팅 판단 두뇌 주간 학습  ⚠️ _wiki에서 참조되지 않음_
 - [[_수집대기]] — 📥 로스터기 자료 수집 대기열  ⚠️ _wiki에서 참조되지 않음_
 - [[_출처카탈로그]] — 로스팅 프로파일 출처 카탈로그 (SOURCES.md)
 
@@ -228,7 +232,7 @@ _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0
 
 ## ⚠️ 정리 대기
 
-아래 192건은 아직 wiki에 반영되지 않았습니다.
+아래 196건은 아직 wiki에 반영되지 않았습니다.
 정리하려면 Claude에게 다음처럼 지시하세요:
 
 ```
@@ -288,6 +292,7 @@ vault/raw의 아래 문서를 읽고 vault/CLAUDE.md 규칙대로 wiki로 정리
   - raw/auctions/2026-10-31-coe-전체랏.md
   - raw/auctions/2026-10-31-lamastus-전체랏.md
   - raw/papers/2026-10-17-로스팅-사전조사.md
+  - raw/papers/2026-10-31-블렌딩-리서치.md
   - raw/papers/_수집대기.md
   - raw/papers/fulltext/PMC10305520-Chemical-and-Biological-Characterization-of-Green-and-Proces.md
   - raw/papers/fulltext/PMC11002029-The-effect-of-roast-profiles-on-the-dynamics-of-titratable-a.md
@@ -395,10 +400,13 @@ vault/raw의 아래 문서를 읽고 vault/CLAUDE.md 규칙대로 wiki로 정리
   - raw/roast-profiles/2026-10-20-AI학습현황.md
   - raw/roast-profiles/2026-10-26-AI학습현황.md
   - raw/roast-profiles/2026-10-27-AI학습현황.md
+  - raw/roast-profiles/2026-10-27-판독벤치마크.md
   - raw/roast-profiles/2026-10-28-AI학습현황.md
   - raw/roast-profiles/2026-10-29-AI학습현황.md
   - raw/roast-profiles/2026-10-30-AI학습현황.md
+  - raw/roast-profiles/2026-10-30-판단두뇌-실험.md
   - raw/roast-profiles/2026-10-31-AI학습현황.md
+  - raw/roast-profiles/2026-10-31-판단두뇌.md
   - raw/roast-profiles/_수집대기.md
   - raw/roast-profiles/machines/easyster-800.md
   - raw/roast-profiles/machines/roest.md

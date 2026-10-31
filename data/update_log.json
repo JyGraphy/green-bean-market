@@ -1,14 +1,10 @@
 {
-  "updated_at": "2026-10-31T00:27:07Z",
+  "updated_at": "2026-10-31T15:56:44Z",
   "stores": [
     {
-      "name": "지에스씨(GSC)",
-      "new_count": 3
-    },
-    {
-      "name": "코빈즈커피",
-      "new_count": 1
+      "name": "루베르로스터리",
+      "new_count": 8
     }
   ],
-  "total_new": 4
+  "total_new": 8
 }

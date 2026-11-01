@@ -117,28 +117,57 @@ def _collect_cards(page):
     return out
 
 
-def _wait_leave_login(page, landing, headless):
-    """로그인 창이면 사용자가 로그인할 때까지 URL 을 폴링(wait_for_function 금지 — 로그인
-    페이지 CSP 가 eval 을 막아 터진다). headless 는 안내 후 중단."""
+def _live_page(ctx, page):
+    """현재 page 가 닫혔으면 컨텍스트에서 살아있는 다른 탭을 집어 반환(로그인 중 창 교체 대응)."""
+    try:
+        if page and not page.is_closed():
+            return page
+    except Exception:
+        pass
+    live = [q for q in ctx.pages if not q.is_closed()]
+    return live[-1] if live else None
+
+
+def _page_url(page):
+    try:
+        return page.url
+    except Exception:
+        return ''
+
+
+def _wait_leave_login(ctx, page, landing, headless):
+    """로그인 창이면 사용자가 로그인할 때까지 URL 을 폴링. 로그인 과정에서 탭이 닫히거나
+    바뀌어도(TargetClosed) 살아있는 탭으로 복구한다. 성공 시 사용할 page 를 반환."""
     import time
-    if 'nid.naver.com' not in page.url:
-        return True
+    page = _live_page(ctx, page)
+    if page is None:
+        raise RuntimeError('브라우저 창이 닫혔습니다 — 다시 실행해 주세요.')
+    if 'nid.naver.com' not in _page_url(page):
+        return page
     if headless:
         raise RuntimeError(
-            '네이버 로그인 창으로 막혔습니다. 최초 1회는 창을 띄워 로그인해야 합니다:\n'
-            '    python3 scripts/update_smartstore_browser_local.py  (창 모드)\n'
-            '뜬 크롬 창에서 네이버에 로그인하면 세션이 .pw-naver-profile 에 저장되어, '
-            '이후 자동 실행에서는 로그인이 필요 없습니다.')
+            '네이버 로그인 창으로 막혔습니다(headless). 최초 1회는 창 모드로 로그인해야 합니다:\n'
+            '    python3 scripts/update_smartstore_browser_local.py\n'
+            '창에서 네이버에 로그인하면 세션이 .pw-naver-profile 에 저장되어 이후 자동 실행됩니다.')
     print('  🔑 네이버 로그인 창이 떴습니다 — 열린 크롬 창에서 직접 로그인해 주세요. '
-          '(최대 300초 대기, 로그인되면 자동으로 이어집니다)')
+          '(최대 300초 대기, 창을 닫지 말고 로그인만 완료하면 자동으로 이어집니다)')
     start = time.monotonic()
-    while 'nid.naver.com' in page.url:
+    while True:
+        page = _live_page(ctx, page)
+        if page is None:
+            raise RuntimeError('로그인 중 브라우저 창이 닫혔습니다 — 창을 닫지 말고 다시 실행해 주세요.')
+        url = _page_url(page)
+        if url and 'nid.naver.com' not in url:
+            break
         if time.monotonic() - start > 300:
             raise RuntimeError('로그인 대기 300초 초과 — 로그인이 완료되지 않았습니다.')
-        page.wait_for_timeout(1500)
+        try:
+            page.wait_for_timeout(1500)
+        except Exception:
+            time.sleep(1.5)
     page.goto(landing, wait_until='domcontentloaded', timeout=60000)
     page.wait_for_timeout(1500)
-    return True
+    return page
 
 
 def fetch_products_browser(store_id, category='ALL', landing_url=None, headless=True):
@@ -158,12 +187,19 @@ def fetch_products_browser(store_id, category='ALL', landing_url=None, headless=
     all_cards = {}
     with sync_playwright() as p:
         # 영속 프로필 — 한 번 로그인하면 쿠키가 남아 다음부터 자동 통과.
-        ctx = p.chromium.launch_persistent_context(
-            PROFILE_DIR, headless=headless, locale='ko-KR', user_agent=UA,
+        # 실제 Google Chrome(channel='chrome')을 우선 쓴다 — 번들 Chromium 보다 봇
+        # 탐지를 훨씬 덜 당하고 네이버 로그인 세션이 오래 유지된다. 없으면 Chromium 폴백.
+        launch_kwargs = dict(
+            headless=headless, locale='ko-KR', user_agent=UA,
             timezone_id='Asia/Seoul', viewport={'width': 1280, 'height': 900},
-            # 자동화 탐지 회피 1: AutomationControlled 플래그 끄기
             args=['--disable-blink-features=AutomationControlled',
                   '--no-sandbox', '--disable-dev-shm-usage'])
+        try:
+            ctx = p.chromium.launch_persistent_context(PROFILE_DIR, channel='chrome',
+                                                       **launch_kwargs)
+        except Exception as e:
+            print(f'  (실제 Chrome 사용 불가 → 번들 Chromium 으로 진행: {type(e).__name__})')
+            ctx = p.chromium.launch_persistent_context(PROFILE_DIR, **launch_kwargs)
         # 자동화 탐지 회피 2: navigator.webdriver 등 봇 지문 제거(스텔스).
         # 네이버가 이 지문으로 자동 브라우저를 로그인 창으로 튕긴다 — 사람처럼 위장한다.
         ctx.add_init_script("""
@@ -180,14 +216,14 @@ def fetch_products_browser(store_id, category='ALL', landing_url=None, headless=
         page = ctx.pages[0] if ctx.pages else ctx.new_page()
         page.goto(landing, wait_until='domcontentloaded', timeout=60000)
         page.wait_for_timeout(1500)
-        _wait_leave_login(page, landing, headless)
+        page = _wait_leave_login(ctx, page, landing, headless)
 
         for cp in range(1, 11):
             if cp > 1:
                 page.goto(_set_cp(landing, cp), wait_until='domcontentloaded', timeout=60000)
                 page.wait_for_timeout(1200)
-            if 'nid.naver.com' in page.url:
-                _wait_leave_login(page, _set_cp(landing, cp), headless)
+            if 'nid.naver.com' in _page_url(page):
+                page = _wait_leave_login(ctx, page, _set_cp(landing, cp), headless)
             try:
                 page.wait_for_selector('a[href*="/products/"]', timeout=12000)
             except Exception:

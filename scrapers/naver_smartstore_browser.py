@@ -18,6 +18,7 @@ CI(데이터센터 IP)는 브라우저로도 막히므로 로컬 전용.
 import os
 import re
 import sys
+from urllib.parse import urljoin
 
 from naver_smartstore import normalize_price_1kg  # noqa: E402
 
@@ -109,7 +110,10 @@ def _collect_cards(page):
                 text = (a.inner_text(timeout=800) or '').strip()
             except Exception:
                 text = ''
-        out.append({'id': pid, 'href': href.split('?')[0], 'text': text})
+        # href 가 상대경로(/store/products/..)면 절대경로로 — 검증 게이트가 상대경로 url 을
+        # 차단한다(클릭 시 우리 도메인으로 해석돼 403). urljoin 으로 BASE 를 붙인다.
+        abs_href = urljoin(BASE + '/', href).split('?')[0]
+        out.append({'id': pid, 'href': abs_href, 'text': text})
     return out
 
 

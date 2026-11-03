@@ -52,6 +52,61 @@
      "tp_err": null
     }
    }
+  },
+  {
+   "date": "2026-11-03",
+   "code": "a951fed",
+   "prompt": "ecc5c48a7f63",
+   "cases": 18,
+   "reanalyzed": 18,
+   "ai_cached": 0,
+   "groups": {
+    "holdout:boost_web": {
+     "n": 8,
+     "pixel_ok": 8,
+     "bt_mae": 0.2,
+     "bt_max": 0.68,
+     "et_mae": 0.16,
+     "ror_mae": 0.38,
+     "agit_match": 100.0,
+     "anchor_mae": null,
+     "ai_bt_mae": 9.2,
+     "ai_ror_mae": 5.24,
+     "drop_t_err": 0.0,
+     "drop_temp_err": 0.0,
+     "tp_err": 0.0
+    },
+    "tuned:boost_web": {
+     "n": 9,
+     "pixel_ok": 9,
+     "bt_mae": 0.18,
+     "bt_max": 0.51,
+     "et_mae": 0.17,
+     "ror_mae": 0.33,
+     "agit_match": 100.0,
+     "anchor_mae": null,
+     "ai_bt_mae": 4.57,
+     "ai_ror_mae": 4.36,
+     "drop_t_err": 0,
+     "drop_temp_err": 0,
+     "tp_err": 0
+    },
+    "tuned:ikawa_app": {
+     "n": 1,
+     "pixel_ok": 1,
+     "bt_mae": null,
+     "bt_max": null,
+     "et_mae": null,
+     "ror_mae": null,
+     "agit_match": null,
+     "anchor_mae": 0.16,
+     "ai_bt_mae": null,
+     "ai_ror_mae": null,
+     "drop_t_err": 0,
+     "drop_temp_err": 0,
+     "tp_err": null
+    }
+   }
   }
  ]
 }

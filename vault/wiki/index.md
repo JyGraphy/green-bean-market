@@ -1,8 +1,8 @@
 # 📚 생두마켓 세컨드 브레인
 
-_이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0) · 2026-11-02_
+_이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0) · 2026-11-03_
 
-정리된 주제 **6개** · 원본 문서 **233건**
+정리된 주제 **6개** · 원본 문서 **238건**
 
 ---
 
@@ -187,6 +187,7 @@ _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0
 - [[2026-10-31-사이트점검]] — 사이트 자가 점검 — 2026-10-31  ⚠️ _wiki에서 참조되지 않음_
 - [[2026-11-01-사이트점검]] — 사이트 자가 점검 — 2026-11-01  ⚠️ _wiki에서 참조되지 않음_
 - [[2026-11-02-사이트점검]] — 사이트 자가 점검 — 2026-11-02  ⚠️ _wiki에서 참조되지 않음_
+- [[2026-11-03-사이트점검]] — 사이트 자가 점검 — 2026-11-03  ⚠️ _wiki에서 참조되지 않음_
 
 ### 🔥 로스팅 프로파일 `raw/roast-profiles/`
 
@@ -223,6 +224,10 @@ _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0
 - [[2026-10-31-AI학습현황]] — 로스팅 AI 학습 현황  ⚠️ _wiki에서 참조되지 않음_
 - [[2026-10-31-판단두뇌]] — 로스팅 판단 두뇌 주간 학습  ⚠️ _wiki에서 참조되지 않음_
 - [[2026-11-02-AI학습현황]] — 로스팅 AI 학습 현황  ⚠️ _wiki에서 참조되지 않음_
+- [[2026-11-03-AI학습현황]] — 로스팅 AI 학습 현황  ⚠️ _wiki에서 참조되지 않음_
+- [[2026-11-03-실사용피드백]] — 로스팅 AI 실사용 피드백 학습  ⚠️ _wiki에서 참조되지 않음_
+- [[2026-11-03-판단두뇌]] — 로스팅 판단 두뇌 주간 학습  ⚠️ _wiki에서 참조되지 않음_
+- [[2026-11-03-판독벤치마크]] — 로스팅 AI 판독 벤치마크  ⚠️ _wiki에서 참조되지 않음_
 - [[_수집대기]] — 📥 로스터기 자료 수집 대기열  ⚠️ _wiki에서 참조되지 않음_
 - [[_출처카탈로그]] — 로스팅 프로파일 출처 카탈로그 (SOURCES.md)
 
@@ -238,7 +243,7 @@ _이 목차는 `scripts/build_wiki_index.py`가 자동 생성합니다 (토큰 0
 
 ## ⚠️ 정리 대기
 
-아래 202건은 아직 wiki에 반영되지 않았습니다.
+아래 207건은 아직 wiki에 반영되지 않았습니다.
 정리하려면 Claude에게 다음처럼 지시하세요:
 
 ```
@@ -387,6 +392,7 @@ vault/raw의 아래 문서를 읽고 vault/CLAUDE.md 규칙대로 wiki로 정리
   - raw/qa/2026-10-31-사이트점검.md
   - raw/qa/2026-11-01-사이트점검.md
   - raw/qa/2026-11-02-사이트점검.md
+  - raw/qa/2026-11-03-사이트점검.md
   - raw/roast-profiles/2026-08-05-AI학습현황.md
   - raw/roast-profiles/2026-08-19-AI학습현황.md
   - raw/roast-profiles/2026-08-23-AI학습현황.md
@@ -419,6 +425,10 @@ vault/raw의 아래 문서를 읽고 vault/CLAUDE.md 규칙대로 wiki로 정리
   - raw/roast-profiles/2026-10-31-AI학습현황.md
   - raw/roast-profiles/2026-10-31-판단두뇌.md
   - raw/roast-profiles/2026-11-02-AI학습현황.md
+  - raw/roast-profiles/2026-11-03-AI학습현황.md
+  - raw/roast-profiles/2026-11-03-실사용피드백.md
+  - raw/roast-profiles/2026-11-03-판단두뇌.md
+  - raw/roast-profiles/2026-11-03-판독벤치마크.md
   - raw/roast-profiles/_수집대기.md
   - raw/roast-profiles/machines/easyster-800.md
   - raw/roast-profiles/machines/roest.md

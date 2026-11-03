@@ -1,60 +1,60 @@
 {
-  "checked_at": "2026-11-02T00:16:48Z",
-  "targets": 190,
-  "filled": 182,
+  "checked_at": "2026-11-03T03:17:31Z",
+  "targets": 173,
+  "filled": 165,
   "removed_dead": 0,
   "filled_by": {
     "디카페인": 18,
-    "워시드": 87,
-    "내추럴": 23,
+    "워시드": 85,
+    "펄프드내추럴": 6,
+    "내추럴": 8,
     "웻훌드": 5,
     "무산소발효": 40,
-    "허니": 4,
-    "펄프드내추럴": 5
+    "허니": 3
   },
   "held_stores": [],
   "timing": {
-    "elapsed_sec": 110.7,
-    "requests": 190,
+    "elapsed_sec": 96.6,
+    "requests": 173,
     "slowest_domains": [
       {
         "domain": "comansa.kr",
-        "sec": 110.7,
-        "count": 57
-      },
-      {
-        "domain": "www.gsc.coffee",
-        "sec": 74.8,
-        "count": 35
+        "sec": 96.6,
+        "count": 58
       },
       {
         "domain": "www.micoffee.co.kr",
-        "sec": 66.0,
-        "count": 37
+        "sec": 63.9,
+        "count": 36
+      },
+      {
+        "domain": "www.gsc.coffee",
+        "sec": 63.1,
+        "count": 34
       },
       {
         "domain": "coffeeplant.co.kr",
-        "sec": 31.5,
+        "sec": 26.3,
         "count": 19
       },
       {
-        "domain": "www.cobeans.com",
-        "sec": 18.1,
-        "count": 16
-      },
-      {
         "domain": "kapkawa.com",
-        "sec": 12.7,
+        "sec": 11.7,
         "count": 10
       },
       {
         "domain": "momos.co.kr",
-        "sec": 9.1,
+        "sec": 7.2,
+        "count": 4
+      },
+      {
+        "domain": "mayforest.kr",
+        "sec": 5.0,
         "count": 4
       },
       {
         "domain": "smartstore.naver.com",
-        "sec": 5.7,
+        "sec": 4.9,
         "count": 7
       }
     ]

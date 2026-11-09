@@ -5898,21 +5898,6 @@
     {
       "id": 206,
       "store": "엠아이커피",
-      "name": "[ 500g 한정 판매]콜롬비아 세로 아줄 게이샤 나폴레옹",
-      "price": 215000,
-      "origin": "콜롬비아",
-      "region": "중남미",
-      "process": "펄프드내추럴",
-      "notes": "",
-      "url": "https://www.micoffee.co.kr/goods/goods_view.php?goodsNo=1000007515",
-      "is_new": false,
-      "is_decaf": false,
-      "is_special": true,
-      "is_soldout": false
-    },
-    {
-      "id": 207,
-      "store": "엠아이커피",
       "name": "브라질 산타루시아 내추럴",
       "price": 45000,
       "origin": "브라질",
@@ -5926,7 +5911,7 @@
       "is_soldout": true
     },
     {
-      "id": 208,
+      "id": 207,
       "store": "엠아이커피",
       "name": "브라질 산타루시아 펄프드 내추럴",
       "price": 45000,
@@ -5941,7 +5926,7 @@
       "is_soldout": true
     },
     {
-      "id": 209,
+      "id": 208,
       "store": "엠아이커피",
       "name": "콜롬비아 수프리모 후일라",
       "price": 19000,
@@ -5956,7 +5941,7 @@
       "is_soldout": false
     },
     {
-      "id": 210,
+      "id": 209,
       "store": "엠아이커피",
       "name": "브라질 산타이네스 내추럴",
       "price": 45000,
@@ -5971,7 +5956,7 @@
       "is_soldout": true
     },
     {
-      "id": 211,
+      "id": 210,
       "store": "엠아이커피",
       "name": "브라질 산타이네스 펄프드 내추럴",
       "price": 45000,
@@ -5986,7 +5971,7 @@
       "is_soldout": true
     },
     {
-      "id": 212,
+      "id": 211,
       "store": "엠아이커피",
       "name": "콜롬비아 안티오키아 라 수이사",
       "price": 21000,
@@ -6001,7 +5986,7 @@
       "is_soldout": false
     },
     {
-      "id": 213,
+      "id": 212,
       "store": "엠아이커피",
       "name": "콜롬비아 엑셀소 디카페인",
       "price": 25500,
@@ -6016,7 +6001,7 @@
       "is_soldout": false
     },
     {
-      "id": 214,
+      "id": 213,
       "store": "엠아이커피",
       "name": "페루 엘 라우렐 핑크 버번 워시드",
       "price": 35000,
@@ -6031,7 +6016,7 @@
       "is_soldout": false
     },
     {
-      "id": 215,
+      "id": 214,
       "store": "엠아이커피",
       "name": "[2026 카페쇼]페루 엘 세드로 게이샤 워시드",
       "price": 88000,
@@ -6046,7 +6031,7 @@
       "is_soldout": false
     },
     {
-      "id": 216,
+      "id": 215,
       "store": "엠아이커피",
       "name": "페루 라 리마 게이샤 워시드",
       "price": 90000,
@@ -6061,7 +6046,7 @@
       "is_soldout": false
     },
     {
-      "id": 217,
+      "id": 216,
       "store": "엠아이커피",
       "name": "콜롬비아 라스 마가리타스 CGLE-17 워시드",
       "price": 105000,
@@ -6076,13 +6061,13 @@
       "is_soldout": false
     },
     {
-      "id": 218,
+      "id": 217,
       "store": "엠아이커피",
       "name": "콜롬비아 세로 아줄 게이샤 나폴레옹",
       "price": 430000,
       "origin": "콜롬비아",
       "region": "중남미",
-      "process": "펄프드내추럴",
+      "process": "허니",
       "notes": "",
       "url": "https://www.micoffee.co.kr/goods/goods_view.php?goodsNo=1000007335",
       "is_new": false,
@@ -6091,22 +6076,7 @@
       "is_soldout": false
     },
     {
-      "id": 219,
-      "store": "엠아이커피",
-      "name": "[신규입고]콜롬비아 엘 엔칸토 카투라 워시드 룰로",
-      "price": 45000,
-      "origin": "콜롬비아",
-      "region": "중남미",
-      "process": "워시드",
-      "notes": "",
-      "url": "https://www.micoffee.co.kr/goods/goods_view.php?goodsNo=1000007471",
-      "is_new": false,
-      "is_decaf": false,
-      "is_special": false,
-      "is_soldout": false
-    },
-    {
-      "id": 220,
+      "id": 218,
       "store": "엠아이커피",
       "name": "콜롬비아 엘 엔칸토 카투라 워시드 스트로베리",
       "price": 45000,
@@ -6121,7 +6091,7 @@
       "is_soldout": false
     },
     {
-      "id": 221,
+      "id": 219,
       "store": "엠아이커피",
       "name": "[2025 Brazil COE Washed & Honey #5] 브라질 카나스트라 아라라 허니",
       "price": 73000,
@@ -6136,7 +6106,7 @@
       "is_soldout": false
     },
     {
-      "id": 222,
+      "id": 220,
       "store": "엠아이커피",
       "name": "브라질 세하도 17/18 NY2 FC",
       "price": 17000,
@@ -6151,7 +6121,7 @@
       "is_soldout": false
     },
     {
-      "id": 223,
+      "id": 221,
       "store": "엠아이커피",
       "name": "콜롬비아 포토시 핑크 버번 워시드",
       "price": 53000,
@@ -6166,7 +6136,7 @@
       "is_soldout": false
     },
     {
-      "id": 224,
+      "id": 222,
       "store": "엠아이커피",
       "name": "[이주의 특가]니카라과 라 라구나 카투라 워시드",
       "price": 28000,
@@ -6181,7 +6151,7 @@
       "is_soldout": false
     },
     {
-      "id": 225,
+      "id": 223,
       "store": "엠아이커피",
       "name": "[11월 추천생두]온두라스 산 로렌조 카투아이 워시드",
       "price": 28000,
@@ -6196,7 +6166,7 @@
       "is_soldout": false
     },
     {
-      "id": 226,
+      "id": 224,
       "store": "엠아이커피",
       "name": "엘살바도르 플란 델 호요 케냐 워시드",
       "price": 32500,
@@ -6211,7 +6181,7 @@
       "is_soldout": false
     },
     {
-      "id": 227,
+      "id": 225,
       "store": "엠아이커피",
       "name": "온두라스 엘 나랑호 파라이네마 워시드",
       "price": 29000,
@@ -6226,7 +6196,7 @@
       "is_soldout": false
     },
     {
-      "id": 228,
+      "id": 226,
       "store": "엠아이커피",
       "name": "엘살바도르 말라카라 C 산타 아나 파카마라 내추럴",
       "price": 28500,
@@ -6241,7 +6211,7 @@
       "is_soldout": false
     },
     {
-      "id": 229,
+      "id": 227,
       "store": "엠아이커피",
       "name": "온두라스 테판구아레 렘피라 내추럴",
       "price": 30000,
@@ -6256,7 +6226,7 @@
       "is_soldout": false
     },
     {
-      "id": 230,
+      "id": 228,
       "store": "엠아이커피",
       "name": "코스타리카 볼칸 아술 산 이시드로 내추럴",
       "price": 28000,
@@ -6271,7 +6241,7 @@
       "is_soldout": false
     },
     {
-      "id": 231,
+      "id": 229,
       "store": "엠아이커피",
       "name": "코스타리카 볼칸 아술 오바타 내추럴",
       "price": 28000,
@@ -6286,7 +6256,7 @@
       "is_soldout": false
     },
     {
-      "id": 232,
+      "id": 230,
       "store": "엠아이커피",
       "name": "코스타리카 볼칸 아술 마르세예사 내추럴",
       "price": 28500,
@@ -6301,7 +6271,7 @@
       "is_soldout": false
     },
     {
-      "id": 233,
+      "id": 231,
       "store": "엠아이커피",
       "name": "[2026 카페쇼]코스타리카 볼칸 아술 SL-28 언에어로빅 내추럴",
       "price": 55000,
@@ -6316,7 +6286,7 @@
       "is_soldout": false
     },
     {
-      "id": 234,
+      "id": 232,
       "store": "엠아이커피",
       "name": "코스타리카 볼칸 아술 SL-28 워시드",
       "price": 53000,
@@ -6331,7 +6301,7 @@
       "is_soldout": false
     },
     {
-      "id": 235,
+      "id": 233,
       "store": "엠아이커피",
       "name": "니카라과 라 라구나 카투라 허니",
       "price": 31000,
@@ -6346,7 +6316,7 @@
       "is_soldout": false
     },
     {
-      "id": 236,
+      "id": 234,
       "store": "엠아이커피",
       "name": "과테말라 시에라 데 라스 미나스 마라고지페 워시드",
       "price": 35000,
@@ -6361,7 +6331,7 @@
       "is_soldout": false
     },
     {
-      "id": 237,
+      "id": 235,
       "store": "엠아이커피",
       "name": "과테말라 라 벨라 파카마라 내추럴",
       "price": 37000,
@@ -6376,7 +6346,7 @@
       "is_soldout": false
     },
     {
-      "id": 238,
+      "id": 236,
       "store": "엠아이커피",
       "name": "과테말라 엘 소코로 파카마라 워시드",
       "price": 32500,
@@ -6391,7 +6361,7 @@
       "is_soldout": false
     },
     {
-      "id": 239,
+      "id": 237,
       "store": "엠아이커피",
       "name": "[2026 카페쇼]과테말라 엘 인헤르또 게이샤 워시드",
       "price": 174000,
@@ -6406,7 +6376,7 @@
       "is_soldout": false
     },
     {
-      "id": 240,
+      "id": 238,
       "store": "엠아이커피",
       "name": "파나마 아부 게이샤 GW-4225 워시드",
       "price": 345000,
@@ -6421,7 +6391,7 @@
       "is_soldout": false
     },
     {
-      "id": 241,
+      "id": 239,
       "store": "엠아이커피",
       "name": "파나마 아부 게이샤 GW-4175 워시드",
       "price": 290000,
@@ -6436,7 +6406,7 @@
       "is_soldout": false
     },
     {
-      "id": 242,
+      "id": 240,
       "store": "엠아이커피",
       "name": "파나마 아부 게이샤 GH-4145 허니",
       "price": 310000,
@@ -6451,7 +6421,7 @@
       "is_soldout": false
     },
     {
-      "id": 243,
+      "id": 241,
       "store": "엠아이커피",
       "name": "과테말라 엘 소코로 마르세예사 워시드",
       "price": 23000,
@@ -6466,7 +6436,7 @@
       "is_soldout": false
     },
     {
-      "id": 244,
+      "id": 242,
       "store": "엠아이커피",
       "name": "과테말라 엘 소코로 산 로렌조",
       "price": 21000,
@@ -6481,7 +6451,7 @@
       "is_soldout": false
     },
     {
-      "id": 245,
+      "id": 243,
       "store": "엠아이커피",
       "name": "파나마 아이리스 일립스 게이샤 내추럴 니트로겐 마서레이션 워시드 피니쉬",
       "price": 370000,
@@ -6496,7 +6466,7 @@
       "is_soldout": false
     },
     {
-      "id": 246,
+      "id": 244,
       "store": "엠아이커피",
       "name": "파나마 데보라 엄브라 게이샤 익스텐디드 세이드 드라이드 내추럴",
       "price": 418000,
@@ -6511,7 +6481,7 @@
       "is_soldout": false
     },
     {
-      "id": 247,
+      "id": 245,
       "store": "엠아이커피",
       "name": "파나마 데보라 일립스 게이샤 내추럴 니트로겐 머서레이션 워시드 피니쉬",
       "price": 401000,
@@ -6526,7 +6496,7 @@
       "is_soldout": false
     },
     {
-      "id": 248,
+      "id": 246,
       "store": "엠아이커피",
       "name": "파나마 아이리스 비비드 게이샤 내추럴 카보닉 마서레이티드 워시드 피니쉬",
       "price": 347000,
@@ -6541,7 +6511,7 @@
       "is_soldout": false
     },
     {
-      "id": 249,
+      "id": 247,
       "store": "엠아이커피",
       "name": "파나마 데보라 일루미네이션 게이샤 카보닉 머서레이션 워시드",
       "price": 357000,
@@ -6556,7 +6526,7 @@
       "is_soldout": false
     },
     {
-      "id": 250,
+      "id": 248,
       "store": "엠아이커피",
       "name": "파나마 데보라 에프터글로우 게이샤 클래식 내추럴",
       "price": 357000,
@@ -6571,7 +6541,7 @@
       "is_soldout": false
     },
     {
-      "id": 251,
+      "id": 249,
       "store": "엠아이커피",
       "name": "파나마 데보라 호라이즌 게이샤 이스트 이노큘레이티드 하이브리드 워시드",
       "price": 416000,
@@ -6586,7 +6556,7 @@
       "is_soldout": false
     },
     {
-      "id": 252,
+      "id": 250,
       "store": "엠아이커피",
       "name": "파나마 데보라 시미트리 게이샤 CM내추럴",
       "price": 394000,
@@ -6601,7 +6571,7 @@
       "is_soldout": false
     },
     {
-      "id": 253,
+      "id": 251,
       "store": "엠아이커피",
       "name": "파나마 데보라 에코 게이샤 CM 워시드",
       "price": 378000,
@@ -6616,7 +6586,7 @@
       "is_soldout": false
     },
     {
-      "id": 254,
+      "id": 252,
       "store": "엠아이커피",
       "name": "파나마 아이리스 이스테이트 너바나 게이샤 언에어로빅 내추럴",
       "price": 399000,
@@ -6631,7 +6601,7 @@
       "is_soldout": false
     },
     {
-      "id": 255,
+      "id": 253,
       "store": "엠아이커피",
       "name": "과테말라 엘 소코로 마라카투라 워시드",
       "price": 33000,
@@ -6646,7 +6616,7 @@
       "is_soldout": false
     },
     {
-      "id": 256,
+      "id": 254,
       "store": "엠아이커피",
       "name": "과테말라 엘 소코로 자바 워시드",
       "price": 45000,
@@ -6661,7 +6631,7 @@
       "is_soldout": false
     },
     {
-      "id": 257,
+      "id": 255,
       "store": "엠아이커피",
       "name": "코스타리카 따라주 로스 두퀘스 SHB EP",
       "price": 20000,
@@ -6676,7 +6646,7 @@
       "is_soldout": false
     },
     {
-      "id": 258,
+      "id": 256,
       "store": "엠아이커피",
       "name": "과테말라 SHB EP",
       "price": 19000,
@@ -6691,7 +6661,7 @@
       "is_soldout": false
     },
     {
-      "id": 259,
+      "id": 257,
       "store": "엠아이커피",
       "name": "과테말라 우에우에테낭고 킨 워시드",
       "price": 21500,
@@ -6706,7 +6676,7 @@
       "is_soldout": false
     },
     {
-      "id": 260,
+      "id": 258,
       "store": "엠아이커피",
       "name": "과테말라 SHB 디카페인",
       "price": 21000,
@@ -6721,7 +6691,7 @@
       "is_soldout": true
     },
     {
-      "id": 261,
+      "id": 259,
       "store": "엠아이커피",
       "name": "엘살바도르 플란 델 호요 아나카페 14 워시드",
       "price": 30500,
@@ -6736,7 +6706,7 @@
       "is_soldout": false
     },
     {
-      "id": 262,
+      "id": 260,
       "store": "엠아이커피",
       "name": "코스타리카 부르마스 델 수르키 엘 센트로 티피카 내추럴",
       "price": 49500,
@@ -6751,7 +6721,7 @@
       "is_soldout": false
     },
     {
-      "id": 263,
+      "id": 261,
       "store": "엠아이커피",
       "name": "[가격인하]과테말라 엘 인헤르또 파카마라 워시드",
       "price": 71000,
@@ -6766,7 +6736,7 @@
       "is_soldout": false
     },
     {
-      "id": 264,
+      "id": 262,
       "store": "엠아이커피",
       "name": "파나마 가리도 하이랜드 파넬라 둘세 게이샤 워시드",
       "price": 64000,
@@ -6781,7 +6751,7 @@
       "is_soldout": false
     },
     {
-      "id": 265,
+      "id": 263,
       "store": "엠아이커피",
       "name": "파나마 가리도 하이랜드 파넬라 둘세 게이샤 내추럴",
       "price": 67000,
@@ -6796,7 +6766,7 @@
       "is_soldout": false
     },
     {
-      "id": 266,
+      "id": 264,
       "store": "엠아이커피",
       "name": "과테말라 엘 소코로 게이샤 워시드",
       "price": 131000,
@@ -6811,7 +6781,7 @@
       "is_soldout": false
     },
     {
-      "id": 267,
+      "id": 265,
       "store": "엠아이커피",
       "name": "파나마 아부 게이샤 GW-3160 워시드",
       "price": 346000,
@@ -6826,7 +6796,7 @@
       "is_soldout": false
     },
     {
-      "id": 268,
+      "id": 266,
       "store": "엠아이커피",
       "name": "과테말라 안티구아 파노라마 SHB EP",
       "price": 20000,
@@ -6841,7 +6811,7 @@
       "is_soldout": false
     },
     {
-      "id": 269,
+      "id": 267,
       "store": "엠아이커피",
       "name": "과테말라 엘 미라도르 옐로우 카투아이 워시드",
       "price": 22500,
@@ -6856,7 +6826,7 @@
       "is_soldout": false
     },
     {
-      "id": 270,
+      "id": 268,
       "store": "엠아이커피",
       "name": "[2026 카페쇼]니카라과 부에노스 아이레스 마라카투라 워시드",
       "price": 32000,
@@ -6871,7 +6841,7 @@
       "is_soldout": false
     },
     {
-      "id": 271,
+      "id": 269,
       "store": "엠아이커피",
       "name": "니카라과 산 살바도르 카투라 워시드",
       "price": 28000,
@@ -6886,7 +6856,7 @@
       "is_soldout": false
     },
     {
-      "id": 272,
+      "id": 270,
       "store": "엠아이커피",
       "name": "온두라스 산타로사  SHG",
       "price": 19500,
@@ -6901,7 +6871,7 @@
       "is_soldout": false
     },
     {
-      "id": 273,
+      "id": 271,
       "store": "엠아이커피",
       "name": "[2026 Mexico COE Honey & Natural #8] 멕시코 라 루스 게이샤 내추럴",
       "price": 64000,
@@ -6916,7 +6886,7 @@
       "is_soldout": true
     },
     {
-      "id": 274,
+      "id": 272,
       "store": "엠아이커피",
       "name": "[2026 카페쇼]엘살바도르 말라카라 C 산타 아나 레드 버번 워시드",
       "price": 22500,
@@ -6931,7 +6901,7 @@
       "is_soldout": false
     },
     {
-      "id": 275,
+      "id": 273,
       "store": "엠아이커피",
       "name": "엘살바도르 플란 델 호요 케냐 내추럴",
       "price": 34500,
@@ -6946,7 +6916,7 @@
       "is_soldout": false
     },
     {
-      "id": 276,
+      "id": 274,
       "store": "엠아이커피",
       "name": "엘살바도르 레포르마 산타 아나 마르세예사 워시드",
       "price": 23500,
@@ -6961,7 +6931,7 @@
       "is_soldout": false
     },
     {
-      "id": 277,
+      "id": 275,
       "store": "엠아이커피",
       "name": "COMPETITION DO MARCALA #6 온두라스 데보라 파카마라 언에어로빅 내추럴",
       "price": 58000,
@@ -6976,7 +6946,7 @@
       "is_soldout": false
     },
     {
-      "id": 278,
+      "id": 276,
       "store": "엠아이커피",
       "name": "COMPETITION DO MARCALA #5 온두라스 라 갈락시아 카투아이 내추럴",
       "price": 58000,
@@ -6991,7 +6961,7 @@
       "is_soldout": false
     },
     {
-      "id": 279,
+      "id": 277,
       "store": "엠아이커피",
       "name": "COMPETITION DO MARCALA #10 온두라스 이레 파체 워시드",
       "price": 45000,
@@ -7006,7 +6976,7 @@
       "is_soldout": false
     },
     {
-      "id": 280,
+      "id": 278,
       "store": "엠아이커피",
       "name": "온두라스 엘 아구아카테 파라이네마 워시드",
       "price": 29000,
@@ -7021,7 +6991,7 @@
       "is_soldout": false
     },
     {
-      "id": 281,
+      "id": 279,
       "store": "엠아이커피",
       "name": "온두라스 라 크루즈 카투아이 내추럴 모스토",
       "price": 30000,
@@ -7036,7 +7006,7 @@
       "is_soldout": false
     },
     {
-      "id": 282,
+      "id": 280,
       "store": "엠아이커피",
       "name": "온두라스 라 마루카 파라이네마 내추럴 모스토",
       "price": 30000,
@@ -7051,7 +7021,7 @@
       "is_soldout": false
     },
     {
-      "id": 283,
+      "id": 281,
       "store": "엠아이커피",
       "name": "온두라스 미 레갈로 카투아이 언에어로빅 내추럴",
       "price": 30000,
@@ -7066,7 +7036,7 @@
       "is_soldout": false
     },
     {
-      "id": 284,
+      "id": 282,
       "store": "엠아이커피",
       "name": "온두라스 라 아노나 파라이네마 언에어로빅 내추럴",
       "price": 30000,
@@ -7081,7 +7051,7 @@
       "is_soldout": false
     },
     {
-      "id": 285,
+      "id": 283,
       "store": "엠아이커피",
       "name": "온두라스 라 크루즈 카투아이 언에어로빅 내추럴",
       "price": 30000,
@@ -7096,7 +7066,7 @@
       "is_soldout": false
     },
     {
-      "id": 286,
+      "id": 284,
       "store": "엠아이커피",
       "name": "온두라스 라 푸엔테 파라이네마 워시드",
       "price": 29000,
@@ -7111,7 +7081,7 @@
       "is_soldout": false
     },
     {
-      "id": 287,
+      "id": 285,
       "store": "엠아이커피",
       "name": "온두라스 란초 에스콘디도 파카스 워시드",
       "price": 28000,
@@ -7126,7 +7096,7 @@
       "is_soldout": false
     },
     {
-      "id": 288,
+      "id": 286,
       "store": "엠아이커피",
       "name": "온두라스 엘 바란코 IH-90 워시드",
       "price": 28000,
@@ -7141,7 +7111,7 @@
       "is_soldout": false
     },
     {
-      "id": 289,
+      "id": 287,
       "store": "엠아이커피",
       "name": "온두라스 부에나 비스타 파라이네마 워시드",
       "price": 29000,
@@ -7156,7 +7126,7 @@
       "is_soldout": false
     },
     {
-      "id": 290,
+      "id": 288,
       "store": "엠아이커피",
       "name": "온두라스 라 케브라다 버번 워시드",
       "price": 28000,
@@ -7171,7 +7141,7 @@
       "is_soldout": false
     },
     {
-      "id": 291,
+      "id": 289,
       "store": "엠아이커피",
       "name": "온두라스 엘 사나테 카투아이 워시드",
       "price": 28000,
@@ -7186,7 +7156,7 @@
       "is_soldout": false
     },
     {
-      "id": 522,
+      "id": 290,
       "store": "엠아이커피",
       "name": "엘살바도르 산타 마리아 레드 버번 내추럴",
       "price": 24500,
@@ -7201,7 +7171,7 @@
       "is_soldout": false
     },
     {
-      "id": 523,
+      "id": 291,
       "store": "엠아이커피",
       "name": "온두라스 엘 씨루엘로 파라이네마 내추럴",
       "price": 30000,
@@ -7216,7 +7186,7 @@
       "is_soldout": false
     },
     {
-      "id": 524,
+      "id": 522,
       "store": "엠아이커피",
       "name": "[2026 카페쇼]온두라스 구아스포로로 IH-90 워시드",
       "price": 28000,
@@ -7231,7 +7201,7 @@
       "is_soldout": false
     },
     {
-      "id": 525,
+      "id": 523,
       "store": "엠아이커피",
       "name": "온두라스 엘 플란 IH-90 워시드",
       "price": 28000,
@@ -7246,7 +7216,7 @@
       "is_soldout": false
     },
     {
-      "id": 533,
+      "id": 524,
       "store": "엠아이커피",
       "name": "온두라스 캄파나리오 IH-90 워시드",
       "price": 28000,
@@ -7261,7 +7231,7 @@
       "is_soldout": false
     },
     {
-      "id": 596,
+      "id": 525,
       "store": "엠아이커피",
       "name": "온두라스 라 벤디시온 파라이네마 워시드",
       "price": 29000,
@@ -7276,7 +7246,7 @@
       "is_soldout": false
     },
     {
-      "id": 752,
+      "id": 533,
       "store": "엠아이커피",
       "name": "니카라과 라 라구나 파라이네마 워시드",
       "price": 30000,
@@ -7291,7 +7261,7 @@
       "is_soldout": false
     },
     {
-      "id": 753,
+      "id": 596,
       "store": "엠아이커피",
       "name": "니카라과 몬테 리바노 카투라 워시드",
       "price": 28000,
@@ -7306,7 +7276,7 @@
       "is_soldout": false
     },
     {
-      "id": 762,
+      "id": 752,
       "store": "엠아이커피",
       "name": "니카라과 엘 수야탈 카투라 워시드",
       "price": 28000,
@@ -7321,7 +7291,7 @@
       "is_soldout": false
     },
     {
-      "id": 763,
+      "id": 753,
       "store": "엠아이커피",
       "name": "엘살바도르 산타 마리아 레드 버번 워시드",
       "price": 22500,
@@ -7336,7 +7306,7 @@
       "is_soldout": false
     },
     {
-      "id": 764,
+      "id": 762,
       "store": "엠아이커피",
       "name": "온두라스 엘 아구아카테 버번 워시드",
       "price": 28000,
@@ -7351,7 +7321,7 @@
       "is_soldout": false
     },
     {
-      "id": 765,
+      "id": 763,
       "store": "엠아이커피",
       "name": "온두라스 비전 데 디오스 파라이네마 워시드",
       "price": 29000,
@@ -7366,7 +7336,7 @@
       "is_soldout": false
     },
     {
-      "id": 766,
+      "id": 764,
       "store": "엠아이커피",
       "name": "온두라스 엘 엔칸토 파라이네마 내추럴",
       "price": 30000,
@@ -7381,7 +7351,7 @@
       "is_soldout": false
     },
     {
-      "id": 767,
+      "id": 765,
       "store": "엠아이커피",
       "name": "[신규 라인업]에티오피아 구지 G1 모모라 내추럴",
       "price": 26000,
@@ -7396,7 +7366,7 @@
       "is_soldout": false
     },
     {
-      "id": 768,
+      "id": 766,
       "store": "엠아이커피",
       "name": "[11월 추천생두]케냐 AA",
       "price": 20000,
@@ -7411,7 +7381,7 @@
       "is_soldout": false
     },
     {
-      "id": 769,
+      "id": 767,
       "store": "엠아이커피",
       "name": "[신규입고]케냐 이차마라 AA TOP",
       "price": 29000,
@@ -7426,7 +7396,7 @@
       "is_soldout": false
     },
     {
-      "id": 770,
+      "id": 768,
       "store": "엠아이커피",
       "name": "에티오피아 예가체프 G1 게뎁 첼첼레 내추럴",
       "price": 26000,
@@ -7441,7 +7411,7 @@
       "is_soldout": false
     },
     {
-      "id": 771,
+      "id": 769,
       "store": "엠아이커피",
       "name": "에티오피아 시다모 G1 봄베 내추럴",
       "price": 26000,
@@ -7456,7 +7426,7 @@
       "is_soldout": false
     },
     {
-      "id": 772,
+      "id": 770,
       "store": "엠아이커피",
       "name": "에티오피아 구지 G1 아르소살라 워시드",
       "price": 25500,
@@ -7471,7 +7441,7 @@
       "is_soldout": false
     },
     {
-      "id": 773,
+      "id": 771,
       "store": "엠아이커피",
       "name": "에티오피아 시다모 G1 벤사 곤조베 벨라이네 바리소 내추럴",
       "price": 49000,
@@ -7486,7 +7456,7 @@
       "is_soldout": false
     },
     {
-      "id": 774,
+      "id": 772,
       "store": "엠아이커피",
       "name": "에티오피아 시다모 G4",
       "price": 17000,
@@ -7501,7 +7471,7 @@
       "is_soldout": false
     },
     {
-      "id": 775,
+      "id": 773,
       "store": "엠아이커피",
       "name": "케냐 캄완기 AB TOP",
       "price": 29000,
@@ -7516,7 +7486,7 @@
       "is_soldout": false
     },
     {
-      "id": 776,
+      "id": 774,
       "store": "엠아이커피",
       "name": "[신규 라인업]에티오피아 구지 G1 고고구 내추럴",
       "price": 26000,
@@ -7531,7 +7501,7 @@
       "is_soldout": false
     },
     {
-      "id": 777,
+      "id": 775,
       "store": "엠아이커피",
       "name": "에티오피아 시다모 G1 부라 카라모 마테 마티오스 언에어로빅 내추럴",
       "price": 60000,
@@ -7546,7 +7516,7 @@
       "is_soldout": false
     },
     {
-      "id": 795,
+      "id": 776,
       "store": "엠아이커피",
       "name": "에티오피아 시다모 G1 벤사 곤조베 바샤 베켈레 언에어로빅 내추럴",
       "price": 60000,
@@ -7561,7 +7531,7 @@
       "is_soldout": false
     },
     {
-      "id": 796,
+      "id": 777,
       "store": "엠아이커피",
       "name": "에티오피아 예가체프 G1 아리차 내추럴",
       "price": 26500,
@@ -7576,7 +7546,7 @@
       "is_soldout": false
     },
     {
-      "id": 797,
+      "id": 795,
       "store": "엠아이커피",
       "name": "[신규입고]케냐 미샤디 그로워스 쿠프 TOP 언에어로빅 내추럴",
       "price": 41000,
@@ -7591,7 +7561,7 @@
       "is_soldout": false
     },
     {
-      "id": 798,
+      "id": 796,
       "store": "엠아이커피",
       "name": "[신규입고]케냐 게투야 AA TOP",
       "price": 29000,
@@ -7606,7 +7576,7 @@
       "is_soldout": false
     },
     {
-      "id": 799,
+      "id": 797,
       "store": "엠아이커피",
       "name": "[신규입고]케냐 은디마이니 AA TOP",
       "price": 29000,
@@ -7621,7 +7591,7 @@
       "is_soldout": false
     },
     {
-      "id": 800,
+      "id": 798,
       "store": "엠아이커피",
       "name": "[신규입고]케냐 가투구 AA TOP",
       "price": 29000,
@@ -7636,7 +7606,7 @@
       "is_soldout": false
     },
     {
-      "id": 833,
+      "id": 799,
       "store": "엠아이커피",
       "name": "[신규입고]케냐 문가리아 AA TOP",
       "price": 29000,
@@ -7651,7 +7621,7 @@
       "is_soldout": false
     },
     {
-      "id": 865,
+      "id": 800,
       "store": "엠아이커피",
       "name": "[신규입고]케냐 기투라 AA TOP",
       "price": 29000,
@@ -7666,7 +7636,7 @@
       "is_soldout": false
     },
     {
-      "id": 866,
+      "id": 833,
       "store": "엠아이커피",
       "name": "[신규입고]케냐 가치카 AB TOP",
       "price": 27500,
@@ -7681,7 +7651,7 @@
       "is_soldout": false
     },
     {
-      "id": 867,
+      "id": 865,
       "store": "엠아이커피",
       "name": "[신규입고]케냐 카루기로 AB TOP",
       "price": 27500,
@@ -7696,7 +7666,7 @@
       "is_soldout": false
     },
     {
-      "id": 868,
+      "id": 866,
       "store": "엠아이커피",
       "name": "케냐 카구모 AA TOP",
       "price": 29000,
@@ -7711,7 +7681,7 @@
       "is_soldout": false
     },
     {
-      "id": 869,
+      "id": 867,
       "store": "엠아이커피",
       "name": "케냐 키 AA TOP",
       "price": 30000,
@@ -7726,7 +7696,7 @@
       "is_soldout": false
     },
     {
-      "id": 870,
+      "id": 868,
       "store": "엠아이커피",
       "name": "케냐 은다로이니 AA TOP",
       "price": 30000,
@@ -7741,7 +7711,7 @@
       "is_soldout": false
     },
     {
-      "id": 871,
+      "id": 869,
       "store": "엠아이커피",
       "name": "케냐 기티투 AB TOP",
       "price": 29000,
@@ -7756,7 +7726,7 @@
       "is_soldout": false
     },
     {
-      "id": 872,
+      "id": 870,
       "store": "엠아이커피",
       "name": "케냐 가투부 PB TOP",
       "price": 29000,
@@ -7771,7 +7741,7 @@
       "is_soldout": false
     },
     {
-      "id": 873,
+      "id": 871,
       "store": "엠아이커피",
       "name": "케냐 캄완기 PB TOP",
       "price": 29000,
@@ -7786,7 +7756,7 @@
       "is_soldout": false
     },
     {
-      "id": 874,
+      "id": 872,
       "store": "엠아이커피",
       "name": "케냐 키아무구모 AA TOP",
       "price": 30000,
@@ -7801,7 +7771,7 @@
       "is_soldout": false
     },
     {
-      "id": 890,
+      "id": 873,
       "store": "엠아이커피",
       "name": "에티오피아 시다모 G2",
       "price": 27500,
@@ -7816,7 +7786,7 @@
       "is_soldout": true
     },
     {
-      "id": 891,
+      "id": 874,
       "store": "엠아이커피",
       "name": "에티오피아 예가체프 G2 워시드",
       "price": 27500,
@@ -7831,7 +7801,7 @@
       "is_soldout": true
     },
     {
-      "id": 892,
+      "id": 890,
       "store": "엠아이커피",
       "name": "에티오피아 예가체프 G2 코체레",
       "price": 21000,
@@ -7846,7 +7816,7 @@
       "is_soldout": false
     },
     {
-      "id": 893,
+      "id": 891,
       "store": "엠아이커피",
       "name": "케냐 니에리 레드 마운틴 AA",
       "price": 21000,
@@ -7861,7 +7831,7 @@
       "is_soldout": false
     },
     {
-      "id": 894,
+      "id": 892,
       "store": "엠아이커피",
       "name": "에티오피아 예가체프 G1 할로 베리티 워시드",
       "price": 25500,
@@ -7876,7 +7846,7 @@
       "is_soldout": false
     },
     {
-      "id": 895,
+      "id": 893,
       "store": "엠아이커피",
       "name": "에티오피아 시다모 G1 아르베고나 내추럴",
       "price": 26000,
@@ -7891,7 +7861,7 @@
       "is_soldout": false
     },
     {
-      "id": 896,
+      "id": 894,
       "store": "엠아이커피",
       "name": "에티오피아 시다모 G1 봄베 와인 내추럴",
       "price": 32500,
@@ -7906,7 +7876,7 @@
       "is_soldout": false
     },
     {
-      "id": 897,
+      "id": 895,
       "store": "엠아이커피",
       "name": "파푸아뉴기니 쿠아마운틴",
       "price": 20000,
@@ -7921,7 +7891,7 @@
       "is_soldout": false
     },
     {
-      "id": 898,
+      "id": 896,
       "store": "엠아이커피",
       "name": "인도네시아 와하나 만델링 G1",
       "price": 19500,
@@ -7936,7 +7906,7 @@
       "is_soldout": false
     },
     {
-      "id": 899,
+      "id": 897,
       "store": "엠아이커피",
       "name": "인도 카피로얄 AA",
       "price": 14500,
@@ -7951,7 +7921,7 @@
       "is_soldout": false
     },
     {
-      "id": 963,
+      "id": 898,
       "store": "엠아이커피",
       "name": "인도 리버데일 SL-9 워시드",
       "price": 19500,
@@ -7966,7 +7936,7 @@
       "is_soldout": false
     },
     {
-      "id": 964,
+      "id": 899,
       "store": "엠아이커피",
       "name": "인도네시아 알라민 버니 텔롱 티피카 내추럴 HASD",
       "price": 35000,
@@ -7981,7 +7951,7 @@
       "is_soldout": false
     },
     {
-      "id": 967,
+      "id": 963,
       "store": "엠아이커피",
       "name": "인도네시아 알라민 베너 메리아 티피카 웻 헐드 멜론",
       "price": 44000,
@@ -7996,7 +7966,7 @@
       "is_soldout": false
     },
     {
-      "id": 968,
+      "id": 964,
       "store": "엠아이커피",
       "name": "[500g 한정 판매]예멘 퀴마 후리아 알 시야기 예메니아 내추럴",
       "price": 87000,
@@ -8011,7 +7981,7 @@
       "is_soldout": false
     },
     {
-      "id": 969,
+      "id": 967,
       "store": "엠아이커피",
       "name": "[500g 한정 판매]예멘 퀴마 아미라 알 카디 예메니아 내추럴",
       "price": 87000,
@@ -8026,7 +7996,7 @@
       "is_soldout": false
     },
     {
-      "id": 970,
+      "id": 968,
       "store": "엠아이커피",
       "name": "예멘 퀴마 아미라 알 카디 예메니아 내추럴",
       "price": 174000,
@@ -10008,21 +9978,6 @@
     {
       "id": 684,
       "store": "지에스씨(GSC)",
-      "name": "브라질 파젠다 엄 알레크림 다크룸 · 아울렛",
-      "price": 64200,
-      "origin": "브라질",
-      "region": "중남미",
-      "process": "펄프드내추럴",
-      "notes": "",
-      "url": "https://www.gsc.coffee/goods/goods_view.php?goodsNo=1000001215",
-      "is_new": false,
-      "is_decaf": false,
-      "is_special": true,
-      "is_soldout": false
-    },
-    {
-      "id": 685,
-      "store": "지에스씨(GSC)",
       "name": "에티오피아 G1 예가체프 아메데라로 아나에어로빅 레드 허니",
       "price": 42000,
       "origin": "에티오피아",
@@ -10033,6 +9988,21 @@
       "is_new": false,
       "is_decaf": false,
       "is_special": false,
+      "is_soldout": false
+    },
+    {
+      "id": 685,
+      "store": "지에스씨(GSC)",
+      "name": "브라질 파젠다 엄 알레크림 다크룸 · 아울렛",
+      "price": 64200,
+      "origin": "브라질",
+      "region": "중남미",
+      "process": "펄프드내추럴",
+      "notes": "",
+      "url": "https://www.gsc.coffee/goods/goods_view.php?goodsNo=1000001215",
+      "is_new": false,
+      "is_decaf": false,
+      "is_special": true,
       "is_soldout": false
     },
     {
@@ -10278,13 +10248,13 @@
     {
       "id": 702,
       "store": "지에스씨(GSC)",
-      "name": "케냐 AB TOP 키린야가 룽게토 키안고이",
-      "price": 28900,
+      "name": "케냐 AB TOP 키린야가 룽게토 키 · 11월세일",
+      "price": 27800,
       "origin": "케냐",
       "region": "아프리카",
       "process": "워시드",
       "notes": "",
-      "url": "https://www.gsc.coffee/goods/goods_view.php?goodsNo=1000001434",
+      "url": "https://www.gsc.coffee/goods/goods_view.php?goodsNo=1000001433",
       "is_new": false,
       "is_decaf": false,
       "is_special": false,
@@ -10293,13 +10263,13 @@
     {
       "id": 703,
       "store": "지에스씨(GSC)",
-      "name": "케냐 AB TOP 키린야가 룽게토 키 · 11월세일",
-      "price": 27800,
+      "name": "케냐 AB TOP 키린야가 룽게토 키안고이",
+      "price": 28900,
       "origin": "케냐",
       "region": "아프리카",
       "process": "워시드",
       "notes": "",
-      "url": "https://www.gsc.coffee/goods/goods_view.php?goodsNo=1000001433",
+      "url": "https://www.gsc.coffee/goods/goods_view.php?goodsNo=1000001434",
       "is_new": false,
       "is_decaf": false,
       "is_special": false,
@@ -10338,13 +10308,13 @@
     {
       "id": 782,
       "store": "지에스씨(GSC)",
-      "name": "코스타리카 카페 리벤스 SHB 엘 크리스토벌 카투라 내추럴 · 11월세일",
-      "price": 27900,
-      "origin": "코스타리카",
+      "name": "과테말라 Vides 58 도스 리오스 카투라 버번 워시드",
+      "price": 29000,
+      "origin": "과테말라",
       "region": "중남미",
-      "process": "내추럴",
+      "process": "워시드",
       "notes": "",
-      "url": "https://www.gsc.coffee/goods/goods_view.php?goodsNo=1000001461",
+      "url": "https://www.gsc.coffee/goods/goods_view.php?goodsNo=1000001442",
       "is_new": false,
       "is_decaf": false,
       "is_special": false,
@@ -10353,13 +10323,13 @@
     {
       "id": 783,
       "store": "지에스씨(GSC)",
-      "name": "과테말라 Vides 58 도스 리오스 카투라 버번 워시드",
-      "price": 29000,
-      "origin": "과테말라",
+      "name": "코스타리카 카페 리벤스 SHB 엘 크리스토벌 카투라 내추럴 · 11월세일",
+      "price": 27900,
+      "origin": "코스타리카",
       "region": "중남미",
-      "process": "워시드",
+      "process": "내추럴",
       "notes": "",
-      "url": "https://www.gsc.coffee/goods/goods_view.php?goodsNo=1000001442",
+      "url": "https://www.gsc.coffee/goods/goods_view.php?goodsNo=1000001461",
       "is_new": false,
       "is_decaf": false,
       "is_special": false,
@@ -10383,13 +10353,13 @@
     {
       "id": 785,
       "store": "지에스씨(GSC)",
-      "name": "코스타리카 Bean Voyage 알토 엘 바포르 게이샤 아나에어로빅 내추럴",
-      "price": 81000,
-      "origin": "코스타리카",
+      "name": "콜롬비아 엘 디비소 게이샤 워시드",
+      "price": 89000,
+      "origin": "콜롬비아",
       "region": "중남미",
-      "process": "내추럴",
+      "process": "워시드",
       "notes": "",
-      "url": "https://www.gsc.coffee/goods/goods_view.php?goodsNo=1000001464",
+      "url": "https://www.gsc.coffee/goods/goods_view.php?goodsNo=1000001451",
       "is_new": false,
       "is_decaf": false,
       "is_special": true,
@@ -10398,13 +10368,13 @@
     {
       "id": 786,
       "store": "지에스씨(GSC)",
-      "name": "콜롬비아 엘 디비소 게이샤 워시드",
-      "price": 89000,
-      "origin": "콜롬비아",
+      "name": "코스타리카 Bean Voyage 알토 엘 바포르 게이샤 아나에어로빅 내추럴",
+      "price": 81000,
+      "origin": "코스타리카",
       "region": "중남미",
-      "process": "워시드",
+      "process": "내추럴",
       "notes": "",
-      "url": "https://www.gsc.coffee/goods/goods_view.php?goodsNo=1000001451",
+      "url": "https://www.gsc.coffee/goods/goods_view.php?goodsNo=1000001464",
       "is_new": false,
       "is_decaf": false,
       "is_special": true,
@@ -10443,6 +10413,21 @@
     {
       "id": 789,
       "store": "지에스씨(GSC)",
+      "name": "코스타리카 Bean Voyage 란초 애리조나 카티구아 워시드 · 11월세일",
+      "price": 27900,
+      "origin": "코스타리카",
+      "region": "중남미",
+      "process": "워시드",
+      "notes": "",
+      "url": "https://www.gsc.coffee/goods/goods_view.php?goodsNo=1000001462",
+      "is_new": false,
+      "is_decaf": false,
+      "is_special": false,
+      "is_soldout": false
+    },
+    {
+      "id": 790,
+      "store": "지에스씨(GSC)",
       "name": "콜롬비아 아나야 옐로우 파카마라 멀티스테이지 워시드",
       "price": 56900,
       "origin": "콜롬비아",
@@ -10456,7 +10441,7 @@
       "is_soldout": false
     },
     {
-      "id": 790,
+      "id": 791,
       "store": "지에스씨(GSC)",
       "name": "브라질 파젠다 엄 레드 카투카이 L-S2 펄프드 내추럴",
       "price": 49000,
@@ -10471,7 +10456,7 @@
       "is_soldout": false
     },
     {
-      "id": 791,
+      "id": 792,
       "store": "지에스씨(GSC)",
       "name": "코스타리카 Bean Voyage 산타 아니타 게이샤 블랙 허니",
       "price": 76000,
@@ -10483,21 +10468,6 @@
       "is_new": false,
       "is_decaf": false,
       "is_special": true,
-      "is_soldout": false
-    },
-    {
-      "id": 792,
-      "store": "지에스씨(GSC)",
-      "name": "코스타리카 Bean Voyage 란초 애리조나 카티구아 워시드 · 11월세일",
-      "price": 27900,
-      "origin": "코스타리카",
-      "region": "중남미",
-      "process": "워시드",
-      "notes": "",
-      "url": "https://www.gsc.coffee/goods/goods_view.php?goodsNo=1000001462",
-      "is_new": false,
-      "is_decaf": false,
-      "is_special": false,
       "is_soldout": false
     },
     {
@@ -10803,6 +10773,21 @@
     {
       "id": 853,
       "store": "지에스씨(GSC)",
+      "name": "콜롬비아 암베라 랩스 프로젝트 핑크 버번 코퍼멘티드 블루베리",
+      "price": 54500,
+      "origin": "콜롬비아",
+      "region": "중남미",
+      "process": "무산소발효",
+      "notes": "",
+      "url": "https://www.gsc.coffee/goods/goods_view.php?goodsNo=1000001449",
+      "is_new": false,
+      "is_decaf": false,
+      "is_special": true,
+      "is_soldout": false
+    },
+    {
+      "id": 854,
+      "store": "지에스씨(GSC)",
       "name": "파나마 ALTIERI X ABRACCIO 게이샤 워시드 퍼먼티드 Plano (Finca Hermanos Perez)",
       "price": 220000,
       "origin": "파나마",
@@ -10816,7 +10801,7 @@
       "is_soldout": false
     },
     {
-      "id": 854,
+      "id": 855,
       "store": "지에스씨(GSC)",
       "name": "엘살바도르 Finca Montevideo 볼케이노 레드버번 워시드 (Micro B2T9-13)",
       "price": 43000,
@@ -10831,7 +10816,7 @@
       "is_soldout": false
     },
     {
-      "id": 855,
+      "id": 875,
       "store": "지에스씨(GSC)",
       "name": "엘살바도르 Finca Montevideo 볼케이노 레드 버번 아나에어로빅 내추럴",
       "price": 56000,
@@ -10846,7 +10831,7 @@
       "is_soldout": false
     },
     {
-      "id": 875,
+      "id": 876,
       "store": "지에스씨(GSC)",
       "name": "콜롬비아 레볼루션 프로젝트 티피카 코퍼멘티드 워터멜론",
       "price": 54500,
@@ -10861,7 +10846,7 @@
       "is_soldout": false
     },
     {
-      "id": 876,
+      "id": 877,
       "store": "지에스씨(GSC)",
       "name": "코스타리카 핀카 엘 라우달 오바타 내추럴",
       "price": 36000,
@@ -10876,7 +10861,7 @@
       "is_soldout": false
     },
     {
-      "id": 877,
+      "id": 880,
       "store": "지에스씨(GSC)",
       "name": "과테말라 엘 인헤르또 레전더리 게이샤 로스 피노스 #El02",
       "price": 490000,
@@ -10891,7 +10876,7 @@
       "is_soldout": false
     },
     {
-      "id": 880,
+      "id": 881,
       "store": "지에스씨(GSC)",
       "name": "코스타리카 Bean Voyage 라 그라시아 파카마라 내추럴",
       "price": 68000,
@@ -10906,7 +10891,7 @@
       "is_soldout": false
     },
     {
-      "id": 881,
+      "id": 882,
       "store": "지에스씨(GSC)",
       "name": "콜롬비아 암베라 랩스 프로젝트 핑크 버번 코퍼멘티드 로즈 티",
       "price": 57000,
@@ -10915,21 +10900,6 @@
       "process": "무산소발효",
       "notes": "",
       "url": "https://www.gsc.coffee/goods/goods_view.php?goodsNo=1000001450",
-      "is_new": false,
-      "is_decaf": false,
-      "is_special": true,
-      "is_soldout": false
-    },
-    {
-      "id": 882,
-      "store": "지에스씨(GSC)",
-      "name": "콜롬비아 암베라 랩스 프로젝트 핑크 버번 코퍼멘티드 블루베리",
-      "price": 54500,
-      "origin": "콜롬비아",
-      "region": "중남미",
-      "process": "무산소발효",
-      "notes": "",
-      "url": "https://www.gsc.coffee/goods/goods_view.php?goodsNo=1000001449",
       "is_new": false,
       "is_decaf": false,
       "is_special": true,
@@ -11026,7 +10996,7 @@
       "is_soldout": false
     },
     {
-      "id": 971,
+      "id": 969,
       "store": "지에스씨(GSC)",
       "name": "엘살바도르 Finca Montevideo 볼케이노 아나카페 14 내추럴",
       "price": 47000,
@@ -11041,7 +11011,7 @@
       "is_soldout": false
     },
     {
-      "id": 972,
+      "id": 970,
       "store": "지에스씨(GSC)",
       "name": "파나마 엘리다 게이샤 워시드 DRD TORRE 090326",
       "price": 360000,
@@ -11056,7 +11026,7 @@
       "is_soldout": false
     },
     {
-      "id": 975,
+      "id": 971,
       "store": "지에스씨(GSC)",
       "name": "파나마 엘리다 게이샤 내추럴 DRD TORRE 250326",
       "price": 360000,
@@ -11071,7 +11041,7 @@
       "is_soldout": false
     },
     {
-      "id": 976,
+      "id": 972,
       "store": "지에스씨(GSC)",
       "name": "코스타리카 핀카 엘 콩고 게이샤 소프트 내추럴",
       "price": 95000,
@@ -11086,7 +11056,7 @@
       "is_soldout": false
     },
     {
-      "id": 984,
+      "id": 975,
       "store": "지에스씨(GSC)",
       "name": "코스타리카 핀카 살라카 산타 엘레나 라이트 허니",
       "price": 36000,
@@ -11101,7 +11071,7 @@
       "is_soldout": false
     },
     {
-      "id": 985,
+      "id": 976,
       "store": "지에스씨(GSC)",
       "name": "코스타리카 Cafe Rivense 비스타 알 치리포 하이브리드 H17 블랙허니",
       "price": 42000,
@@ -11116,7 +11086,7 @@
       "is_soldout": false
     },
     {
-      "id": 986,
+      "id": 984,
       "store": "지에스씨(GSC)",
       "name": "파나마 ALTIERI X ABRACCIO 게이샤 내추럴 DF Plano (Finca Hermanos Perez)",
       "price": 220000,
@@ -11131,7 +11101,7 @@
       "is_soldout": false
     },
     {
-      "id": 991,
+      "id": 985,
       "store": "지에스씨(GSC)",
       "name": "파나마 ALTIERI X ABRACCIO 게이샤 내추럴 DF Loma (Finca Hermanos Perez)",
       "price": 220000,
@@ -11178,21 +11148,6 @@
     {
       "id": 1403,
       "store": "캅카와",
-      "name": "콜롬비아 수프리모",
-      "price": 17700,
-      "origin": "콜롬비아",
-      "region": "중남미",
-      "process": "디카페인",
-      "notes": "",
-      "url": "https://kapkawa.com/product/캅카와-콜롬비아-수프리모-생두커피-1kg/142/category/25/display/1/",
-      "is_new": false,
-      "is_decaf": false,
-      "is_special": false,
-      "is_soldout": false
-    },
-    {
-      "id": 1405,
-      "store": "캅카와",
       "name": "에티오피아 레켐티 G4 내추럴",
       "price": 14000,
       "origin": "에티오피아",
@@ -11206,7 +11161,7 @@
       "is_soldout": false
     },
     {
-      "id": 1406,
+      "id": 1405,
       "store": "캅카와",
       "name": "카메룬 동가 티피카 내추럴",
       "price": 43000,
@@ -11221,7 +11176,7 @@
       "is_soldout": false
     },
     {
-      "id": 1407,
+      "id": 1406,
       "store": "캅카와",
       "name": "탄자니아 부코바 하이랜드 로부스타",
       "price": 11200,
@@ -11236,7 +11191,7 @@
       "is_soldout": false
     },
     {
-      "id": 1408,
+      "id": 1407,
       "store": "캅카와",
       "name": "에티오피아 아바야 게이샤 G1 내추럴",
       "price": 26100,
@@ -11251,7 +11206,7 @@
       "is_soldout": false
     },
     {
-      "id": 1409,
+      "id": 1408,
       "store": "캅카와",
       "name": "탄자니아 기고마 AA FAQ",
       "price": 17800,
@@ -11266,7 +11221,7 @@
       "is_soldout": false
     },
     {
-      "id": 1410,
+      "id": 1409,
       "store": "캅카와",
       "name": "동티모르 메르투투 공정무역",
       "price": 24900,
@@ -11281,7 +11236,7 @@
       "is_soldout": false
     },
     {
-      "id": 1411,
+      "id": 1410,
       "store": "캅카와",
       "name": "케냐 니에리 AB FAQ",
       "price": 19100,
@@ -11296,7 +11251,7 @@
       "is_soldout": false
     },
     {
-      "id": 1412,
+      "id": 1411,
       "store": "캅카와",
       "name": "베트남 달랏 로부스타 G1",
       "price": 9500,
@@ -11311,7 +11266,7 @@
       "is_soldout": false
     },
     {
-      "id": 1413,
+      "id": 1412,
       "store": "캅카와",
       "name": "브라질 세하도 NY2 14/16",
       "price": 16100,
@@ -11320,6 +11275,21 @@
       "process": "디카페인",
       "notes": "",
       "url": "https://kapkawa.com/product/캅카와-브라질-세하도-ny2-1416-생두커피-1kg/144/category/25/display/1/",
+      "is_new": false,
+      "is_decaf": false,
+      "is_special": false,
+      "is_soldout": false
+    },
+    {
+      "id": 1413,
+      "store": "캅카와",
+      "name": "콜롬비아 수프리모",
+      "price": 17700,
+      "origin": "콜롬비아",
+      "region": "중남미",
+      "process": "디카페인",
+      "notes": "",
+      "url": "https://kapkawa.com/product/캅카와-콜롬비아-수프리모-생두커피-1kg/142/category/25/display/1/",
       "is_new": false,
       "is_decaf": false,
       "is_special": false,
@@ -11418,7 +11388,7 @@
     {
       "id": 1003,
       "store": "커만사",
-      "name": "[참가자 사은품 증정] 2026 콜롬비아 생산자 초청 발효 커핑 세미나",
+      "name": "[참가자 사은품 증정] 카페쇼 2026 콜롬비아 생산자 초청 커핑 및 세미나-엘디비소, 아나야, 로사리오",
       "price": 21900,
       "origin": "콜롬비아",
       "region": "중남미",
@@ -12334,7 +12304,7 @@
       "id": 1064,
       "store": "커만사",
       "name": "185 과테말라 제뉴인 안티구아 SHP EP",
-      "price": 31400,
+      "price": 34100,
       "origin": "과테말라",
       "region": "중남미",
       "process": "워시드",
@@ -12484,7 +12454,7 @@
       "id": 1074,
       "store": "커만사",
       "name": "228 파푸아뉴기니 모데나 Y1 워시드 1KG",
-      "price": 31400,
+      "price": 34100,
       "origin": "파푸아뉴기니",
       "region": "아시아/태평양",
       "process": "워시드",
@@ -12603,21 +12573,6 @@
     {
       "id": 1082,
       "store": "커만사",
-      "name": "223 콜롬비아 엔칸토 오렌지 버번 워시드-트로피컬 카프리썬",
-      "price": 58000,
-      "origin": "콜롬비아",
-      "region": "중남미",
-      "process": "워시드",
-      "notes": "",
-      "url": "https://comansa.kr/goods/goods_view.php?goodsNo=1000003051",
-      "is_new": false,
-      "is_decaf": false,
-      "is_special": true,
-      "is_soldout": false
-    },
-    {
-      "id": 1083,
-      "store": "커만사",
       "name": "(할인커피생두) 90 콜롬비아 엘엔칸토 카투라 치로소 내추럴-스트로베리 브라우니",
       "price": 59000,
       "origin": "콜롬비아",
@@ -12631,7 +12586,7 @@
       "is_soldout": false
     },
     {
-      "id": 1084,
+      "id": 1083,
       "store": "커만사",
       "name": "57 콜롬비아 아나야 우쉬우쉬 워시드-레몬 모히토",
       "price": 65000,
@@ -12646,7 +12601,7 @@
       "is_soldout": false
     },
     {
-      "id": 1085,
+      "id": 1084,
       "store": "커만사",
       "name": "21 콜롬비아 아나야 티피카 메호라도 워시드 - 제뉴인 워터멜론",
       "price": 50500,
@@ -12661,7 +12616,7 @@
       "is_soldout": false
     },
     {
-      "id": 1086,
+      "id": 1085,
       "store": "커만사",
       "name": "245 라오스 볼라벤 반타텡 로부스타 내추럴",
       "price": 10300,
@@ -12676,7 +12631,7 @@
       "is_soldout": false
     },
     {
-      "id": 1087,
+      "id": 1086,
       "store": "커만사",
       "name": "244 라오스 볼라벤 반남폿 카티모르 워시드",
       "price": 16200,
@@ -12691,7 +12646,7 @@
       "is_soldout": false
     },
     {
-      "id": 1088,
+      "id": 1087,
       "store": "커만사",
       "name": "238 라오스 반농쿠앙 티피카 워시드 1kg",
       "price": 27200,
@@ -12706,7 +12661,7 @@
       "is_soldout": false
     },
     {
-      "id": 1089,
+      "id": 1088,
       "store": "커만사",
       "name": "232 라오스 반남폿 카티모르 ASD 내추럴 1kg",
       "price": 31400,
@@ -12721,7 +12676,7 @@
       "is_soldout": false
     },
     {
-      "id": 1090,
+      "id": 1089,
       "store": "커만사",
       "name": "230 라오스 반딱정 카티모르 무산소 내추럴 1kg",
       "price": 31400,
@@ -12736,7 +12691,7 @@
       "is_soldout": false
     },
     {
-      "id": 1091,
+      "id": 1090,
       "store": "커만사",
       "name": "74 콜롬비아 핀카 엘 아마네세르 카투라 워시드- 골든 피치 플라워",
       "price": 34100,
@@ -12751,7 +12706,7 @@
       "is_soldout": false
     },
     {
-      "id": 1092,
+      "id": 1091,
       "store": "커만사",
       "name": "76 에티오피아 시다모 G2 워시드",
       "price": 18900,
@@ -12766,7 +12721,7 @@
       "is_soldout": false
     },
     {
-      "id": 1093,
+      "id": 1092,
       "store": "커만사",
       "name": "66 에티오피아 예가체프 G2 워시드",
       "price": 18900,
@@ -12781,7 +12736,7 @@
       "is_soldout": false
     },
     {
-      "id": 1094,
+      "id": 1093,
       "store": "커만사",
       "name": "44 온두라스 코판 SHG EP 워시드",
       "price": 13400,
@@ -12796,7 +12751,7 @@
       "is_soldout": false
     },
     {
-      "id": 1095,
+      "id": 1094,
       "store": "커만사",
       "name": "027 에티오피아 내추럴 G5 짐마",
       "price": 11400,
@@ -12811,7 +12766,7 @@
       "is_soldout": false
     },
     {
-      "id": 1096,
+      "id": 1095,
       "store": "커만사",
       "name": "62 케냐 니에리 마시라 쿠리루  AB",
       "price": 28300,
@@ -12826,7 +12781,7 @@
       "is_soldout": false
     },
     {
-      "id": 1097,
+      "id": 1096,
       "store": "커만사",
       "name": "56 케냐 니에리 마시라 카문야카  AB",
       "price": 21700,
@@ -12841,7 +12796,7 @@
       "is_soldout": false
     },
     {
-      "id": 1098,
+      "id": 1097,
       "store": "커만사",
       "name": "324 케냐 키암부 카운티 AB FAQ",
       "price": 18300,
@@ -12856,7 +12811,7 @@
       "is_soldout": false
     },
     {
-      "id": 1099,
+      "id": 1098,
       "store": "커만사",
       "name": "236 케냐 니에리 우타무 탐바야 피베리",
       "price": 20700,
@@ -12871,7 +12826,7 @@
       "is_soldout": false
     },
     {
-      "id": 1100,
+      "id": 1099,
       "store": "커만사",
       "name": "208 케냐 니에리 아구티 타게이니 슈퍼 내추럴",
       "price": 34800,
@@ -12886,7 +12841,7 @@
       "is_soldout": false
     },
     {
-      "id": 1101,
+      "id": 1100,
       "store": "커만사",
       "name": "(할인커피생두) 188 케냐 니에리 마시라 카문야카 AA",
       "price": 26100,
@@ -12901,7 +12856,7 @@
       "is_soldout": false
     },
     {
-      "id": 1102,
+      "id": 1101,
       "store": "커만사",
       "name": "(할인커피생두) 178 케냐 니에리 테투 기티투 AB",
       "price": 21700,
@@ -12916,7 +12871,7 @@
       "is_soldout": false
     },
     {
-      "id": 1103,
+      "id": 1102,
       "store": "커만사",
       "name": "144 케냐 니에리 테투 기티투 내추럴",
       "price": 30400,
@@ -12931,7 +12886,7 @@
       "is_soldout": false
     },
     {
-      "id": 1104,
+      "id": 1103,
       "store": "커만사",
       "name": "252 콜롬비아 후일라 슈프리모 사탕수수 EA 디카페인",
       "price": 24500,
@@ -12946,7 +12901,7 @@
       "is_soldout": false
     },
     {
-      "id": 1105,
+      "id": 1104,
       "store": "커만사",
       "name": "311 콜롬비아 라스 팔마스 카투라 워시드 – 몽키 바나나",
       "price": 53000,
@@ -12961,7 +12916,7 @@
       "is_soldout": false
     },
     {
-      "id": 1106,
+      "id": 1105,
       "store": "커만사",
       "name": "309 콜롬비아 라스 팔마스 카투라 워시드-핑크 마시멜로",
       "price": 53000,
@@ -12976,7 +12931,7 @@
       "is_soldout": false
     },
     {
-      "id": 1107,
+      "id": 1106,
       "store": "커만사",
       "name": "303 콜롬비아 라스 팔마스 카투라 워시드- 체리 콜라",
       "price": 53000,
@@ -12991,7 +12946,7 @@
       "is_soldout": false
     },
     {
-      "id": 1108,
+      "id": 1107,
       "store": "커만사",
       "name": "288 콜롬비아 라스 팔마스 카투라 내추럴-섹시 체리",
       "price": 47000,
@@ -13006,7 +12961,7 @@
       "is_soldout": false
     },
     {
-      "id": 1109,
+      "id": 1108,
       "store": "커만사",
       "name": "286 콜롬비아 라스 팔마스 카투라 하이드로 허니- 파인애플 멜론 스무디",
       "price": 56000,
@@ -13021,7 +12976,7 @@
       "is_soldout": false
     },
     {
-      "id": 1110,
+      "id": 1109,
       "store": "커만사",
       "name": "-36 콜롬비아 라스 팔마스 카투라 워시드-크리미 라즈베리",
       "price": 53000,
@@ -13036,7 +12991,7 @@
       "is_soldout": false
     },
     {
-      "id": 1111,
+      "id": 1110,
       "store": "커만사",
       "name": "346 콜롬비아 캄포 에르모소 카투라 허니 석류 모스토 코퍼멘테이션",
       "price": 65000,
@@ -13051,7 +13006,7 @@
       "is_soldout": false
     },
     {
-      "id": 1112,
+      "id": 1111,
       "store": "커만사",
       "name": "289 콜롬비아 캄포 에르모소 카투라 허니 크렌베리 모스토 코퍼멘테이션",
       "price": 62000,
@@ -13066,7 +13021,7 @@
       "is_soldout": false
     },
     {
-      "id": 1113,
+      "id": 1112,
       "store": "커만사",
       "name": "341 콜롬비아 캄포 에르모소 카투라 블랙허니 앰버 블룸",
       "price": 62000,
@@ -13081,7 +13036,7 @@
       "is_soldout": false
     },
     {
-      "id": 1114,
+      "id": 1113,
       "store": "커만사",
       "name": "263 콜롬비아 캄포 에르모소 카투라 허니 바나나 모스토 코퍼멘테이션",
       "price": 56000,
@@ -13096,7 +13051,7 @@
       "is_soldout": false
     },
     {
-      "id": 1115,
+      "id": 1114,
       "store": "커만사",
       "name": "319 콜롬비아 캄포 에르모소 카투라 허니 룰로-키위 모스토 코퍼멘테이션 1kg",
       "price": 59000,
@@ -13111,7 +13066,7 @@
       "is_soldout": false
     },
     {
-      "id": 1116,
+      "id": 1115,
       "store": "커만사",
       "name": "39 파푸아뉴기니 아고가 워시드 유기농 인증 트리플픽",
       "price": 21000,
@@ -13126,7 +13081,7 @@
       "is_soldout": false
     },
     {
-      "id": 1117,
+      "id": 1116,
       "store": "커만사",
       "name": "308 파푸아뉴기니 아고가 워시드 유기농 인증",
       "price": 16500,
@@ -13141,7 +13096,7 @@
       "is_soldout": false
     },
     {
-      "id": 1118,
+      "id": 1117,
       "store": "커만사",
       "name": "113 에티오피아 구지 G4 내추럴",
       "price": 15400,
@@ -13156,7 +13111,7 @@
       "is_soldout": false
     },
     {
-      "id": 1119,
+      "id": 1118,
       "store": "커만사",
       "name": "207 콜롬비아 핀카 엘엔칸토 카투라 치로소 내추럴-스트로베리 브라우니",
       "price": 62000,
@@ -13171,7 +13126,7 @@
       "is_soldout": false
     },
     {
-      "id": 1120,
+      "id": 1119,
       "store": "커만사",
       "name": "276 콜롬비아 핀카 라 베타니아 게이샤 워시드 - 허니 레몬그라스",
       "price": 60900,
@@ -13186,7 +13141,7 @@
       "is_soldout": false
     },
     {
-      "id": 1121,
+      "id": 1120,
       "store": "커만사",
       "name": "112 케냐 니에리 오타야 FCS 피베리",
       "price": 21000,
@@ -13201,7 +13156,7 @@
       "is_soldout": false
     },
     {
-      "id": 1122,
+      "id": 1121,
       "store": "커만사",
       "name": "30 콜롬비아 핀카 엘파라이소 라우리나 내추럴",
       "price": 240000,
@@ -13216,7 +13171,7 @@
       "is_soldout": false
     },
     {
-      "id": 1123,
+      "id": 1122,
       "store": "커만사",
       "name": "86 베트남 닥락 이탄 협동조합 파인로부스타 G1 무산소 내추럴",
       "price": 20400,
@@ -13231,10 +13186,10 @@
       "is_soldout": false
     },
     {
-      "id": 1124,
+      "id": 1123,
       "store": "커만사",
       "name": "40 베트남 달락 로부스타 G1 SC16 웻폴리시드",
-      "price": 26500,
+      "price": 28000,
       "origin": "베트남",
       "region": "아시아/태평양",
       "process": "웻훌드",
@@ -13246,10 +13201,10 @@
       "is_soldout": false
     },
     {
-      "id": 1125,
+      "id": 1124,
       "store": "커만사",
       "name": "338 브라질 산토스 내추럴 사탕수수 디카페인",
-      "price": 26500,
+      "price": 28000,
       "origin": "브라질",
       "region": "중남미",
       "process": "내추럴",
@@ -13261,7 +13216,7 @@
       "is_soldout": false
     },
     {
-      "id": 1126,
+      "id": 1125,
       "store": "커만사",
       "name": "327 에티오피아 예가체프 아리차 G1 내추럴",
       "price": 25800,
@@ -13276,10 +13231,10 @@
       "is_soldout": false
     },
     {
-      "id": 1127,
+      "id": 1126,
       "store": "커만사",
       "name": "233 에티오피아 아바야 게이샤 G1 내추럴",
-      "price": 26500,
+      "price": 28000,
       "origin": "에티오피아",
       "region": "아프리카",
       "process": "내추럴",
@@ -13291,7 +13246,7 @@
       "is_soldout": false
     },
     {
-      "id": 1128,
+      "id": 1127,
       "store": "커만사",
       "name": "234 파푸아뉴기니 모로베 로부스타 스위스워터 디카페인",
       "price": 15500,
@@ -13306,7 +13261,7 @@
       "is_soldout": false
     },
     {
-      "id": 1129,
+      "id": 1128,
       "store": "커만사",
       "name": "215 에티오피아 구지 벤티 내추럴 스위스워터 디카페인",
       "price": 33000,
@@ -13321,7 +13276,7 @@
       "is_soldout": false
     },
     {
-      "id": 1130,
+      "id": 1129,
       "store": "커만사",
       "name": "91 에티오피아 게샤빌리지 오마 게샤1931 내추럴",
       "price": 180000,
@@ -13336,7 +13291,7 @@
       "is_soldout": false
     },
     {
-      "id": 1131,
+      "id": 1130,
       "store": "커만사",
       "name": "84 에티오피아 게샤빌리지 수르마 게샤1931 내추럴",
       "price": 180000,
@@ -13351,7 +13306,7 @@
       "is_soldout": false
     },
     {
-      "id": 1132,
+      "id": 1131,
       "store": "커만사",
       "name": "78 에티오피아 게샤빌리지 오마 게샤1931 워시드",
       "price": 180000,
@@ -13366,7 +13321,7 @@
       "is_soldout": false
     },
     {
-      "id": 1133,
+      "id": 1132,
       "store": "커만사",
       "name": "(할인커피생두) 052 에티오피아 게샤빌리지 사야 고리 게이샤 내추럴",
       "price": 73000,
@@ -13381,7 +13336,7 @@
       "is_soldout": false
     },
     {
-      "id": 1134,
+      "id": 1133,
       "store": "커만사",
       "name": "(할인커피생두) 051 에티오피아 게샤빌리지 셰와-지바부 고리게이샤 내추럴",
       "price": 73000,
@@ -13396,7 +13351,7 @@
       "is_soldout": false
     },
     {
-      "id": 1135,
+      "id": 1134,
       "store": "커만사",
       "name": "254 인도 카르나타카 로부스타 체리 AA 내추럴",
       "price": 10800,
@@ -13411,7 +13366,7 @@
       "is_soldout": false
     },
     {
-      "id": 1136,
+      "id": 1135,
       "store": "커만사",
       "name": "281 콜롬비아 나리뇨 버번 치로소 워시드-잉가 미스틱 프로젝트",
       "price": 53000,
@@ -13426,7 +13381,7 @@
       "is_soldout": false
     },
     {
-      "id": 1137,
+      "id": 1136,
       "store": "커만사",
       "name": "310 콜롬비아 나리뇨 바이오 리액터 에너로빅 카투라 워시드-잉가 미스틱 프로젝트",
       "price": 38000,
@@ -13441,7 +13396,7 @@
       "is_soldout": false
     },
     {
-      "id": 1138,
+      "id": 1137,
       "store": "커만사",
       "name": "(할인커피생두) 302 콜롬비아 나리뇨 EP-10 카투라 워시드-잉가 미스틱 프로젝트",
       "price": 21000,
@@ -13456,7 +13411,7 @@
       "is_soldout": false
     },
     {
-      "id": 1139,
+      "id": 1138,
       "store": "커만사",
       "name": "163 과테말라 SHB EP 워시드 아티틀란",
       "price": 19200,
@@ -13471,7 +13426,7 @@
       "is_soldout": false
     },
     {
-      "id": 1140,
+      "id": 1139,
       "store": "커만사",
       "name": "154 과테말라 SHB EP 워시드 우에우에테낭고",
       "price": 20000,
@@ -13486,7 +13441,7 @@
       "is_soldout": false
     },
     {
-      "id": 1141,
+      "id": 1140,
       "store": "커만사",
       "name": "307 콜롬비아 핀카 엘파라이소 카스티요-플럼",
       "price": 44500,
@@ -13501,7 +13456,7 @@
       "is_soldout": false
     },
     {
-      "id": 1142,
+      "id": 1141,
       "store": "커만사",
       "name": "(할인커피생두) 116 브라질 파젠다 시티오 보아 비스타 옐로우 카투아이 내추럴-베스트 산컵 2025 옥션 11위 1kg",
       "price": 29000,
@@ -13516,7 +13471,7 @@
       "is_soldout": false
     },
     {
-      "id": 1143,
+      "id": 1142,
       "store": "커만사",
       "name": "220 콜롬비아 핀카 라프라데라 카스티죠 슈가케인 디카페인",
       "price": 22000,
@@ -13531,7 +13486,7 @@
       "is_soldout": false
     },
     {
-      "id": 1144,
+      "id": 1143,
       "store": "커만사",
       "name": "312 르완다 니야루구루 후기 레드버번 300시간 무산소 내추럴",
       "price": 28000,
@@ -13546,7 +13501,7 @@
       "is_soldout": false
     },
     {
-      "id": 1145,
+      "id": 1144,
       "store": "커만사",
       "name": "271 르완다 루와마가나 무조 레드버번 풀리 워시드",
       "price": 20000,
@@ -13561,7 +13516,7 @@
       "is_soldout": false
     },
     {
-      "id": 1146,
+      "id": 1145,
       "store": "커만사",
       "name": "237 르완다 루와마가나 무조 넴바 힐스 레드 버번 풀리 워시드",
       "price": 20500,
@@ -13576,7 +13531,7 @@
       "is_soldout": false
     },
     {
-      "id": 1147,
+      "id": 1146,
       "store": "커만사",
       "name": "151 르완다 가츠보 후무레 레드 버번 풀리 워시드",
       "price": 18500,
@@ -13591,7 +13546,7 @@
       "is_soldout": false
     },
     {
-      "id": 1148,
+      "id": 1147,
       "store": "커만사",
       "name": "300 콩고 응고마 라이니 레드 버번 풀리 워시드",
       "price": 20000,
@@ -13606,7 +13561,7 @@
       "is_soldout": false
     },
     {
-      "id": 1149,
+      "id": 1148,
       "store": "커만사",
       "name": "291 콩고 응고마 아실리 레드 버번 풀리 워시드",
       "price": 20000,
@@ -13621,7 +13576,7 @@
       "is_soldout": false
     },
     {
-      "id": 1150,
+      "id": 1149,
       "store": "커만사",
       "name": "325 르와다 가츠보 후무레 레드버번 48시간 슈퍼애너러빅 내추럴",
       "price": 26500,
@@ -13636,7 +13591,7 @@
       "is_soldout": false
     },
     {
-      "id": 1151,
+      "id": 1150,
       "store": "커만사",
       "name": "305 르완다 니야마쉐케 응고마 레드버번 300시간 무산소 내추럴",
       "price": 28000,
@@ -13651,7 +13606,7 @@
       "is_soldout": false
     },
     {
-      "id": 1152,
+      "id": 1151,
       "store": "커만사",
       "name": "(할인커피생두) 201 르완다 키고마 카라비 레드 버본 풀리 워시드 1kg",
       "price": 20000,
@@ -13666,7 +13621,7 @@
       "is_soldout": false
     },
     {
-      "id": 1153,
+      "id": 1152,
       "store": "커만사",
       "name": "41 브라질 세하도 파젠다 돔 카페 아라라 내추럴 1kg",
       "price": 20500,
@@ -13681,7 +13636,7 @@
       "is_soldout": false
     },
     {
-      "id": 1154,
+      "id": 1153,
       "store": "커만사",
       "name": "108 에티오피아 시다모 G4 마운틴워터 디카페인",
       "price": 25500,
@@ -13696,7 +13651,7 @@
       "is_soldout": false
     },
     {
-      "id": 1155,
+      "id": 1154,
       "store": "커만사",
       "name": "5 브라질 산토스 내추럴 마운틴워터 디카페인",
       "price": 24500,
@@ -13711,7 +13666,7 @@
       "is_soldout": false
     },
     {
-      "id": 1156,
+      "id": 1155,
       "store": "커만사",
       "name": "119 브라질 파젠다 노사 아프레시다 토파지오 내추럴 1kg",
       "price": 18200,
@@ -13726,7 +13681,7 @@
       "is_soldout": false
     },
     {
-      "id": 1157,
+      "id": 1156,
       "store": "커만사",
       "name": "98 인도 마이소르너깃 엑스트라볼드",
       "price": 18900,
@@ -13741,7 +13696,7 @@
       "is_soldout": false
     },
     {
-      "id": 1158,
+      "id": 1157,
       "store": "커만사",
       "name": "183 파푸아뉴기니 지와카 내추럴",
       "price": 23500,
@@ -13756,7 +13711,7 @@
       "is_soldout": false
     },
     {
-      "id": 1159,
+      "id": 1158,
       "store": "커만사",
       "name": "287 콜롬비아 리저널 슈프리모 톨리마 워시드-카사 베르데 조합",
       "price": 19800,
@@ -13771,7 +13726,7 @@
       "is_soldout": false
     },
     {
-      "id": 1160,
+      "id": 1159,
       "store": "커만사",
       "name": "241 파푸아뉴기니 마라와카 스위스워터 디카페인 유기농 1kg",
       "price": 26500,
@@ -13786,7 +13741,7 @@
       "is_soldout": false
     },
     {
-      "id": 1161,
+      "id": 1160,
       "store": "커만사",
       "name": "130 파푸아뉴기니 마라와카 스위스워터 디카페인",
       "price": 25000,
@@ -13801,7 +13756,7 @@
       "is_soldout": false
     },
     {
-      "id": 1162,
+      "id": 1161,
       "store": "커만사",
       "name": "328 하와이 코나 엑스트라 팬시 칸시노 이스테이트 CROP2026 1kg",
       "price": 179000,
@@ -13816,7 +13771,7 @@
       "is_soldout": false
     },
     {
-      "id": 1163,
+      "id": 1162,
       "store": "커만사",
       "name": "121 케냐 니에리 오타야 FCS AA",
       "price": 21500,
@@ -13831,7 +13786,7 @@
       "is_soldout": false
     },
     {
-      "id": 1164,
+      "id": 1163,
       "store": "커만사",
       "name": "156 콜롬비아 핀카 엘파라이소 카스티요  마차 그린티 1kg",
       "price": 56000,
@@ -13846,7 +13801,7 @@
       "is_soldout": false
     },
     {
-      "id": 1165,
+      "id": 1164,
       "store": "커만사",
       "name": "122 콜롬비아 핀카 엘파라이소 게이샤 워시드",
       "price": 69000,
@@ -13861,7 +13816,7 @@
       "is_soldout": false
     },
     {
-      "id": 1166,
+      "id": 1165,
       "store": "커만사",
       "name": "128 페루 카하마르카 산후안 옐로우 게이샤 워시드",
       "price": 68000,
@@ -13876,7 +13831,7 @@
       "is_soldout": false
     },
     {
-      "id": 1167,
+      "id": 1166,
       "store": "커만사",
       "name": "(할인커피생두) 65 페루 카하마르카 산후안 게이샤 워시드 1720M 1KG",
       "price": 67000,
@@ -13891,7 +13846,7 @@
       "is_soldout": false
     },
     {
-      "id": 1168,
+      "id": 1167,
       "store": "커만사",
       "name": "35 페루 카하마르카 산후안 게이샤 워시드 1800M",
       "price": 69000,
@@ -13906,7 +13861,7 @@
       "is_soldout": false
     },
     {
-      "id": 1169,
+      "id": 1168,
       "store": "커만사",
       "name": "194 페루 하엔 미칸커피 게이샤 워시드",
       "price": 83000,
@@ -13921,7 +13876,7 @@
       "is_soldout": false
     },
     {
-      "id": 1170,
+      "id": 1169,
       "store": "커만사",
       "name": "11 페루 카하마르카 핀카 라팔마 게이샤 워시드",
       "price": 68000,
@@ -13936,7 +13891,7 @@
       "is_soldout": false
     },
     {
-      "id": 1171,
+      "id": 1170,
       "store": "커만사",
       "name": "7 페루 카하마르카 핀카 라리마 게이샤 워시드",
       "price": 82000,
@@ -13951,7 +13906,7 @@
       "is_soldout": false
     },
     {
-      "id": 1172,
+      "id": 1171,
       "store": "커만사",
       "name": "315 콜롬비아 라 에스페란자 포토시 케이세도니아-바예 시드라 내추럴",
       "price": 99000,
@@ -13966,7 +13921,7 @@
       "is_soldout": false
     },
     {
-      "id": 1173,
+      "id": 1172,
       "store": "커만사",
       "name": "43 콜롬비아 라 에스페란자 트루히요-바예 만델라 XO 내추럴 1kg",
       "price": 140000,
@@ -13981,7 +13936,7 @@
       "is_soldout": false
     },
     {
-      "id": 1174,
+      "id": 1173,
       "store": "커만사",
       "name": "93 브라질 파젠다 마나부이우 롱카도르 토파지오 펄프드 네추럴",
       "price": 22000,
@@ -13996,7 +13951,7 @@
       "is_soldout": false
     },
     {
-      "id": 1175,
+      "id": 1174,
       "store": "커만사",
       "name": "26 브라질 파젠다 상마테우스 옐로우버번 네추럴",
       "price": 18900,
@@ -14011,7 +13966,7 @@
       "is_soldout": false
     },
     {
-      "id": 1176,
+      "id": 1175,
       "store": "커만사",
       "name": "266 인도네시아 수마트라 만델링 크린치 내추럴",
       "price": 23500,
@@ -14026,7 +13981,7 @@
       "is_soldout": false
     },
     {
-      "id": 1177,
+      "id": 1176,
       "store": "커만사",
       "name": "69 콜롬비아 그란하 파라이소92 게이샤 더블무산소-다마스크 로즈",
       "price": 78400,
@@ -14041,7 +13996,7 @@
       "is_soldout": false
     },
     {
-      "id": 1178,
+      "id": 1177,
       "store": "커만사",
       "name": "316 탄자니아 키고마 레드버번 AA FAQ 풀리워시드",
       "price": 18900,
@@ -14056,7 +14011,7 @@
       "is_soldout": false
     },
     {
-      "id": 1179,
+      "id": 1178,
       "store": "커만사",
       "name": "28 과테말라 핀카 산타펠리사 옐로우 카투아이 풀리워시드 이중발효",
       "price": 23800,
@@ -14071,7 +14026,7 @@
       "is_soldout": false
     },
     {
-      "id": 1180,
+      "id": 1179,
       "store": "커만사",
       "name": "80 멕시코 핀카 돈라파 파체 무산소 내추럴 코지 프로세스 1kg",
       "price": 59000,
@@ -14086,7 +14041,7 @@
       "is_soldout": false
     },
     {
-      "id": 1181,
+      "id": 1180,
       "store": "커만사",
       "name": "123 엘살바도르 핀카 알타미라 파카마라 내추럴-엘살바도르 COE2025 7위",
       "price": 88000,
@@ -14101,7 +14056,7 @@
       "is_soldout": false
     },
     {
-      "id": 1182,
+      "id": 1181,
       "store": "커만사",
       "name": "117 멕시코 핀카 돈라파 파체 마운틴워터 디카페인 1kg",
       "price": 23500,
@@ -14116,7 +14071,7 @@
       "is_soldout": false
     },
     {
-      "id": 1183,
+      "id": 1182,
       "store": "커만사",
       "name": "53 멕시코 핀카 돈라파 게이샤 워시드",
       "price": 48000,
@@ -14131,7 +14086,7 @@
       "is_soldout": false
     },
     {
-      "id": 1184,
+      "id": 1183,
       "store": "커만사",
       "name": "(할인커피생두) 14 멕시코 핀카 돈라파 파체 워시드",
       "price": 20200,
@@ -14146,7 +14101,7 @@
       "is_soldout": false
     },
     {
-      "id": 1185,
+      "id": 1184,
       "store": "커만사",
       "name": "182 케냐 카히라이니 조합 무산소 내추럴",
       "price": 22400,
@@ -14161,7 +14116,7 @@
       "is_soldout": false
     },
     {
-      "id": 1186,
+      "id": 1185,
       "store": "커만사",
       "name": "221 니카라과 델라핀카커피 마라고지페 내추럴-COE 2025 내추럴/허니 부문 7위",
       "price": 84000,
@@ -14176,7 +14131,7 @@
       "is_soldout": false
     },
     {
-      "id": 1187,
+      "id": 1186,
       "store": "커만사",
       "name": "217 라오스 볼라벤 카우추옌 티피카 워시드-라오 그린커피 컴피티션 아라비카 2위 1KG",
       "price": 24000,
@@ -14191,7 +14146,7 @@
       "is_soldout": false
     },
     {
-      "id": 1188,
+      "id": 1187,
       "store": "커만사",
       "name": "9 콜롬비아 리오 네그로 아지버번 워시드- 멜론 초코 캔디",
       "price": 43000,
@@ -14206,7 +14161,7 @@
       "is_soldout": false
     },
     {
-      "id": 1189,
+      "id": 1188,
       "store": "커만사",
       "name": "10 엘살바도르 산타아나 워시드 SHG EP",
       "price": 19800,
@@ -14221,7 +14176,7 @@
       "is_soldout": false
     },
     {
-      "id": 1190,
+      "id": 1189,
       "store": "커만사",
       "name": "(할인커피생두) 184 베트남 닥락 이탄 협동조합 파인로부스타 G1 SC16 내추럴",
       "price": 18000,
@@ -14236,7 +14191,7 @@
       "is_soldout": false
     },
     {
-      "id": 1191,
+      "id": 1190,
       "store": "커만사",
       "name": "137 베트남 크롱낭 이탄 협동조합 파인로부스타 G1 SC16 레드허니",
       "price": 21900,
@@ -14251,7 +14206,7 @@
       "is_soldout": false
     },
     {
-      "id": 1192,
+      "id": 1191,
       "store": "커만사",
       "name": "198 케냐 키암부 AB",
       "price": 19500,
@@ -14266,7 +14221,7 @@
       "is_soldout": false
     },
     {
-      "id": 1193,
+      "id": 1192,
       "store": "커만사",
       "name": "318 우간다 로부스타 내추럴 SC15",
       "price": 10900,
@@ -14281,7 +14236,7 @@
       "is_soldout": false
     },
     {
-      "id": 1194,
+      "id": 1193,
       "store": "커만사",
       "name": "125 콜롬비아 톨리마 슈프리모",
       "price": 19600,
@@ -14296,7 +14251,7 @@
       "is_soldout": false
     },
     {
-      "id": 1195,
+      "id": 1194,
       "store": "커만사",
       "name": "127 인도네시아 수마트라 G1 블루 만델링",
       "price": 21000,
@@ -14311,7 +14266,7 @@
       "is_soldout": false
     },
     {
-      "id": 1196,
+      "id": 1195,
       "store": "커만사",
       "name": "(할인커피생두) 218 콜롬비아 하치프로젝트 게이샤 산화발효 워시드-LGP",
       "price": 199000,
@@ -14326,7 +14281,7 @@
       "is_soldout": false
     },
     {
-      "id": 1197,
+      "id": 1196,
       "store": "커만사",
       "name": "132 에티오피아 구지 G1 워시드 수케 쿠토",
       "price": 21800,
@@ -14341,7 +14296,7 @@
       "is_soldout": false
     },
     {
-      "id": 1198,
+      "id": 1197,
       "store": "커만사",
       "name": "92 콜롬비아 핀카 엘파라이소 옐로우 게이샤 더블애너로빅-레티 1kg",
       "price": 145000,
@@ -14356,7 +14311,7 @@
       "is_soldout": false
     },
     {
-      "id": 1199,
+      "id": 1198,
       "store": "커만사",
       "name": "64 콜롬비아 핀카 엘파라이소 카스티죠 안티머서레이션1kg",
       "price": 145000,
@@ -14371,7 +14326,7 @@
       "is_soldout": false
     },
     {
-      "id": 1200,
+      "id": 1199,
       "store": "커만사",
       "name": "255 콜롬비아 핀카 그랑하 파라이소92 코지 프로세스 스트라이프 버번 1kg",
       "price": 83000,
@@ -14386,7 +14341,7 @@
       "is_soldout": false
     },
     {
-      "id": 1201,
+      "id": 1200,
       "store": "커만사",
       "name": "038 에티오피아 예가체프 워시드 G2 트리플픽",
       "price": 19500,
@@ -14401,7 +14356,7 @@
       "is_soldout": false
     },
     {
-      "id": 1202,
+      "id": 1201,
       "store": "커만사",
       "name": "24 케냐 키암부 AA 트리플픽",
       "price": 23000,
@@ -14416,7 +14371,7 @@
       "is_soldout": false
     },
     {
-      "id": 1203,
+      "id": 1202,
       "store": "커만사",
       "name": "61 과테말라 우에우에테낭고 SHB 트리플픽",
       "price": 22000,
@@ -14431,7 +14386,7 @@
       "is_soldout": false
     },
     {
-      "id": 1204,
+      "id": 1203,
       "store": "커만사",
       "name": "81 브라질 세하도 파인컵 17/18 트리플픽",
       "price": 18900,
@@ -14446,7 +14401,7 @@
       "is_soldout": false
     },
     {
-      "id": 1205,
+      "id": 1204,
       "store": "커만사",
       "name": "54 코스타리카 따라주 SHB 워시드",
       "price": 20300,
@@ -14461,7 +14416,7 @@
       "is_soldout": false
     },
     {
-      "id": 1206,
+      "id": 1205,
       "store": "커만사",
       "name": "63 베트남 닥락 로부스타 G1",
       "price": 7000,
@@ -14476,7 +14431,7 @@
       "is_soldout": false
     },
     {
-      "id": 1207,
+      "id": 1206,
       "store": "커만사",
       "name": "8 콜롬비아 후일라 슈프리모",
       "price": 15900,
@@ -14491,7 +14446,7 @@
       "is_soldout": false
     },
     {
-      "id": 1208,
+      "id": 1207,
       "store": "커만사",
       "name": "2  브라질 파젠타 판타노 내추럴 옐로우버번 1kg",
       "price": 19600,
@@ -14506,10 +14461,10 @@
       "is_soldout": false
     },
     {
-      "id": 1209,
+      "id": 1208,
       "store": "커만사",
       "name": "1 브라질 세하도 파인컵 NY2 17/18",
-      "price": 57000,
+      "price": 85000,
       "origin": "브라질",
       "region": "중남미",
       "process": "펄프드내추럴",
@@ -14521,7 +14476,7 @@
       "is_soldout": false
     },
     {
-      "id": 1210,
+      "id": 1209,
       "store": "커만사",
       "name": "169 콜롬비아 하치 프로젝트 치로소 세미 워시드",
       "price": 57000,
@@ -14536,7 +14491,7 @@
       "is_soldout": false
     },
     {
-      "id": 1211,
+      "id": 1210,
       "store": "커만사",
       "name": "329 콜롬비아 하치 프로젝트 게이샤 세미 워시드",
       "price": 85000,
@@ -14551,7 +14506,7 @@
       "is_soldout": false
     },
     {
-      "id": 1212,
+      "id": 1211,
       "store": "커만사",
       "name": "347 콜롬비아 하치 프로젝트 게이샤 내추럴",
       "price": 77000,
@@ -14566,7 +14521,7 @@
       "is_soldout": false
     },
     {
-      "id": 1213,
+      "id": 1212,
       "store": "커만사",
       "name": "110 콜롬비아 핀카 엘 벤틸라도르 핑크버번 내추럴-엑스포카페 피탈리토 2026 옥션",
       "price": 42000,
@@ -14581,7 +14536,7 @@
       "is_soldout": false
     },
     {
-      "id": 1214,
+      "id": 1213,
       "store": "커만사",
       "name": "055 콜롬비아 핀카 엘엔칸토 오렌지 버번 워시드-엑스포카페 피탈리토 2026 옥션",
       "price": 67000,
@@ -14596,7 +14551,7 @@
       "is_soldout": false
     },
     {
-      "id": 1215,
+      "id": 1214,
       "store": "커만사",
       "name": "344 콜롬비아 하치 프로젝트 타비 내추럴",
       "price": 69600,
@@ -14611,7 +14566,7 @@
       "is_soldout": false
     },
     {
-      "id": 1216,
+      "id": 1215,
       "store": "커만사",
       "name": "343 콜롬비아 하치 프로젝트 옐로우 카투아이 내추럴",
       "price": 69600,
@@ -14626,7 +14581,7 @@
       "is_soldout": false
     },
     {
-      "id": 1217,
+      "id": 1216,
       "store": "커만사",
       "name": "290 콜롬비아 하치 프로젝트 치로소 워시드",
       "price": 82500,
@@ -14641,7 +14596,7 @@
       "is_soldout": false
     },
     {
-      "id": 1218,
+      "id": 1217,
       "store": "커만사",
       "name": "278 콜롬비아 하치 프로젝트 게이샤 워시드",
       "price": 82500,
@@ -14656,7 +14611,7 @@
       "is_soldout": false
     },
     {
-      "id": 1219,
+      "id": 1218,
       "store": "커만사",
       "name": "200 콜롬비아 하치 프로젝트 수단 루메 내추럴",
       "price": 82500,
@@ -14671,7 +14626,7 @@
       "is_soldout": false
     },
     {
-      "id": 1220,
+      "id": 1219,
       "store": "커만사",
       "name": "172 콜롬비아 하치 프로젝트 마라고지페 워시드",
       "price": 82500,
@@ -14686,7 +14641,7 @@
       "is_soldout": false
     },
     {
-      "id": 1221,
+      "id": 1220,
       "store": "커만사",
       "name": "106 콜롬비아 핀카 엘파라이소 카스티요 리치",
       "price": 46500,
@@ -14701,7 +14656,7 @@
       "is_soldout": false
     },
     {
-      "id": 1222,
+      "id": 1221,
       "store": "커만사",
       "name": "100 콜롬비아 핀카 엘파라이소 카스티요 리치피치",
       "price": 47000,
@@ -14716,7 +14671,7 @@
       "is_soldout": false
     },
     {
-      "id": 1223,
+      "id": 1222,
       "store": "커만사",
       "name": "143 카메룬 블루마운틴 음베싸 내추럴 1kg",
       "price": 25000,
@@ -14731,7 +14686,7 @@
       "is_soldout": false
     },
     {
-      "id": 1224,
+      "id": 1223,
       "store": "커만사",
       "name": "351 콜롬비아 핀카 아나야 레드 파카마라 워시드-블루베리 캔디",
       "price": 44000,
@@ -14746,7 +14701,7 @@
       "is_soldout": false
     },
     {
-      "id": 1225,
+      "id": 1224,
       "store": "커만사",
       "name": "190 베트남 람동 라이크팜 리베리카 바나나 위스키 발효 무산소 내추럴",
       "price": 32000,
@@ -14761,7 +14716,7 @@
       "is_soldout": false
     },
     {
-      "id": 1226,
+      "id": 1225,
       "store": "커만사",
       "name": "187 베트남 람동 라이크팜 파인로부스타 바나나 위스키 발효 무산소 내추럴",
       "price": 17200,
@@ -14776,7 +14731,7 @@
       "is_soldout": false
     },
     {
-      "id": 1227,
+      "id": 1226,
       "store": "커만사",
       "name": "257 콜롬비아 엘엔칸토 게이샤 워시드-오렌지 로즈 1kg",
       "price": 58000,
@@ -14791,7 +14746,7 @@
       "is_soldout": false
     },
     {
-      "id": 1228,
+      "id": 1227,
       "store": "커만사",
       "name": "242 콜롬비아 핀카 아나야 시드라 내추럴 -피치 샤베트",
       "price": 64000,
@@ -14806,7 +14761,7 @@
       "is_soldout": false
     },
     {
-      "id": 1229,
+      "id": 1228,
       "store": "커만사",
       "name": "077 과테말라 푸에블로 누에보 비냐스 핀카 미라문도 게이샤 워시드",
       "price": 49000,
@@ -14821,7 +14776,7 @@
       "is_soldout": false
     },
     {
-      "id": 1230,
+      "id": 1229,
       "store": "커만사",
       "name": "331 코스타리카 핀카부 카투아이 72시간 무산소 내추럴",
       "price": 74000,
@@ -14836,7 +14791,7 @@
       "is_soldout": false
     },
     {
-      "id": 1231,
+      "id": 1230,
       "store": "커만사",
       "name": "329 콜롬비아 카필라 델 로사리오 카스티요 워시드-칼루아 밀크 1kg",
       "price": 53000,
@@ -14851,7 +14806,7 @@
       "is_soldout": false
     },
     {
-      "id": 1232,
+      "id": 1231,
       "store": "커만사",
       "name": "306 콜롬비아 라스 팔마스 카투라 워시드-구아바나 1kg",
       "price": 48000,
@@ -14866,7 +14821,7 @@
       "is_soldout": false
     },
     {
-      "id": 1233,
+      "id": 1232,
       "store": "커만사",
       "name": "202 콜롬비아 로사리오 카스티요 워시드- 카라멜 위스키",
       "price": 51000,
@@ -14881,7 +14836,7 @@
       "is_soldout": false
     },
     {
-      "id": 1234,
+      "id": 1233,
       "store": "커만사",
       "name": "172 콜롬비아 엘미라도 카티오페 워시드-위스키배럴 에이지드 1kg",
       "price": 53000,
@@ -14896,7 +14851,7 @@
       "is_soldout": false
     },
     {
-      "id": 1235,
+      "id": 1234,
       "store": "커만사",
       "name": "169 콜롬비아 엘미라도 카티오페 워시드-럼배럴 에이지드",
       "price": 53000,
@@ -14911,7 +14866,7 @@
       "is_soldout": false
     },
     {
-      "id": 1236,
+      "id": 1235,
       "store": "커만사",
       "name": "167 콜롬비아 카필라 델 로사리오 카스티요 워시드-초콜릿 1kg",
       "price": 48000,
@@ -14926,7 +14881,7 @@
       "is_soldout": false
     },
     {
-      "id": 1237,
+      "id": 1236,
       "store": "커만사",
       "name": "164 콜롬비아 카필라 델 로사리오 카스티요 워시드-사우어 베리 1kg",
       "price": 51000,
@@ -14941,7 +14896,7 @@
       "is_soldout": false
     },
     {
-      "id": 1238,
+      "id": 1237,
       "store": "커만사",
       "name": "158 콜롬비아 라스 팔마스 카투라 워시드-패션후르츠 1kg",
       "price": 48000,
@@ -14956,7 +14911,7 @@
       "is_soldout": false
     },
     {
-      "id": 1239,
+      "id": 1238,
       "store": "커만사",
       "name": "152 콜롬비아 라스 팔마스 카투라 워시드-망고베리 1kg",
       "price": 48000,
@@ -14971,7 +14926,7 @@
       "is_soldout": false
     },
     {
-      "id": 1240,
+      "id": 1239,
       "store": "커만사",
       "name": "136 콜롬비아 엘미라도 버번 워시드 - 핑크 샴페인 1kg",
       "price": 49000,
@@ -14986,7 +14941,7 @@
       "is_soldout": false
     },
     {
-      "id": 1241,
+      "id": 1240,
       "store": "커만사",
       "name": "243 브라질 산토스 NY2 파인컵 내추럴 1kg",
       "price": 14800,
@@ -15001,7 +14956,7 @@
       "is_soldout": false
     },
     {
-      "id": 1242,
+      "id": 1241,
       "store": "커만사",
       "name": "212 코스타리카 로스 산토스 알타비스타 게이샤 허니 CROP24/25 700g",
       "price": 34300,
@@ -15016,7 +14971,7 @@
       "is_soldout": false
     },
     {
-      "id": 1243,
+      "id": 1242,
       "store": "커만사",
       "name": "270 코스타리카 하시엔다 산 이시드로 게이샤 허니",
       "price": 84500,
@@ -15031,7 +14986,7 @@
       "is_soldout": false
     },
     {
-      "id": 1244,
+      "id": 1243,
       "store": "커만사",
       "name": "94 콜롬비아 아나야 티피카 메호라도 워시드-제뉴엔 워터멜론-9월 입고예정",
       "price": 53500,
@@ -15046,7 +15001,7 @@
       "is_soldout": false
     },
     {
-      "id": 1245,
+      "id": 1244,
       "store": "커만사",
       "name": "203 콜롬비아 아나야 SL28 워시드-리몬 첼로-9월 입고예정",
       "price": 55800,
@@ -15061,7 +15016,7 @@
       "is_soldout": false
     },
     {
-      "id": 1246,
+      "id": 1245,
       "store": "커만사",
       "name": "19 콜롬비아 아나야 옴블리곤 워시드-로즈 스플래쉬-9월 입고예정",
       "price": 49000,
@@ -15076,7 +15031,7 @@
       "is_soldout": false
     },
     {
-      "id": 1247,
+      "id": 1246,
       "store": "커만사",
       "name": "296 콜롬비아 리오 네그로 카스티죠 워시드-멜론 아이스크림",
       "price": 50000,
@@ -15091,7 +15046,7 @@
       "is_soldout": false
     },
     {
-      "id": 1248,
+      "id": 1247,
       "store": "커만사",
       "name": "293 콜롬비아 퀘브라디타스 게이샤  워시드-피치펀치 1kg",
       "price": 69500,
@@ -15106,7 +15061,7 @@
       "is_soldout": false
     },
     {
-      "id": 1249,
+      "id": 1248,
       "store": "커만사",
       "name": "275 콜롬비아 라플란타 레드 버번 내추럴-체리 코튼 캔디",
       "price": 59000,
@@ -15121,7 +15076,7 @@
       "is_soldout": false
     },
     {
-      "id": 1250,
+      "id": 1249,
       "store": "커만사",
       "name": "265 콜롬비아 엘디비소 게이샤 워시드-엘더플라워 피즈 1kg",
       "price": 69500,
@@ -15130,6 +15085,21 @@
       "process": "워시드",
       "notes": "",
       "url": "https://comansa.kr/goods/goods_view.php?goodsNo=1000003053",
+      "is_new": false,
+      "is_decaf": false,
+      "is_special": true,
+      "is_soldout": false
+    },
+    {
+      "id": 1250,
+      "store": "커만사",
+      "name": "223 콜롬비아 엔칸토 오렌지 버번 워시드-트로피컬 카프리썬",
+      "price": 58000,
+      "origin": "콜롬비아",
+      "region": "중남미",
+      "process": "워시드",
+      "notes": "",
+      "url": "https://comansa.kr/goods/goods_view.php?goodsNo=1000003051",
       "is_new": false,
       "is_decaf": false,
       "is_special": true,
@@ -18466,21 +18436,6 @@
       "is_soldout": false
     },
     {
-      "id": 68,
-      "store": "커피플랜트",
-      "name": "콜롬비아 엘 디비소 자바 내추럴 2026",
-      "price": 47000,
-      "origin": "콜롬비아",
-      "region": "중남미",
-      "process": "내추럴",
-      "notes": "",
-      "url": "https://coffeeplant.co.kr/44/?idx=1001",
-      "is_new": true,
-      "is_decaf": false,
-      "is_special": false,
-      "is_soldout": false
-    },
-    {
       "id": 292,
       "store": "코빈즈커피",
       "name": "26 케냐 AB FAQ 워시드",
@@ -20116,7 +20071,7 @@
       "is_soldout": false
     },
     {
-      "id": 987,
+      "id": 986,
       "store": "코빈즈커피",
       "name": "26 콜롬비아 로스 파티오스 피치 코퍼먼티드",
       "price": 36800,
@@ -20134,7 +20089,7 @@
       "id": 801,
       "store": "팔콘커피",
       "name": "Banko Taratu Washing Station, EDN, Ethiopia |  Washed FSK-0085",
-      "price": 27150,
+      "price": 132820,
       "origin": "에티오피아",
       "region": "아프리카",
       "process": "워시드",
@@ -20142,7 +20097,7 @@
       "url": "https://korea.falcon-micro.com/products/banko-taratu-washing-station-edn-ethiopia-washed-fsk-0085",
       "is_new": false,
       "is_decaf": false,
-      "is_special": false,
+      "is_special": true,
       "is_soldout": false
     },
     {
@@ -20866,7 +20821,7 @@
       "is_soldout": false
     },
     {
-      "id": 988,
+      "id": 987,
       "store": "팔콘커피",
       "name": "Gititu AB, Gititu AB, Kenya |  Washed FSK-0092",
       "price": 23540,
@@ -20881,7 +20836,7 @@
       "is_soldout": false
     },
     {
-      "id": 989,
+      "id": 988,
       "store": "팔콘커피",
       "name": "Tegu AB, Tegu AB, Kenya |  Washed FSK-0089",
       "price": 24180,

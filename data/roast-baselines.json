@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-03",
+ "generated": "2026-11-10",
  "method": "P5·중앙값·P95. 5초 리샘플·RoR 30초 창. 드럼 건조=150°C 도달, 발달=200°C 도달~배출. S7X 터닝포인트는 내부 온도 기준. scripts/roast_baselines.py 가 매주 재계산.",
  "sources": {
   "firescope_seed": 50919,

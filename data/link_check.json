@@ -1,51 +1,51 @@
 {
-  "checked_at": "2026-11-14T01:21:27Z",
+  "checked_at": "2026-11-15T00:44:26Z",
   "total": 1396,
   "removed": [],
   "held_stores": [],
   "timing": {
-    "elapsed_sec": 557.4,
+    "elapsed_sec": 552.3,
     "requests": 1211,
     "skipped_unknown": 185,
     "slowest_domains": [
       {
         "domain": "comansa.kr",
-        "sec": 557.4,
+        "sec": 552.3,
         "count": 362
       },
       {
         "domain": "www.gsc.coffee",
-        "sec": 220.1,
+        "sec": 218.1,
         "count": 127
       },
       {
         "domain": "www.micoffee.co.kr",
-        "sec": 166.5,
+        "sec": 162.9,
         "count": 103
       },
       {
         "domain": "momos.co.kr",
-        "sec": 133.1,
+        "sec": 133.5,
         "count": 103
       },
       {
         "domain": "www.blessbean.co.kr",
-        "sec": 89.0,
+        "sec": 89.1,
         "count": 119
       },
       {
         "domain": "wbeans.com",
-        "sec": 68.7,
+        "sec": 68.1,
         "count": 42
       },
       {
         "domain": "www.cobeans.com",
-        "sec": 67.7,
+        "sec": 67.5,
         "count": 81
       },
       {
         "domain": "coffeeplant.co.kr",
-        "sec": 58.9,
+        "sec": 60.0,
         "count": 46
       }
     ]
